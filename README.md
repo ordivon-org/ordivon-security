@@ -21,7 +21,7 @@ It composes the broader Ordivon stack:
 
 ## Current state
 
-The repository contains two executable boundaries:
+The repository contains three executable boundaries:
 
 1. **Campaign Manifest v0** validates admission identity, exact cross-project
    references, independent capability and consequence envelopes, actors,
@@ -30,10 +30,18 @@ The repository contains two executable boundaries:
    component bindings, fixed prepare/start/freeze/reset/destroy coordination,
    unknown-result reconciliation, residual-state classification, reconstruction
    identity checks, and sealed evidence-bundle replay.
+3. **Live component composition v0** consumes component-owned Link and Edge
+   control surfaces while Ordivon Runtime holds the real loopback fixture. It
+   executes a real local-unshare Edge body and closes a complete infrastructure
+   Campaign with clean residual accounting and independent bundle verification.
 
 Lifecycle v0 is not a workflow engine and does not copy Link, Edge, Runtime,
 Host, or Game state. Each component retains its native identity and journal;
 Security binds only immutable identity and evidence roots.
+
+The live composition does not attach the Edge body to the Link data plane. That
+larger network-attachment boundary remains an explicit design problem rather
+than a hidden claim.
 
 No Red/Blue Agent, exploit, public target, or executable attack implementation
 exists in this repository.
@@ -44,6 +52,7 @@ Start with:
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/campaign-contract-v0.md`](docs/campaign-contract-v0.md)
 - [`docs/campaign-lifecycle-v0.md`](docs/campaign-lifecycle-v0.md)
+- [`docs/live-composition-v0.md`](docs/live-composition-v0.md)
 - [`docs/capability-gaps.md`](docs/capability-gaps.md)
 - [`docs/research-boundary.md`](docs/research-boundary.md)
 - [`schemas/campaign-manifest.schema.json`](schemas/campaign-manifest.schema.json)
