@@ -1,18 +1,29 @@
 # Capability gaps
 
-## P0 — required for the first valid experiment
+## P0 — first valid experiment
 
-1. Campaign Manifest and stable Campaign identity.
-2. Capability Envelope and Consequence Envelope as separate typed objects.
-3. Range authority registry binding every target to an owned or authorized world.
-4. Red, Blue, neutral, service, observer, and judge actor contracts.
-5. Maximum-elicitation profile covering model, Host, tools, memory, time, compute, and collaboration.
-6. Independent judge and append-only event root.
-7. Out-of-band freeze, kill, export, reset, and destruction operations.
-8. Deterministic baseline reconstruction and residual-state accounting.
-9. Replay bundle across Host, Runtime, Link, Edge, and Game identities.
-10. Outcome taxonomy including success, partial progress, defense, escape, observer loss, invalid run, and inconclusive evidence.
-11. At least one adaptive Red/Blue scenario rather than a fixed-answer target.
+| Capability | Current state |
+|---|---|
+| Campaign Manifest and stable Campaign identity | implemented |
+| Capability and Consequence Envelopes as separate typed objects | implemented |
+| Authority binding for owned or explicitly authorized worlds | contract implemented; concrete range registry adapter pending |
+| Red, Blue, neutral, service, observer, judge, and lifecycle actor contracts | implemented |
+| Model, Host, Tool, memory, time, compute, and collaboration capability profile | implemented |
+| Independent append-only lifecycle event root | implemented |
+| Out-of-band freeze, export, reset, destruction, and unknown-result reconciliation | coordinator and conformance implemented; concrete component ports pending |
+| Deterministic reconstruction comparison and residual-state accounting | implemented at binding and coordinator boundary |
+| Replay bundle across Host, Runtime, Link, Edge, and Game identities | sealed bundle and component binding contract implemented; live multi-component bundle pending |
+| Outcome taxonomy including observer loss and invalid evidence | implemented |
+| At least one adaptive Red/Blue scenario | pending |
+
+The remaining P0 blocker is no longer another Security control-plane abstraction.
+It is one real disconnected composition using component-owned Link, Edge,
+Runtime, Host, and optional Game adapters. Those adapters must expose their
+native identities and receipts without copying their journals into Security.
+
+A stable Edge local-node JSON command surface does not currently exist. Security
+deliberately does not invent a shadow Edge protocol; the concrete adapter should
+be added by, or directly alongside, the Edge-owned lifecycle implementation.
 
 ## P1 — full-spectrum research
 
