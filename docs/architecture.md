@@ -52,6 +52,24 @@ Security does not copy component-native journals. A `ComponentBinding` joins the
 Security Campaign and World IDs to one native object identity, revision, root
 digest, and bounded metadata.
 
+## Module boundary
+
+| Classification | Modules | Phase 0 role |
+|---|---|---|
+| Security core contract | `campaign.py` | Campaign, Actor, Authority, Capability and Consequence Envelopes, and Outcome admission semantics |
+| Authority ledger and replay | `ledger.py` | append-only Security lifecycle truth and deterministic projection |
+| Evidence and bundle | `bundle.py` | bounded export, integrity verification, and replay material |
+| Component-neutral coordinator and binding | `bindings.py`, `coordinator.py` | immutable native identity bindings and fixed lifecycle ordering |
+| Reference acceptance harness | `process_ports.py`, `live_composition.py` | P0-C Link/Edge/Runtime composition only |
+
+Only the first four rows are reusable Security boundaries.
+`process_ports.py` and `live_composition.py` are acceptance-only: they are not
+the Campaign engine, a workflow DSL, Host, Runtime, or a general process
+manager. Native process, container, Node, and network authority stays with
+Runtime, Edge, and Link. See
+[`module-boundaries.md`](module-boundaries.md) for the complete authority and
+Phase 0 disposition.
+
 ## Lifecycle boundary
 
 Campaign lifecycle v0 supports only:
@@ -85,14 +103,20 @@ There are two distinct identity checks:
 
 ## Current executable slice
 
-The implemented slice includes Campaign admission, lifecycle authority,
-component bindings, fixed coordination, response-loss reconciliation, observer
-loss, residual reports, reconstruction comparison, evidence export, replay,
-and infrastructure outcome classification.
+The reusable implemented slice includes Campaign admission, lifecycle
+authority, component bindings, fixed coordination, response-loss
+reconciliation, observer loss, residual reports, reconstruction comparison,
+evidence export, replay, and infrastructure outcome classification.
 
-Concrete Link, Edge, Runtime, Host, and Game adapters remain component-owned.
-Security deliberately does not introduce a shadow network controller, Node
-runtime, Job registry, Host journal, or Game database.
+Production Link, Edge, Runtime, Host, and Game control surfaces remain
+component-owned. Security deliberately does not introduce a shadow network
+controller, Node runtime, Job registry, Host journal, or Game database. The
+P0-C reference acceptance harness wraps real component-owned Link and Edge
+JSON control surfaces and holds one Link fixture process under the declared
+Runtime Workspace; that wrapper does not become a production adapter or a new
+component authority.
 
-The first future adversarial slice may add evaluated Red and Blue actors only
-after a real disconnected component composition proves the lifecycle boundary.
+The remaining Phase 0 order is Persistent Body plus Attachment, one evaluated
+Agent, a fixed/deterministic Campaign, passive/rule-based Blue, and finally
+adaptive Red/Blue. These are evidence gates; the final adaptive Red/Blue target
+is not reduced by the intermediate slices.
