@@ -6,24 +6,30 @@
 |---|---|
 | Campaign Manifest and stable Campaign identity | implemented |
 | Capability and Consequence Envelopes as separate typed objects | implemented |
-| Authority binding for owned or explicitly authorized worlds | contract implemented; concrete range registry adapter pending |
+| Authority binding for owned or explicitly authorized worlds | implemented for explicit local manifests; shared range registry pending |
 | Red, Blue, neutral, service, observer, judge, and lifecycle actor contracts | implemented |
 | Model, Host, Tool, memory, time, compute, and collaboration capability profile | implemented |
 | Independent append-only lifecycle event root | implemented |
-| Out-of-band freeze, export, reset, destruction, and unknown-result reconciliation | coordinator and conformance implemented; concrete component ports pending |
-| Deterministic reconstruction comparison and residual-state accounting | implemented at binding and coordinator boundary |
-| Replay bundle across Host, Runtime, Link, Edge, and Game identities | sealed bundle and component binding contract implemented; live multi-component bundle pending |
+| Out-of-band freeze, export, reset, destruction, and unknown-result reconciliation | implemented in Security plus component-owned Link and Edge ports |
+| Deterministic reconstruction comparison and residual-state accounting | implemented and exercised against real Link and Edge bodies |
+| Replay bundle across component-native identities | live Link, Edge, and Runtime composition implemented; Host and Game consumers pending |
 | Outcome taxonomy including observer loss and invalid evidence | implemented |
+| At least one infrastructure-only live Campaign | implemented |
+| Persistent Edge-to-Link network attachment | pending; intentionally deferred to P0-D design review |
 | At least one adaptive Red/Blue scenario | pending |
 
-The remaining P0 blocker is no longer another Security control-plane abstraction.
-It is one real disconnected composition using component-owned Link, Edge,
-Runtime, Host, and optional Game adapters. Those adapters must expose their
-native identities and receipts without copying their journals into Security.
+The control-plane blocker has been removed. A live infrastructure-only Campaign
+now creates a deterministic Link World, runs its loopback fixture under an
+Ordivon Runtime Workspace Job, executes a real Edge local-unshare body, and
+closes prepare, start, freeze, reset, destroy, reconstruction, residual, replay,
+and final evidence-bundle verification.
 
-A stable Edge local-node JSON command surface does not currently exist. Security
-deliberately does not invent a shadow Edge protocol; the concrete adapter should
-be added by, or directly alongside, the Edge-owned lifecycle implementation.
+This proves lifecycle and evidence composition. It does **not** prove that the
+Edge body is attached to the Link Network World. The current Edge body has an
+empty ephemeral network namespace, while Link's loopback fixture remains a
+separate Runtime-held process. Persistent network attachment, veth topology,
+route/DNS application, and packet-level impairment are the next large design
+boundary and must be reviewed before implementation.
 
 ## P1 — full-spectrum research
 

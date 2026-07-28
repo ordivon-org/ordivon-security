@@ -12,8 +12,8 @@ from .ledger import CampaignLedger, CampaignProjection
 
 FIXED_ORDERS: dict[str, tuple[str, ...]] = {
     "prepare": ("link", "edge", "runtime", "game", "host"),
-    "start": ("link", "edge", "runtime", "game", "host"),
-    "freeze": ("edge", "link", "runtime", "game", "host"),
+    "start": ("link", "runtime", "edge", "game", "host"),
+    "freeze": ("edge", "runtime", "link", "game", "host"),
     "reset": ("runtime", "edge", "link", "game", "host"),
     "destroy": ("runtime", "edge", "link", "game", "host"),
     "reconstruct": ("link", "edge", "game", "runtime", "host"),
