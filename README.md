@@ -39,6 +39,14 @@ Lifecycle v0 is not a workflow engine and does not copy Link, Edge, Runtime,
 Host, or Game state. Each component retains its native identity and journal;
 Security binds only immutable identity and evidence roots.
 
+The reusable Phase 0 boundary is deliberately split into the Security core
+contract (`campaign.py`), authority ledger and replay (`ledger.py`), evidence
+and bundle handling (`bundle.py`), and component-neutral binding and fixed
+coordination (`bindings.py` and `coordinator.py`). `process_ports.py` and
+`live_composition.py` are a reference acceptance harness for P0-C only. They
+are not the Campaign engine, a workflow DSL, Host, Runtime, or a general
+process-management facility.
+
 The live composition does not attach the Edge body to the Link data plane. That
 larger network-attachment boundary remains an explicit design problem rather
 than a hidden claim.
@@ -52,6 +60,7 @@ Start with:
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/campaign-contract-v0.md`](docs/campaign-contract-v0.md)
 - [`docs/campaign-lifecycle-v0.md`](docs/campaign-lifecycle-v0.md)
+- [`docs/module-boundaries.md`](docs/module-boundaries.md)
 - [`docs/live-composition-v0.md`](docs/live-composition-v0.md)
 - [`docs/capability-gaps.md`](docs/capability-gaps.md)
 - [`docs/research-boundary.md`](docs/research-boundary.md)
