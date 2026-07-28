@@ -1,0 +1,6 @@
+artifacts/
+.env
+*.pcap
+*.pcapng
+*.key
+*.pem
