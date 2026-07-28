@@ -13,6 +13,13 @@ Security Campaign Ledger
   └─ Runtime Workspace  → live Link loopback fixture process
 ```
 
+`ordivon_security_contracts/process_ports.py` and
+`ordivon_security_contracts/live_composition.py` together form the reference
+P0-C acceptance harness. They are not the Campaign engine, a workflow DSL,
+Host, Runtime, or a general process-management library. Their child-process
+handling exists only to drive this acceptance composition; production process,
+Node, container, and network lifecycle remain owned by Runtime, Edge, and Link.
+
 ## Component-owned surfaces
 
 Security consumes, but does not reimplement:
@@ -24,6 +31,9 @@ Security consumes, but does not reimplement:
 The Edge surface is deliberately long-lived because lease tokens are
 non-persistent and are invalidated when its management process restarts. A
 one-shot CLI would either lose the lease boundary or persist bearer authority.
+`EdgeJsonLinePort` is the real cross-language JSON adapter used by this
+acceptance harness, but it is not a Security-owned Edge protocol or a general
+production adapter.
 
 ## Live lifecycle
 
@@ -51,9 +61,12 @@ Edge → Runtime → Link. This ensures future network-attached bodies cannot be
 before their network fixture exists and cannot continue after the Runtime-held
 fixture is withdrawn.
 
-## Proven properties
+## P0-C evidence scope
 
-The live acceptance proves:
+For a completed acceptance run, the exact Campaign, Security World, Link World,
+Edge Node, Runtime Workspace, source revisions, ledger head, and bundle digest
+are recorded in the private output and sealed bundle. Those identified
+artifacts support the following P0-C properties:
 
 - one Security Campaign and Security World bind three native component identities;
 - the Link World uses its real manifest identity and observer chain;
@@ -67,6 +80,11 @@ The live acceptance proves:
   explicitly retained;
 - the final Security outcome is derived only after clean residual accounting;
 - the final evidence bundle independently replays the complete ledger.
+
+This document alone does not assert that an unidentified run succeeded. Attack,
+defense, escape, and containment claims require the exact Campaign and
+environment identity plus authoritative evidence; P0-C executes no evaluated
+Agent and makes none of those claims.
 
 ## Explicit non-claims
 

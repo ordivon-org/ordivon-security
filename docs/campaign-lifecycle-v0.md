@@ -132,9 +132,39 @@ contract. The Security repository does not implement a shadow Link controller,
 Edge Node runtime, Runtime Job system, Host journal, or Game replay database.
 
 The current repository provides the authority, coordination, and conformance
-boundary. A real Edge cross-language command adapter was deliberately not added:
-Edge currently exposes a TypeScript local adapter rather than a stable JSON CLI,
-and inventing an additional command protocol here would duplicate ownership.
+boundary. The P0-C acceptance harness now includes a real cross-language
+`EdgeJsonLinePort` that consumes the component-owned
+`ordivon_edge_node_control.ts` long-lived JSONL surface. This corrects the
+earlier assumption that no real Edge JSON adapter was available. The adapter
+remains acceptance-only: it neither defines a new Edge protocol nor transfers
+Edge Node or process authority into Security.
+
+## Receipt, attestation, and Host binding terminology
+
+Phase 0 freezes only the minimum cross-component meaning of these terms, not a
+JSON shape, public Protocol, or signature scheme. A **Component Receipt**
+semantically carries:
+
+- the issuing component identity;
+- the exact Security operation identity and operation kind;
+- the component-native result or disposition;
+- the native subject identity or the binding through which it is resolved;
+- an integrity digest and native evidence or journal reference.
+
+The surrounding Security ledger may supply Campaign, World, actor, and recorded
+time context; a native receipt need not duplicate that context. A
+**Component Attestation** is an identified component or authority statement
+over an exact receipt, binding, or evidence digest. Its minimum meaning is the
+attester identity and role, exact subject identity and digest, typed predicate,
+verdict, evidence references, and issuance context. Phase 0 specifies no
+signature format, key lifecycle, or trust infrastructure.
+
+The **Host Binding** direction is Security Campaign plus Security Actor toward
+a Host-owned Agent/Goal/Task identity, revision, and evidence root. Security
+consumes the Host-issued identity snapshot or receipt and records an immutable
+binding; it does not create Host objects, copy Goal/Task/Context state, or mint
+replacement Host identities. These terms are documentation constraints only
+and do not change the current Schema or component protocols.
 
 ## Independent observer loss
 
@@ -266,7 +296,8 @@ The test suite covers:
 The following remain outside lifecycle v0:
 
 - concrete production adapters for every component;
-- a stable Edge local-node JSON CLI;
+- production promotion and ownership of the component-owned Edge JSONL control
+  surface and any production Edge adapter;
 - Runtime MCP adapter wiring in this repository;
 - long-running service deployment;
 - generalized workflow or scheduling;
