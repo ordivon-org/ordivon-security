@@ -2,39 +2,424 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ordivon.com/schemas/security/campaign-manifest-v0.json",
   "title": "Ordivon Security Campaign Manifest v0",
+  "description": "Admission and evidence contract. Cross-field identity and transition invariants are enforced by scripts/validate_campaign.py.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "schema_version",
-    "campaign_id",
-    "world_id",
-    "authority_ref",
-    "capability_envelope",
-    "consequence_envelope",
+    "campaign",
+    "world",
+    "authority",
+    "provenance",
     "actors",
     "objectives",
-    "stop_conditions"
+    "stop_conditions",
+    "capability_envelope",
+    "consequence_envelope",
+    "outcome",
+    "identity"
   ],
   "properties": {
-    "schema_version": {"const": 0},
-    "campaign_id": {"type": "string", "minLength": 1, "maxLength": 128},
-    "world_id": {"type": "string", "minLength": 1, "maxLength": 128},
-    "authority_ref": {"type": "string", "minLength": 1, "maxLength": 256},
-    "capability_envelope": {"type": "object"},
-    "consequence_envelope": {"type": "object"},
+    "schema_version": {"const": "0.1.0"},
+    "campaign": {"$ref": "#/$defs/campaign"},
+    "world": {"$ref": "#/$defs/world"},
+    "authority": {"$ref": "#/$defs/authority"},
+    "provenance": {"$ref": "#/$defs/provenance"},
     "actors": {
       "type": "array",
+      "minItems": 3,
+      "maxItems": 64,
+      "items": {"$ref": "#/$defs/actor"}
+    },
+    "objectives": {
+      "type": "array",
       "minItems": 1,
-      "items": {
+      "maxItems": 256,
+      "items": {"$ref": "#/$defs/objective"}
+    },
+    "stop_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "contains": {
         "type": "object",
-        "required": ["actor_id", "role"],
-        "properties": {
-          "actor_id": {"type": "string", "minLength": 1},
-          "role": {"enum": ["red", "blue", "neutral", "user", "service", "observer", "judge"]}
+        "required": ["kind"],
+        "properties": {"kind": {"const": "authority_action"}}
+      },
+      "items": {"$ref": "#/$defs/stopCondition"}
+    },
+    "capability_envelope": {"$ref": "#/$defs/capabilityEnvelope"},
+    "consequence_envelope": {"$ref": "#/$defs/consequenceEnvelope"},
+    "outcome": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/outcome"}
+      ]
+    },
+    "identity": {"$ref": "#/$defs/manifestIdentity"}
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^urn:ordivon:[a-z][a-z0-9-]*:[a-z][a-z0-9._-]*(?::[a-z0-9][a-z0-9._-]*)+$",
+      "maxLength": 240
+    },
+    "revision": {"type": "integer", "minimum": 1, "maximum": 9223372036854775807},
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "stringSet": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 256}
+    },
+    "nonEmptyStringSet": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 256}
+    },
+    "typedRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project", "id", "revision", "digest"],
+      "properties": {
+        "project": {
+          "enum": ["host", "runtime", "link", "edge", "game", "source", "policy", "tool"]
+        },
+        "id": {"$ref": "#/$defs/id"},
+        "revision": {"type": "string", "minLength": 1, "maxLength": 128},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "campaign": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision", "revision_id", "name", "state"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "revision": {"$ref": "#/$defs/revision"},
+        "revision_id": {"$ref": "#/$defs/id"},
+        "name": {"type": "string", "minLength": 1, "maxLength": 160},
+        "state": {"enum": ["admitted", "completed"]}
+      }
+    },
+    "world": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision", "revision_id", "kind", "ownership", "link_ref", "edge_ref", "game_ref"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "revision": {"$ref": "#/$defs/revision"},
+        "revision_id": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["owned_range", "authorized_fixture", "emulator"]},
+        "ownership": {"enum": ["owned", "explicitly_authorized"]},
+        "link_ref": {"$ref": "#/$defs/typedRef"},
+        "edge_ref": {"$ref": "#/$defs/typedRef"},
+        "game_ref": {"$ref": "#/$defs/typedRef"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_id",
+        "authority_id",
+        "campaign_id",
+        "campaign_revision",
+        "world_id",
+        "world_revision_id",
+        "admitted_at",
+        "admitted_by_actor_id",
+        "lifecycle_actor_id",
+        "judge_actor_id",
+        "observer_actor_ids",
+        "capability_envelope_ref",
+        "consequence_envelope_ref"
+      ],
+      "properties": {
+        "record_id": {"$ref": "#/$defs/id"},
+        "authority_id": {"$ref": "#/$defs/id"},
+        "campaign_id": {"$ref": "#/$defs/id"},
+        "campaign_revision": {"$ref": "#/$defs/revision"},
+        "world_id": {"$ref": "#/$defs/id"},
+        "world_revision_id": {"$ref": "#/$defs/id"},
+        "admitted_at": {"$ref": "#/$defs/timestamp"},
+        "admitted_by_actor_id": {"$ref": "#/$defs/id"},
+        "lifecycle_actor_id": {"$ref": "#/$defs/id"},
+        "judge_actor_id": {"$ref": "#/$defs/id"},
+        "observer_actor_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "capability_envelope_ref": {"$ref": "#/$defs/envelopeRef"},
+        "consequence_envelope_ref": {"$ref": "#/$defs/envelopeRef"}
+      }
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "role", "control_plane", "evaluated"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "role": {
+          "enum": ["red", "blue", "neutral", "user", "service", "observer", "judge", "lifecycle_authority"]
+        },
+        "control_plane": {"enum": ["experiment", "observation", "management"]},
+        "evaluated": {"type": "boolean"}
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "actor_id", "description", "success_criteria", "evidence_refs"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "actor_id": {"$ref": "#/$defs/id"},
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "success_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/nonEmptyString"}
+        },
+        "evidence_refs": {"$ref": "#/$defs/stringSet"}
+      }
+    },
+    "stopCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "action", "description"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {
+          "enum": ["objectives_resolved", "deadline", "budget_exhausted", "containment_breach", "observer_loss", "authority_action"]
+        },
+        "action": {"enum": ["stop", "freeze", "destroy"]},
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "limit": {"type": "integer", "minimum": 1, "maximum": 9223372036854775807},
+        "resource": {"type": "string", "minLength": 1, "maxLength": 128}
+      }
+    },
+    "capabilityEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "revision",
+        "digest",
+        "subject_actor_id",
+        "model",
+        "host_ref",
+        "runtime_ref",
+        "tool_catalog_ref",
+        "memory",
+        "compute",
+        "time",
+        "resources",
+        "collaborator_actor_ids"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "revision": {"$ref": "#/$defs/revision"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "subject_actor_id": {"$ref": "#/$defs/id"},
+        "model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "name", "revision", "digest"],
+          "properties": {
+            "provider": {"type": "string", "minLength": 1, "maxLength": 128},
+            "name": {"type": "string", "minLength": 1, "maxLength": 128},
+            "revision": {"type": "string", "minLength": 1, "maxLength": 128},
+            "digest": {"$ref": "#/$defs/digest"}
+          }
+        },
+        "host_ref": {"$ref": "#/$defs/typedRef"},
+        "runtime_ref": {"$ref": "#/$defs/typedRef"},
+        "tool_catalog_ref": {"$ref": "#/$defs/typedRef"},
+        "memory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["persistent", "max_bytes"],
+          "properties": {
+            "persistent": {"type": "boolean"},
+            "max_bytes": {"type": "integer", "minimum": 0, "maximum": 9223372036854775807}
+          }
+        },
+        "compute": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cpu_millis", "memory_bytes"],
+          "properties": {
+            "cpu_millis": {"type": "integer", "minimum": 0, "maximum": 9223372036854775807},
+            "memory_bytes": {"type": "integer", "minimum": 0, "maximum": 9223372036854775807}
+          }
+        },
+        "time": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wall_seconds", "step_limit"],
+          "properties": {
+            "wall_seconds": {"type": "integer", "minimum": 1, "maximum": 9223372036854775807},
+            "step_limit": {"type": "integer", "minimum": 1, "maximum": 9223372036854775807}
+          }
+        },
+        "resources": {
+          "type": "object",
+          "maxProperties": 64,
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          }
+        },
+        "collaborator_actor_ids": {
+          "type": "array",
+          "maxItems": 63,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
         }
       }
     },
-    "objectives": {"type": "array", "minItems": 1},
-    "stop_conditions": {"type": "array", "minItems": 1}
+    "consequenceEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision", "digest", "world_revision_id", "targets", "networks", "identities", "data", "resources", "external_boundaries"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "revision": {"$ref": "#/$defs/revision"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "world_revision_id": {"$ref": "#/$defs/id"},
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "authority_id"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "authority_id": {"$ref": "#/$defs/id"}
+            }
+          }
+        },
+        "networks": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "mode", "allowed_destinations"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "mode": {"enum": ["disconnected", "emulated", "explicit_allowlist"]},
+              "allowed_destinations": {"$ref": "#/$defs/stringSet"}
+            }
+          }
+        },
+        "identities": {"$ref": "#/$defs/stringSet"},
+        "data": {"$ref": "#/$defs/stringSet"},
+        "resources": {"$ref": "#/$defs/stringSet"},
+        "external_boundaries": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "rule", "effect"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "rule": {"$ref": "#/$defs/nonEmptyString"},
+              "effect": {"enum": ["deny", "freeze", "stop"]}
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_ref", "policy_refs"],
+      "properties": {
+        "source_ref": {"$ref": "#/$defs/typedRef"},
+        "policy_refs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/typedRef"}
+        }
+      }
+    },
+    "envelopeRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision", "digest"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "revision": {"$ref": "#/$defs/revision"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "objectiveAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective_id", "status", "evidence_refs"],
+      "properties": {
+        "objective_id": {"$ref": "#/$defs/id"},
+        "status": {"enum": ["achieved", "partially_achieved", "prevented", "not_achieved", "unknown"]},
+        "evidence_refs": {"$ref": "#/$defs/stringSet"}
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "recorded_by", "evidence_quality", "objective_assessments", "evidence_refs", "containment_breach"],
+      "properties": {
+        "classification": {
+          "enum": ["success", "partial_progress", "defense", "escape", "observer_loss", "invalid_run", "inconclusive_evidence"]
+        },
+        "recorded_by": {"$ref": "#/$defs/id"},
+        "evidence_quality": {"enum": ["conclusive", "inconclusive", "invalid"]},
+        "objective_assessments": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {"$ref": "#/$defs/objectiveAssessment"}
+        },
+        "evidence_refs": {"$ref": "#/$defs/nonEmptyStringSet"},
+        "containment_breach": {"type": "boolean"},
+        "reason_codes": {"$ref": "#/$defs/stringSet"}
+      }
+    },
+    "manifestIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonicalization", "manifest_digest"],
+      "properties": {
+        "canonicalization": {"const": "ordivon-canonical-json-v0"},
+        "manifest_digest": {"$ref": "#/$defs/digest"}
+      }
+    }
   }
 }
