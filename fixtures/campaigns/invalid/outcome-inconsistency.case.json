@@ -1,0 +1,27 @@
+{
+  "fixture_version": "ordivon-invalid-campaign-case-v0",
+  "base": "../valid/minimal-owned-range.json",
+  "mutations": [
+    {"op": "replace", "path": "/campaign/state", "value": "completed"},
+    {
+      "op": "replace",
+      "path": "/outcome",
+      "value": {
+        "classification": "success",
+        "recorded_by": "urn:ordivon:security:actor:judge",
+        "evidence_quality": "conclusive",
+        "objective_assessments": [
+          {
+            "objective_id": "urn:ordivon:security:objective:observe-owned-fixture",
+            "status": "prevented",
+            "evidence_refs": ["evidence://judge/receipt"]
+          }
+        ],
+        "evidence_refs": ["evidence://judge/receipt"],
+        "containment_breach": false,
+        "reason_codes": []
+      }
+    }
+  ],
+  "expected_error": "success requires every objective to be achieved"
+}

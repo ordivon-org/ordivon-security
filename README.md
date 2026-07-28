@@ -21,7 +21,11 @@ It composes the broader Ordivon stack:
 
 ## Current state
 
-This repository currently defines the research contract only. No executable Cyber Range or attack implementation exists yet.
+This repository now includes an executable Campaign Manifest v0 contract. It
+validates admission identity, exact cross-project references, independent
+capability and consequence envelopes, actors, authority, objectives, stop
+conditions, and outcomes. No executable Cyber Range or attack implementation
+exists.
 
 Start with:
 
@@ -29,4 +33,13 @@ Start with:
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/capability-gaps.md`](docs/capability-gaps.md)
 - [`docs/research-boundary.md`](docs/research-boundary.md)
+- [`docs/campaign-contract-v0.md`](docs/campaign-contract-v0.md)
 - [`schemas/campaign-manifest.schema.json`](schemas/campaign-manifest.schema.json)
+
+Validate the fixture and run all tests with the standard library:
+
+```bash
+python3 scripts/validate_campaign.py \
+  fixtures/campaigns/valid/minimal-owned-range.json
+python3 -m unittest discover -v
+```

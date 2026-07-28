@@ -1,0 +1,12 @@
+{
+  "fixture_version": "ordivon-invalid-campaign-case-v0",
+  "base": "../valid/minimal-owned-range.json",
+  "mutations": [
+    {
+      "op": "replace",
+      "path": "/authority/consequence_envelope_ref/revision",
+      "value": 2
+    }
+  ],
+  "expected_error": "$.authority.consequence_envelope_ref.revision"
+}
