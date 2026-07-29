@@ -103,12 +103,18 @@ The repository already contains an executable experimental-support substrate:
    cross-project bindings;
 2. an append-only lifecycle ledger, reconciliation, residual classification,
    evidence export, and replay;
-3. a historical live infrastructure-only Link/Edge/Runtime composition whose implementation carriers now live inside Ordivon World.
+3. a historical live infrastructure-only Link/Edge/Runtime composition whose implementation carriers now live inside Ordivon World;
+4. a separate experimental adversarial layer with exact Actor/World/Judge
+   identity, actor-specific observations, authoritative World truth, deterministic
+   traces, multidimensional outcomes, model-provider adapters, a local
+   dynamic-opponent fixture, and a pinned CAGE Challenge 4 adapter.
 
-This work proves that an owned experimental world can be admitted, observed,
-closed, reconstructed, and verified. It does **not** prove adversarial agency,
-strategic planning, opponent modelling, deception, dynamic Red/Blue behavior,
-attack capability, defense capability, or coevolution.
+The frozen Campaign substrate proves that an owned experimental world can be
+admitted, observed, closed, reconstructed, and verified. The new experiment
+layer proves that scripted, organizational, model-backed, and mature external
+World comparisons can be run and diagnosed. Neither result proves general
+adversarial autonomy, transferable Campaign synthesis, mature offense/defense,
+or coevolution.
 
 The current contracts are therefore retained as a **frozen research substrate**,
 not treated as the final architecture or the main roadmap. New lifecycle,
@@ -116,8 +122,29 @@ identity, evidence, or coordination abstractions require a concrete adversarial
 experiment that cannot be expressed by mature existing systems or the current
 minimal substrate.
 
-No Red/Blue Agent, exploit implementation, public target, or executable attack
-system currently exists in this repository.
+The repository now contains bounded simulated Red policies and external CAGE 4
+Red/Blue baselines. It contains no real exploit implementation, public target,
+credential, uncontrolled egress, or executable attack system against external
+infrastructure.
+
+## Experimental adversarial layer
+
+The executable research layer is documented in
+[`docs/experiment-layer.md`](docs/experiment-layer.md). Round 1 executed 84
+Trials across a local dynamic-opponent fixture, pinned CAGE 4 baselines, and four
+model-backed diagnostic runs. Results and claim boundaries are in
+[`docs/round1-experimental-results.md`](docs/round1-experimental-results.md),
+with a sanitized digest-bound summary under
+[`evidence/experiments/round1-20260730.json`](evidence/experiments/round1-20260730.json).
+
+Deterministic local acceptance requires only the standard library:
+
+```bash
+./scripts/run_round1_acceptance.sh
+```
+
+CAGE 4 and model-backed Trials remain optional, pinned, and outside CI because
+they depend on external source or locally configured providers.
 
 ## Route
 
@@ -143,6 +170,8 @@ See:
 - [`docs/classical-to-agent-adversarial-map.md`](docs/classical-to-agent-adversarial-map.md)
 - [`docs/capability-gaps.md`](docs/capability-gaps.md)
 - [`docs/research-boundary.md`](docs/research-boundary.md)
+- [`docs/experiment-layer.md`](docs/experiment-layer.md)
+- [`docs/round1-experimental-results.md`](docs/round1-experimental-results.md)
 
 ## Existing substrate validation
 
