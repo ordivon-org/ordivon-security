@@ -1,5 +1,7 @@
 # Live component composition v0
 
+
+> **Historical composition and current carrier:** this P0-C acceptance was executed against the then-independent Ordivon Link and Ordivon Edge repositories, and its exact receipts and identities remain historical truth. Their code and Git histories now live in `ordivon-world/modules/network-observation/` and `ordivon-world/providers/cloudflare/`. The compatibility CLI and argument names below remain unchanged; current re-runs should use paths inside `ordivon-world`.
 ## Purpose
 
 This acceptance slice proves that component-owned Link and Edge control planes
@@ -17,23 +19,21 @@ Security Campaign Ledger
 `ordivon_security_contracts/live_composition.py` together form the reference
 P0-C acceptance harness. They are not the Campaign engine, a workflow DSL,
 Host, Runtime, or a general process-management library. Their child-process
-handling exists only to drive this acceptance composition; production process,
-Node, container, and network lifecycle remain owned by Runtime, Edge, and Link.
+handling exists only to drive this acceptance composition; production process lifecycle remains owned by Runtime; the inherited external-body and network-condition fixtures are now carried as modules of Ordivon World.
 
 ## Component-owned surfaces
 
 Security consumes, but does not reimplement:
 
-- `link-world-security`, a one-shot JSON CLI owned by Ordivon Link;
-- `ordivon_edge_node_control.ts`, a long-lived JSONL session owned by Ordivon Edge;
+- `link-world-security`, a one-shot JSON CLI inherited in Ordivon World’s network-observation module;
+- `ordivon_edge_node_control.ts`, a long-lived JSONL session inherited in Ordivon World’s Cloudflare/provider module;
 - the surrounding Ordivon Runtime Workspace Job as the trusted execution substrate.
 
 The Edge surface is deliberately long-lived because lease tokens are
 non-persistent and are invalidated when its management process restarts. A
 one-shot CLI would either lose the lease boundary or persist bearer authority.
 `EdgeJsonLinePort` is the real cross-language JSON adapter used by this
-acceptance harness, but it is not a Security-owned Edge protocol or a general
-production adapter.
+acceptance harness, but it is not a Security-owned World protocol or a general production adapter.
 
 ## Live lifecycle
 
@@ -108,10 +108,10 @@ The runner accepts exact component-owned executable paths and an output root:
 ```bash
 python3 scripts/run_live_component_composition.py \
   --campaign-template fixtures/campaigns/valid/minimal-owned-range.json \
-  --link-manifest-template /path/to/ordivon-link/config/worlds/disconnected-three-service.toml \
+  --link-manifest-template /path/to/ordivon-world/modules/network-observation/config/worlds/disconnected-three-service.toml \
   --link-security-executable /path/to/link-world-security \
   --link-world-executable /path/to/link-world \
-  --edge-cwd /path/to/ordivon-edge \
+  --edge-cwd /path/to/ordivon-world/providers/cloudflare \
   --edge-command=/usr/bin/node \
   --edge-command=--import \
   --edge-command=tsx \

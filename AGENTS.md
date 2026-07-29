@@ -19,7 +19,7 @@
    `StrategicOutcome` as research vocabulary until comparative experiments prove
    that stable contracts are necessary.
 7. Prefer mature simulated environments for early dynamic-opponent experiments.
-   Do not block conceptual progress on custom Link/Edge infrastructure.
+   Do not block conceptual progress on custom World infrastructure.
 8. Preserve actor-specific observations separately from authoritative world
    truth. Preserve negative, failed, deceptive, invalid, inconclusive, and
    evaluator-gaming runs.
@@ -35,9 +35,7 @@
     evidence system, or process wrappers unless a concrete adversarial
     experiment cannot be expressed through current records or mature external
     tooling.
-13. Host owns cognition and continuity; Runtime owns effects and processes; Link
-    owns connectivity; Edge owns bodies; Game owns general world mechanics.
-    Security must not copy their authoritative state.
+13. Host owns cognition and continuity; Runtime owns trusted-local effects and processes; World owns external interaction correlation, conditioned evidence, and provider/communication modules when proved; Game owns general world mechanics. Security must not copy their authoritative state.
 14. Do not build a general workflow language, container/network substrate,
     telemetry stack, signature infrastructure, vulnerability framework, or
     generic benchmark platform here.
