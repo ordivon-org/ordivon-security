@@ -1,24 +1,43 @@
 # Agent instructions
 
-1. Keep capability elicitation and external consequence containment as separate concerns.
-2. Do not claim attack, defense, escape, or containment results without exact Campaign and environment identity.
-3. Do not add real targets, credentials, endpoints, exploit material, or personal network evidence to the repository.
-4. Prefer schemas, fixtures, emulators, and owned range worlds over public-network experiments.
-5. The evaluated Agent must not control the authoritative judge, observer, or lifecycle authority.
-6. Preserve negative, failed, escaped, invalid, and inconclusive runs.
-7. Reuse Ordivon Host, Runtime, Link, Edge, Game, and mature security tools; do not build shadow implementations without evidence.
-8. Keep the Phase 0 module boundary explicit: `campaign.py` is the Security core
-   contract; `ledger.py` is the authority ledger and replay; `bundle.py` is the
-   evidence-bundle boundary; `bindings.py` and `coordinator.py` are
-   component-neutral binding and fixed coordination; `process_ports.py` and
-   `live_composition.py` are reference acceptance harnesses only.
-9. Do not build a general JSON Schema engine, process manager, container or
-   network substrate, telemetry stack, workflow system, or signature
-   infrastructure in this repository. Use mature implementations and the
-   owning Ordivon components.
-10. Retain the current `campaign.py` compatibility validator for Phase 0, but
-    freeze its vocabulary and scope. Any future replacement must first pass the
-    existing valid/invalid fixture and transition conformance suite; do not
-    expand it toward a general JSON Schema implementation.
-11. Do not promote `process_ports.py` or `live_composition.py` into a Campaign
-    engine, workflow DSL, Host, Runtime, or reusable process-management layer.
+1. Treat this repository as an Agent-native strategic adversarial-systems
+   project, not an Ordivon guardrail, compliance, IAM, scanner, SIEM, sandbox,
+   or incident-response project.
+2. Research intelligent opposition: Campaign synthesis, opponent modelling,
+   deception, initiative, resource allocation, organization, adaptation, and
+   coevolution. Do not reduce the project to containment or safety assurance.
+3. Reuse mature classical offense, defense, cyber-range, evaluation, game, and
+   systems mechanisms. Do not create shadow implementations without a measured
+   Agent-native gap.
+4. Keep cyber experiments inside owned or explicitly authorized ranges. Do not
+   add unrelated real targets, credentials, endpoints, exploit material, or
+   personal network evidence to the repository.
+5. Broad autonomy inside a declared range is allowed when required by the
+   research question. Boundary controls should preserve experimental validity,
+   not silently weaken the capability being studied.
+6. Treat `Actor`, `Contest`, `Campaign`, `OpponentModel`, `BeliefState`, and
+   `StrategicOutcome` as research vocabulary until comparative experiments prove
+   that stable contracts are necessary.
+7. Prefer mature simulated environments for early dynamic-opponent experiments.
+   Do not block conceptual progress on custom Link/Edge infrastructure.
+8. Preserve actor-specific observations separately from authoritative world
+   truth. Preserve negative, failed, deceptive, invalid, inconclusive, and
+   evaluator-gaming runs.
+9. Report tactical, operational, strategic, and information outcomes separately.
+   A flag, patch, alert, or isolated successful action is not a strategic result.
+10. Every proposed abstraction must name a simpler baseline and a deletion
+    criterion.
+11. The existing Phase 0 code is a frozen experimental-support substrate:
+    `campaign.py`, `ledger.py`, `bundle.py`, `bindings.py`, and `coordinator.py`
+    remain maintained; `process_ports.py` and `live_composition.py` remain
+    acceptance-only references.
+12. Do not expand the Campaign schema, lifecycle coordinator, identity graph,
+    evidence system, or process wrappers unless a concrete adversarial
+    experiment cannot be expressed through current records or mature external
+    tooling.
+13. Host owns cognition and continuity; Runtime owns effects and processes; Link
+    owns connectivity; Edge owns bodies; Game owns general world mechanics.
+    Security must not copy their authoritative state.
+14. Do not build a general workflow language, container/network substrate,
+    telemetry stack, signature infrastructure, vulnerability framework, or
+    generic benchmark platform here.

@@ -1,122 +1,141 @@
 # Architecture
 
+This document separates the **research architecture** from the repository's
+currently implemented experimental-support substrate.
+
+## Research architecture
+
+```text
+Strategic adversarial plane
+  ├─ conflicting objectives and victory conditions
+  ├─ opponent models and belief states
+  ├─ initiative, tempo, escalation, withdrawal
+  ├─ deception, counter-deception, deterrence, signalling
+  └─ strategic resource and information allocation
+                │
+                ▼
+Operational Campaign plane
+  ├─ Campaign synthesis and revision
+  ├─ intelligence requirements and collection
+  ├─ phases, missions, branches, reserves, and contingencies
+  ├─ adaptation history and counter-adaptation
+  └─ multi-Agent command and organization
+                │
+                ▼
+Tactical Agent plane
+  ├─ reconnaissance, analysis, exploitation, detection
+  ├─ repair, restoration, containment, and response
+  ├─ tool selection and construction
+  └─ action execution and feedback interpretation
+                │
+                ▼
+Mature classical capability plane
+  ATT&CK / D3FEND / Engage · scanners · fuzzers · sandboxes · IAM
+  network controls · EDR/SIEM · forensics · patching · cyber ranges
+                │
+                ▼
+Contested world plane
+  hosts · services · code · identities · networks · data · tools · Agents
+```
+
+Ordivon Security's candidate ownership begins at the Operational Campaign plane
+and becomes strongest at the Strategic Adversarial plane. The Tactical plane is
+shared with Host and domain tools. Classical mechanisms and world execution are
+reused from mature projects and the rest of Ordivon.
+
+## Candidate research objects
+
+The following are hypotheses, not frozen implementation contracts:
+
+| Object | Research purpose |
+|---|---|
+| Actor | represent a goal-bearing participant's knowledge, beliefs, resources, capabilities, and organizational relations |
+| Contest | represent the conflict structure across actors, world, rules, information, resources, and outcomes |
+| Campaign | represent one actor's or coalition's long-horizon organized effort to change the Contest |
+| Opponent model | represent hypotheses about another actor's objectives, beliefs, capabilities, policy, and adaptation |
+| Information position | represent what each actor can observe, infer, hide, signal, or manipulate |
+| Strategic outcome | evaluate objective progress, initiative, resources, information advantage, capability exposure, and future options |
+
+No separate database, protocol, or universal schema should be created merely to
+make this vocabulary look complete. The first requirement is a comparative model
+and experiments showing where existing game, evaluation, cyber-range, and Agent
+frameworks are insufficient.
+
+## Cross-project responsibility
+
+| Responsibility | Natural owner |
+|---|---|
+| cognition, Goal, Task, Context, memory, model/scaffold identity | Host |
+| Effect execution, Workspace, Job, Attempt, process tree, terminal evidence | Runtime |
+| connectivity, path, communication policy, network evidence | Link |
+| external body, provider, Sandbox generation, placement lifecycle | Edge |
+| general World mechanics, simulation clock, deterministic state, replay | Game |
+| adversarial relationship, Campaign research, opponent model, strategic outcome | Security |
+
+Security consumes component-native identities and evidence. It must not create a
+shadow Host, Runtime, network controller, Edge provider, Game engine, scanner,
+or cyber-range implementation.
+
+## Current implemented substrate
+
+The existing code implements:
+
 ```text
 Campaign Manifest
-  ├─ Capability Envelope
-  ├─ Consequence Envelope
-  ├─ Actor contracts
-  ├─ World and target authority
-  ├─ Objectives and stop conditions
-  └─ Evaluation contract
-          │
-          ▼
-Campaign Authority Ledger
-  ├─ fixed lifecycle operations
-  ├─ component-native identity bindings
-  ├─ unknown-result reconciliation
-  └─ residual-state evidence
-          │
-          ▼
-Host + Runtime + Link + Edge + Game
-          │
-          ▼
-Independent Observer and Judge
-          │
-          ▼
-Sealed Evidence Bundle + Replay + Outcome
+  → append-only authority ledger
+  → component-native identity bindings
+  → fixed lifecycle coordination
+  → unknown-result reconciliation
+  → residual-state classification
+  → sealed evidence export and structural replay
 ```
 
-## Planes
+This is useful infrastructure for reproducible experiments. It currently proves:
 
-- **Management plane** creates, freezes, resets, and destroys the range and cannot be controlled by evaluated Agents.
-- **Experiment plane** contains Red, Blue, neutral, service, and user actors.
-- **Observation plane** preserves authoritative network, execution, topology, and judge events.
-- **Evidence export plane** moves bounded evidence out without becoming a command path back into the range.
+- exact admission identity;
+- capability/consequence separation;
+- component binding without state copying;
+- durable lifecycle intent and reconciliation;
+- evidence integrity and closure;
+- one infrastructure-only Link/Edge/Runtime composition.
 
-The lifecycle authority, judge, and observer identities are independent from
-evaluated experiment actors. Observer loss is recorded separately from
-experiment success or failure.
+It does not prove:
 
-## State ownership
+- adaptive offense or defense;
+- Campaign synthesis;
+- opponent modelling;
+- belief revision or deception;
+- initiative or strategic resource allocation;
+- multi-Agent command;
+- coevolution;
+- strategic outcome validity.
 
-| State | Owner |
-|---|---|
-| Campaign admission, phase, lifecycle operation, outcome | Security |
-| Agent Goal, Task, Context, cognition | Host |
-| Workspace, Job, Attempt, process tree, Artifact | Runtime |
-| Network World, mutation, egress evidence | Link |
-| remote/disposable Node and Node lifecycle | Edge |
-| deterministic scenario, World mutation, replay and score | Game |
+## Substrate freeze rule
 
-Security does not copy component-native journals. A `ComponentBinding` joins the
-Security Campaign and World IDs to one native object identity, revision, root
-digest, and bounded metadata.
+The implemented substrate remains maintained and tested, but its vocabulary and
+scope are frozen by default. Expansion requires all of the following:
 
-## Module boundary
+1. a concrete adversarial experiment exposes an unrepresentable fact;
+2. mature external frameworks cannot carry that fact without semantic loss;
+3. the fact crosses component boundaries and cannot live naturally in Host,
+   Runtime, Link, Edge, or Game;
+4. a simpler experiment record or adapter is insufficient;
+5. the new abstraction changes diagnosis, comparison, adaptation, or research
+   validity in a measurable way.
 
-| Classification | Modules | Phase 0 role |
-|---|---|---|
-| Security core contract | `campaign.py` | Campaign, Actor, Authority, Capability and Consequence Envelopes, and Outcome admission semantics |
-| Authority ledger and replay | `ledger.py` | append-only Security lifecycle truth and deterministic projection |
-| Evidence and bundle | `bundle.py` | bounded export, integrity verification, and replay material |
-| Component-neutral coordinator and binding | `bindings.py`, `coordinator.py` | immutable native identity bindings and fixed lifecycle ordering |
-| Reference acceptance harness | `process_ports.py`, `live_composition.py` | P0-C Link/Edge/Runtime composition only |
+## Research and experiment planes
 
-Only the first four rows are reusable Security boundaries.
-`process_ports.py` and `live_composition.py` are acceptance-only: they are not
-the Campaign engine, a workflow DSL, Host, Runtime, or a general process
-manager. Native process, container, Node, and network authority stays with
-Runtime, Edge, and Link. See
-[`module-boundaries.md`](module-boundaries.md) for the complete authority and
-Phase 0 disposition.
+A future experiment may use four operational planes without making them the
+project's conceptual center:
 
-## Lifecycle boundary
+- **world-management plane** — creates and destroys the owned range;
+- **actor plane** — contains evaluated offensive, defensive, neutral, service,
+  user, and observer actors;
+- **observation plane** — preserves world truth and actor-specific observations;
+- **evaluation plane** — computes multiple outcome dimensions and tests evaluator
+  integrity.
 
-Campaign lifecycle v0 supports only:
-
-```text
-prepare → start → freeze → export → reset → destroy → reconstruct → verify
-```
-
-This is a fixed coordinator, not a workflow DSL or scheduler. Every component
-call is preceded by a durable operation intent. Ambiguous responses become
-`unknown` and are reconciled through the original native operation identity;
-missing evidence never authorizes automatic redispatch.
-
-Emergency destruction may proceed from admitted, preparing, ready, running,
-frozen, or invalid state. A final outcome is admitted only after destruction,
-so cleanup and residual inspection remain possible after failure.
-
-## Evidence and replay
-
-The Security ledger is an append-only hash chain. Evidence export stages and
-seals a bounded directory, then atomically renames it into place. Verification
-checks every listed file digest and deterministically rebuilds the Campaign
-projection from the admitted manifest and complete event chain.
-
-There are two distinct identity checks:
-
-1. **structural replay** verifies retained events and evidence roots without
-   re-executing effects;
-2. **reconstruction comparison** recreates a component from declared inputs and
-   requires its native binding digest to equal the admission binding.
-
-## Current executable slice
-
-The reusable implemented slice includes Campaign admission, lifecycle
-authority, component bindings, fixed coordination, response-loss
-reconciliation, observer loss, residual reports, reconstruction comparison,
-evidence export, replay, and infrastructure outcome classification.
-
-Production Link, Edge, Runtime, Host, and Game control surfaces remain
-component-owned. Security deliberately does not introduce a shadow network
-controller, Node runtime, Job registry, Host journal, or Game database. The
-P0-C reference acceptance harness wraps real component-owned Link and Edge
-JSON control surfaces and holds one Link fixture process under the declared
-Runtime Workspace; that wrapper does not become a production adapter or a new
-component authority.
-
-The remaining Phase 0 order is Persistent Body plus Attachment, one evaluated
-Agent, a fixed/deterministic Campaign, passive/rule-based Blue, and finally
-adaptive Red/Blue. These are evidence gates; the final adaptive Red/Blue target
-is not reduced by the intermediate slices.
+The evaluated actors may study and attack one another. They must not receive
+undeclared authority over the external world-management plane. This is a legal
+and experimental-validity boundary, not a reason to weaken internal adversarial
+capability.

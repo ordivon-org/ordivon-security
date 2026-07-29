@@ -1,77 +1,155 @@
-# Capability gaps
+# Research route and capability gaps
 
-## P0 — first valid experiment
+## Reorientation
 
-| Capability | Current state |
+The earlier route treated infrastructure admission, lifecycle closure, evidence,
+and one attached Agent as the path toward adaptive Red/Blue. Those remain useful
+supporting capabilities, but they are no longer the main intellectual sequence.
+
+A persistent body and real network attachment do not by themselves teach us how
+to model intelligent opposition. Strategic adversarial research can and should
+advance on mature simulated and sandboxed substrates while Link and Edge evolve
+for their own justified workloads.
+
+## What is already verified
+
+The repository has verified an experimental-support slice:
+
+- stable Campaign admission and exact cross-project bindings;
+- separate capability and consequence declarations;
+- durable lifecycle intent, ambiguous-result reconciliation, and evidence roots;
+- residual classification, reconstruction checks, and sealed replay bundles;
+- one live infrastructure-only Link/Edge/Runtime composition.
+
+This is evidence of experimental-world composition. It is not evidence of
+attack, defense, strategic planning, adaptive opposition, or adversarial
+intelligence.
+
+## Core missing capabilities
+
+| Capability | Status |
 |---|---|
-| Campaign Manifest and stable Campaign identity | implemented |
-| Capability and Consequence Envelopes as separate typed objects | implemented |
-| Authority binding for owned or explicitly authorized worlds | implemented for explicit local manifests; shared range registry pending |
-| Red, Blue, neutral, service, observer, judge, and lifecycle actor contracts | implemented |
-| Model, Host, Tool, memory, time, compute, and collaboration capability profile | implemented |
-| Independent append-only lifecycle event root | implemented |
-| Out-of-band freeze, export, reset, destruction, and unknown-result reconciliation | implemented in Security plus component-owned Link and Edge ports |
-| Deterministic reconstruction comparison and residual-state accounting | implemented and exercised against real Link and Edge bodies |
-| Replay bundle across component-native identities | live Link, Edge, and Runtime composition implemented; Host and Game consumers pending |
-| Outcome taxonomy including observer loss and invalid evidence | implemented |
-| At least one infrastructure-only live Campaign | implemented |
-| Persistent Edge-to-Link network attachment | pending; intentionally deferred to P0-D design review |
-| One evaluated Agent in the attached world | pending after P0-D |
-| Fixed/deterministic evaluated Campaign | pending after the single-Agent slice |
-| Passive/rule-based Blue | pending after the fixed Campaign |
-| At least one adaptive Red/Blue scenario | pending; final Phase 0 target unchanged |
+| distinguish tactical automation from strategic adversarial agency | unmodelled |
+| represent a Contest with actors, asymmetric information, resources, and victory conditions | research hypothesis only |
+| synthesize and revise a Campaign from strategic objectives | unproven |
+| maintain explicit opponent hypotheses and belief updates | unproven |
+| reason about deception, signalling, counter-deception, and information position | unproven |
+| allocate time, compute, tools, access, secrecy, and Agent resources strategically | unproven |
+| measure initiative, tempo, capability exposure, and future option space | unmodelled |
+| organize multiple offensive or defensive Agents under partial trust | unproven |
+| distinguish coordination from collusion and command failure | unmodelled |
+| adapt against an opponent that adapts in response | unproven |
+| evaluate a judge or monitor that actors may model and manipulate | partial external baselines only |
+| measure transfer across opponents, worlds, tools, and time horizons | unproven |
 
-## P0-C evidence boundary
+## Research phases
 
-The control-plane blocker has been removed. The P0-C acceptance harness can
-create a deterministic Link World, run its loopback fixture under an Ordivon
-Runtime Workspace Job, execute a real Edge local-unshare body, and close
-prepare, start, freeze, reset, destroy, reconstruction, residual, replay, and
-final evidence-bundle verification. Each completed run records its exact
-Campaign and environment identities in private output; this document does not
-claim an unidentified run.
+### R0 — conceptual reset
 
-An identified completed P0-C run proves lifecycle and evidence composition. It
-does **not** prove that the Edge body is attached to the Link Network World. The
-current Edge body has an empty ephemeral network namespace, while Link's
-loopback fixture remains a separate Runtime-held process. Persistent network
-attachment, veth topology, route/DNS application, and packet-level impairment
-are the next large design boundary and must be reviewed before implementation.
+- separate strategic adversarial systems from Agent safety and assurance;
+- classify current lifecycle/evidence code as support substrate;
+- freeze infrastructure expansion without experimental pressure;
+- move foundational modelling questions to Ordivon Computing.
 
-## Remaining Phase 0 order
+### R1 — comparative foundations
 
-The implementation and evidence sequence is:
+Study and compare:
 
-1. **P0-D — Persistent Body + Attachment:** keep an Edge body alive and attach
-   it to the declared Link World with independently observable lifecycle and
-   residual evidence.
-2. **single evaluated Agent:** add exactly one Host-owned evaluated Agent only
-   after the attached body boundary is established.
-3. **fixed/deterministic Campaign:** exercise that Agent against a fixed
-   scenario with deterministic setup, judging, teardown, and replay.
-4. **passive/rule-based Blue:** add a non-adaptive or rule-driven defensive
-   actor so observation and scoring mature before co-adaptation.
-5. **adaptive Red/Blue:** run the required adaptive adversarial Campaign with
-   authoritative evidence.
+- classical attack lifecycles and threat-informed defense;
+- cyber deception and adversary engagement;
+- automated cyber reasoning systems;
+- autonomous cyber-operation environments;
+- AI control and sabotage evaluation;
+- partially observable stochastic games and extensive-form games;
+- opponent modelling, multi-Agent learning, social generalization, and
+  organization;
+- command, intelligence cycles, tempo, resource allocation, and strategic
+  assessment.
 
-These stages narrow implementation risk; they do not lower the final Phase 0
-goal. A fixed target, a single evaluated Agent, or passive/rule-based Blue does
-not satisfy the final adaptive Red/Blue target.
+Deliverable: a falsifiable difference map identifying what is classical,
+automated, Agent-amplified, or genuinely Agent-native.
 
-## P1 — full-spectrum research
+### R2 — minimal dynamic-opponent experiments
 
-- dynamic multi-stage Web, service, operating-system, identity, and network campaigns;
-- adaptive defense, deception, repair, and restoration;
-- prompt, context, memory, Tool, Artifact, identity, delegation, evaluation, and supply-chain attacks;
-- multi-Agent teams and communication or ownership failures;
-- range-local Tool generation and controlled persistence;
-- long-horizon campaigns and model or Host replacement;
-- causal comparison of model, Harness, Tool, budget, and topology contributions.
+Use mature external environments. Compare at least:
 
-## P2 — frontier research
+- scripted or finite-state actors;
+- learned policies;
+- LLM Agent actors with tool use;
+- mixed teams.
 
-- attack-defense coevolution;
-- evidence-governed Skill or policy learning;
-- organizational Agent structures and resource economies;
-- days-long campaigns and cross-range transfer;
-- verified post-training and evaluation datasets.
+The first experiments should measure adaptation to an unfamiliar opponent, not
+merely completion of a fixed attack path.
+
+### R3 — opponent model and information-state experiments
+
+Test whether explicit opponent models, belief histories, deception hypotheses,
+and information-position records improve performance or explanation compared
+with ordinary transcript prompting.
+
+Delete the abstraction if it adds no measurable value.
+
+### R4 — Campaign synthesis and strategic outcome
+
+Give actors strategic objectives, limited resources, changing mission value, and
+multiple possible paths. Measure tactical success separately from operational
+progress and strategic advantage.
+
+### R5 — multi-Agent adversarial organization
+
+Compare centralized command, hierarchical delegation, specialist teams,
+decentralized coordination, and partially trusted organizations. Include
+communication limits, compromised members, conflicting local incentives, and
+possible collusion.
+
+### R6 — coevolution and transfer
+
+Run repeated encounters where both sides can change policy, tools, organization,
+and deception. Test transfer to unseen opponents, world structures, and resource
+budgets.
+
+### R7 — high-fidelity owned ranges
+
+Only after the earlier phases expose requirements that simulation cannot answer,
+move selected Campaigns onto persistent Link/Edge worlds and real service stacks.
+The real range is a fidelity upgrade, not the source of the conceptual model.
+
+## Existing Issue disposition
+
+| Issue family | New role |
+|---|---|
+| Campaign lifecycle and evidence contracts | frozen support substrate |
+| component-native action-plan correction | infrastructure debt; execute only when a new experiment consumes it |
+| reconstruction and outcome separation | supporting evaluation correctness |
+| repeated trials and hidden scoring | foundational evaluation support |
+| first single-Agent Campaign | optional substrate spike, not the strategic north star |
+| adaptive Red/Blue Campaign | first empirical north star, redesigned around dynamic opposition and strategic outcomes |
+| context/Tool poisoning | one tactical information-manipulation family within the larger deception program |
+
+## Evidence gates
+
+A claim of Agent-native adversarial value requires:
+
+1. an adaptive opponent or held-out social environment;
+2. multiple trials and at least one simpler baseline;
+3. exact actor, model, scaffold, tool, world, budget, and evaluation identity;
+4. actor-specific observations plus authoritative world truth;
+5. evidence of belief, strategy, or organization change—not only a different
+   action sequence;
+6. tactical, operational, strategic, and information outcomes reported
+   separately;
+7. negative, null, exploitative, and evaluator-gaming results retained;
+8. a deletion test for every proposed Ordivon abstraction.
+
+## Stop conditions
+
+Pause or delete a line of work when:
+
+- it is a thin reimplementation of a mature security or game framework;
+- fixed rules or a simple policy perform equivalently;
+- the proposed semantic object exists only in documentation and changes no
+  experimental result;
+- additional infrastructure fidelity does not alter the research conclusion;
+- a feature primarily protects Ordivon rather than studies intelligent
+  opposition;
+- the work cannot state a falsifier or a comparison baseline.
