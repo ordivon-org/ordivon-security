@@ -2,6 +2,9 @@ artifacts/
 __pycache__/
 *.py[cod]
 .env
+.venv/
+.venv-cage4/
+.cache/
 *.pcap
 *.pcapng
 *.key
