@@ -15,9 +15,8 @@ continue a Campaign across time.
 
 ```text
 Host      gives an Agent cognition and continuity
-Runtime   turns decisions into real effects
-Link      gives actors communication relationships
-Edge      gives actors external execution bodies
+Runtime   turns decisions into trusted-local effects
+World     binds external relationships, providers, actions, evidence, and recovery
 Game      supplies general worlds and interaction mechanics
 Security  studies how goal-conflicting actors contest information,
           resources, initiative, access, and world state
@@ -104,7 +103,7 @@ The repository already contains an executable experimental-support substrate:
    cross-project bindings;
 2. an append-only lifecycle ledger, reconciliation, residual classification,
    evidence export, and replay;
-3. a live infrastructure-only Link/Edge/Runtime composition.
+3. a historical live infrastructure-only Link/Edge/Runtime composition whose implementation carriers now live inside Ordivon World.
 
 This work proves that an owned experimental world can be admitted, observed,
 closed, reconstructed, and verified. It does **not** prove adversarial agency,
@@ -134,8 +133,7 @@ The route is research-first and experiment-driven:
 5. compare scripted automation, learned policies, LLM Agents, and mixed teams;
 6. promote only abstractions that explain or enable results unavailable from
    simpler baselines;
-7. move proven execution responsibilities to Host, Runtime, Link, Edge, or Game
-   rather than centralizing them in Security.
+7. move proven responsibilities to Host, Runtime, World, or Game rather than centralizing them in Security.
 
 See:
 
