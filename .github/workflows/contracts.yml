@@ -9,10 +9,10 @@ permissions:
   contents: read
 
 jobs:
-  campaign-v0:
+  contracts-and-experiments:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: python3 scripts/validate_campaign.py fixtures/campaigns/valid/minimal-owned-range.json
-      - run: python3 -m unittest discover -v
+      - run: ./scripts/run_round1_acceptance.sh

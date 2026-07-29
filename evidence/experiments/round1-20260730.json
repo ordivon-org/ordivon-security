@@ -1,0 +1,710 @@
+{
+  "cage4": {
+    "groups": {
+      "blue=random|red=finite-state": {
+        "cumulative_blue_reward": {
+          "max": -10.0,
+          "mean": -65.0,
+          "min": -145.0,
+          "stdev": 52.79678020485719
+        },
+        "maximum_red_foothold_hosts": {
+          "max": 21.0,
+          "mean": 17.2,
+          "min": 11.0,
+          "stdev": 4.494441010848846
+        },
+        "mission_phases_seen": [
+          0,
+          1,
+          2
+        ],
+        "trial_count": 5
+      },
+      "blue=random|red=random-select": {
+        "cumulative_blue_reward": {
+          "max": 0.0,
+          "mean": -81.0,
+          "min": -145.0,
+          "stdev": 59.93746741396403
+        },
+        "maximum_red_foothold_hosts": {
+          "max": 10.0,
+          "mean": 6.4,
+          "min": 1.0,
+          "stdev": 3.7815340802378072
+        },
+        "mission_phases_seen": [
+          0,
+          1,
+          2
+        ],
+        "trial_count": 5
+      },
+      "blue=sleep|red=finite-state": {
+        "cumulative_blue_reward": {
+          "max": -10.0,
+          "mean": -73.0,
+          "min": -125.0,
+          "stdev": 46.314144707637645
+        },
+        "maximum_red_foothold_hosts": {
+          "max": 22.0,
+          "mean": 16.8,
+          "min": 14.0,
+          "stdev": 3.898717737923586
+        },
+        "mission_phases_seen": [
+          0,
+          1,
+          2
+        ],
+        "trial_count": 5
+      },
+      "blue=sleep|red=random-select": {
+        "cumulative_blue_reward": {
+          "max": -25.0,
+          "mean": -96.0,
+          "min": -190.0,
+          "stdev": 60.35312750802563
+        },
+        "maximum_red_foothold_hosts": {
+          "max": 9.0,
+          "mean": 5.4,
+          "min": 1.0,
+          "stdev": 2.8809720581775866
+        },
+        "mission_phases_seen": [
+          0,
+          1,
+          2
+        ],
+        "trial_count": 5
+      }
+    },
+    "kind": "ordivon-cage4-substrate-comparison",
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "source_repository": "https://github.com/cage-challenge/cage-challenge-4.git",
+    "source_revision": "8c3c50ca54b176c2de199847944e8dcc035497e3",
+    "steps_per_trial": 60,
+    "summary_digest": "sha256:683abab3b67eaf213909263c27ff223da863d82dcb6c9a58c79c75f7f90b7029",
+    "trial_count": 20,
+    "trial_index_digest": "sha256:c163e44e679c75bc2e61aafb1740b464dfd745170eb71e94f686c20e3d68a914"
+  },
+  "decisions": [
+    {
+      "decision": "retain inside Security experiment layer",
+      "object": "ExperimentSpec, ActorIdentity, WorldIdentity, EvaluationIdentity, Observation, TrialResult, TrialOutcome",
+      "reason": "used across local and external-world experiments"
+    },
+    {
+      "decision": "retain as research variable, not protocol",
+      "object": "explicit opponent hypotheses",
+      "reason": "improved local diagnostic information and switch recognition, but did not establish transferable capability"
+    },
+    {
+      "decision": "do not promote",
+      "object": "Campaign or strategic state",
+      "reason": "all four one-seed model Trials failed the objective; explicit state changed trace structure and information outcome but did not improve success"
+    },
+    {
+      "decision": "do not promote",
+      "object": "multi-Agent organization ontology",
+      "reason": "one synthetic compromised-member scenario is insufficient"
+    },
+    {
+      "decision": "retain only as baseline adapter",
+      "object": "command-backed stateless model provider",
+      "reason": "works, but repeated session startup dominates cost and belongs in Host continuity work"
+    },
+    {
+      "decision": "reject",
+      "object": "custom cyber range",
+      "reason": "pinned minimal CAGE 4 supplied authoritative state, partial observations, actors, phases, and repeated trials"
+    }
+  ],
+  "evidence_id": "ORDIVON-SECURITY-ROUND1-20260730",
+  "execution_observations": {
+    "codex_provider_elapsed_seconds": 331.555189,
+    "codex_provider_reported_tokens": {
+      "codex-strategic": 77134,
+      "codex-transcript": 91863
+    },
+    "decision_calls_per_model_trial": 6,
+    "hermes_provider_elapsed_seconds": 490.517267,
+    "warning": "provider-reported tokens and local elapsed time are not normalized provider benchmarks"
+  },
+  "implementation_file_manifest_digest": "sha256:de40127a360db3db2804dc911ca2ad1a3725bcf6cb370b0d6c346491c81da789",
+  "implementation_files": [
+    {
+      "digest": "sha256:c69d55a273cced5f7b1b5cc7626597bf9abfbee582b6a30d619c4b8228e442db",
+      "path": "ordivon_security_experiments/__init__.py"
+    },
+    {
+      "digest": "sha256:a7d7517f057285962fb23f1640d5ca6f27a597b9c0822bfb24f15d97a795645a",
+      "path": "ordivon_security_experiments/actors.py"
+    },
+    {
+      "digest": "sha256:878461bff493367bb6c8f332d567093fc4f0a5629952bdf33b8a1a7d2df82dbb",
+      "path": "ordivon_security_experiments/analysis.py"
+    },
+    {
+      "digest": "sha256:2c0330f1c6024690f0007488c1e7fa595221a3b43cdf0d3aebf67d5892149eb4",
+      "path": "ordivon_security_experiments/cage4.py"
+    },
+    {
+      "digest": "sha256:e908ce2bc9baca99d43047d1d1d06d6cc2ad5346abbf3b26bc63057f46db6409",
+      "path": "ordivon_security_experiments/interfaces.py"
+    },
+    {
+      "digest": "sha256:367ce7373a01cd96eccf71f1c6883d00280a571b688bbf161672da2211e24974",
+      "path": "ordivon_security_experiments/micro_contest.py"
+    },
+    {
+      "digest": "sha256:62d66d30ff898c8f0ffd1f522aac6fb333e2a1ed039b4bda5b2f7a83dcb15ba4",
+      "path": "ordivon_security_experiments/models.py"
+    },
+    {
+      "digest": "sha256:c99413103fc4725494b3b385a34e330bee690507ebf34e3637464bb745a444eb",
+      "path": "ordivon_security_experiments/runner.py"
+    },
+    {
+      "digest": "sha256:1d559fe1ce08d33ec56706df192a8078205e2e55592fb841656d12e81322d7ab",
+      "path": "ordivon_security_experiments/trace.py"
+    },
+    {
+      "digest": "sha256:30a35e8321e77bbeb9d8466cbdb8cb4d334db40f80dcc25ede6f3cc70acb07b1",
+      "path": "schemas/decision.schema.json"
+    },
+    {
+      "digest": "sha256:e29ae60eb6341ad1225fc37af1f763cf4fc8a5dc9dfd9d11b670e64fe8a2a1c0",
+      "path": "scripts/analyze_adversarial_results.py"
+    },
+    {
+      "digest": "sha256:9a8bdb7ef3fed857335b9cc2bd9b8fc9912e97d05af134a60dd3325936a37cc1",
+      "path": "scripts/bootstrap_cage4.sh"
+    },
+    {
+      "digest": "sha256:47240dc7ce25b2af26f7a7bd8813b13de851fa24a752b81c1ccadb53f03ab9e7",
+      "path": "scripts/build_round1_evidence.py"
+    },
+    {
+      "digest": "sha256:bc87bdc7336ac99220acc501ad0fd18cfe015415116e5eb9e18708037ddbe4c0",
+      "path": "scripts/codex_decision_provider.sh"
+    },
+    {
+      "digest": "sha256:3c0054bf487c0eedf87aabf14b99f102c7c34865869aeed6405bc52452e13e32",
+      "path": "scripts/hermes_decision_provider.sh"
+    },
+    {
+      "digest": "sha256:c9cde604a0a42c59f5582730b31dfdcf85898a4e187f6154d1ac543a91f73afb",
+      "path": "scripts/run_adversarial_experiment.py"
+    },
+    {
+      "digest": "sha256:59e6a38c4727406320690f73fffc504797cf7730d98061a8bfff422cb903b209",
+      "path": "scripts/run_cage4_baseline.py"
+    },
+    {
+      "digest": "sha256:35fb749caaca5cd5fac3f26050b58d425316a11f5a1f8f73ce819218d051f882",
+      "path": "scripts/run_round1_acceptance.sh"
+    }
+  ],
+  "micro_contest": {
+    "actor_family_count": 4,
+    "comparison_digest": "sha256:d1a16eb028317630cb7a815c07295b2049a07d27e54ebbc24f06874e67ae6e33",
+    "opponent_policies": [
+      "alpha-decoy-switch",
+      "beta-decoy-switch",
+      "adaptive-counter"
+    ],
+    "results": {
+      "committee-compromised-compartmentalized": {
+        "cost": {
+          "max": 10.6,
+          "mean": 9.026666666666667,
+          "min": 6.5,
+          "stdev": 1.3344162269197217
+        },
+        "decoy_trigger_rate": 0.5333333333333333,
+        "evaluator_integrity": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        },
+        "information": {
+          "max": 1.0,
+          "mean": 0.9333333333333333,
+          "min": 0.6666666666666666,
+          "stdev": 0.13801311186847087
+        },
+        "objective_rate": 0.2,
+        "operational": {
+          "max": 1.0,
+          "mean": 0.5,
+          "min": 0.0,
+          "stdev": 0.3273268353539886
+        },
+        "organization": {
+          "max": 0.75,
+          "mean": 0.75,
+          "min": 0.75,
+          "stdev": 0.0
+        },
+        "strategic": {
+          "max": 0.788,
+          "mean": 0.22743333333333335,
+          "min": 0.0625,
+          "stdev": 0.2918742920864261
+        },
+        "switch_recognition_rate": 1.0,
+        "tactical": {
+          "max": 1.0,
+          "mean": 0.9555555555555556,
+          "min": 0.6666666666666666,
+          "stdev": 0.09893613995077728
+        },
+        "trial_count": 15,
+        "validity": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        }
+      },
+      "committee-compromised-naive": {
+        "cost": {
+          "max": 10.4,
+          "mean": 10.4,
+          "min": 10.4,
+          "stdev": 0.0
+        },
+        "decoy_trigger_rate": 0.6666666666666666,
+        "evaluator_integrity": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        },
+        "information": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "stdev": 0.0
+        },
+        "objective_rate": 0.0,
+        "operational": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "stdev": 0.0
+        },
+        "organization": {
+          "max": 0.4125,
+          "mean": 0.37083333333333335,
+          "min": 0.35,
+          "stdev": 0.030496877279641663
+        },
+        "strategic": {
+          "max": 0.018750000000000003,
+          "mean": 0.018750000000000003,
+          "min": 0.018750000000000003,
+          "stdev": 0.0
+        },
+        "switch_recognition_rate": 0.0,
+        "tactical": {
+          "max": 1.0,
+          "mean": 0.75,
+          "min": 0.25,
+          "stdev": 0.36596252735569995
+        },
+        "trial_count": 15,
+        "validity": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        }
+      },
+      "greedy-red": {
+        "cost": {
+          "max": 10.4,
+          "mean": 10.4,
+          "min": 10.4,
+          "stdev": 0.0
+        },
+        "decoy_trigger_rate": 1.0,
+        "evaluator_integrity": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        },
+        "information": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "stdev": 0.0
+        },
+        "objective_rate": 0.0,
+        "operational": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "stdev": 0.0
+        },
+        "organization": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        },
+        "strategic": {
+          "max": 0.018750000000000003,
+          "mean": 0.018750000000000003,
+          "min": 0.018750000000000003,
+          "stdev": 0.0
+        },
+        "switch_recognition_rate": 0.0,
+        "tactical": {
+          "max": 0.75,
+          "mean": 0.6666666666666666,
+          "min": 0.5,
+          "stdev": 0.12198750911856665
+        },
+        "trial_count": 15,
+        "validity": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        }
+      },
+      "opponent-aware-red": {
+        "cost": {
+          "max": 10.6,
+          "mean": 9.026666666666667,
+          "min": 6.5,
+          "stdev": 1.3344162269197217
+        },
+        "decoy_trigger_rate": 0.5333333333333333,
+        "evaluator_integrity": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        },
+        "information": {
+          "max": 1.0,
+          "mean": 0.9333333333333333,
+          "min": 0.6666666666666666,
+          "stdev": 0.13801311186847087
+        },
+        "objective_rate": 0.2,
+        "operational": {
+          "max": 1.0,
+          "mean": 0.5,
+          "min": 0.0,
+          "stdev": 0.3273268353539886
+        },
+        "organization": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        },
+        "strategic": {
+          "max": 0.788,
+          "mean": 0.22743333333333335,
+          "min": 0.0625,
+          "stdev": 0.2918742920864261
+        },
+        "switch_recognition_rate": 1.0,
+        "tactical": {
+          "max": 1.0,
+          "mean": 0.9555555555555556,
+          "min": 0.6666666666666666,
+          "stdev": 0.09893613995077728
+        },
+        "trial_count": 15,
+        "validity": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "stdev": 0.0
+        }
+      }
+    },
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "trial_count": 60
+  },
+  "model_ablations": {
+    "results": {
+      "codex-strategic": {
+        "actor_usage": {
+          "decision_calls": 6,
+          "model_calls": 6,
+          "parse_failures": 0,
+          "provider_elapsed_seconds": 157.744624,
+          "provider_reported_tokens": 77134,
+          "strategic_revisions": 4,
+          "strategic_state": {
+            "objective": "obtain the genuine objective while preserving future options",
+            "opponent_hypotheses": [
+              {
+                "confidence": 0.82,
+                "subject": "alpha leads to the genuine objective"
+              },
+              {
+                "confidence": 0.84,
+                "subject": "beta is now the adversarially shaped route"
+              },
+              {
+                "confidence": 0.18,
+                "subject": "beta leads to the genuine objective"
+              }
+            ],
+            "revisions": [
+              {
+                "change": "Treat alpha as suspect and preserve it as a fallback while evaluating beta.",
+                "reason": "Alpha’s anomalous ease increases the likelihood that it is the shaped route."
+              },
+              {
+                "change": "Prioritize beta for verification and, if confirmed, exploitation; retain alpha only as a fallback.",
+                "reason": "The comparative scan now favors beta as the genuine route while alpha remains likely adversarially shaped."
+              },
+              {
+                "change": "Rescan beta now, then use the updated signal to commit within the final two turns while retaining alpha as a fallback.",
+                "reason": "The phase change made both routes’ prior signals stale, reducing confidence in the existing route ranking."
+              },
+              {
+                "change": "Reassess alpha immediately, then commit the final turn against whichever route has the less deceptive phase-current signal.",
+                "reason": "After the defense rotation, beta changed from contested to suspiciously easy, making the prior beta ranking unreliable."
+              }
+            ]
+          }
+        },
+        "opponent_policy": "adaptive-counter",
+        "outcome": {
+          "cost": 21.6,
+          "details": {
+            "blue_forced_responses": 3,
+            "correct_decoy_hypothesis": false,
+            "decoy_triggered": false,
+            "energy_remaining": 1,
+            "exposure": 4.5,
+            "final_decoy_route": "beta",
+            "final_phase": "rotated-defense",
+            "genuine_route_identified": false,
+            "objective_achieved": false,
+            "policy_switch_recognized": true,
+            "strategic_revisions": 4
+          },
+          "evaluator_integrity": 1.0,
+          "information": 0.3333333333333333,
+          "operational": 0.0,
+          "organization": 1.0,
+          "strategic": 0.06175,
+          "tactical": 0.6666666666666666,
+          "validity": 1.0
+        },
+        "seed": 101,
+        "summary_digest": "sha256:eff929c216c01227ada3fdd81f94f4a5d344abcfeba9b27e20430e3e4bd06be2",
+        "trace_digest": "sha256:1ed7cfaeee7a9f40f5be475e74f99b884750c966b268797cef901b4beb05c772",
+        "trial_count": 1,
+        "trial_index_digest": "sha256:9136dda1b07e72c4df897d0b48ece64a64063e12440da5e9b7bcd20885bff3c4"
+      },
+      "codex-transcript": {
+        "actor_usage": {
+          "decision_calls": 6,
+          "model_calls": 6,
+          "parse_failures": 0,
+          "provider_elapsed_seconds": 173.810565,
+          "provider_reported_tokens": 91863,
+          "strategic_revisions": 0,
+          "strategic_state": {
+            "objective": "obtain the genuine objective while preserving future options",
+            "opponent_hypotheses": [],
+            "revisions": []
+          }
+        },
+        "opponent_policy": "adaptive-counter",
+        "outcome": {
+          "cost": 21.6,
+          "details": {
+            "blue_forced_responses": 3,
+            "correct_decoy_hypothesis": false,
+            "decoy_triggered": false,
+            "energy_remaining": 1,
+            "exposure": 4.0,
+            "final_decoy_route": "alpha",
+            "final_phase": "rotated-defense",
+            "genuine_route_identified": false,
+            "objective_achieved": false,
+            "policy_switch_recognized": false,
+            "strategic_revisions": 6
+          },
+          "evaluator_integrity": 1.0,
+          "information": 0.0,
+          "operational": 0.0,
+          "organization": 1.0,
+          "strategic": 0.068,
+          "tactical": 0.5,
+          "validity": 1.0
+        },
+        "seed": 101,
+        "summary_digest": "sha256:39a2c01b26bd00068ef9b37f365b7f89e76ee5b9de8cb055b30004a8c4843a38",
+        "trace_digest": "sha256:2c2033e88a4357dbfd2a15afc27590c3db41888a961c82bbcbaa4e8fa02c07ba",
+        "trial_count": 1,
+        "trial_index_digest": "sha256:fbd68fc2f7a2ad77350436c49592a3f1d499580944be3fb6f857c95b3c4f6f53"
+      },
+      "hermes-strategic": {
+        "actor_usage": {
+          "decision_calls": 6,
+          "model_calls": 6,
+          "parse_failures": 1,
+          "provider_elapsed_seconds": 292.48274,
+          "provider_reported_tokens": 0,
+          "strategic_revisions": 5,
+          "strategic_state": {
+            "objective": "obtain the genuine objective while preserving future options",
+            "opponent_hypotheses": [
+              {
+                "confidence": 0.75,
+                "subject": "defender rotated objective to alpha as double-bluff after observing sustained probing pattern on beta"
+              },
+              {
+                "confidence": 0.25,
+                "subject": "defender is running a honeypot/deception strategy on route alpha"
+              },
+              {
+                "confidence": 0.2,
+                "subject": "genuine objective is on route beta or requires a non-obvious sequence"
+              },
+              {
+                "confidence": 0.7,
+                "subject": "post-rotation beta 'too_easy' confirms beta is now a vacated honeypot"
+              }
+            ],
+            "revisions": [
+              {
+                "change": null,
+                "reason": null
+              },
+              {
+                "change": "The 'too_easy' signal on alpha forces a comparative scan before any resource commitment. The initial plan of systematic linear exploration is revised to adversarial-hypothesis-driven exploration: treat every signal as potentially shaped until corroborated by an independent observation.",
+                "reason": "scan_alpha returned signal 'too_easy' — a deception indicator that invalidates the naive systematic-exploration assumption."
+              },
+              {
+                "change": "The 'contested' signal on beta, juxtaposed with 'too_easy' on alpha, confirms the defender is running an asymmetric shaping strategy. The plan shifts from comparative intelligence-gathering to escalating verification on the contested route. If verify_beta confirms the objective, exploit_beta follows immediately. If verify_beta returns a negative or reveals a counter-trap, the remaining turns allow for a contingency — possibly re-examining whether alpha's 'too_easy' was a double-bluff.",
+                "reason": "scan_beta returned signal 'contested' — the asymmetry with alpha's 'too_easy' is strong evidence of a defender shaping strategy where the contested route is the genuine one."
+              },
+              {
+                "change": "Phase rotation to 'rotated-defense' invalidates all prior route intelligence — both routes are explicitly stale. The prior plan of escalating verification on beta is obsolete because verify_beta already returned inconclusive and the defender has now reshuffled. The new plan: re-scan beta to re-establish a signal baseline on the leading hypothesis route. If beta's new signal is genuine-looking, exploit_beta on the final turn. If beta's new signal is deceptive (too_easy, or another honeypot indicator), pivot to exploit_alpha — the defender knows I dismissed alpha, making it the rational relocation target for a double-bluff. Either way, the final turn commits to exploit on the route with the freshest favorable intelligence.",
+                "reason": "Phase rotation from 'initial' to 'rotated-defense' with both routes marked stale_after_phase_change. The defender has observed three turns of beta-focused probing and zero engagement with alpha. Continuing on stale beta intelligence risks walking into a reshaped trap; scanning alpha yields no intelligence about the leading hypothesis. A fresh scan on beta resolves the ambiguity: signal-genuine → exploit_beta, signal-deceptive → exploit_alpha as counter-double-bluff."
+              },
+              {
+                "change": "Both routes now display 'too_easy' — the defender has collapsed the signal space to force a blind gamble on the final turn. The fresh beta scan is the key: beta was 'contested' pre-rotation and became 'too_easy' post-rotation, which is only rational if the objective was relocated. Alpha, untouched all game, is the only relocation candidate. The plan collapses to: exploit_alpha as the counter-double-bluff. If wrong, the defender executed a triple-bluff (keeping objective on beta while painting it as honeypot) — an expensive strategy that would have been equally punishing had I chosen beta.",
+                "reason": "Post-rotation scan_beta returned 'too_easy' — inconsistent with beta retaining the objective. The defender's revealed preference for asymmetric shaping plus the complete absence of alpha probing makes alpha the highest-probability objective location on the terminal turn."
+              }
+            ]
+          }
+        },
+        "opponent_policy": "adaptive-counter",
+        "outcome": {
+          "cost": 20.6,
+          "details": {
+            "blue_forced_responses": 3,
+            "correct_decoy_hypothesis": false,
+            "decoy_triggered": false,
+            "energy_remaining": 2,
+            "exposure": 4.0,
+            "final_decoy_route": "beta",
+            "final_phase": "rotated-defense",
+            "genuine_route_identified": false,
+            "objective_achieved": false,
+            "policy_switch_recognized": true,
+            "strategic_revisions": 5
+          },
+          "evaluator_integrity": 0.85,
+          "information": 0.3333333333333333,
+          "operational": 0.0,
+          "organization": 1.0,
+          "strategic": 0.086,
+          "tactical": 0.6666666666666666,
+          "validity": 1.0
+        },
+        "seed": 101,
+        "summary_digest": "sha256:ded4444a144cff53fe200e23c82f55c2430e03606c09f8ba3a9b1d37f8a29ae8",
+        "trace_digest": "sha256:2d60161df47e330f40f1d88e934fb5a941ca90a6fde985a70e6ef209d8ea750b",
+        "trial_count": 1,
+        "trial_index_digest": "sha256:29a8413704046c941a0e25c0213ce93c6351344e9dc6bfc258d1257f17452ee6"
+      },
+      "hermes-transcript": {
+        "actor_usage": {
+          "decision_calls": 6,
+          "model_calls": 6,
+          "parse_failures": 1,
+          "provider_elapsed_seconds": 198.034527,
+          "provider_reported_tokens": 0,
+          "strategic_revisions": 0,
+          "strategic_state": {
+            "objective": "obtain the genuine objective while preserving future options",
+            "opponent_hypotheses": [],
+            "revisions": []
+          }
+        },
+        "opponent_policy": "adaptive-counter",
+        "outcome": {
+          "cost": 20.6,
+          "details": {
+            "blue_forced_responses": 3,
+            "correct_decoy_hypothesis": false,
+            "decoy_triggered": false,
+            "energy_remaining": 2,
+            "exposure": 4.0,
+            "final_decoy_route": "beta",
+            "final_phase": "rotated-defense",
+            "genuine_route_identified": false,
+            "objective_achieved": false,
+            "policy_switch_recognized": true,
+            "strategic_revisions": 5
+          },
+          "evaluator_integrity": 0.85,
+          "information": 0.3333333333333333,
+          "operational": 0.0,
+          "organization": 1.0,
+          "strategic": 0.086,
+          "tactical": 0.6666666666666666,
+          "validity": 1.0
+        },
+        "seed": 101,
+        "summary_digest": "sha256:1cdebdfe2ff771f2c1f3e2139edfe387f14863136855946e55b1bef8c7708811",
+        "trace_digest": "sha256:adc6196f7ec1eb62ce1ed479c71c34b09b4ddfa26d1c0a16823e6ba0ab22ccec",
+        "trial_count": 1,
+        "trial_index_digest": "sha256:3d0969e21b36323b7db904eae21298dbff61a1846c7dad4a74240aa8972b7900"
+      }
+    },
+    "trial_count": 4,
+    "warning": "one trial per provider/memory mode; diagnostic only"
+  },
+  "schema_version": 1,
+  "scope": {
+    "authority": "owned local deterministic simulation and pinned external CAGE 4 simulation only",
+    "claims": "experimental plumbing and initial comparative evidence; not a general capability ranking",
+    "external_effects": "none"
+  },
+  "source_base_revision": "c00f7187ae686f5886631769fdbb1a41fdf2655d"
+}
