@@ -4,6 +4,12 @@ Date: 2026-07-30
 
 Evidence: [`../evidence/experiments/round1-20260730.json`](../evidence/experiments/round1-20260730.json)
 
+Complete report: [`round1-full-experimental-report.md`](round1-full-experimental-report.md)
+
+This file is the compact result summary. The complete report contains the
+research model, metric formulas, experimental architecture, full comparisons,
+integration failures, corrections, validity threats, and next-round design.
+
 ## Claim boundary
 
 Round 1 establishes executable experimental plumbing and initial comparative
