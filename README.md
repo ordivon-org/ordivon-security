@@ -132,7 +132,10 @@ infrastructure.
 The executable research layer is documented in
 [`docs/experiment-layer.md`](docs/experiment-layer.md). Round 1 executed 84
 Trials across a local dynamic-opponent fixture, pinned CAGE 4 baselines, and four
-model-backed diagnostic runs. Results and claim boundaries are in
+model-backed diagnostic runs. The complete method, comparison, data, failure,
+and validity analysis is in
+[`docs/round1-full-experimental-report.md`](docs/round1-full-experimental-report.md).
+A compact result summary remains in
 [`docs/round1-experimental-results.md`](docs/round1-experimental-results.md),
 with a sanitized digest-bound summary under
 [`evidence/experiments/round1-20260730.json`](evidence/experiments/round1-20260730.json).
@@ -171,6 +174,7 @@ See:
 - [`docs/capability-gaps.md`](docs/capability-gaps.md)
 - [`docs/research-boundary.md`](docs/research-boundary.md)
 - [`docs/experiment-layer.md`](docs/experiment-layer.md)
+- [`docs/round1-full-experimental-report.md`](docs/round1-full-experimental-report.md)
 - [`docs/round1-experimental-results.md`](docs/round1-experimental-results.md)
 
 ## Existing substrate validation
