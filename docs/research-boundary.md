@@ -61,3 +61,28 @@ problem that existing mechanisms do not adequately express or evaluate:
 - evaluation under actors that model or manipulate the evaluator.
 
 Any new code must point to a concrete experiment demonstrating this gap.
+
+## R-A control-boundary closeout
+
+The Game-to-Security R-A experiment showed that Security does not need a new
+control platform. Model-only instructions and global risk/approval thresholds
+failed low-risk evidence corruption and UNKNOWN recovery, while a fixed threshold
+also blocked valid work when the monitor was unavailable. Direct native state
+was materially stronger but still missed stale provenance, evidence omission,
+provider-replacement continuity, evidence laundering, and reconcile-first
+recovery.
+
+The retained boundary is compositional:
+
+- Host Context and source adapters bind provenance and current revision;
+- Host/provider operation state reconciles UNKNOWN before redispatch;
+- Host completion authority requires accepted independent verification;
+- completion proposals bind the required evidence set, including unfavorable
+  evidence;
+- provider or Harness replacement emits an explicit continuity/reconstruction
+  receipt rather than claiming hidden memory;
+- observer failure changes evidence quality but is not a default veto;
+- Security owns the adversarial scenario and evaluation evidence only.
+
+No Campaign schema, lifecycle state, generic Hook layer, trust score, approval
+plane, or duplicate component state was added.

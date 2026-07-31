@@ -17,3 +17,10 @@ it contains:
 Round 1 evidence:
 
 - [`experiments/round1-20260730.json`](experiments/round1-20260730.json)
+
+R-A control-boundary evidence:
+
+- [`r-a-control-boundary/report.json`](r-a-control-boundary/report.json) binds
+  the exact Game M5-R1 source report, Security implementation revision, 24
+  paired scenarios, four baseline decisions, effect accounting, evaluator
+  disagreement, and retain/localize/shrink/delete dispositions.
