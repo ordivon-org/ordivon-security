@@ -1,4 +1,9 @@
-"""Executable Ordivon Security contracts and Campaign lifecycle primitives."""
+"""Frozen Campaign v0 research substrate.
+
+This package remains executable for historical reproduction. It is not the
+active Security architecture and must not absorb new World, Runtime, Host,
+Harness, or evaluation responsibilities.
+"""
 
 from .bindings import ComponentBinding, ResidualCheck, ResidualReport
 from .bundle import (

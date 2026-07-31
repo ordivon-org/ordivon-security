@@ -73,12 +73,17 @@ Actor
   reset → decide → update → usage
 
 WorldAdapter
-  reset → observe → step → truth → judge
+  reset → observe → step → truth → evaluation_record
+
+Scorer
+  versioned identity → score sealed hidden record
 ```
 
 A World controls action semantics and authoritative state. An Actor receives only
-its declared observation and allowed action list. Security records the relation;
-it does not reinterpret component-native truth.
+its declared observation and allowed action list. The World emits a hidden
+evaluation record after execution; an independently identified Scorer computes
+the outcome. Security records the relation without making the executing World
+the sole authority over its own score.
 
 ## Local dynamic-opponent fixture
 
@@ -129,19 +134,26 @@ into Security lifecycle semantics.
 
 ## Evidence
 
-Every Trial writes:
+Every family writes `experiment-spec.json`, `trial-index.json`, and
+`summary.json`. Every Trial is an immutable atomic evidence unit:
 
 ```text
-experiment-spec.json
-trials/<trial>/trace.jsonl
-trials/<trial>/result.json
-trial-index.json
-summary.json
+trials/<identity-bound-trial>/
+├── trial-manifest.json
+├── trace.jsonl
+├── hidden-evaluation-record.json
+├── result.json
+└── seal.json
 ```
 
-JSONL traces are append-only within one run and receive a deterministic SHA-256
-digest. The repository ignores raw artifacts and stores only sanitized evidence
-summaries and their source digests under [`../evidence/experiments/`](../evidence/experiments/).
+The Trial key binds the complete ExperimentSpec, Actor, World, Scorer, seed,
+opponent policy, and turn limit. Files are written in a private staging
+directory, sealed by exact byte length and SHA-256, synchronized, and atomically
+renamed. An existing Trial directory cannot be overwritten. The hidden record
+is excluded from Actor Context but retained for offline rescoring.
+
+The repository ignores raw artifacts and stores only sanitized evidence summaries
+and their source digests under [`../evidence/experiments/`](../evidence/experiments/).
 
 ## Reproduction
 
@@ -183,6 +195,8 @@ python3 scripts/run_adversarial_experiment.py \
 
 Model Trials depend on locally configured providers, are not CI gates, and must
 not be interpreted as provider benchmarks from one seed.
+
+See [`P0-CORE-A-CONSTRAINT-AUDIT.md`](P0-CORE-A-CONSTRAINT-AUDIT.md) for the A-series ownership and constraint review.
 
 ## Promotion and deletion rules
 

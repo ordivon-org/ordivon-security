@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping, Protocol
 
-from .models import ActorIdentity, Decision, Observation, TrialOutcome, WorldIdentity
+from .models import ActorIdentity, Decision, EvaluationIdentity, Observation, TrialOutcome, WorldIdentity
 
 
 class Actor(Protocol):
@@ -39,6 +39,18 @@ class WorldAdapter(Protocol):
 
     def truth(self) -> Mapping[str, Any]: ...
 
-    def judge(self, *, actor_usage: Mapping[str, Any]) -> TrialOutcome: ...
+    def evaluation_record(self) -> Mapping[str, Any]: ...
 
     def metadata(self) -> Mapping[str, Any]: ...
+
+
+class Scorer(Protocol):
+    @property
+    def identity(self) -> EvaluationIdentity: ...
+
+    def score(
+        self,
+        evaluation_record: Mapping[str, Any],
+        *,
+        actor_usage: Mapping[str, Any],
+    ) -> TrialOutcome: ...

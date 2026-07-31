@@ -5,7 +5,7 @@ import json
 import unittest
 from pathlib import Path
 
-from ordivon_security_contracts.control_boundary_adversary import (
+from ordivon_security_evaluations.control_boundary import (
     evaluate,
     load_game_report,
     report_markdown,

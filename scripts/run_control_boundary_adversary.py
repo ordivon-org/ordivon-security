@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from ordivon_security_contracts.control_boundary_adversary import (  # noqa: E402
+from ordivon_security_evaluations.control_boundary import (  # noqa: E402
     evaluate,
     load_game_report,
     report_markdown,
