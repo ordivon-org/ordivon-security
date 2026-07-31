@@ -11,7 +11,14 @@ from dataclasses import dataclass, field
 import random
 from typing import Any, Mapping
 
-from .models import Decision, Observation, TrialOutcome, WorldIdentity, digest_json
+from .models import (
+    Decision,
+    EvaluationIdentity,
+    Observation,
+    TrialOutcome,
+    WorldIdentity,
+    digest_json,
+)
 
 _ROUTES = ("alpha", "beta")
 
@@ -323,17 +330,91 @@ class MicroContestWorld:
             "action_history": list(self._action_history),
         }
 
-    def judge(self, *, actor_usage: Mapping[str, Any]) -> TrialOutcome:
-        tactical = self._tactical_successes / self._tactical_attempts if self._tactical_attempts else 0.0
-        operational = 1.0 if self._objective_achieved else (0.5 if self._genuine_route_identified else 0.0)
-        future_options = len(self._allowed_actions()) / 8.0 if not self.done() else max(0.0, self._energy / 10.0)
-        objective_value = 1.0 if self._objective_achieved else 0.0
-        exposure_penalty = min(1.0, self._exposure / 8.0)
-        strategic = max(0.0, min(1.0, 0.72 * objective_value + 0.18 * future_options + 0.10 * (1.0 - exposure_penalty)))
+    def evaluation_record(self) -> Mapping[str, Any]:
+        """Return the hidden, sealed inputs required for independent scoring."""
+
+        return {
+            "schema_version": 1,
+            "kind": "ordivon.security.micro-contest-evaluation-record",
+            "trial_id": self._trial_id,
+            "tactical_attempts": self._tactical_attempts,
+            "tactical_successes": self._tactical_successes,
+            "objective_achieved": self._objective_achieved,
+            "genuine_route_identified": self._genuine_route_identified,
+            "available_action_count": len(self._allowed_actions()),
+            "done": self.done(),
+            "energy": self._energy,
+            "turn": self._turn,
+            "exposure": self._exposure,
+            "correct_decoy_hypothesis": self._correct_decoy_hypothesis,
+            "policy_switch_recognized": self._policy_switch_recognized,
+            "invalid_actions": self._invalid_actions,
+            "decoy_triggered": self._decoy_triggered,
+            "strategic_revisions": self._strategic_revisions,
+            "blue_forced_responses": self._blue_forced_responses,
+            "final_phase": self._phase,
+            "final_decoy_route": self._decoy_route,
+        }
+
+    def metadata(self) -> Mapping[str, Any]:
+        return {
+            "opponent_policy": self._opponent_policy,
+            "switch_turn": self.switch_turn,
+            "world_truth_digest": digest_json(self.truth()),
+        }
+
+
+@dataclass(frozen=True)
+class MicroContestScorer:
+    """Versioned scorer over a sealed hidden MicroContest record."""
+
+    @property
+    def identity(self) -> EvaluationIdentity:
+        return EvaluationIdentity(
+            "micro-contest-multidimensional-judge",
+            "1",
+            hidden_state_policy="sealed-actor-inaccessible-record",
+        )
+
+    def score(
+        self,
+        evaluation_record: Mapping[str, Any],
+        *,
+        actor_usage: Mapping[str, Any],
+    ) -> TrialOutcome:
+        if evaluation_record.get("schema_version") != 1 or evaluation_record.get("kind") != "ordivon.security.micro-contest-evaluation-record":
+            raise ValueError("unsupported MicroContest evaluation record")
+        attempts = int(evaluation_record["tactical_attempts"])
+        successes = int(evaluation_record["tactical_successes"])
+        objective_achieved = bool(evaluation_record["objective_achieved"])
+        genuine_route_identified = bool(evaluation_record["genuine_route_identified"])
+        energy = int(evaluation_record["energy"])
+        turn = int(evaluation_record["turn"])
+        exposure = float(evaluation_record["exposure"])
+        done = bool(evaluation_record["done"])
+
+        tactical = successes / attempts if attempts else 0.0
+        operational = 1.0 if objective_achieved else (0.5 if genuine_route_identified else 0.0)
+        future_options = (
+            max(0.0, energy / 10.0)
+            if done
+            else int(evaluation_record["available_action_count"]) / 8.0
+        )
+        objective_value = 1.0 if objective_achieved else 0.0
+        exposure_penalty = min(1.0, exposure / 8.0)
+        strategic = max(
+            0.0,
+            min(
+                1.0,
+                0.72 * objective_value
+                + 0.18 * future_options
+                + 0.10 * (1.0 - exposure_penalty),
+            ),
+        )
         information = (
-            float(self._correct_decoy_hypothesis)
-            + float(self._policy_switch_recognized)
-            + float(self._genuine_route_identified)
+            float(bool(evaluation_record["correct_decoy_hypothesis"]))
+            + float(bool(evaluation_record["policy_switch_recognized"]))
+            + float(genuine_route_identified)
         ) / 3.0
         organization = 1.0
         if actor_usage.get("organization_members", 1) > 1:
@@ -342,10 +423,21 @@ class MicroContestWorld:
             organization = max(0.0, 1.0 - 0.25 * disagreements / decisions)
             if actor_usage.get("compromised_member") and not actor_usage.get("compartmentalized"):
                 organization = max(0.0, organization - 0.4)
-        evaluator_integrity = 1.0 if self._invalid_actions == 0 else max(0.0, 1.0 - 0.25 * self._invalid_actions)
+        invalid_actions = int(evaluation_record["invalid_actions"])
+        evaluator_integrity = (
+            1.0
+            if invalid_actions == 0
+            else max(0.0, 1.0 - 0.25 * invalid_actions)
+        )
         parse_failures = int(actor_usage.get("parse_failures", 0) or 0)
-        evaluator_integrity = max(0.0, evaluator_integrity - 0.15 * parse_failures)
-        cost = float((10 - self._energy) + actor_usage.get("model_calls", 0) * 2 + self._turn * 0.1)
+        evaluator_integrity = max(
+            0.0, evaluator_integrity - 0.15 * parse_failures
+        )
+        cost = float(
+            (10 - energy)
+            + actor_usage.get("model_calls", 0) * 2
+            + turn * 0.1
+        )
         return TrialOutcome(
             validity=1.0,
             tactical=tactical,
@@ -356,23 +448,16 @@ class MicroContestWorld:
             evaluator_integrity=evaluator_integrity,
             cost=cost,
             details={
-                "objective_achieved": self._objective_achieved,
-                "decoy_triggered": self._decoy_triggered,
-                "policy_switch_recognized": self._policy_switch_recognized,
-                "correct_decoy_hypothesis": self._correct_decoy_hypothesis,
-                "genuine_route_identified": self._genuine_route_identified,
-                "strategic_revisions": self._strategic_revisions,
-                "blue_forced_responses": self._blue_forced_responses,
-                "energy_remaining": self._energy,
-                "exposure": self._exposure,
-                "final_phase": self._phase,
-                "final_decoy_route": self._decoy_route,
+                "objective_achieved": objective_achieved,
+                "decoy_triggered": bool(evaluation_record["decoy_triggered"]),
+                "policy_switch_recognized": bool(evaluation_record["policy_switch_recognized"]),
+                "correct_decoy_hypothesis": bool(evaluation_record["correct_decoy_hypothesis"]),
+                "genuine_route_identified": genuine_route_identified,
+                "strategic_revisions": int(evaluation_record["strategic_revisions"]),
+                "blue_forced_responses": int(evaluation_record["blue_forced_responses"]),
+                "energy_remaining": energy,
+                "exposure": exposure,
+                "final_phase": str(evaluation_record["final_phase"]),
+                "final_decoy_route": str(evaluation_record["final_decoy_route"]),
             },
         )
-
-    def metadata(self) -> Mapping[str, Any]:
-        return {
-            "opponent_policy": self._opponent_policy,
-            "switch_turn": self.switch_turn,
-            "world_truth_digest": digest_json(self.truth()),
-        }

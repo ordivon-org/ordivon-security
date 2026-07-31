@@ -17,10 +17,12 @@ from ordivon_security_experiments.actors import (  # noqa: E402
     GreedyActor,
     OpponentAwareActor,
 )
-from ordivon_security_experiments.micro_contest import MicroContestWorld  # noqa: E402
+from ordivon_security_experiments.micro_contest import (  # noqa: E402
+    MicroContestScorer,
+    MicroContestWorld,
+)
 from ordivon_security_experiments.models import (  # noqa: E402
     ActorIdentity,
-    EvaluationIdentity,
     ExperimentSpec,
 )
 from ordivon_security_experiments.runner import run_family  # noqa: E402
@@ -114,7 +116,7 @@ def main() -> int:
         experiment_id=f"EXP-002-{args.actor}",
         world=world.identity,
         actor=actor.identity,
-        evaluation=EvaluationIdentity("micro-contest-multidimensional-judge", "1"),
+        evaluation=MicroContestScorer().identity,
         seeds=seeds,
         opponent_policies=opponents,
         max_turns=args.max_turns,
@@ -127,6 +129,7 @@ def main() -> int:
         spec=spec,
         world_factory=lambda: MicroContestWorld(max_turns=args.max_turns),
         actor_factory=factory,
+        scorer_factory=MicroContestScorer,
         output_dir=args.output,
     )
     print(f"experiment={summary.experiment_id}")

@@ -109,8 +109,8 @@ The repository already contains an executable experimental-support substrate:
    traces, multidimensional outcomes, model-provider adapters, a local
    dynamic-opponent fixture, and a pinned CAGE Challenge 4 adapter.
 
-The frozen Campaign substrate proves that an owned experimental world can be
-admitted, observed, closed, reconstructed, and verified. The new experiment
+The frozen Campaign substrate historically proved that an owned experimental world could be
+admitted, observed, closed, reconstructed, and verified. It is compatibility and reproduction code, not an active cross-project control plane. The new experiment
 layer proves that scripted, organizational, model-backed, and mature external
 World comparisons can be run and diagnosed. Neither result proves general
 adversarial autonomy, transferable Campaign synthesis, mature offense/defense,
@@ -190,6 +190,9 @@ python3 -m unittest discover -v
 Its validation proves contract and evidence behavior only. Passing these tests
 must not be reported as progress in strategic adversarial autonomy.
 
+The current A-series ownership and constraint audit is in
+[`docs/P0-CORE-A-CONSTRAINT-AUDIT.md`](docs/P0-CORE-A-CONSTRAINT-AUDIT.md).
+
 ## R-A control-boundary experiment
 
 Security #19 consumed the exact committed Game M5-R1 seven-pair matrix and
@@ -206,7 +209,16 @@ The closeout is in
 [`docs/r-a-control-boundary-evaluation.md`](docs/r-a-control-boundary-evaluation.md),
 with digest-bound evidence under
 [`evidence/r-a-control-boundary/report.json`](evidence/r-a-control-boundary/report.json).
-The experiment added no Security control state machine. It retained owner-local
+The active evaluator now lives under `ordivon_security_evaluations`; the old contract import is compatibility-only. The experiment added no Security control state machine. It retained owner-local
 Host/Game controls and exposed only two minimal cross-project requirements:
 omission-aware completion evidence coverage and an explicit continuity receipt
 when a provider or Harness is replaced.
+
+
+## R-A claim boundary amendment
+
+The frozen 24/24 result is a deterministic regression over designed evidence
+mutations, not an estimate of unknown-attack coverage or model-policy safety.
+It rejects a global context-free threshold and a system-wide monitor-liveness
+veto. It does not forbid a monitor or threshold that is local to one exact
+high-consequence protocol and validated by paired honest/attack evidence.

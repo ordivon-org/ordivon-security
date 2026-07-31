@@ -160,14 +160,44 @@ class TrialOutcome:
 
 
 @dataclass(frozen=True)
+class HiddenEvaluationRecord:
+    trial_id: str
+    world_identity: WorldIdentity
+    payload: Mapping[str, JsonValue]
+    payload_digest: str
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        trial_id: str,
+        world_identity: WorldIdentity,
+        payload: Mapping[str, JsonValue],
+    ) -> "HiddenEvaluationRecord":
+        normalized = dict(payload)
+        return cls(
+            trial_id=trial_id,
+            world_identity=world_identity,
+            payload=normalized,
+            payload_digest=digest_json(normalized),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class TrialResult:
     trial_id: str
+    trial_key: str
     experiment_id: str
     seed: int
     opponent_policy: str
     actor_identity: ActorIdentity
     world_identity: WorldIdentity
     evaluation_identity: EvaluationIdentity
+    manifest_digest: str
+    hidden_evaluation_digest: str
     trace_digest: str
     event_count: int
     outcome: TrialOutcome

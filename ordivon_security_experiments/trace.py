@@ -30,6 +30,8 @@ class TraceRecorder:
     def __init__(self, path: Path) -> None:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        if self.path.exists():
+            raise FileExistsError(f"Trace evidence already exists: {self.path}")
         self.path.write_text("")
         self._hasher = sha256()
         self._count = 0

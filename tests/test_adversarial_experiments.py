@@ -13,7 +13,11 @@ from ordivon_security_experiments.actors import (
     OpponentAwareActor,
 )
 from ordivon_security_experiments.analysis import compare_actor_families
-from ordivon_security_experiments.micro_contest import MicroContestWorld
+from ordivon_security_experiments.evidence import verify_trial_evidence
+from ordivon_security_experiments.micro_contest import (
+    MicroContestScorer,
+    MicroContestWorld,
+)
 from ordivon_security_experiments.models import (
     ActorIdentity,
     EvaluationIdentity,
@@ -50,13 +54,19 @@ class ExperimentModelTests(unittest.TestCase):
         self.assertNotEqual(observation.source_truth_digest, digest_json(observation.visible_state))
 
 
+class MicroContestScorerWithDrift(MicroContestScorer):
+    @property
+    def identity(self) -> EvaluationIdentity:
+        return EvaluationIdentity("micro-contest-multidimensional-judge", "drift")
+
+
 class DynamicContestTests(unittest.TestCase):
     def _spec(self, actor_identity: ActorIdentity, experiment_id: str = "EXP-TEST") -> ExperimentSpec:
         return ExperimentSpec(
             experiment_id=experiment_id,
             world=MicroContestWorld().identity,
             actor=actor_identity,
-            evaluation=EvaluationIdentity("micro-judge", "1"),
+            evaluation=MicroContestScorer().identity,
             seeds=(3,),
             opponent_policies=("adaptive-counter",),
             max_turns=8,
@@ -69,6 +79,7 @@ class DynamicContestTests(unittest.TestCase):
                 spec=self._spec(identity),
                 world=MicroContestWorld(),
                 actor=GreedyActor(identity),
+                scorer=MicroContestScorer(),
                 seed=3,
                 opponent_policy="adaptive-counter",
                 output_dir=Path(directory),
@@ -90,6 +101,7 @@ class DynamicContestTests(unittest.TestCase):
                 spec=self._spec(identity),
                 world=MicroContestWorld(),
                 actor=OpponentAwareActor(identity),
+                scorer=MicroContestScorer(),
                 seed=3,
                 opponent_policy="adaptive-counter",
                 output_dir=Path(directory),
@@ -177,7 +189,7 @@ class DynamicContestTests(unittest.TestCase):
             experiment_id="EXP-FAMILY",
             world=MicroContestWorld().identity,
             actor=identity,
-            evaluation=EvaluationIdentity("micro-judge", "1"),
+            evaluation=MicroContestScorer().identity,
             seeds=(1, 2),
             opponent_policies=("alpha-decoy-switch", "beta-decoy-switch"),
             max_turns=6,
@@ -188,6 +200,7 @@ class DynamicContestTests(unittest.TestCase):
                 spec=spec,
                 world_factory=MicroContestWorld,
                 actor_factory=lambda: GreedyActor(identity),
+                scorer_factory=MicroContestScorer,
                 output_dir=output,
             )
             comparison = compare_actor_families([output / "trial-index.json"])
@@ -195,6 +208,62 @@ class DynamicContestTests(unittest.TestCase):
         self.assertEqual(summary.trial_count, 4)
         self.assertEqual(len(index), 4)
         self.assertEqual(comparison["greedy"]["trial_count"], 4)
+
+    def test_trial_evidence_is_sealed_replayable_and_immutable(self) -> None:
+        identity = ActorIdentity("sealed", "Red", "scripted", "GreedyActor")
+        spec = self._spec(identity, "EXP-SEALED")
+        scorer = MicroContestScorer()
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            result = run_trial(
+                spec=spec,
+                world=MicroContestWorld(),
+                actor=GreedyActor(identity),
+                scorer=scorer,
+                seed=3,
+                opponent_policy="adaptive-counter",
+                output_dir=output,
+            )
+            trial_dir = next((output / "trials").iterdir())
+            seal = verify_trial_evidence(trial_dir)
+            hidden = json.loads(
+                (trial_dir / "hidden-evaluation-record.json").read_text()
+            )
+            recomputed = scorer.score(
+                hidden["payload"],
+                actor_usage=result.metadata["actor_usage"],
+            )
+            self.assertEqual(result.outcome, recomputed)
+            self.assertEqual(result.trial_key, seal.trial_key)
+            with self.assertRaisesRegex(FileExistsError, "immutable Trial evidence"):
+                run_trial(
+                    spec=spec,
+                    world=MicroContestWorld(),
+                    actor=GreedyActor(identity),
+                    scorer=MicroContestScorer(),
+                    seed=3,
+                    opponent_policy="adaptive-counter",
+                    output_dir=output,
+                )
+            result_path = trial_dir / "result.json"
+            result_path.write_text("{}\n")
+            with self.assertRaisesRegex(ValueError, "evidence bytes differ"):
+                verify_trial_evidence(trial_dir)
+
+    def test_trial_admission_rejects_identity_drift(self) -> None:
+        identity = ActorIdentity("identity", "Red", "scripted", "GreedyActor")
+        spec = self._spec(identity, "EXP-IDENTITY")
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "Scorer identity differs"):
+                run_trial(
+                    spec=spec,
+                    world=MicroContestWorld(),
+                    actor=GreedyActor(identity),
+                    scorer=MicroContestScorerWithDrift(),
+                    seed=3,
+                    opponent_policy="adaptive-counter",
+                    output_dir=Path(directory),
+                )
 
 
 if __name__ == "__main__":
