@@ -1,16 +1,22 @@
-"""Experiment execution and family aggregation."""
+"""Experiment execution, immutable Trial evidence, and family aggregation."""
 
 from __future__ import annotations
 
-from dataclasses import asdict
 from pathlib import Path
 import statistics
-from typing import Any, Iterable, Mapping
+from typing import Any, Callable, Iterable, Mapping
 
-from .interfaces import Actor, WorldAdapter
+from .evidence import (
+    build_trial_manifest,
+    discard_trial_staging,
+    prepare_trial_staging,
+    seal_and_commit_trial,
+)
+from .interfaces import Actor, Scorer, WorldAdapter
 from .models import (
     ExperimentSpec,
     FamilySummary,
+    HiddenEvaluationRecord,
     TrialResult,
     digest_json,
     write_json,
@@ -34,103 +40,165 @@ def run_trial(
     spec: ExperimentSpec,
     world: WorldAdapter,
     actor: Actor,
+    scorer: Scorer,
     seed: int,
     opponent_policy: str,
     output_dir: Path,
 ) -> TrialResult:
-    trial_id = f"{spec.experiment_id}:{actor.identity.actor_id}:{opponent_policy}:seed-{seed}"
-    trial_dir = output_dir / "trials" / _safe_name(trial_id)
-    trial_dir.mkdir(parents=True, exist_ok=True)
-    recorder = TraceRecorder(trial_dir / "trace.jsonl")
+    if actor.identity != spec.actor:
+        raise ValueError("Actor identity differs from the admitted ExperimentSpec")
+    if world.identity != spec.world:
+        raise ValueError("World identity differs from the admitted ExperimentSpec")
+    if scorer.identity != spec.evaluation:
+        raise ValueError("Scorer identity differs from the admitted ExperimentSpec")
+    if seed not in spec.seeds:
+        raise ValueError("Trial seed is outside the admitted ExperimentSpec")
+    if opponent_policy not in spec.opponent_policies:
+        raise ValueError("opponent policy is outside the admitted ExperimentSpec")
 
-    world.reset(trial_id=trial_id, seed=seed, opponent_policy=opponent_policy)
-    actor.reset(trial_id=trial_id, seed=seed, opponent_policy=opponent_policy)
-
-    turn = 0
-    while turn < spec.max_turns and not world.done():
-        observation = world.observe(actor.identity.actor_id)
-        decision = actor.decide(observation)
-        effect = world.step(actor.identity.actor_id, decision)
-        actor.update(observation, decision, effect)
-        event = TraceEvent(
-            event_id=f"{trial_id}:event-{turn + 1}",
-            trial_id=trial_id,
-            turn=observation.turn,
-            actor_id=actor.identity.actor_id,
-            observation=observation,
-            decision=decision,
-            effect=effect,
-            world_truth_digest=digest_json(world.truth()),
-        )
-        recorder.append(event)
-        turn += 1
-
-    if not recorder.verify():
-        raise RuntimeError(f"trace verification failed for {trial_id}")
-
-    outcome = world.judge(actor_usage=actor.usage())
-    result = TrialResult(
-        trial_id=trial_id,
-        experiment_id=spec.experiment_id,
+    manifest = build_trial_manifest(
+        spec=spec,
+        actor=actor.identity,
+        world=world.identity,
+        evaluation=scorer.identity,
         seed=seed,
         opponent_policy=opponent_policy,
-        actor_identity=actor.identity,
-        world_identity=world.identity,
-        evaluation_identity=spec.evaluation,
-        trace_digest=recorder.digest(),
-        event_count=recorder.count,
-        outcome=outcome,
-        metadata={
-            "world": dict(world.metadata()),
-            "actor_usage": dict(actor.usage()),
-            "spec_digest": digest_json(spec.to_dict()),
-        },
     )
-    write_json(trial_dir / "result.json", result.to_dict())
-    return result
+    staging, final = prepare_trial_staging(output_dir, manifest)
+    try:
+        recorder = TraceRecorder(staging / "trace.jsonl")
+        world.reset(
+            trial_id=manifest.trial_id,
+            seed=seed,
+            opponent_policy=opponent_policy,
+        )
+        actor.reset(
+            trial_id=manifest.trial_id,
+            seed=seed,
+            opponent_policy=opponent_policy,
+        )
+
+        turn = 0
+        while turn < spec.max_turns and not world.done():
+            observation = world.observe(actor.identity.actor_id)
+            decision = actor.decide(observation)
+            effect = world.step(actor.identity.actor_id, decision)
+            actor.update(observation, decision, effect)
+            recorder.append(
+                TraceEvent(
+                    event_id=f"{manifest.trial_id}:event-{turn + 1}",
+                    trial_id=manifest.trial_id,
+                    turn=observation.turn,
+                    actor_id=actor.identity.actor_id,
+                    observation=observation,
+                    decision=decision,
+                    effect=effect,
+                    world_truth_digest=digest_json(world.truth()),
+                )
+            )
+            turn += 1
+
+        if not recorder.verify():
+            raise RuntimeError(
+                f"trace verification failed for {manifest.trial_id}"
+            )
+
+        hidden = HiddenEvaluationRecord.create(
+            trial_id=manifest.trial_id,
+            world_identity=world.identity,
+            payload=world.evaluation_record(),
+        )
+        actor_usage = dict(actor.usage())
+        outcome = scorer.score(hidden.payload, actor_usage=actor_usage)
+        result = TrialResult(
+            trial_id=manifest.trial_id,
+            trial_key=manifest.trial_key,
+            experiment_id=spec.experiment_id,
+            seed=seed,
+            opponent_policy=opponent_policy,
+            actor_identity=actor.identity,
+            world_identity=world.identity,
+            evaluation_identity=scorer.identity,
+            manifest_digest=digest_json(manifest.to_dict()),
+            hidden_evaluation_digest=hidden.payload_digest,
+            trace_digest=recorder.digest(),
+            event_count=recorder.count,
+            outcome=outcome,
+            metadata={
+                "world": dict(world.metadata()),
+                "actor_usage": actor_usage,
+                "spec_digest": digest_json(spec.to_dict()),
+            },
+        )
+        write_json(
+            staging / "hidden-evaluation-record.json",
+            hidden.to_dict(),
+        )
+        write_json(staging / "result.json", result.to_dict())
+        seal_and_commit_trial(staging, final, manifest)
+        return result
+    except BaseException:
+        discard_trial_staging(staging)
+        raise
 
 
 def run_family(
     *,
     spec: ExperimentSpec,
-    world_factory: Any,
-    actor_factory: Any,
+    world_factory: Callable[[], WorldAdapter],
+    actor_factory: Callable[[], Actor],
+    scorer_factory: Callable[[], Scorer],
     output_dir: Path,
 ) -> FamilySummary:
     output_dir.mkdir(parents=True, exist_ok=True)
-    write_json(output_dir / "experiment-spec.json", spec.to_dict())
+    spec_path = output_dir / "experiment-spec.json"
+    if spec_path.exists():
+        retained = ExperimentSpec.from_path(spec_path)
+        if retained != spec:
+            raise ValueError(
+                "experiment output is bound to a different ExperimentSpec"
+            )
+    else:
+        write_json(spec_path, spec.to_dict())
+
     results: list[TrialResult] = []
     for opponent_policy in spec.opponent_policies:
         for seed in spec.seeds:
-            world = world_factory()
-            actor = actor_factory()
-            result = run_trial(
-                spec=spec,
-                world=world,
-                actor=actor,
-                seed=seed,
-                opponent_policy=opponent_policy,
-                output_dir=output_dir,
+            results.append(
+                run_trial(
+                    spec=spec,
+                    world=world_factory(),
+                    actor=actor_factory(),
+                    scorer=scorer_factory(),
+                    seed=seed,
+                    opponent_policy=opponent_policy,
+                    output_dir=output_dir,
+                )
             )
-            results.append(result)
 
     groups = _aggregate(results)
     summary = FamilySummary(
         experiment_id=spec.experiment_id,
         trial_count=len(results),
         groups=groups,
-        trial_result_digests=tuple(digest_json(result.to_dict()) for result in results),
+        trial_result_digests=tuple(
+            digest_json(result.to_dict()) for result in results
+        ),
     )
     write_json(output_dir / "summary.json", summary.to_dict())
-    write_json(output_dir / "trial-index.json", [result.to_dict() for result in results])
+    write_json(
+        output_dir / "trial-index.json",
+        [result.to_dict() for result in results],
+    )
     return summary
 
 
 def _aggregate(results: Iterable[TrialResult]) -> dict[str, Mapping[str, Any]]:
+    materialized = list(results)
     grouped: dict[str, list[TrialResult]] = {}
-    for result in results:
+    for result in materialized:
         grouped.setdefault(result.opponent_policy, []).append(result)
-    grouped["__all__"] = list(results)
+    grouped["__all__"] = materialized
 
     output: dict[str, Mapping[str, Any]] = {}
     for name, group in grouped.items():
@@ -145,7 +213,3 @@ def _aggregate(results: Iterable[TrialResult]) -> dict[str, Mapping[str, Any]]:
             }
         output[name] = metrics
     return output
-
-
-def _safe_name(value: str) -> str:
-    return "".join(character if character.isalnum() or character in "-_." else "_" for character in value)
