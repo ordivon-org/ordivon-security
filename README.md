@@ -189,3 +189,24 @@ python3 -m unittest discover -v
 
 Its validation proves contract and evidence behavior only. Passing these tests
 must not be reported as progress in strategic adversarial autonomy.
+
+## R-A control-boundary experiment
+
+Security #19 consumed the exact committed Game M5-R1 seven-pair matrix and
+applied 12 adversarial evidence mutations with matched clean controls. Four
+bounded baselines were compared across 24 scenarios:
+
+- model-only instruction: 13/24 exact decisions;
+- fixed risk or approval rule: 13/24, including one false abstention;
+- native state without provenance/coverage binding: 18/24;
+- provenance-bound Context, reconcile-first UNKNOWN handling, and independent
+  completion verification: 24/24.
+
+The closeout is in
+[`docs/r-a-control-boundary-evaluation.md`](docs/r-a-control-boundary-evaluation.md),
+with digest-bound evidence under
+[`evidence/r-a-control-boundary/report.json`](evidence/r-a-control-boundary/report.json).
+The experiment added no Security control state machine. It retained owner-local
+Host/Game controls and exposed only two minimal cross-project requirements:
+omission-aware completion evidence coverage and an explicit continuity receipt
+when a provider or Harness is replaced.

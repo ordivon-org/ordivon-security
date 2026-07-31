@@ -39,3 +39,7 @@
 14. Do not build a general workflow language, container/network substrate,
     telemetry stack, signature infrastructure, vulnerability framework, or
     generic benchmark platform here.
+15. Adversarial evaluators may consume exact component-owned evidence and mutate
+    evidence views, but must not reconstruct a second Game, Host, Runtime, World,
+    provider, or Campaign state machine. Retain only owner-local facts exposed by
+    measured attacks.
