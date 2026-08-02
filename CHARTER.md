@@ -64,8 +64,7 @@ Ordivon Security does not rebuild them. It studies how intelligent actors:
 
 - Host owns cognition, Goal, Task, Context, memory, and Agent continuity;
 - Runtime owns real execution, process supervision, Effects, and terminal facts;
-- Link owns communication relationships and path evidence;
-- Edge owns external execution bodies and provider lifecycle;
+- World owns provider-native external interactions, observations, and their adapter-local recovery boundaries;
 - Game owns general world mechanics, simulation, and interaction substrates;
 - Security owns the research problem of conflict: actors, conflicting
   objectives, Contest and Campaign hypotheses, opponent models, strategic
@@ -73,13 +72,9 @@ Ordivon Security does not rebuild them. It studies how intelligent actors:
 
 Security must not copy the authoritative state of the other projects.
 
-## Experimental-support substrate
+## Experimental substrate
 
-The existing Campaign Manifest, lifecycle ledger, bindings, reconciliation,
-residual accounting, and replay code are retained as an experimental-support
-substrate. They prove bounded experimental-world composition and evidence
-closure. They do not define the final adversarial architecture and must not grow
-without pressure from a concrete experiment.
+Security retains only the adversarial experiment and evaluation layer. Historical Campaign lifecycle and infrastructure-composition machinery is recoverable from Git but is not active architecture.
 
 ## Governing principles
 
