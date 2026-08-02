@@ -23,7 +23,7 @@ Delete or narrow any mechanism when its research question disappears, a mature e
 
 ## Removed active machinery
 
-The former Campaign Manifest, lifecycle ledger, coordinator, evidence-bundle format, process ports, and Link/Edge/Runtime live-composition harness had no external consumer. They proved one historical infrastructure-composition experiment but did not produce strategic adversarial autonomy. They are removed from the active package and remain recoverable from Git revision `36ce116c8de9df492946a04b710b6fe71aef901a` and the retained reports.
+The former Campaign Manifest, lifecycle ledger, coordinator, evidence-bundle format, process ports, and Link/Edge/Runtime live-composition harness had no external consumer. They proved one historical infrastructure-composition experiment but did not produce strategic adversarial autonomy. They are removed from the active package; [`docs/archive/campaign-v0.md`](docs/archive/campaign-v0.md) binds the exact revision and reproduction command without restoring that machinery to current `main`.
 
 Security therefore owns no cross-project lifecycle, provider authority, Runtime state, World database, general workflow engine, IAM layer, scanner, or production attack platform.
 
