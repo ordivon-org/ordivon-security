@@ -1,0 +1,20 @@
+schema_version: 1
+id: ordivon-security
+name: Ordivon Security
+repository: https://github.com/zycxfyh/ordivon-security
+kind: research-engineering
+default_profiles:
+  - research
+  - engineering
+  - organization
+documentation_roots:
+  - README.md
+  - AGENTS.md
+  - CHARTER.md
+  - docs
+managed_paths: []
+enforcement: advisory
+maintainers:
+  - zycxfyh
+public_projection: ordivon-web
+description: Strategic adversarial research, executable experiments, evaluation integrity, and evidence boundaries.
