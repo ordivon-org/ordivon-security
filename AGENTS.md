@@ -28,10 +28,8 @@
 10. Every proposed abstraction must name a simpler baseline and a deletion
     criterion.
 11. The existing Phase 0 code is a frozen experimental-support substrate:
-    `campaign.py`, `ledger.py`, `bundle.py`, `bindings.py`, and `coordinator.py`
     remain maintained; `process_ports.py` and `live_composition.py` remain
     acceptance-only references.
-12. Do not expand the Campaign schema, lifecycle coordinator, identity graph,
     evidence system, or process wrappers unless a concrete adversarial
     experiment cannot be expressed through current records or mature external
     tooling.

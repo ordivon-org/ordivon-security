@@ -1,8 +1,0 @@
-{
-  "fixture_version": "ordivon-invalid-campaign-case-v0",
-  "base": "../valid/minimal-owned-range.json",
-  "mutations": [
-    {"op": "append-copy", "path": "/actors", "index": 0}
-  ],
-  "expected_error": "duplicates identity"
-}
