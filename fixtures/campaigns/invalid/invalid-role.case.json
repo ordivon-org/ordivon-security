@@ -1,8 +1,0 @@
-{
-  "fixture_version": "ordivon-invalid-campaign-case-v0",
-  "base": "../valid/minimal-owned-range.json",
-  "mutations": [
-    {"op": "replace", "path": "/actors/0/role", "value": "attacker"}
-  ],
-  "expected_error": "$.actors[0].role: must be one of"
-}

@@ -1,8 +1,0 @@
-{
-  "fixture_version": "ordivon-invalid-campaign-case-v0",
-  "base": "../valid/minimal-owned-range.json",
-  "mutations": [
-    {"op": "remove", "path": "/authority"}
-  ],
-  "expected_error": "$: missing required property 'authority'"
-}

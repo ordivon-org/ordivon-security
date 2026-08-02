@@ -1,4 +1,4 @@
-name: contracts
+name: adversarial research checks
 
 on:
   pull_request:
@@ -9,10 +9,10 @@ permissions:
   contents: read
 
 jobs:
-  contracts-and-experiments:
+  active-research:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - run: python3 scripts/validate_campaign.py fixtures/campaigns/valid/minimal-owned-range.json
-      - run: ./scripts/run_round1_acceptance.sh
+      - run: python3 -m compileall -q ordivon_security_experiments ordivon_security_evaluations scripts tests
+      - run: python3 -m unittest discover -v
