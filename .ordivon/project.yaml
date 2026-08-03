@@ -12,8 +12,17 @@ documentation_roots:
   - AGENTS.md
   - CHARTER.md
   - docs
-managed_paths: []
-enforcement: advisory
+  - evidence
+managed_paths:
+  - README.md
+  - CHARTER.md
+  - docs/architecture.md
+  - docs/experiment-layer.md
+  - docs/research-agenda.md
+  - docs/research-boundary.md
+  - evidence/README.md
+  - docs/authority.md
+enforcement: strict
 maintainers:
   - zycxfyh
 public_projection: ordivon-web

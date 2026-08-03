@@ -1,12 +1,64 @@
+---
+schema_version: 1
+id: security.experiment-layer
+title: Experimental adversarial research layer
+type: protocol
+profile: research
+lifecycle: active
+source_role: canonical
+visibility: public
+owners:
+  - ordivon-security
+audience:
+  - researcher
+  - builder
+  - evaluator
+  - agent
+updated: 2026-08-03
+summary: Canonical protocol for identity-bound adversarial Trials, actor-specific observations, hidden World records, independent scoring, immutable evidence, reproduction, promotion, and deletion.
+evidence_status: verified
+readiness: READY
+applies_to:
+  - ordivon-security-experiments
+related:
+  - security.architecture
+  - security.research-agenda
+  - security.evidence
+  - security.authority
+---
 # Experimental adversarial research layer
+
+## Question
+
+What is the smallest executable layer that can test adaptive opposition while preserving exact experimental identity, epistemic separation, independently contestable evaluation, and immutable evidence?
+
+## Method
+
+Bind every Trial to Actor, World, evaluator, seed, opponent, resources, and limits; expose only actor-authorized Observation and actions; let the World retain hidden truth; score a sealed hidden record through a separately identified Scorer; preserve complete Trace and independent outcome dimensions; compare scripted, structured, organizational, model-backed, local, and mature external baselines.
+
+## Inputs
+
+Inputs are an ExperimentSpec, Actor implementation, WorldAdapter, Scorer identity, seeds, opponent policies, resource and turn limits, optional provider configuration, and exact external-source identity for mature Worlds.
+
+## Procedure
+
+Reset Actor and World, obtain the actor-specific Observation, admit one bounded Decision, apply it through the World, record Effect and truth digest, repeat to terminal or bounded limit, emit the hidden evaluation record, independently score it, seal immutable Trial files, and aggregate only through references to individual Trials.
+
+## Evidence
+
+Each Trial retains a manifest, Trace, hidden evaluation record, result, and byte-level seal. Repository evidence contains sanitized summaries, exact digests, authority boundaries, limitations, null results, and retain, reduce, or delete decisions.
+
+## Failure conditions
+
+Reject a Trial or claim when identity is incomplete, hidden truth leaks to the Actor, a Decision is outside the allowed action set, World and Scorer identity are conflated, files are overwritten or unsealed, aggregate output loses Trial references, provider failure is omitted, or an external adapter changes native semantics without disclosure.
 
 Status: implemented research substrate; not Protocol and not a production control plane
 
 ## Purpose
 
 `ordivon_security_experiments` is the smallest executable layer needed to test
-claims about adaptive opposition without expanding the frozen Campaign
-lifecycle/evidence substrate.
+claims about adaptive opposition after removing the former Campaign lifecycle and
+evidence machinery from active architecture.
 
 It answers six practical questions:
 
@@ -111,9 +163,7 @@ range, game engine, or evidence that a policy transfers to real cyber operations
 - `CommandDecisionActor` — invokes a bounded command provider and accepts one
   JSON decision from an allowed action set.
 
-Hermes and Codex are adapters behind `CommandDecisionActor`. Future Ordivon Host
-integration should replace repeated stateless CLI startup; Security should not
-own a second model-session implementation.
+Hermes and Codex are adapters behind `CommandDecisionActor`. Future Ordivon Harness integration should replace repeated stateless CLI startup; Security should not own a second model-session implementation.
 
 ## Mature external World
 
@@ -132,7 +182,7 @@ The adapter preserves CAGE-native facts, including its native time type, mission
 phase, actions, rewards, sessions, and foothold state. It does not coerce them
 into Security lifecycle semantics.
 
-## Evidence
+## Evidence artifacts
 
 Every family writes `experiment-spec.json`, `trial-index.json`, and
 `summary.json`. Every Trial is an immutable atomic evidence unit:
