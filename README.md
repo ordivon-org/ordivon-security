@@ -14,7 +14,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-03
+updated: 2026-08-04
 summary: Canonical entry to Security's Agent-native adversarial research problem, active experiment and evaluation surfaces, removed Campaign machinery, verification, and research route.
 evidence_status: verified
 readiness: READY
@@ -107,3 +107,9 @@ Current work prioritizes:
 New ontologies, control planes, monitors, or evidence layers require a named adversarial experiment that fails without them and a deletion condition.
 
 See [`CHARTER.md`](CHARTER.md), [`docs/experiment-layer.md`](docs/experiment-layer.md), [`docs/research-agenda.md`](docs/research-agenda.md), and the retained Round 1 reports under [`docs/`](docs/).
+
+## Project family
+
+- [Public project directory](https://ordivon.com/projects) — reader-facing research status, evidence, limits, and next experiments.
+- [Cross-project map](https://github.com/zycxfyh/ordivon-computing/blob/main/projects/README.md) — stable roles, repository links, and authority entry points for all nine repositories.
+- Related owners: Security owns adversarial research and evaluation; [Game](https://github.com/zycxfyh/ordivon-game) or external ranges own domain truth, while [Host](https://github.com/zycxfyh/ordivon-host), [Harness](https://github.com/zycxfyh/ordivon-harness), and [Runtime](https://github.com/zycxfyh/ordivon-runtime) retain their generic boundaries.
