@@ -1,4 +1,49 @@
+---
+schema_version: 1
+id: security.charter
+title: Ordivon Security Charter
+type: decision
+profile: organization
+lifecycle: active
+source_role: canonical
+visibility: public
+owners:
+  - ordivon-security
+audience:
+  - researcher
+  - maintainer
+  - builder
+  - evaluator
+  - agent
+updated: 2026-08-03
+summary: Canonical decision defining Security's adversarial relationship, strategic research scope, classical-substrate reuse, cross-project boundary, authorization conditions, and success criterion.
+evidence_status: not_applicable
+readiness: READY
+applies_to:
+  - ordivon-security
+related:
+  - security.start
+  - security.architecture
+  - security.research-boundary
+  - security.authority
+---
 # Ordivon Security Charter
+
+## Context
+
+Security projects commonly collapse intelligent opposition into static vulnerabilities, policy compliance, scanner output, or one-sided safety evaluation. Ordivon needs a research boundary where attacker, defender, target, observer, ally, rival, and evaluator may all be adaptive subjects.
+
+## Decision
+
+Make the adversarial relationship the central object. Reuse mature classical security and world substrates, preserve actor-specific information and independent evaluation, permit high-intensity work only inside owned or explicitly authorized worlds, and admit new abstractions only when experiments show an Agent-native gap.
+
+## Consequences
+
+Cyber is the first reproducible domain rather than the full boundary. Security does not duplicate Host, Harness, Runtime, World, Game, identity, scanner, workflow, or production-control responsibilities. Reachability never grants authority, and undeclared third-party effects invalidate an experiment.
+
+## Status
+
+Accepted and active. [`docs/architecture.md`](docs/architecture.md) defines current structure, [`docs/research-boundary.md`](docs/research-boundary.md) defines authorization, and [`docs/authority.md`](docs/authority.md) records content authority. The former Campaign infrastructure remains historical evidence and is not restored by this charter.
 
 Status: strategic reorientation — research charter
 
@@ -62,13 +107,13 @@ Ordivon Security does not rebuild them. It studies how intelligent actors:
 
 ## Relationship to Ordivon
 
-- Host owns cognition, Goal, Task, Context, memory, and Agent continuity;
-- Runtime owns real execution, process supervision, Effects, and terminal facts;
-- World owns provider-native external interactions, observations, and their adapter-local recovery boundaries;
-- Game owns general world mechanics, simulation, and interaction substrates;
-- Security owns the research problem of conflict: actors, conflicting
-  objectives, Contest and Campaign hypotheses, opponent models, strategic
-  outcomes, and adversarial evaluation.
+- Host owns Goal and Task continuity, commitment, uncertainty, verification, and outcomes;
+- Harness owns replaceable Agent Assignment, Run, Provider, Tool, and recovery semantics;
+- Runtime owns Workspaces, Jobs, Attempts, Artifacts, process state, and physical recovery;
+- World owns external provider adapters and private operator tools;
+- Game and domain systems own authoritative world mechanics, simulation, and replay;
+- Computing owns promoted shared contracts and cross-project research synthesis;
+- Security owns the research problem of conflict: actors, conflicting objectives, Contest and Campaign hypotheses, opponent models, strategic outcomes, and adversarial evaluation.
 
 Security must not copy the authoritative state of the other projects.
 
