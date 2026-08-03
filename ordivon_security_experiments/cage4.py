@@ -9,7 +9,6 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from hashlib import sha256
 import importlib
-import json
 from pathlib import Path
 import statistics
 import sys

@@ -1,4 +1,56 @@
+---
+schema_version: 1
+id: security.architecture
+title: Architecture
+type: architecture
+profile: engineering
+lifecycle: active
+source_role: canonical
+visibility: public
+owners:
+  - ordivon-security
+audience:
+  - researcher
+  - builder
+  - evaluator
+  - agent
+updated: 2026-08-03
+summary: Canonical architecture separating strategic adversarial research, experiment-local records, bounded evaluations, mature external Worlds, cross-project ownership, and archived Campaign infrastructure.
+evidence_status: verified
+readiness: READY
+applies_to:
+  - ordivon-security
+related:
+  - security.charter
+  - security.experiment-layer
+  - security.research-boundary
+  - security.authority
+---
 # Architecture
+
+## Purpose
+
+Separate Security's strategic research object from its smallest current executable experiment and evaluation substrates, while preventing historical Campaign infrastructure or mature external systems from becoming shadow authorities.
+
+## Boundaries
+
+Security owns adversarial relationship hypotheses, experiment identity, actor-specific observation, hidden evaluation records, independent scoring, strategic outcome dimensions, and adversarial evaluation scenarios. Host, Harness, Runtime, World, Game, and external cyber ranges retain their own state and execution authority.
+
+## Components
+
+The active repository consists of `ordivon_security_experiments`, `ordivon_security_evaluations`, local and external World adapters, scripted and model-backed Actor baselines, immutable Trial evidence, independent Scorers, analysis, and sanitized repository evidence. The former Campaign lifecycle substrate is archived and absent from active code.
+
+## Data flow
+
+An ExperimentSpec binds Actor, World, evaluator, seed, opponent policy, resources, and limits; the World emits actor-specific Observation; the Actor returns a bounded Decision; the World applies the Effect and retains hidden truth; a separately identified Scorer evaluates the sealed record; Security stores immutable Trace and per-dimension outcomes for comparison and diagnosis.
+
+## Failure modes
+
+The architecture fails when Actor context leaks hidden truth, Trial identity omits a changing condition, World execution certifies its own result without contestable evidence, aggregate scores erase dimensions, traces can be overwritten, external adapters copy authoritative state, model failures escape evidence, or archived infrastructure is treated as current behavior.
+
+## Verification
+
+Verification combines deterministic unit tests, local dynamic-opponent acceptance, sealed Trial artifacts, offline rescoring, exact source and implementation identity, optional pinned CAGE runs, bounded model diagnostics, and explicit null or deletion judgments. [`experiment-layer.md`](experiment-layer.md) defines the executable protocol, [`research-boundary.md`](research-boundary.md) defines authorization, and [`authority.md`](authority.md) records document authority. Current claims must link to retained evidence rather than document recency.
 
 This document separates the **research architecture** from the repository's
 currently implemented experimental-support substrate.
@@ -65,50 +117,36 @@ frameworks are insufficient.
 
 | Responsibility | Natural owner |
 |---|---|
-| cognition, Goal, Task, Context, memory, model/scaffold identity | Host |
-| Effect execution, Workspace, Job, Attempt, process tree, terminal evidence | Runtime |
-| connectivity, path, communication policy, network evidence | Link |
-| external body, provider, Sandbox generation, placement lifecycle | Edge |
-| general World mechanics, simulation clock, deterministic state, replay | Game |
-| adversarial relationship, Campaign research, opponent model, strategic outcome | Security |
+| Goal and Task continuity, commitment, uncertainty, verification, outcome | Host |
+| Assignment, Run, Provider and Tool execution semantics | Harness |
+| Workspace, Job, Attempt, Artifact, process and physical recovery | Runtime |
+| external provider adapters and private operator tools | World |
+| authoritative world mechanics, simulation, replay and domain rules | Game or domain system |
+| promoted contracts and cross-project synthesis | Computing |
+| adversarial relationship, opponent model, strategic outcome and evaluation research | Security |
 
-Security consumes component-native identities and evidence. It must not create a
-shadow Host, Runtime, network controller, Edge provider, Game engine, scanner,
-or cyber-range implementation.
+Security consumes component-native identities and evidence. It must not create a shadow Host, Harness, Runtime, World provider, Game engine, scanner, cyber range, or external control plane.
 
 ## Current implemented substrate
 
-The existing code implements:
+The active code implements two deliberately bounded surfaces:
 
 ```text
-Campaign Manifest
-  → append-only authority ledger
-  → component-native identity bindings
-  → fixed lifecycle coordination
-  → unknown-result reconciliation
-  → residual-state classification
-  → sealed evidence export and structural replay
+ordivon_security_experiments
+  ExperimentSpec / Actor / WorldAdapter / Observation / Decision / Trial
+  hidden evaluation record / independent Scorer / immutable Trace / sealed evidence
+  local dynamic-opponent fixture / model-backed actors / pinned CAGE adapter
+
+ordivon_security_evaluations
+  exact adversarial control-boundary scenarios
+  paired baselines / evidence accounting / evaluator disagreement / dispositions
 ```
 
-This is useful infrastructure for reproducible experiments. It currently proves:
+This substrate currently proves exact Trial identity, actor-specific observation, hidden World truth, independent scoring, immutable evidence, multi-dimensional outcomes, optional external-World adaptation, and bounded evaluation of provenance, reconciliation, evidence omission, and evaluator manipulation.
 
-- exact admission identity;
-- capability/consequence separation;
-- component binding without state copying;
-- durable lifecycle intent and reconciliation;
-- evidence integrity and closure;
-- one infrastructure-only Link/Edge/Runtime composition.
+It does not prove real-world offensive or defensive capability, universal Contest or Campaign schemas, autonomous Campaign synthesis, robust opponent modelling, transfer across broad domains, production authorization, or safe uncontrolled external action.
 
-It does not prove:
-
-- adaptive offense or defense;
-- Campaign synthesis;
-- opponent modelling;
-- belief revision or deception;
-- initiative or strategic resource allocation;
-- multi-Agent command;
-- coevolution;
-- strategic outcome validity.
+The former Campaign Manifest, lifecycle ledger, coordinator, evidence bundle, process ports, and Link/Edge/Runtime composition are removed from active code. Their exact historical revision and reproduction command remain in the archive.
 
 ## Substrate freeze rule
 

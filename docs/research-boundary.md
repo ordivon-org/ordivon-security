@@ -1,4 +1,49 @@
+---
+schema_version: 1
+id: security.research-boundary
+title: Research boundary
+type: decision
+profile: engineering
+lifecycle: active
+source_role: canonical
+visibility: public
+owners:
+  - ordivon-security
+audience:
+  - researcher
+  - operator
+  - builder
+  - evaluator
+  - agent
+updated: 2026-08-03
+summary: Canonical decision for high-intensity authorized adversarial experiments, external-effect prohibition, mature-substrate reuse, Agent-native ownership, and retained compositional control boundaries.
+evidence_status: verified
+readiness: READY
+applies_to:
+  - ordivon-security
+related:
+  - security.charter
+  - security.architecture
+  - security.experiment-layer
+  - security.authority
+---
 # Research boundary
+
+## Context
+
+Useful adversarial research may require broad autonomy, writable systems, adaptive offense and defense, deception, persistence, and long execution. Without a precise boundary, the project either becomes an inert compliance exercise or creates invalid undeclared effects on systems it does not own.
+
+## Decision
+
+Permit high experimental intensity only inside owned or explicitly authorized Worlds with independent management and destroy capability. Outside that World, reachability is not authority, unrelated third-party systems are not targets, real personal or production credentials are absent, and undeclared external effects invalidate the experiment.
+
+## Consequences
+
+Security can study realistic adaptive opposition without owning a guardrail product, generic containment layer, or external control plane. Mature ranges, hypervisors, networks, scanners, identity, forensics, and recovery are reused. Security code must point to a concrete Agent-native experiment and remain separable from Host, Harness, Runtime, World, Game, and domain authority.
+
+## Status
+
+Accepted and active. [`architecture.md`](architecture.md) defines ownership, [`experiment-layer.md`](experiment-layer.md) defines current execution, and [`authority.md`](authority.md) records content authority. The retained R-A conclusion is compositional: provenance, UNKNOWN reconciliation, verification, evidence completeness, and replacement continuity remain with their natural owners; Security owns the adversarial scenario and evaluation evidence.
 
 Ordivon Security is a high-intensity adversarial research project, not an
 enterprise protection or compliance system.

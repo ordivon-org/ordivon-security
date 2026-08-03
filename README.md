@@ -1,4 +1,53 @@
+---
+schema_version: 1
+id: security.start
+title: Ordivon Security
+type: start
+profile: organization
+lifecycle: active
+source_role: canonical
+visibility: public
+owners:
+  - ordivon-security
+audience:
+  - researcher
+  - builder
+  - evaluator
+  - agent
+updated: 2026-08-03
+summary: Canonical entry to Security's Agent-native adversarial research problem, active experiment and evaluation surfaces, removed Campaign machinery, verification, and research route.
+evidence_status: verified
+readiness: READY
+applies_to:
+  - ordivon-security
+related:
+  - security.charter
+  - security.architecture
+  - security.experiment-layer
+  - security.research-agenda
+  - security.research-boundary
+  - security.evidence
+  - security.authority
+---
 # Ordivon Security
+
+## Purpose
+
+Study intelligent actors pursuing conflicting objectives under partial observation, manipulated information, adaptive opposition, resource constraints, and contestable evaluation.
+
+## Start here
+
+- [`CHARTER.md`](CHARTER.md) defines the research object and governing principles.
+- [`docs/architecture.md`](docs/architecture.md) defines the current research and executable architecture.
+- [`docs/experiment-layer.md`](docs/experiment-layer.md) defines the active adversarial experiment substrate.
+- [`docs/research-agenda.md`](docs/research-agenda.md) defines research tracks, baselines, and falsifiers.
+- [`docs/research-boundary.md`](docs/research-boundary.md) defines authorized experimental intensity and external-effect limits.
+- [`evidence/README.md`](evidence/README.md) defines admissible repository evidence.
+- [`docs/authority.md`](docs/authority.md) separates current architecture, active experiments, reports, and archived Campaign work.
+
+## Current boundary
+
+Security owns adversarial research questions, experiment-local Actor and World relations, hidden evaluation records, independent scoring, strategic diagnosis, and bounded adversarial evaluations. It does not own Host continuity, Harness execution, Runtime physical state, World provider authority, Game state, a production attack platform, or the retired Campaign lifecycle substrate.
 
 **Agent-native strategic adversarial research.**
 

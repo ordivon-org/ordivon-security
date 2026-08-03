@@ -1,4 +1,52 @@
+---
+schema_version: 1
+id: security.research-agenda
+title: Agent-native strategic adversarial systems research agenda
+type: research-proposal
+profile: research
+lifecycle: active
+source_role: canonical
+visibility: public
+owners:
+  - ordivon-security
+audience:
+  - researcher
+  - builder
+  - evaluator
+  - agent
+updated: 2026-08-03
+summary: Canonical research agenda for Contest and Campaign theory, opponent modelling, deception, tempo, organization, coevolution, adversarial evaluation, and cross-domain transfer.
+evidence_status: not_applicable
+readiness: READY
+applies_to:
+  - ordivon-security
+related:
+  - security.charter
+  - security.experiment-layer
+  - security.research-boundary
+  - security.authority
+---
 # Agent-native strategic adversarial systems research agenda
+
+## Question
+
+Where does open-ended intelligent opposition create structural research problems that classical security mechanisms, automation, adaptive policies, ordinary workflows, and static benchmarks do not adequately express or evaluate?
+
+## Current judgment
+
+The strongest admitted gaps concern opponent models and belief revision, deception and information position, initiative and strategic resources, multi-Agent adversarial organization, coevolution and transfer, and evaluation when actors model or manipulate the evaluator. Universal Contest or Campaign contracts remain unproven.
+
+## Method
+
+For each track, compare mature primary sources and formal models, construct a minimum experiment on existing substrates, include static and scripted baselines, bind exact information and resources, test held-out opponents or social situations, preserve negative results, and make an abstraction deletion decision.
+
+## Evidence threshold
+
+A research concept survives only when it changes diagnosis, transfer, long-horizon continuity, strategy, or evaluator validity across more than one condition and cannot be represented more cheaply by an existing Game, Host, Harness, evaluation, or workflow mechanism.
+
+## Stop rule
+
+Stop, localize, or delete a track when ordinary trajectory state performs equivalently, explicit models overfit known opponents, metrics do not transfer across Worlds, organization adds only overhead, adaptation is memorization, evaluator complexity exceeds diagnostic value, or no cross-project implication remains. [`experiment-layer.md`](experiment-layer.md) defines the current testing substrate and [`authority.md`](authority.md) governs promotion or supersession.
 
 ## Purpose
 
