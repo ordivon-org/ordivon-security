@@ -103,6 +103,28 @@ class Cage4RangeIntegrationTests(unittest.TestCase):
                 )
             )
 
+    def test_rejected_plan_invalidates_without_cage_step(self) -> None:
+        invalid_plan = "cage.team.invalid"
+        config, manifest, actors = self._bindings(
+            red_plan=CAGE4_NATIVE_PLAN,
+            blue_plan=invalid_plan,
+            steps=1,
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            result = ContestRunner(
+                Cage4RangeBackend(config),
+                actors,
+                evidence_root=Path(directory),
+            ).run(manifest, seed=1)
+            self.assertEqual(result.terminal_reason, "invalid-action")
+            self.assertEqual(result.ticks_executed, 0)
+            self.assertEqual(result.raw_metrics["cage.ticks"], 0)
+            self.assertEqual(result.raw_metrics["cage.external_actions.submitted"], 0)
+            self.assertEqual(
+                verify_evidence_bundle(Path(result.evidence_path)),
+                result.evidence_digest,
+            )
+
     def test_same_seed_and_plans_replay_deterministically(self) -> None:
         with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
             one = self._run(

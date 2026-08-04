@@ -36,6 +36,9 @@ class RangeDestroyReceipt:
 class RangeBackend(Protocol):
     range_id: str
 
+    @property
+    def execution_identity(self) -> JsonObject: ...
+
     def create(self, trial_id: str, manifest: ScenarioManifest, seed: int) -> RangeInstance: ...
 
     def observe(self, instance: RangeInstance, actor_id: str) -> ActorObservation: ...

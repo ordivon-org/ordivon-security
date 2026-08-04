@@ -245,33 +245,43 @@ class RangeResolution:
 class ContestResult:
     trial_id: str
     scenario_digest: str
+    trial_identity_digest: str
     seed: int
     terminal_reason: str
     ticks_executed: int
     raw_metrics: JsonObject
     evidence_path: str
     evidence_digest: str
+    operational_evidence_digest: str
 
     def __post_init__(self) -> None:
         _text(self.trial_id, "Trial identity", prefix="trial")
         _text(self.scenario_digest, "Scenario digest", prefix="sha256")
+        _text(self.trial_identity_digest, "Trial identity digest", prefix="sha256")
         _text(self.terminal_reason, "Contest terminal reason")
         if self.seed < 0 or self.ticks_executed < 0:
             raise ValueError("Contest seed and tick count must be non-negative")
         validate_json(self.raw_metrics)
         _text(self.evidence_path, "Evidence path")
         _text(self.evidence_digest, "Evidence digest", prefix="sha256")
+        _text(
+            self.operational_evidence_digest,
+            "Operational evidence digest",
+            prefix="sha256",
+        )
 
     def to_dict(self) -> JsonObject:
         return {
             "trialId": self.trial_id,
             "scenarioDigest": self.scenario_digest,
+            "trialIdentityDigest": self.trial_identity_digest,
             "seed": self.seed,
             "terminalReason": self.terminal_reason,
             "ticksExecuted": self.ticks_executed,
             "rawMetrics": self.raw_metrics,
             "evidencePath": self.evidence_path,
             "evidenceDigest": self.evidence_digest,
+            "operationalEvidenceDigest": self.operational_evidence_digest,
         }
 
 

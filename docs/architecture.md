@@ -15,7 +15,7 @@ audience:
   - evaluator
   - agent
 updated: 2026-08-04
-summary: Canonical architecture for multi-Actor Contest execution, deterministic and CAGE Ranges, actor backends, evidence channels, and staged cyber-range integration.
+summary: Canonical architecture for fail-closed multi-Actor Contest execution, complete execution identity, semantic and operational evidence, CAGE Ranges, and staged model integration.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -24,6 +24,7 @@ related:
   - security.charter
   - security.research-boundary
   - security.migration.round2
+  - security.migration.round3-p0
   - security.authority
 ---
 # Architecture
@@ -34,7 +35,7 @@ Ordivon Security is the adversarial domain layer. It defines who is contesting w
 
 It composes rather than replaces Host, Harness, Runtime, external ranges, model Providers, and classical security tools.
 
-## Active `0.2` flow
+## Active `0.3` flow
 
 ```text
 ScenarioManifest
@@ -51,14 +52,15 @@ ContestRunner
   3. collect actor-specific observations
   4. collect one proposal per Actor
   5. admit every proposal against Range and Actor grants
-  6. resolve admitted proposals simultaneously
-  7. return Actor results
-  8. record sensor telemetry and hidden truth independently
-  9. repeat until Range terminal or tick limit
- 10. seal raw metrics and evidence
+  6. invalidate the tick without world mutation if any Actor fails or proposal is rejected
+  7. otherwise resolve all admitted proposals simultaneously
+  8. return Actor results
+  9. record sensor telemetry and hidden truth independently
+ 10. repeat until Range terminal or tick limit
+ 11. seal semantic and operational evidence independently
 ```
 
-The ordered Actor list is part of the Scenario identity. Actor invocation is sequential in the current process, but all proposals are collected before any world mutation; therefore the semantic tick is simultaneous.
+The ordered Actor list is part of the Scenario identity. Trial identity additionally binds the Security implementation, evidence schema revision, Range adapter and substrate, and each Actor implementation identity. Actor invocation is sequential in the current process, but all proposals are collected before any world mutation; therefore the semantic tick is simultaneous.
 
 ## Core contracts
 
@@ -105,7 +107,7 @@ ActionProposal
   → independent world verification
 ```
 
-A model-generated command is never automatically authoritative. Structured actions and open tools share this path.
+A model-generated command is never automatically authoritative. Structured actions and open tools share this path. If one Actor fails to propose or any proposal is rejected, no side is resolved for that tick; peers receive `not-executed` and the Trial ends with an explicit failure reason.
 
 ## CAGE 4 Range
 
@@ -156,7 +158,7 @@ Every active Trial produces four hash-chained streams:
 | Sensor | fallible and potentially manipulable telemetry |
 | World truth | management-plane state unavailable to evaluated actors |
 
-The bundle additionally contains the exact Scenario manifest, raw metrics, result summary, per-channel file digests, and chain heads. Wall-clock timestamps are intentionally absent from the deterministic core; logical time is authoritative.
+The semantic bundle additionally contains the exact Scenario manifest, Trial execution identity, raw metrics, result summary, per-channel file digests, and chain heads. Wall-clock timestamps remain absent from the deterministic core; logical time is authoritative. A separately chained operational stream records durations and operating facts and binds back to the semantic evidence digest without changing it.
 
 For CAGE, actor events contain each side's admitted observations and team plan. Management events contain the concrete CAGE actions submitted. Sensor events contain reward, mission phase, foothold, and action-count telemetry. Truth events independently summarize native CAGE state.
 
@@ -181,8 +183,8 @@ Security may request a Harness or Runtime change but must not copy their state m
 
 ## Next integration sequence
 
-1. define a stable Security domain Tool catalog above CAGE team plans;
-2. add a generic Harness Domain Tool Bridge without making Harness depend on Security;
+1. define the Security-owned CAGE team-plan catalog using the implemented Harness `DomainToolCatalog`;
+2. implement the Security `DomainToolBridge` and Native Harness Actor failure mapping;
 3. run DeepSeek Flash-backed Native Harness Red and Blue Actors;
 4. expand from team-plan control to parameterized CAGE Action Proposals where experiments require it;
 5. add Campaign and organization state only when multi-Actor experiments consume it;

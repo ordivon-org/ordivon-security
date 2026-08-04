@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from ordivon_security._canonical import canonical_digest
+from ordivon_security._canonical import JsonObject, canonical_digest
 from ordivon_security.contest.model import (
     ActionProposal,
     ActorActionResult,
@@ -10,6 +10,7 @@ from ordivon_security.contest.model import (
     ActorObservation,
     ScenarioManifest,
 )
+from ordivon_security.identity import security_source_identity
 
 from .protocol import ActorBackendReceipt, ActorSession
 
@@ -24,6 +25,14 @@ class SequenceActorBackend:
     @property
     def configuration_digest(self) -> str:
         return canonical_digest({"actions": list(self.actions)})
+
+    @property
+    def execution_identity(self) -> JsonObject:
+        return {
+            "backendId": self.backend_id,
+            "backendConfigDigest": self.configuration_digest,
+            "implementation": security_source_identity(),
+        }
 
     def start(self, binding: ActorBinding, scenario: ScenarioManifest) -> ActorSession:
         del scenario
