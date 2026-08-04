@@ -14,166 +14,140 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-03
-summary: Canonical architecture separating strategic adversarial research, experiment-local records, bounded evaluations, mature external Worlds, cross-project ownership, and archived Campaign infrastructure.
+updated: 2026-08-04
+summary: Canonical architecture for multi-Actor Contest execution, Range authority, native and delegated actors, evidence channels, and staged cyber-range integration.
 evidence_status: verified
-readiness: READY
+readiness: EXPERIMENTAL
 applies_to:
   - ordivon-security
 related:
   - security.charter
-  - security.experiment-layer
   - security.research-boundary
   - security.authority
 ---
 # Architecture
 
-## Purpose
+## System boundary
 
-Separate Security's strategic research object from its smallest current executable experiment and evaluation substrates, while preventing historical Campaign infrastructure or mature external systems from becoming shadow authorities.
+Ordivon Security is the adversarial domain layer. It defines who is contesting what, what each actor may know and attempt, how concurrent actions are admitted and resolved, which source owns world truth, and how evidence and outcomes are reconstructed.
 
-## Boundaries
+It composes rather than replaces Host, Harness, Runtime, external ranges, model Providers, and classical security tools.
 
-Security owns adversarial relationship hypotheses, experiment identity, actor-specific observation, hidden evaluation records, independent scoring, strategic outcome dimensions, and adversarial evaluation scenarios. Host, Harness, Runtime, World, Game, and external cyber ranges retain their own state and execution authority.
-
-## Components
-
-The active repository consists of `ordivon_security_experiments`, `ordivon_security_evaluations`, local and external World adapters, scripted and model-backed Actor baselines, immutable Trial evidence, independent Scorers, analysis, and sanitized repository evidence. The former Campaign lifecycle substrate is archived and absent from active code.
-
-## Data flow
-
-An ExperimentSpec binds Actor, World, evaluator, seed, opponent policy, resources, and limits; the World emits actor-specific Observation; the Actor returns a bounded Decision; the World applies the Effect and retains hidden truth; a separately identified Scorer evaluates the sealed record; Security stores immutable Trace and per-dimension outcomes for comparison and diagnosis.
-
-## Failure modes
-
-The architecture fails when Actor context leaks hidden truth, Trial identity omits a changing condition, World execution certifies its own result without contestable evidence, aggregate scores erase dimensions, traces can be overwritten, external adapters copy authoritative state, model failures escape evidence, or archived infrastructure is treated as current behavior.
-
-## Verification
-
-Verification combines deterministic unit tests, local dynamic-opponent acceptance, sealed Trial artifacts, offline rescoring, exact source and implementation identity, optional pinned CAGE runs, bounded model diagnostics, and explicit null or deletion judgments. [`experiment-layer.md`](experiment-layer.md) defines the executable protocol, [`research-boundary.md`](research-boundary.md) defines authorization, and [`authority.md`](authority.md) records document authority. Current claims must link to retained evidence rather than document recency.
-
-This document separates the **research architecture** from the repository's
-currently implemented experimental-support substrate.
-
-## Research architecture
+## Active `0.1` flow
 
 ```text
-Strategic adversarial plane
-  ├─ conflicting objectives and victory conditions
-  ├─ opponent models and belief states
-  ├─ initiative, tempo, escalation, withdrawal
-  ├─ deception, counter-deception, deterrence, signalling
-  └─ strategic resource and information allocation
-                │
-                ▼
-Operational Campaign plane
-  ├─ Campaign synthesis and revision
-  ├─ intelligence requirements and collection
-  ├─ phases, missions, branches, reserves, and contingencies
-  ├─ adaptation history and counter-adaptation
-  └─ multi-Agent command and organization
-                │
-                ▼
-Tactical Agent plane
-  ├─ reconnaissance, analysis, exploitation, detection
-  ├─ repair, restoration, containment, and response
-  ├─ tool selection and construction
-  └─ action execution and feedback interpretation
-                │
-                ▼
-Mature classical capability plane
-  ATT&CK / D3FEND / Engage · scanners · fuzzers · sandboxes · IAM
-  network controls · EDR/SIEM · forensics · patching · cyber ranges
-                │
-                ▼
-Contested world plane
-  hosts · services · code · identities · networks · data · tools · Agents
+ScenarioManifest
+  ├─ Range binding
+  ├─ ordered Actor bindings
+  ├─ objectives and Action grants
+  ├─ limits
+  └─ metadata
+        ↓
+ContestRunner
+  1. create authoritative Range instance
+  2. start one backend session per Actor
+  3. collect actor-specific observations
+  4. collect one proposal per Actor
+  5. admit every proposal against Range and Actor grants
+  6. resolve admitted proposals simultaneously
+  7. return Actor results
+  8. record sensor telemetry and hidden truth independently
+  9. repeat until Range terminal or tick limit
+ 10. seal raw metrics and evidence
 ```
 
-Ordivon Security's candidate ownership begins at the Operational Campaign plane
-and becomes strongest at the Strategic Adversarial plane. The Tactical plane is
-shared with Host and domain tools. Classical mechanisms and world execution are
-reused from mature projects and the rest of Ordivon.
+The ordered Actor list is part of the Scenario identity. Actor invocation is sequential in the current process, but all proposals are collected before any world mutation; therefore the semantic tick is simultaneous.
 
-## Candidate research objects
+## Core contracts
 
-The following are hypotheses, not frozen implementation contracts:
+### `ScenarioManifest`
 
-| Object | Research purpose |
-|---|---|
-| Actor | represent a goal-bearing participant's knowledge, beliefs, resources, capabilities, and organizational relations |
-| Contest | represent the conflict structure across actors, world, rules, information, resources, and outcomes |
-| Campaign | represent one actor's or coalition's long-horizon organized effort to change the Contest |
-| Opponent model | represent hypotheses about another actor's objectives, beliefs, capabilities, policy, and adaptation |
-| Information position | represent what each actor can observe, infer, hide, signal, or manipulate |
-| Strategic outcome | evaluate objective progress, initiative, resources, information advantage, capability exposure, and future options |
+Binds Scenario revision, Range identity, ordered Actors, backend identities, objectives, allowed actions, tick limit, and experiment metadata. Its canonical digest participates in Trial identity.
 
-No separate database, protocol, or universal schema should be created merely to
-make this vocabulary look complete. The first requirement is a comparative model
-and experiments showing where existing game, evaluation, cyber-range, and Agent
-frameworks are insufficient.
+### `ActorBackend`
 
-## Cross-project responsibility
+Starts an Actor session, receives only that Actor's observation, returns an `ActionProposal`, receives the resolved result, and produces a stop receipt.
 
-| Responsibility | Natural owner |
-|---|---|
-| Goal and Task continuity, commitment, uncertainty, verification, outcome | Host |
-| Assignment, Run, Provider and Tool execution semantics | Harness |
-| Workspace, Job, Attempt, Artifact, process and physical recovery | Runtime |
-| external provider adapters and private operator tools | World |
-| authoritative world mechanics, simulation, replay and domain rules | Game or domain system |
-| promoted contracts and cross-project synthesis | Computing |
-| adversarial relationship, opponent model, strategic outcome and evaluation research | Security |
+Planned implementations:
 
-Security consumes component-native identities and evidence. It must not create a shadow Host, Harness, Runtime, World provider, Game engine, scanner, cyber range, or external control plane.
+- scripted baseline;
+- Native Ordivon Harness Actor using model APIs such as DeepSeek;
+- delegated Codex/Hermes Harness backend;
+- PettingZoo/RL policy adapter.
 
-## Current implemented substrate
+### `RangeBackend`
 
-The active code implements two deliberately bounded surfaces:
+Creates and destroys an authorized world, emits actor-specific observations, admits proposals, resolves simultaneous actions, exposes independent truth, exports raw metrics, and declares terminal state.
+
+Planned fidelity levels:
+
+- S0: deterministic local and CAGE/CybORG simulations;
+- E1: containerlab/Docker isolated emulation;
+- E2: Proxmox/KVM VM range when required.
+
+### Action path
 
 ```text
-ordivon_security_experiments
-  ExperimentSpec / Actor / WorldAdapter / Observation / Decision / Trial
-  hidden evaluation record / independent Scorer / immutable Trace / sealed evidence
-  local dynamic-opponent fixture / model-backed actors / pinned CAGE adapter
-
-ordivon_security_evaluations
-  exact adversarial control-boundary scenarios
-  paired baselines / evidence accounting / evaluator disagreement / dispositions
+ActionProposal
+  → ActionAdmission
+  → Range-specific intent or Runtime Job
+  → ActorActionResult / EffectReceipt
+  → independent world verification
 ```
 
-This substrate currently proves exact Trial identity, actor-specific observation, hidden World truth, independent scoring, immutable evidence, multi-dimensional outcomes, optional external-World adaptation, and bounded evaluation of provenance, reconciliation, evidence omission, and evaluator manipulation.
+A model-generated command is never automatically authoritative. Structured actions and open tools share this path.
 
-It does not prove real-world offensive or defensive capability, universal Contest or Campaign schemas, autonomous Campaign synthesis, robust opponent modelling, transfer across broad domains, production authorization, or safe uncontrolled external action.
+## Evidence authority
 
-The former Campaign Manifest, lifecycle ledger, coordinator, evidence bundle, process ports, and Link/Edge/Runtime composition are removed from active code. Their exact historical revision and reproduction command remain in the archive.
+Every active Trial produces four hash-chained streams:
 
-## Substrate freeze rule
+| Channel | Owns |
+|---|---|
+| Actor | observations, proposals, returned action results |
+| Range management | lifecycle, admissions, resolutions, backend receipts |
+| Sensor | fallible and potentially manipulable telemetry |
+| World truth | management-plane state unavailable to evaluated actors |
 
-The implemented substrate remains maintained and tested, but its vocabulary and
-scope are frozen by default. Expansion requires all of the following:
+The bundle additionally contains the exact Scenario manifest, raw metrics, result summary, per-channel file digests, and chain heads. Wall-clock timestamps are intentionally absent from the deterministic `0.1` core; logical time is authoritative.
 
-1. a concrete adversarial experiment exposes an unrepresentable fact;
-2. mature external frameworks cannot carry that fact without semantic loss;
-3. the fact crosses component boundaries and cannot live naturally in Host,
-   Runtime, Link, Edge, or Game;
-4. a simpler experiment record or adapter is insufficient;
-5. the new abstraction changes diagnosis, comparison, adaptation, or research
-   validity in a measurable way.
+## Current Micro Range
 
-## Research and experiment planes
+The synthetic Red/Blue Range is not a security simulator product. It proves that:
 
-A future experiment may use four operational planes without making them the
-project's conceptual center:
+- Red and Blue are independently controlled;
+- Blue cannot read Red foothold truth directly;
+- monitoring can create fallible alerts;
+- simultaneous isolation blocks a pivot;
+- a passive defender permits exfiltration;
+- identical inputs reproduce identical evidence digests;
+- modified event files fail verification.
 
-- **world-management plane** — creates and destroys the owned range;
-- **actor plane** — contains evaluated offensive, defensive, neutral, service,
-  user, and observer actors;
-- **observation plane** — preserves world truth and actor-specific observations;
-- **evaluation plane** — computes multiple outcome dimensions and tests evaluator
-  integrity.
+Its deletion condition is a mature external Range adapter that covers the same contract tests more cheaply and deterministically.
 
-The evaluated actors may study and attack one another. They must not receive
-undeclared authority over the external world-management plane. This is a legal
-and experimental-validity boundary, not a reason to weaken internal adversarial
-capability.
+## Cross-project composition
+
+| Responsibility | Owner |
+|---|---|
+| Goal, durable Task, commitment, final outcome | Host |
+| Native Agent loop, Provider turns, Tool recovery, external Harness drivers | Harness |
+| Workspace, Job, Attempt, process, artifact, physical recovery | Runtime |
+| external provider/private operator adapters when needed | World |
+| Scenario, Contest, Campaign, organization, Range semantics, scoring | Security |
+| promoted cross-domain protocols | Computing |
+
+Security may request a Harness or Runtime change but must not copy their state machines.
+
+## Next integration sequence
+
+1. strengthen contracts and failure evidence in the deterministic core;
+2. implement a first-class CAGE 4 Range adapter controlled by Ordivon Actors;
+3. add a generic Harness domain Tool Bridge without making Harness depend on Security;
+4. run DeepSeek-backed Native Harness Red and Blue Actors;
+5. add Campaign and organization state only when multi-Actor experiments consume it;
+6. introduce containerlab, an independent management plane, and Zeek telemetry;
+7. add CALDERA as a TTP execution adapter, not as Campaign authority;
+8. connect Codex and Hermes as delegated Harness baselines in planner-only, Tool-proxy, and black-box modes.
+
+## Explicit non-goals
+
+The repository will not implement its own hypervisor, container runtime, topology engine, C2 framework, exploit database, scanner, EDR/SIEM, generic model router, generic Job system, policy language, RL trainer, or signing infrastructure unless a measured domain gap survives mature alternatives.

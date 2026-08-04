@@ -15,8 +15,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-03
-summary: Canonical decision for high-intensity authorized adversarial experiments, external-effect prohibition, mature-substrate reuse, Agent-native ownership, and retained compositional control boundaries.
+updated: 2026-08-04
+summary: Canonical boundary for high-intensity experiments inside owned or explicitly authorized ranges, with independent management truth and no undeclared third-party effects.
 evidence_status: verified
 readiness: READY
 applies_to:
@@ -24,110 +24,78 @@ applies_to:
 related:
   - security.charter
   - security.architecture
-  - security.experiment-layer
+  - security.migration.round1
   - security.authority
 ---
 # Research boundary
 
-## Context
-
-Useful adversarial research may require broad autonomy, writable systems, adaptive offense and defense, deception, persistence, and long execution. Without a precise boundary, the project either becomes an inert compliance exercise or creates invalid undeclared effects on systems it does not own.
-
 ## Decision
 
-Permit high experimental intensity only inside owned or explicitly authorized Worlds with independent management and destroy capability. Outside that World, reachability is not authority, unrelated third-party systems are not targets, real personal or production credentials are absent, and undeclared external effects invalidate the experiment.
+Ordivon Security may run high-intensity autonomous offensive, defensive, deceptive, persistent, multi-node, and multi-Agent experiments only inside worlds that Ordivon owns or has explicit authority to test.
 
-## Consequences
+The declared Range must have an independent management plane capable of creating, freezing, observing, resetting, and destroying the world without relying on the evaluated actors. Outside that Range, reachability is not authority and undeclared effects invalidate the Trial.
 
-Security can study realistic adaptive opposition without owning a guardrail product, generic containment layer, or external control plane. Mature ranges, hypervisors, networks, scanners, identity, forensics, and recovery are reused. Security code must point to a concrete Agent-native experiment and remain separable from Host, Harness, Runtime, World, Game, and domain authority.
+## Permitted internal intensity
 
-## Status
+Inside a declared authorized Range, an experiment may grant:
 
-Accepted and active. [`architecture.md`](architecture.md) defines ownership, [`experiment-layer.md`](experiment-layer.md) defines current execution, and [`authority.md`](authority.md) records content authority. The retained R-A conclusion is compositional: provenance, UNKNOWN reconciliation, verification, evidence completeness, and replacement continuity remain with their natural owners; Security owns the adversarial scenario and evaluation evidence.
-
-Ordivon Security is a high-intensity adversarial research project, not an
-enterprise protection or compliance system.
-
-## Internal experimental intensity
-
-Inside an owned or explicitly authorized range, experiments may grant:
-
-- broad Agent autonomy;
-- writable systems and real services;
+- broad Agent autonomy and long execution;
+- writable systems and realistic services;
 - range-local Tool creation and modification;
-- persistent range-local state;
-- multi-node and multi-Agent coordination;
-- adaptive offensive and defensive actors;
-- deception, counter-deception, hidden objectives, and asymmetric information;
-- long execution, interruption, replacement, and recovery;
+- persistence, credentials, footholds, and multi-node action;
+- adaptive Red, Blue, neutral, service, observer, and evaluator actors;
+- deception, counter-deception, hidden objectives, compromised teammates, and collusion;
+- interruption, replacement, recovery, withdrawal, escalation, and reorganization;
 - realistic resource scarcity and changing mission value.
 
-The purpose of the boundary is to permit stronger experiments with valid
-world truth, not to make the evaluated actors passive.
+The boundary exists to make stronger experiments valid, not to turn evaluated actors into passive demonstrations.
 
-## External authority boundary
+## Prohibited external effects
 
-Outside the declared world:
+Outside the declared Range:
 
-- reachability is not authority;
 - unrelated public or third-party systems are not targets;
-- real personal and production credentials are absent;
-- world-management authority remains independent from evaluated actors;
-- undeclared external effects invalidate the experiment;
-- the range can be frozen and destroyed out of band.
+- personal and production credentials are absent;
+- Provider/API connectivity does not grant target authority;
+- actor-generated target expansion is not admitted;
+- real-world persistence, scanning, exploitation, denial, credential collection, or lateral movement is prohibited;
+- undeclared external effects invalidate the Trial and must be investigated as a containment failure.
 
-These are authorization and experimental-validity requirements. They are not the
-project's intellectual center and must not cause the repository to drift toward
-guardrails, policy engines, or generic containment products.
+## Plane separation
 
-## Classical substrate reuse
+A valid high-fidelity Range separates:
 
-Ordivon Security composes mature:
+1. **management plane** — deploy, reset, truth, freeze, destroy;
+2. **actor plane** — evaluated Red/Blue/neutral workspaces and services;
+3. **Provider plane** — model/Harness connectivity outside the contested network;
+4. **sensor plane** — fallible telemetry available to defenders or evaluators;
+5. **truth plane** — out-of-band state inaccessible to evaluated actors.
 
-- hypervisors, containers, sandboxes, and operating systems;
-- network emulators and cyber ranges;
-- scanners, fuzzers, analysis tools, and patch systems;
-- identity, secret, logging, forensic, and recovery systems;
-- Agent evaluation and multi-Agent simulation frameworks.
+An actor may attack or manipulate admitted sensor and service surfaces when the experiment requires it. It may not receive management-plane credentials or silently redefine the Range boundary.
 
-It does not claim novelty for these mechanisms.
+## Reuse boundary
 
-## Agent-native research boundary
+Security composes mature hypervisors, containers, operating systems, network emulators, cyber ranges, scanners, fuzzers, analysis tools, C2/TTP libraries, identity systems, telemetry, forensics, and recovery mechanisms. It does not claim novelty or authority over those implementations.
 
-The project owns research only where intelligent opposition creates a structural
-problem that existing mechanisms do not adequately express or evaluate:
+Security's own code is justified where intelligent opposition creates a domain distinction: Contest structure, asymmetric observation, Action admission, Campaign revision, opponent models, deception, organization, strategic outcomes, or adversarial evaluation.
 
-- strategic Campaign formation and revision;
-- opponent modelling and belief state;
-- deception and information position;
-- initiative, tempo, escalation, and strategic resource allocation;
-- multi-Agent adversarial organization;
-- coevolution and transfer;
-- evaluation under actors that model or manipulate the evaluator.
+## Evidence requirements
 
-Any new code must point to a concrete experiment demonstrating this gap.
+Every Range-backed Trial must bind:
 
-## R-A control-boundary closeout
+- authorization and Range identity;
+- management-plane implementation and revision;
+- Actor/Harness/Provider identity;
+- target topology and image revisions;
+- network egress policy;
+- Action grants and budgets;
+- sensor sources and known blind spots;
+- independent truth collection;
+- reset and destroy receipts;
+- all detected boundary violations.
 
-The Game-to-Security R-A experiment showed that Security does not need a new
-control platform. Model-only instructions and global risk/approval thresholds
-failed low-risk evidence corruption and UNKNOWN recovery, while a fixed threshold
-also blocked valid work when the monitor was unavailable. Direct native state
-was materially stronger but still missed stale provenance, evidence omission,
-provider-replacement continuity, evidence laundering, and reconcile-first
-recovery.
+## Historical control-boundary result
 
-The retained boundary is compositional:
+The archived R-A evaluation remains useful: model-only instructions and global risk thresholds did not preserve provenance, UNKNOWN reconciliation, evidence completeness, or replacement continuity. Those generic facts remain owned by Host, Harness, and Runtime. Security owns the adversarial Scenario, Range boundary, domain admissions, and evaluation evidence rather than rebuilding a generic control platform.
 
-- Host Context and source adapters bind provenance and current revision;
-- Host/provider operation state reconciles UNKNOWN before redispatch;
-- Host completion authority requires accepted independent verification;
-- completion proposals bind the required evidence set, including unfavorable
-  evidence;
-- provider or Harness replacement emits an explicit continuity/reconstruction
-  receipt rather than claiming hidden memory;
-- observer failure changes evidence quality but is not a default veto;
-- Security owns the adversarial scenario and evaluation evidence only.
-
-No Campaign schema, lifecycle state, generic Hook layer, trust score, approval
-plane, or duplicate component state was added.
+Current execution is defined by [`architecture.md`](architecture.md) and [`MIGRATION-ROUND-1.md`](MIGRATION-ROUND-1.md). Historical Round 1 protocols remain under [`archive/round1/`](archive/round1/).

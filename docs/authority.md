@@ -15,8 +15,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-03
-summary: Decision separating Security's charter, current architecture, experiment protocol, research agenda, authorization boundary, evidence contract, reports, evaluations, and archived Campaign substrate.
+updated: 2026-08-04
+summary: Authority map for the active Contest core, migration record, research program, authorization boundary, evidence, and frozen Round 1 materials.
 evidence_status: not_applicable
 readiness: READY
 applies_to:
@@ -25,27 +25,30 @@ related:
   - security.start
   - security.charter
   - security.architecture
-  - security.experiment-layer
   - security.research-agenda
   - security.research-boundary
   - security.evidence
 ---
 # Security Content Authority
 
-## Context
+## Current authority
 
-Security contains a strategic charter, research architecture, active experiment and evaluation code, research agenda, control-boundary studies, Round 1 reports, capability-gap notes, evidence summaries, and an archived Campaign substrate. Several documents accurately describe earlier states but cannot define current active machinery.
+- [`../README.md`](../README.md) owns the public entry and current runnable capability.
+- [`../CHARTER.md`](../CHARTER.md) owns mission, principles, and repository responsibility.
+- [`architecture.md`](architecture.md) owns active contracts, data flow, and cross-project composition.
+- [`MIGRATION-ROUND-1.md`](MIGRATION-ROUND-1.md) owns the first replacement scope and acceptance record.
+- [`research-agenda.md`](research-agenda.md) owns the ordered research program and falsifiers.
+- [`research-boundary.md`](research-boundary.md) owns authorization and external-effect limits.
+- [`../evidence/README.md`](../evidence/README.md) owns active and historical evidence admission.
 
-## Decision
+For implemented behavior, source code and deterministic tests outrank prose. For an individual Trial, its Scenario manifest, event streams, raw metrics, bundle manifest, and verified digests outrank summaries.
 
-[`../README.md`](../README.md) is the repository entry. [`../CHARTER.md`](../CHARTER.md) owns the research object and governing principles. [`architecture.md`](architecture.md) owns current architecture and cross-project responsibility. [`experiment-layer.md`](experiment-layer.md) owns the executable Trial protocol. [`research-agenda.md`](research-agenda.md) owns open research tracks and falsifiers. [`research-boundary.md`](research-boundary.md) owns authorization and external-effect limits. [`../evidence/README.md`](../evidence/README.md) owns repository evidence admission.
+## Historical authority
 
-Source code, deterministic tests, exact ExperimentSpec and Trial artifacts, sealed hidden records, Scorer identity, pinned external-source revisions, evaluation reports, and reproduced results remain stronger owners for fields, behavior, metrics, and empirical claims. Round 1 reports, R-A evaluations, capability maps, constraint audits, and closeouts support or constrain the current boundary. [`archive/campaign-v0.md`](archive/campaign-v0.md) is historical reproduction authority only and cannot restore removed Campaign machinery to current architecture.
+The former single-Actor experiment/evaluation framework is frozen at `92c0f9497741c3cde542c347318d2372fb884e30`. [`archive/round1/system.md`](archive/round1/system.md) binds its test baseline and retained evidence digests. Other files under [`archive/round1/`](archive/round1/) explain historical results and constraints but cannot define active APIs.
 
-## Consequences
+[`archive/campaign-v0.md`](archive/campaign-v0.md) remains historical reproduction authority for the earlier Campaign infrastructure only.
 
-Only the current authority set enters strict content management in this adoption step. Existing phase, audit, report, result, and archive documents remain available without bulk conversion. Later human-centered reconstruction may publish clearer concepts, experiment walkthroughs, and comparative reports, but it must retain exact evidence and explicit supersession rather than treating narrative synthesis as machine truth.
+## Reopen conditions
 
-## Status
-
-Accepted and active. Reopen when active executable surfaces change, an external World or Host/Harness integration changes ownership, a research concept is promoted, or two managed sources claim the same current responsibility.
+Revisit this map when a CAGE, Harness, container Range, Campaign, organization, or delegated Harness integration becomes active; when a public API is stabilized; or when two sources claim the same current fact.

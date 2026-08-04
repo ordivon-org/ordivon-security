@@ -15,15 +15,14 @@ audience:
   - evaluator
   - agent
 updated: 2026-08-04
-summary: Canonical entry to Security's Agent-native adversarial research problem, active experiment and evaluation surfaces, removed Campaign machinery, verification, and research route.
+summary: Canonical entry to the authorized multi-Actor adversarial Contest laboratory and its first deterministic executable core.
 evidence_status: verified
-readiness: READY
+readiness: EXPERIMENTAL
 applies_to:
   - ordivon-security
 related:
   - security.charter
   - security.architecture
-  - security.experiment-layer
   - security.research-agenda
   - security.research-boundary
   - security.evidence
@@ -31,85 +30,85 @@ related:
 ---
 # Ordivon Security
 
-## Purpose
+Ordivon Security is an **authorized adversarial-Agent laboratory** for studying autonomous Red, Blue, neutral, observer, and evaluator actors in contested digital worlds.
 
-Study intelligent actors pursuing conflicting objectives under partial observation, manipulated information, adaptive opposition, resource constraints, and contestable evaluation.
+Its central executable object is a **Contest**: multiple goal-bearing actors receive different observations, propose actions concurrently, act through an authoritative Range, and leave independently verifiable evidence. Cyber is the first domain. Campaigns, organizations, deception, adaptation, and coevolution are the next research layers—not substitutes for a working Contest.
 
-## Start here
+## Current capability
 
-- [`CHARTER.md`](CHARTER.md) defines the research object and governing principles.
-- [`docs/architecture.md`](docs/architecture.md) defines the current research and executable architecture.
-- [`docs/experiment-layer.md`](docs/experiment-layer.md) defines the active adversarial experiment substrate.
-- [`docs/research-agenda.md`](docs/research-agenda.md) defines research tracks, baselines, and falsifiers.
-- [`docs/research-boundary.md`](docs/research-boundary.md) defines authorized experimental intensity and external-effect limits.
-- [`evidence/README.md`](evidence/README.md) defines admissible repository evidence.
-- [`docs/authority.md`](docs/authority.md) separates current architecture, active experiments, reports, and archived Campaign work.
+The active `0.1` core now provides:
 
-## Current boundary
+- a multi-Actor `ScenarioManifest`;
+- actor-specific observations separated from hidden world truth;
+- simultaneous Action Proposals followed by explicit admission and deterministic resolution;
+- an authoritative `RangeBackend` contract;
+- raw metrics before derived scores;
+- four independent hash-chained evidence channels: Actor, Range management, sensor, and world truth;
+- deterministic replay and evidence verification;
+- a small Red/Blue synthetic Range proving the complete loop.
 
-Security owns adversarial research questions, experiment-local Actor and World relations, hidden evaluation records, independent scoring, strategic diagnosis, and bounded adversarial evaluations. It does not own Host continuity, Harness execution, Runtime physical state, World provider authority, Game state, a production attack platform, or the retired Campaign lifecycle substrate.
+It does **not yet** provide CAGE control, model-backed actors, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. Those are staged integrations after the Contest semantics are stable.
 
-**Agent-native strategic adversarial research.**
+## Run the first Contest
 
-Ordivon Security studies intelligent actors pursuing conflicting objectives under partial observation, manipulated information, adaptive opposition, and contestable evaluation. Cyber environments are the first reproducible domain, not the final boundary.
-
-## Active core
-
-The active repository contains two executable surfaces:
-
-1. `ordivon_security_experiments/` — Actor, World, Observation, Decision, hidden evaluation record, exact Trial identity, immutable Trace, independent Scorer, evidence sealing, analysis, model-backed actors, a local dynamic-opponent fixture, and a pinned CAGE 4 adapter;
-2. `ordivon_security_evaluations/` — bounded adversarial evaluations that test exact claims such as provenance loss, reconciliation errors, omitted evidence, or evaluator manipulation.
-
-### Why these parts are not replaceable by ordinary tests
-
-- **Actor-specific Observation versus hidden World truth** prevents an Agent from receiving opponent or scorer state it could not observe. A normal unit test has no such epistemic boundary.
-- **Exact Trial identity** prevents results produced by different actors, worlds, scorers, seeds, opponents, or turn limits from being compared as one experiment.
-- **Independent Scorer and sealed hidden record** allow offline rescoring and make the evaluator a separate, contestable research subject rather than letting the executing World certify itself.
-- **Immutable Trace and per-dimension outcomes** preserve strategic diagnosis that one aggregate success flag would erase.
-- **Mature external adapters such as CAGE 4** test whether a local result transfers beyond a fixture designed by this repository.
-
-Delete or narrow any mechanism when its research question disappears, a mature external system provides the same epistemic separation more cheaply, or no active experiment consumes it.
-
-## Removed active machinery
-
-The former Campaign Manifest, lifecycle ledger, coordinator, evidence-bundle format, process ports, and Link/Edge/Runtime live-composition harness had no external consumer. They proved one historical infrastructure-composition experiment but did not produce strategic adversarial autonomy. They are removed from the active package; [`docs/archive/campaign-v0.md`](docs/archive/campaign-v0.md) binds the exact revision and reproduction command without restoring that machinery to current `main`.
-
-Security therefore owns no cross-project lifecycle, provider authority, Runtime state, World database, general workflow engine, IAM layer, scanner, or production attack platform.
-
-## Verification
-
-Default CI validates only the active experiment and evaluation code:
+Python 3.12 is the supported interpreter.
 
 ```bash
-python3 -m unittest discover -v
+uv sync --locked
+uv run ordivon-security-micro --output .artifacts/reactive --blue reactive
+uv run ordivon-security-micro --output .artifacts/sleepy --blue sleepy
 ```
 
-The bounded local comparison remains an explicit research run rather than a merge ritual:
+The reactive Blue baseline detects the web foothold and isolates the vault before Red pivots. The sleepy Blue baseline allows Red to establish two footholds and exfiltrate protected data. Each run writes a sealed evidence bundle containing:
 
-```bash
-./scripts/run_round1_acceptance.sh
+```text
+manifest.json
+raw-metrics.json
+result.json
+bundle-manifest.json
+events/
+  actor.jsonl
+  range-management.jsonl
+  sensor.jsonl
+  world-truth.jsonl
 ```
 
-CAGE 4 and model-backed runs remain optional because they require pinned external source or locally configured providers.
+## Active architecture
 
-## Research route
+```text
+ScenarioManifest
+  → ContestRunner
+  → ActorBackend[]
+  → ActionProposal[]
+  → Range admission
+  → simultaneous resolution
+  → Actor result + sensor telemetry + hidden truth
+  → raw metrics + sealed evidence
+```
 
-Current work prioritizes:
+Security owns the adversarial domain semantics: Scenario, Contest, Campaign and organization hypotheses, actor information boundaries, domain action admission, Range truth, scoring, and adversarial evaluation.
 
-- opponent modelling and belief revision;
-- deception and counter-deception;
-- initiative, tempo, escalation, withdrawal, and resource allocation;
-- organization, delegation, trust, collusion, and internal compromise;
-- held-out opponents and transfer;
-- evaluator manipulation and scorer integrity;
-- attack-defense adaptation across repeated encounters.
+Security does not rebuild model providers, general Agent harnesses, process runtimes, hypervisors, container engines, C2 frameworks, scanners, SIEMs, or generic workflow systems. Host, Harness, Runtime, World, external ranges, and mature security tools retain those responsibilities.
 
-New ontologies, control planes, monitors, or evidence layers require a named adversarial experiment that fails without them and a deletion condition.
+## Native and delegated actors
 
-See [`CHARTER.md`](CHARTER.md), [`docs/experiment-layer.md`](docs/experiment-layer.md), [`docs/research-agenda.md`](docs/research-agenda.md), and the retained Round 1 reports under [`docs/`](docs/).
+The planned actor surfaces are deliberately distinct:
 
-## Project family
+- **Native Harness Actor** — Ordivon Harness owns the Agent loop and calls a model API such as DeepSeek.
+- **Delegated Harness Actor** — Codex App Server, Hermes ACP, or another complete Harness owns its internal loop and is attached through a driver.
+- **Scripted/RL Actor** — deterministic baselines and learned policies use the same Contest boundary.
 
-- [Public project directory](https://ordivon.com/projects) — reader-facing research status, evidence, limits, and next experiments.
-- [Cross-project map](https://github.com/zycxfyh/ordivon-computing/blob/main/projects/README.md) — stable roles, repository links, and authority entry points for all nine repositories.
-- Related owners: Security owns adversarial research and evaluation; [Game](https://github.com/zycxfyh/ordivon-game) or external ranges own domain truth, while [Host](https://github.com/zycxfyh/ordivon-host), [Harness](https://github.com/zycxfyh/ordivon-harness), and [Runtime](https://github.com/zycxfyh/ordivon-runtime) retain their generic boundaries.
+DeepSeek is a model Provider. Codex and Hermes are complete external Harnesses; they are not classified as equivalent providers.
+
+## Historical Round 1
+
+The former single-Actor experiment/evaluation framework is frozen at Git revision `92c0f9497741c3cde542c347318d2372fb884e30`. Its reports, fixture, and retained evidence remain under [`docs/archive/round1/`](docs/archive/round1/) and [`evidence/`](evidence/). They remain valid historical evidence but no longer define active APIs.
+
+## Read next
+
+- [`CHARTER.md`](CHARTER.md) — project purpose and ownership;
+- [`docs/architecture.md`](docs/architecture.md) — active contracts and staged integrations;
+- [`docs/MIGRATION-ROUND-1.md`](docs/MIGRATION-ROUND-1.md) — first migration scope and acceptance;
+- [`docs/research-agenda.md`](docs/research-agenda.md) — research sequence and falsifiers;
+- [`docs/research-boundary.md`](docs/research-boundary.md) — authorization and external-effect limits;
+- [`evidence/README.md`](evidence/README.md) — active and historical evidence contracts.

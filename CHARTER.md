@@ -15,8 +15,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-03
-summary: Canonical decision defining Security's adversarial relationship, strategic research scope, classical-substrate reuse, cross-project boundary, authorization conditions, and success criterion.
+updated: 2026-08-04
+summary: Canonical decision defining Security as an authorized adversarial-Agent laboratory built around reproducible Contests, adaptive actors, independent truth, and strategic evaluation.
 evidence_status: not_applicable
 readiness: READY
 applies_to:
@@ -29,132 +29,68 @@ related:
 ---
 # Ordivon Security Charter
 
-## Context
-
-Security projects commonly collapse intelligent opposition into static vulnerabilities, policy compliance, scanner output, or one-sided safety evaluation. Ordivon needs a research boundary where attacker, defender, target, observer, ally, rival, and evaluator may all be adaptive subjects.
-
-## Decision
-
-Make the adversarial relationship the central object. Reuse mature classical security and world substrates, preserve actor-specific information and independent evaluation, permit high-intensity work only inside owned or explicitly authorized worlds, and admit new abstractions only when experiments show an Agent-native gap.
-
-## Consequences
-
-Cyber is the first reproducible domain rather than the full boundary. Security does not duplicate Host, Harness, Runtime, World, Game, identity, scanner, workflow, or production-control responsibilities. Reachability never grants authority, and undeclared third-party effects invalidate an experiment.
-
-## Status
-
-Accepted and active. [`docs/architecture.md`](docs/architecture.md) defines current structure, [`docs/research-boundary.md`](docs/research-boundary.md) defines authorization, and [`docs/authority.md`](docs/authority.md) records content authority. The former Campaign infrastructure remains historical evidence and is not restored by this charter.
-
-Status: strategic reorientation — research charter
-
 ## Mission
 
-Ordivon Security is Ordivon's Agent-native strategic adversarial-systems
-project. It studies and constructs intelligent actors that can pursue conflicting
-objectives in long-horizon, partially observed, dynamically changing digital
-environments containing adaptive opponents.
+Ordivon Security builds the experimental conditions required to study autonomous intelligent opposition. It must make Red, Blue, neutral, service, observer, and evaluator actors first-class participants in authorized contested worlds—not reduce security to static vulnerabilities, compliance checks, or one-sided safety evaluation.
 
-Its subject is not merely whether an Agent is safe. Its subject is what happens
-when intelligence becomes attacker, defender, target, observer, ally, rival, and
-judge.
+## Central executable object
 
-## Central object
+The first stable object is the **Contest**:
 
-The central object is the **adversarial relationship**, not the vulnerability,
-permission, alert, or individual action.
+- multiple actors have conflicting or partially aligned objectives;
+- each actor receives only its admitted observation;
+- actors may communicate, deceive, coordinate, or withhold information;
+- actions are proposed, authorized, resolved, and independently verified;
+- the Range retains authoritative world truth separate from sensors and actor reports;
+- results preserve tactical, operational, strategic, information, organizational, control, evaluator, and cost dimensions.
 
-A serious research setting contains:
+A **Campaign** is a long-horizon effort by an actor or coalition to change a Contest. An **Organization** is a set of actors connected by explicit roles, authority, communication, and trust. These remain evolving domain contracts until experiments prove the minimum durable structure.
 
-- multiple goal-bearing actors;
-- asymmetric and potentially manipulated information;
-- scarce resources and constrained action opportunities;
-- a world whose state can be contested;
-- active adaptation and counter-adaptation;
-- strategic objectives, victory conditions, and exit conditions;
-- consequences that unfold across many tasks and observations.
+## Product direction
 
-## Research domains
+Cyber is the first high-fidelity domain because it provides mature simulations, ranges, attack/defense tools, sensors, and repeatable effects. The project should progress through:
 
-Ordivon Security investigates:
+1. deterministic multi-Actor simulation;
+2. CAGE/CybORG and other mature simulation adapters;
+3. model-backed Native Harness actors;
+4. isolated container ranges with independent management truth;
+5. delegated external Harnesses such as Codex and Hermes;
+6. Campaign, organization, evaluator manipulation, and coevolution experiments;
+7. VM ranges when container fidelity is insufficient.
 
-- autonomous Campaign synthesis from strategic objectives;
-- opponent modelling and belief revision under partial observability;
-- intelligence collection, denial, deception, and counter-deception;
-- initiative, tempo, escalation, withdrawal, and resource allocation;
-- adaptive offensive and defensive action;
-- multi-Agent organization, command, delegation, trust, collusion, and failure;
-- long-horizon continuity across model, Host, process, body, and world changes;
-- attack-defense coevolution and transfer across opponents and environments;
-- adversarial evaluation in which traces, monitors, scorers, and judges are
-  themselves part of the threat model.
+## Ownership
 
-Cyber is the first experimental domain, not the complete theoretical boundary.
+Security owns:
 
-## Relationship to classical security
+- Scenario and Contest semantics;
+- actor, coalition, Campaign, and organization domain state;
+- actor-specific observations and communication policy;
+- domain Action Proposals, admission, and effect receipts;
+- Range bindings and independent world truth;
+- raw metrics, scoring, replay, and adversarial evaluation;
+- research conclusions about intelligent conflict.
 
-Classical security provides mature tactics, techniques, countermeasures,
-scanners, fuzzers, sandboxes, identity systems, network controls, observability,
-forensics, patching, and cyber-range substrates.
+Security does not own:
 
-Ordivon Security does not rebuild them. It studies how intelligent actors:
-
-- choose and combine them;
-- infer their opponent's use of them;
-- adapt after countermeasures;
-- conceal or expose capability;
-- allocate them across a Campaign;
-- alter the information and strategic position of other actors.
-
-## Relationship to Ordivon
-
-- Host owns Goal and Task continuity, commitment, uncertainty, verification, and outcomes;
-- Harness owns replaceable Agent Assignment, Run, Provider, Tool, and recovery semantics;
-- Runtime owns Workspaces, Jobs, Attempts, Artifacts, process state, and physical recovery;
-- World owns external provider adapters and private operator tools;
-- Game and domain systems own authoritative world mechanics, simulation, and replay;
-- Computing owns promoted shared contracts and cross-project research synthesis;
-- Security owns the research problem of conflict: actors, conflicting objectives, Contest and Campaign hypotheses, opponent models, strategic outcomes, and adversarial evaluation.
-
-Security must not copy the authoritative state of the other projects.
-
-## Experimental substrate
-
-Security retains only the adversarial experiment and evaluation layer. Historical Campaign lifecycle and infrastructure-composition machinery is recoverable from Git but is not active architecture.
+- Host Goal/Task continuity and final outcome authority;
+- Harness model loops, Provider invocation, generic Tool recovery, or external Harness internals;
+- Runtime Workspaces, Jobs, Attempts, processes, or artifact storage;
+- container engines, hypervisors, network emulators, C2 systems, scanners, EDR/SIEM, or vulnerability databases;
+- unrestricted external targets or undeclared third-party effects.
 
 ## Governing principles
 
-1. **Opposition is intelligent.** The opponent is a subject that observes,
-   predicts, deceives, and adapts—not a static fault model.
-2. **Strategy is not a workflow.** A fixed action graph cannot stand in for a
-   Campaign that revises itself under counterplay.
-3. **Information state is real state.** Changes in beliefs, uncertainty,
-   deception, and mutual knowledge are part of the outcome.
-4. **Attack and defense are symmetric research objects.** Offense is not merely
-   a tool for validating defense; defense is not merely a safety wrapper.
-5. **Capability is relational.** A capability claim is incomplete without the
-   opponent, information, resources, environment, time, and organization under
-   which it holds.
-6. **The evaluator is contestable.** Public or predictable scoring and
-   monitoring may be optimized against or manipulated.
-7. **Reuse classical machinery.** New implementation is admitted only when an
-   Agent-native distinction survives comparison with mature alternatives.
-8. **Research precedes ontology.** Contest, Campaign, belief, advantage, and
-   organization remain falsifiable vocabulary until experiments require stable
-   contracts.
-9. **Owned ranges permit high internal intensity.** Within declared authorized
-   worlds, experiments may grant broad autonomy, tool creation, persistence,
-   multi-node action, adaptive opponents, and long execution.
-10. **No uncontrolled third-party effects.** Authorization and isolation are
-    experimental boundary conditions, not the intellectual center of the
-    project.
+1. **Opposition is intelligent.** Opponents observe, infer, deceive, adapt, and reorganize.
+2. **Observation is not truth.** Actor observations, sensor telemetry, communicated claims, and management-plane truth remain distinct.
+3. **Proposal is not effect.** Every consequential action passes explicit admission, execution, receipt, and independent verification.
+4. **Attack and defense are symmetric research subjects.** Neither exists merely to validate the other.
+5. **Strategy exceeds workflow.** Campaign revision, reserve, option value, tempo, exposure, withdrawal, and escalation cannot be assumed equivalent to a fixed DAG.
+6. **Raw facts precede scores.** Metrics retain units and provenance before any normalized ranking.
+7. **Evaluation is adversarial.** Monitors, judges, traces, and scorers may be visible, predicted, evaded, or manipulated.
+8. **Reuse mature infrastructure.** Ordivon owns the semantic spine, not commodity range or security machinery.
+9. **High intensity stays inside declared worlds.** Broad autonomy is valid inside owned or explicitly authorized ranges when the experiment requires it.
+10. **Every abstraction earns survival.** It must change capability, diagnosis, transfer, recovery, or evaluation validity and name a deletion condition.
 
 ## Success condition
 
-Ordivon Security succeeds when it can make intelligent opposition a first-class,
-reproducible research object; distinguish tactical success from operational and
-strategic advantage; explain how actors model and manipulate one another; and
-show adaptive attack-defense behavior that cannot be reduced to scripted tools,
-fixed policies, or static benchmarks.
-
-The cross-project research charter is maintained in
-`ordivon-computing/research/charters/SECURITY-CHARTER-001.md`.
+Security succeeds when autonomous adversarial actors can pursue and revise long-horizon objectives across multiple fidelity levels, use real or simulated tools through explicit authority, adapt to opponents and organizational failure, and leave evidence from which independent evaluators can reconstruct what each actor knew, attempted, caused, concealed, and achieved.
