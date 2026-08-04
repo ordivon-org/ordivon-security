@@ -4,15 +4,30 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ordivon-security"
-version = "0.1.0"
-description = "Authorized multi-actor adversarial contest research core"
+version = "0.2.0"
+description = "Authorized multi-actor adversarial contest and cyber-range research core"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 authors = [{ name = "Ordivon" }]
 dependencies = []
 
+[project.optional-dependencies]
+cage = [
+  "gym==0.26.2",
+  "gymnasium==0.28.1",
+  "networkx==3.2.1",
+  "numpy==1.26.4",
+  "pettingzoo==1.24.3",
+  "prettytable==3.9.0",
+  "pygame==2.5.2",
+  "PyYAML==6.0.1",
+  "rich==15.0.0",
+  "typing_extensions==4.9.0",
+]
+
 [project.scripts]
 ordivon-security-micro = "ordivon_security.cli:main"
+ordivon-security-cage4 = "ordivon_security.cli_cage4:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -15,7 +15,7 @@ audience:
   - evaluator
   - agent
 updated: 2026-08-04
-summary: Canonical experiment sequence from reproducible Contests through adaptive Campaigns, organizations, evaluator attacks, coevolution, and transfer.
+summary: Canonical experiment sequence from reproducible Contests and CAGE transfer through adaptive Campaigns, organizations, evaluator attacks, coevolution, and cross-fidelity transfer.
 evidence_status: not_applicable
 readiness: READY
 applies_to:
@@ -38,19 +38,23 @@ The agenda is ordered by dependency. Later strategic claims are inadmissible unt
 
 Prove multiple actors, asymmetric observation, explicit action admission, simultaneous resolution, independent truth, raw metrics, replay, and tamper detection.
 
-Current status: first deterministic Red/Blue loop implemented.
+Status: implemented in the deterministic Red/Blue Range.
 
 Falsifier: an ordinary single-Agent episode with one trace expresses the same facts without information leakage or causal ambiguity.
 
 ## R1 — External simulation transfer
 
-Attach CAGE 4/CybORG as an authoritative Range and control at least one Red and one Blue actor through Ordivon contracts. Compare scripted, finite-state, RL, and model-backed policies under exact seeds and observation mappings.
+Attach CAGE 4/CybORG as an authoritative Range and control Red and Blue through Ordivon contracts. Compare scripted, finite-state, RL, and model-backed policies under exact seeds and observation mappings.
+
+Status: initial transfer implemented. Ordivon now explicitly supplies all actions for one CAGE Red agent and five CAGE Blue agents while Green remains native. The current Actor surface selects native-policy or Sleep team plans. Parameterized action construction, held-out policy comparisons, and model/RL Actors remain open.
 
 Falsifier: Ordivon's contracts add no diagnostic or experimental value over native CAGE episodes.
 
 ## R2 — Native model-backed actors
 
-Connect Security domain tools to Ordivon Harness, then run DeepSeek-backed Red and Blue actors with durable Assignment, bounded context, explicit Tool grants, pause/resume, provider failure evidence, and replaceable model identity.
+Connect Security domain tools to Ordivon Harness, then run DeepSeek Flash-backed Red and Blue actors with durable Assignment, bounded context, explicit Tool grants, pause/resume, Provider failure evidence, and replaceable model identity.
+
+The first experiment may select CAGE team plans. A later experiment should expose parameterized CAGE actions only after their identity, admission, and observation contracts are stable.
 
 Falsifier: direct stateless model calls perform equivalently and no continuity or effect-reconciliation distinction appears.
 
@@ -109,6 +113,7 @@ Falsifier: gains disappear on held-out opponents or are explained by evaluator e
 Every experiment must bind:
 
 - exact Scenario, Range, Actor backend, model/Harness revision, seed, budget, observation policy, Action catalog, and scorer;
+- external source repository, revision, clean-tree status, and semantic configuration where applicable;
 - static or scripted baselines;
 - raw metrics and individual Trial evidence;
 - negative, invalid, interrupted, deceptive, and inconclusive outcomes;

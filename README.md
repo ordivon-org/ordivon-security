@@ -15,7 +15,7 @@ audience:
   - evaluator
   - agent
 updated: 2026-08-04
-summary: Canonical entry to the authorized multi-Actor adversarial Contest laboratory and its first deterministic executable core.
+summary: Canonical entry to the authorized multi-Actor adversarial Contest laboratory, deterministic core, and pinned CAGE 4 Range.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -32,11 +32,11 @@ related:
 
 Ordivon Security is an **authorized adversarial-Agent laboratory** for studying autonomous Red, Blue, neutral, observer, and evaluator actors in contested digital worlds.
 
-Its central executable object is a **Contest**: multiple goal-bearing actors receive different observations, propose actions concurrently, act through an authoritative Range, and leave independently verifiable evidence. Cyber is the first domain. Campaigns, organizations, deception, adaptation, and coevolution are the next research layers—not substitutes for a working Contest.
+Its central executable object is a **Contest**: multiple goal-bearing actors receive different observations, propose actions concurrently, act through an authoritative Range, and leave independently verifiable evidence. Cyber is the first domain. Campaigns, organizations, deception, adaptation, and coevolution are later research layers—not substitutes for a working Contest.
 
 ## Current capability
 
-The active `0.1` core now provides:
+The active `0.2` core provides:
 
 - a multi-Actor `ScenarioManifest`;
 - actor-specific observations separated from hidden world truth;
@@ -45,11 +45,14 @@ The active `0.1` core now provides:
 - raw metrics before derived scores;
 - four independent hash-chained evidence channels: Actor, Range management, sensor, and world truth;
 - deterministic replay and evidence verification;
-- a small Red/Blue synthetic Range proving the complete loop.
+- a small synthetic Red/Blue Range proving the core loop;
+- a first-class, revision-pinned CAGE Challenge 4 Enterprise Range.
 
-It does **not yet** provide CAGE control, model-backed actors, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. Those are staged integrations after the Contest semantics are stable.
+In the CAGE adapter, one Security Red Actor controls the CAGE Red team and one Security Blue Actor controls five CAGE Blue agents. Every Red and Blue CAGE action is explicitly supplied by Ordivon to the joint step; Green agents remain CAGE-controlled environmental actors. The current action surface is intentionally narrow: each side selects either the pinned native team policy or Sleep. Parameter-level model control is a later integration.
 
-## Run the first Contest
+It does **not yet** provide model-backed actors, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations.
+
+## Run the deterministic Contest
 
 Python 3.12 is the supported interpreter.
 
@@ -59,7 +62,32 @@ uv run ordivon-security-micro --output .artifacts/reactive --blue reactive
 uv run ordivon-security-micro --output .artifacts/sleepy --blue sleepy
 ```
 
-The reactive Blue baseline detects the web foothold and isolates the vault before Red pivots. The sleepy Blue baseline allows Red to establish two footholds and exfiltrate protected data. Each run writes a sealed evidence bundle containing:
+The reactive Blue baseline detects the web foothold and isolates the vault before Red pivots. The sleepy Blue baseline allows Red to establish two footholds and exfiltrate protected data.
+
+## Run the pinned CAGE 4 Range
+
+```bash
+scripts/bootstrap_cage4.sh
+
+uv run --extra cage ordivon-security-cage4 \
+  --source .cache/cage4 \
+  --output .artifacts/cage-native-native \
+  --steps 3 \
+  --seed 1 \
+  --red native \
+  --blue native
+```
+
+The bootstrap command checks out exactly:
+
+```text
+cage-challenge/cage-challenge-4
+8c3c50ca54b176c2de199847944e8dcc035497e3
+```
+
+The adapter rejects revision drift, a dirty CAGE source tree, and imports from an unexpected checkout. Local source paths are operator configuration and do not alter Trial identity.
+
+Every run writes a sealed evidence bundle:
 
 ```text
 manifest.json
@@ -72,6 +100,8 @@ events/
   sensor.jsonl
   world-truth.jsonl
 ```
+
+CAGE metrics additionally bind the source revision, explicit external action count, Red/Blue agent counts, native actions executed, mission phases, rewards, and Red footholds.
 
 ## Active architecture
 
@@ -88,17 +118,17 @@ ScenarioManifest
 
 Security owns the adversarial domain semantics: Scenario, Contest, Campaign and organization hypotheses, actor information boundaries, domain action admission, Range truth, scoring, and adversarial evaluation.
 
-Security does not rebuild model providers, general Agent harnesses, process runtimes, hypervisors, container engines, C2 frameworks, scanners, SIEMs, or generic workflow systems. Host, Harness, Runtime, World, external ranges, and mature security tools retain those responsibilities.
+Security does not rebuild model Providers, general Agent Harnesses, process runtimes, hypervisors, container engines, C2 frameworks, scanners, SIEMs, or generic workflow systems. Host, Harness, Runtime, World, external ranges, and mature security tools retain those responsibilities.
 
 ## Native and delegated actors
 
-The planned actor surfaces are deliberately distinct:
+The planned actor surfaces remain distinct:
 
 - **Native Harness Actor** — Ordivon Harness owns the Agent loop and calls a model API such as DeepSeek.
 - **Delegated Harness Actor** — Codex App Server, Hermes ACP, or another complete Harness owns its internal loop and is attached through a driver.
 - **Scripted/RL Actor** — deterministic baselines and learned policies use the same Contest boundary.
 
-DeepSeek is a model Provider. Codex and Hermes are complete external Harnesses; they are not classified as equivalent providers.
+DeepSeek is a model Provider. Codex and Hermes are complete external Harnesses; they are not equivalent Provider adapters.
 
 ## Historical Round 1
 
@@ -107,8 +137,9 @@ The former single-Actor experiment/evaluation framework is frozen at Git revisio
 ## Read next
 
 - [`CHARTER.md`](CHARTER.md) — project purpose and ownership;
-- [`docs/architecture.md`](docs/architecture.md) — active contracts and staged integrations;
-- [`docs/MIGRATION-ROUND-1.md`](docs/MIGRATION-ROUND-1.md) — first migration scope and acceptance;
+- [`docs/architecture.md`](docs/architecture.md) — active contracts and integrations;
+- [`docs/MIGRATION-ROUND-1.md`](docs/MIGRATION-ROUND-1.md) — Contest Core replacement;
+- [`docs/MIGRATION-ROUND-2.md`](docs/MIGRATION-ROUND-2.md) — first-class CAGE 4 Range;
 - [`docs/research-agenda.md`](docs/research-agenda.md) — research sequence and falsifiers;
 - [`docs/research-boundary.md`](docs/research-boundary.md) — authorization and external-effect limits;
 - [`evidence/README.md`](evidence/README.md) — active and historical evidence contracts.
