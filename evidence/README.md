@@ -15,7 +15,7 @@ audience:
   - maintainer
   - agent
 updated: 2026-08-04
-summary: Evidence contract for active multi-channel Contest bundles and frozen Round 1 reports.
+summary: Evidence contract for active multi-channel Contest and CAGE bundles plus frozen Round 1 reports.
 evidence_status: verified
 readiness: READY
 applies_to:
@@ -23,6 +23,7 @@ applies_to:
 related:
   - security.architecture
   - security.research-boundary
+  - security.migration.round2
   - security.authority
 ---
 # Evidence
@@ -55,9 +56,27 @@ An active claim is inadmissible when:
 - event bytes, sequence, previous digest, or bundle summaries fail verification;
 - secrets, real endpoints, third-party credentials, packet captures, or unauthorized artifacts enter Git.
 
+## CAGE evidence
+
+A CAGE Trial additionally binds:
+
+- source repository and exact revision;
+- semantic Range configuration digest;
+- Red and Blue Security Actor plans;
+- number of CAGE Red and Blue agents;
+- number of externally submitted actions;
+- explicit assertion that Red/Blue default action use is zero;
+- concrete native action names;
+- rewards, mission phases, and Red foothold counts;
+- management-plane truth summary.
+
+The adapter rejects a dirty source tree or an import from another checkout. Local checkout paths are operational locators and do not enter experiment identity. A claim that Ordivon controlled CAGE Red/Blue is inadmissible unless the external action count equals the number of controlled CAGE agents multiplied by executed ticks.
+
+CAGE observations and rewards remain simulator outputs. The current team-plan bridge does not prove that Security or a model selected each concrete parameterized native action.
+
 ## Repository retention
 
-Small sanitized bundles required for a published claim may be committed under a named experiment directory. Large raw Trials, sensitive captures, provider secrets, and ephemeral range images remain outside Git but must be referenced by stable Artifact identity when used.
+Small sanitized bundles required for a published claim may be committed under a named experiment directory. Large raw Trials, sensitive captures, Provider secrets, and ephemeral range images remain outside Git but must be referenced by stable Artifact identity when used.
 
 ## Frozen Round 1 evidence
 

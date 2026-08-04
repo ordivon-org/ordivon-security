@@ -18,6 +18,7 @@ managed_paths:
   - CHARTER.md
   - docs/architecture.md
   - docs/MIGRATION-ROUND-1.md
+  - docs/MIGRATION-ROUND-2.md
   - docs/research-agenda.md
   - docs/research-boundary.md
   - evidence/README.md
@@ -26,4 +27,4 @@ enforcement: strict
 maintainers:
   - zycxfyh
 public_projection: ordivon-web
-description: Authorized multi-Actor adversarial Contest laboratory, Range semantics, evidence, and strategic research.
+description: Authorized multi-Actor adversarial Contest laboratory with deterministic and pinned CAGE Ranges, evidence, and strategic research.
