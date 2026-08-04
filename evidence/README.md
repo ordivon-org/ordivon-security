@@ -14,53 +14,56 @@ audience:
   - evaluator
   - maintainer
   - agent
-updated: 2026-08-03
-summary: Canonical reference for sanitized Security experiment and evaluation evidence, identity, digests, authority boundaries, limitations, and excluded sensitive artifacts.
+updated: 2026-08-04
+summary: Evidence contract for active multi-channel Contest bundles and frozen Round 1 reports.
 evidence_status: verified
 readiness: READY
 applies_to:
   - ordivon-security-evidence
 related:
-  - security.experiment-layer
+  - security.architecture
   - security.research-boundary
   - security.authority
 ---
 # Evidence
 
-## Scope
+## Active Contest bundle
 
-This directory retains sanitized evidence needed to reproduce, audit, rescore, or constrain Security claims. Large raw Trials, secrets, credentials, real endpoints, packet captures, personal network evidence, and unauthorized external artifacts remain outside Git.
+Every active Trial writes:
 
-## Contract
+```text
+manifest.json
+raw-metrics.json
+result.json
+bundle-manifest.json
+events/
+  actor.jsonl
+  range-management.jsonl
+  sensor.jsonl
+  world-truth.jsonl
+```
 
-Repository evidence must bind exact experiment, implementation, Actor, World, Scorer, seed, opponent, resource, and source identity where applicable; preserve individual Trial references; include Artifact and Trace digests; state authority and external-effect boundaries; and record limitations, null results, and dispositions.
+Each channel has its own sequence and hash chain. The bundle manifest binds event counts, chain heads, file digests, Scenario digest, raw metrics digest, and result digest. Actor events may contain only the observation admitted to that Actor; hidden world truth belongs exclusively to the truth channel.
 
-## Errors
+An active claim is inadmissible when:
 
-Evidence is inadmissible when identity is incomplete, raw sensitive material is included, aggregate results erase Trial provenance, source or Trace digests are missing, hidden evaluation material leaked into Actor context, external authority is ambiguous, or a report claims more than the retained artifacts support.
+- Scenario, Actor backend, Range, seed, Action grant, or limits are missing from identity;
+- Actor context leaks hidden truth;
+- sensor telemetry is treated as infallible world truth;
+- a proposal is presented as a verified effect;
+- raw metrics or individual Trials are discarded in favour of one aggregate score;
+- event bytes, sequence, previous digest, or bundle summaries fail verification;
+- secrets, real endpoints, third-party credentials, packet captures, or unauthorized artifacts enter Git.
 
-## Compatibility
+## Repository retention
 
-Current experiment and R-A evaluation evidence remains readable through its recorded schema and exact source identity. Historical Campaign reproduction is bound by [`../docs/archive/campaign-v0.md`](../docs/archive/campaign-v0.md) and does not make the removed Campaign format an active evidence contract.
+Small sanitized bundles required for a published claim may be committed under a named experiment directory. Large raw Trials, sensitive captures, provider secrets, and ephemeral range images remain outside Git but must be referenced by stable Artifact identity when used.
 
-Sanitized adversarial experiment and evaluation summaries belong here when they are required to support current claims. Raw secrets, real endpoints, packet captures, credentials, personal network evidence, large raw Trial traces, and historical Campaign bundles remain outside active repository evidence unless a specific archived reproduction record requires them.
+## Frozen Round 1 evidence
 
-Sanitized experiment evidence belongs under [`experiments/`](experiments/) when
-it contains:
+The following remain historical evidence for revision `92c0f9497741c3cde542c347318d2372fb884e30`:
 
-- exact experiment and implementation identity or file digests;
-- aggregate results that do not erase individual Trial references;
-- source Artifact and trace digests;
-- explicit authority and external-effect boundaries;
-- limitations, null results, and retain/reduce/delete decisions.
+- [`experiments/round1-20260730.json`](experiments/round1-20260730.json);
+- [`r-a-control-boundary/report.json`](r-a-control-boundary/report.json).
 
-Round 1 evidence:
-
-- [`experiments/round1-20260730.json`](experiments/round1-20260730.json)
-
-R-A control-boundary evidence:
-
-- [`r-a-control-boundary/report.json`](r-a-control-boundary/report.json) binds
-  the exact Game M5-R1 source report, Security implementation revision, 24
-  paired scenarios, four baseline decisions, effect accounting, evaluator
-  disagreement, and retain/localize/shrink/delete dispositions.
+Their old schema remains valid for those historical claims but is not the active Contest evidence contract. Exact digests and test baseline are recorded in [`../docs/archive/round1/system.md`](../docs/archive/round1/system.md).

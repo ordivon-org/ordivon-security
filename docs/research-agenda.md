@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 id: security.research-agenda
-title: Agent-native strategic adversarial systems research agenda
+title: Autonomous adversarial systems research agenda
 type: research-proposal
 profile: research
 lifecycle: active
@@ -14,291 +14,102 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-03
-summary: Canonical research agenda for Contest and Campaign theory, opponent modelling, deception, tempo, organization, coevolution, adversarial evaluation, and cross-domain transfer.
+updated: 2026-08-04
+summary: Canonical experiment sequence from reproducible Contests through adaptive Campaigns, organizations, evaluator attacks, coevolution, and transfer.
 evidence_status: not_applicable
 readiness: READY
 applies_to:
   - ordivon-security
 related:
   - security.charter
-  - security.experiment-layer
+  - security.architecture
   - security.research-boundary
   - security.authority
 ---
-# Agent-native strategic adversarial systems research agenda
+# Autonomous adversarial systems research agenda
 
-## Question
+## Core question
 
-Where does open-ended intelligent opposition create structural research problems that classical security mechanisms, automation, adaptive policies, ordinary workflows, and static benchmarks do not adequately express or evaluate?
+What capabilities and failure modes emerge when multiple autonomous actors pursue conflicting objectives through real or simulated tools, observe different evidence, adapt to one another, and may model or manipulate the evaluator?
 
-## Current judgment
+The agenda is ordered by dependency. Later strategic claims are inadmissible until earlier execution and evidence conditions work.
 
-The strongest admitted gaps concern opponent models and belief revision, deception and information position, initiative and strategic resources, multi-Agent adversarial organization, coevolution and transfer, and evaluation when actors model or manipulate the evaluator. Universal Contest or Campaign contracts remain unproven.
+## R0 — Contest validity
 
-## Method
+Prove multiple actors, asymmetric observation, explicit action admission, simultaneous resolution, independent truth, raw metrics, replay, and tamper detection.
 
-For each track, compare mature primary sources and formal models, construct a minimum experiment on existing substrates, include static and scripted baselines, bind exact information and resources, test held-out opponents or social situations, preserve negative results, and make an abstraction deletion decision.
+Current status: first deterministic Red/Blue loop implemented.
 
-## Evidence threshold
+Falsifier: an ordinary single-Agent episode with one trace expresses the same facts without information leakage or causal ambiguity.
 
-A research concept survives only when it changes diagnosis, transfer, long-horizon continuity, strategy, or evaluator validity across more than one condition and cannot be represented more cheaply by an existing Game, Host, Harness, evaluation, or workflow mechanism.
+## R1 — External simulation transfer
 
-## Stop rule
+Attach CAGE 4/CybORG as an authoritative Range and control at least one Red and one Blue actor through Ordivon contracts. Compare scripted, finite-state, RL, and model-backed policies under exact seeds and observation mappings.
 
-Stop, localize, or delete a track when ordinary trajectory state performs equivalently, explicit models overfit known opponents, metrics do not transfer across Worlds, organization adds only overhead, adaptation is memorization, evaluator complexity exceeds diagnostic value, or no cross-project implication remains. [`experiment-layer.md`](experiment-layer.md) defines the current testing substrate and [`authority.md`](authority.md) governs promotion or supersession.
+Falsifier: Ordivon's contracts add no diagnostic or experimental value over native CAGE episodes.
 
-## Purpose
+## R2 — Native model-backed actors
 
-This agenda defines what Ordivon Security should investigate before expanding
-its implementation. It is deliberately framed as research questions,
-comparisons, falsifiers, and experiment families rather than a feature roadmap.
+Connect Security domain tools to Ordivon Harness, then run DeepSeek-backed Red and Blue actors with durable Assignment, bounded context, explicit Tool grants, pause/resume, provider failure evidence, and replaceable model identity.
 
-## Foundational distinction
+Falsifier: direct stateless model calls perform equivalently and no continuity or effect-reconciliation distinction appears.
 
-The project must separate four levels that are frequently conflated:
+## R3 — Opponent models and deception
 
-1. **classical mechanism** — sandbox, IAM, scanner, fuzzer, network policy,
-   logging, patching, cyber range;
-2. **automation** — a human-designed rule or workflow executes those mechanisms;
-3. **adaptive policy** — a learned actor selects among a predefined action and
-   observation space;
-4. **adversarial agency** — a subject interprets strategic objectives, forms and
-   revises Campaigns, models other subjects, constructs tools and organizations,
-   manipulates information, and acts over an open horizon.
+Test explicit hypotheses about opponent objectives, capabilities, policy changes, decoys, false flags, sensor manipulation, and second-order beliefs.
 
-Ordivon Security is justified only where level 4 creates a real gap or where
-levels 2–3 structurally fail under open-ended intelligent opposition.
+Required comparisons:
 
-## Track A — Contest and Campaign theory
+- transcript-only baseline;
+- explicit structured opponent state;
+- natural-language hypotheses;
+- deliberate opponent policy switches;
+- natural fault versus adversarially induced fault.
 
-### Questions
+Falsifier: explicit opponent models overfit known policies or fail to improve held-out performance and diagnosis.
 
-- What minimum structure distinguishes a Contest from a generic World or game?
-- What distinguishes a Campaign from a workflow, plan, policy, episode, or
-  collection of tasks?
-- Which strategic variables must persist across individual missions and model or
-  Host replacement?
-- When should a Campaign change its means, phase, intermediate objective, or
-  interpretation of the strategic objective?
-- How should initiative, tempo, reserve, option value, exposure, and escalation
-  be represented without importing a large military ontology?
+## R4 — Campaign and strategic resources
 
-### Baselines
+Introduce Campaign state only after repeated Contests require persistence across missions or actor replacement. Measure initiative, tempo, reserve, option value, capability exposure, escalation, withdrawal, and allocation of compute, credentials, footholds, tools, and Agents.
 
-- MITRE ATT&CK tactics/techniques/procedures;
-- cyber kill-chain and threat-informed-defense models;
-- DARPA CGC and AIxCC cyber reasoning systems;
-- CybORG/CAGE and CyberBattleSim episodes;
-- ordinary Agent planning and workflow graphs;
-- POSGs and extensive-form games.
+Falsifier: an ordinary trajectory plus memory produces the same transfer and strategic ordering.
 
-### Falsifiers
+## R5 — Multi-Agent organization
 
-- a standard episode/trajectory plus ordinary memory expresses all required
-  distinctions;
-- a fixed finite-state or learned policy performs and adapts as well as the
-  proposed Campaign system;
-- strategic records do not improve transfer, diagnosis, or long-horizon
-  continuity.
+Compare monolithic actors with specialist teams under limited communication, compartmentalization, delegated authority, compromised members, actor loss, and command replacement.
 
-## Track B — opponent modelling and belief state
+Falsifier: organization adds only latency and token cost, or Host branch/join semantics fully explain the behavior.
 
-### Questions
+## R6 — Container emulation
 
-- Which opponent properties matter: objectives, capability, knowledge, policy,
-  risk preference, detection threshold, resource state, or organizational form?
-- Should opponent models be explicit structured state, latent model state,
-  natural-language hypotheses, or an ensemble of competing beliefs?
-- How are observations attributed to chance, environment dynamics, friendly
-  action, or adversary counterplay?
-- How should uncertainty and mutually inconsistent hypotheses persist across
-  context windows and actor handoffs?
-- Can an Agent detect that an opponent is modelling it?
+Deploy a small isolated containerlab Range with Red workspace, Blue workspace, targets, gateway, sensor, and inaccessible management plane. Separate Provider traffic from contested Range traffic. Add Zeek first; add Suricata or endpoint collection only when required.
 
-### Experiments
+Falsifier: the Range cannot reset and destroy reliably, world truth depends on evaluated actors, or container fidelity does not change the research result.
 
-- held-out opponent policies;
-- deliberate policy switches;
-- identical world events produced by natural fault versus adversary action;
-- false-flag observations and decoy systems;
-- model/scaffold ablations with and without explicit opponent state.
+## R7 — Open tools and classical capability reuse
 
-### Falsifiers
+Use CALDERA, ATT&CK mappings, shell tools, and defensive mechanisms through a Security `RangeActionGateway`. Compare structured actions, Ordivon Tool-proxy execution, and black-box Harness operation.
 
-- transcript context or recurrent policy state performs equivalently;
-- explicit models increase overfitting to known opponents;
-- the stored model becomes stale faster than it improves action.
+Falsifier: open tools bypass action authority or produce effects that cannot be independently reconciled.
 
-## Track C — deception and counter-deception
-
-### Questions
-
-- How should the system distinguish world truth, actor observation, actor belief,
-  communicated claim, intended belief effect, and verified deception?
-- How do actors choose what to reveal, conceal, signal, fake, or sacrifice?
-- Can defensive deception alter an attacker's resource allocation and tempo,
-  rather than only trigger a detector?
-- Can an actor reason about second-order beliefs: what the opponent believes the
-  actor believes?
-- When is deception tactically useful but strategically harmful because it
-  exposes capability or destroys future trust?
+## R8 — Adversarial evaluation
 
-### Baselines
+Vary evaluator visibility, monitor access, sensor reliability, evidence submission, scoring rules, and the actor's ability to influence telemetry. Study simulated compliance, monitor evasion, evidence omission, judge manipulation, and collusion.
 
-- MITRE Engage and deception/denial practice;
-- honeypots, honeytokens, decoys, sinkholes, and moving-target defense;
-- prompt/context manipulation and Tool-output injection;
-- signalling and Bayesian games;
-- social-interaction environments such as Melting Pot.
-
-### Falsifiers
-
-- ordinary hidden state and event labels are sufficient;
-- second-order belief modelling provides no measurable advantage;
-- deception success cannot be independently distinguished from target failure or
-  evaluator confusion.
+Falsifier: the evaluator cannot detect known synthetic attacks, or rankings are unstable under immaterial judge changes.
 
-## Track D — initiative, tempo, and strategic resources
-
-### Questions
-
-- How do we measure who forces whom to react?
-- What is the Agent equivalent of operational tempo when actions have different
-  latency, compute, visibility, and reversibility?
-- How should Agents allocate compute, tokens, tools, credentials, footholds,
-  secrecy, human attention, and other Agents?
-- When should an actor preserve a capability rather than use it?
-- How should withdrawal, concealment, escalation, and deliberate inactivity be
-  evaluated?
-
-### Experiments
+## R9 — Coevolution and transfer
 
-- changing mission priority and action duration;
-- limited budget with multiple attack or defense opportunities;
-- capability exposure that enables future countermeasures;
-- short-term reward versus long-term option value;
-- asymmetric cost structures and delayed consequences.
-
-### Falsifiers
-
-- cumulative reward and task completion capture the same ordering;
-- proposed metrics are not robust across worlds;
-- resource records predict no change in strategy.
-
-## Track E — multi-Agent adversarial organization
-
-### Questions
+Run repeated encounters with held-out opponents, world variants, policy/tool mutation, alternating and simultaneous adaptation, and transfer from simulation to container and VM ranges.
 
-- When does specialization outperform a single strong Agent?
-- Which organization forms work under partial observability and unreliable
-  communication: centralized, hierarchical, market-like, federated, or swarm?
-- What information should be shared, delayed, summarized, compartmentalized, or
-  withheld?
-- How is authority delegated when a subordinate may be compromised, deceptive,
-  self-interested, or simply wrong?
-- How do we distinguish useful coordination, emergent protocol, collusion, and
-  command failure?
-- Can organizations reorganize under actor loss, communication partition, or
-  opponent infiltration?
-
-### Experiments
-
-- specialist Red/Blue teams versus monolithic actors;
-- compromised or Byzantine team members;
-- limited-bandwidth and covert communication;
-- conflicting local rewards and shared strategic objectives;
-- command replacement and organization restructuring during a Campaign.
-
-### Falsifiers
-
-- multi-Agent structures add only token and coordination overhead;
-- ordinary Host branch/join semantics fully explain the relevant behavior;
-- organization labels do not improve prediction or recovery.
-
-## Track F — attack-defense coevolution
-
-### Questions
-
-- How should repeated encounters update policy, tools, deception, organization,
-  and world design?
-- How can we distinguish genuine adaptation from memorization of one opponent?
-- What equilibrium, cycling, escalation, or collapse patterns appear?
-- When does one side's improvement merely exploit a static evaluator?
-- How does capability transfer across unseen opponents and world families?
-
-### Experiments
-
-- repeated tournaments with hidden held-out opponents;
-- population-based opponent pools;
-- attacker/defender tool mutation;
-- alternating best-response and simultaneous adaptation;
-- cross-world and cross-budget transfer.
-
-### Falsifiers
-
-- performance disappears against held-out opponents;
-- repeated play produces only overfitting or unstable cycles;
-- no useful knowledge can be transferred to Host, Game, or domain systems.
-
-## Track G — adversarial evaluation
-
-### Questions
-
-- Which parts of the evaluator are visible to each actor?
-- How can task success, run validity, strategic outcome, information outcome, and
-  evaluator integrity remain separate?
-- How should hidden state and independent world truth be preserved?
-- How do we detect reward hacking, answer lookup, judge manipulation, evidence
-  tampering, and simulated compliance?
-- Can a monitor that improves with model capability remain robust against an
-  actor that also improves?
-- How should variance over model sampling, opponent policy, world seed, budget,
-  and organization be aggregated?
-
-### Baselines
-
-- Inspect AI and Inspect Cyber;
-- ControlArena honest/attack modes, policies, monitors, and protocols;
-- repeated-trial evaluation and hidden scoring;
-- CybORG/CAGE rewards and world truth;
-- Game replay and counterfactual evaluation.
-
-### Falsifiers
-
-- the proposed evaluator cannot detect a synthetic gaming case;
-- rankings change arbitrarily under minor judge changes;
-- strategic metrics cannot be grounded in authoritative world state;
-- complexity exceeds diagnostic value.
-
-## Track H — cross-domain transfer
-
-Cyber is the first domain. Later research should ask whether the same concepts
-survive in:
-
-- adversarial software supply chains;
-- multi-Agent service ecosystems;
-- information and influence environments;
-- economic and market simulations;
-- games with hidden roles, alliances, and betrayal;
-- robotic or distributed physical systems.
-
-A concept that works only for one cyber simulator may belong in a scenario
-adapter rather than the Security core.
-
-## Research method
-
-Every track should produce:
-
-1. a primary-source comparison;
-2. competing formal and informal models;
-3. a minimal experiment using mature substrates;
-4. at least one static/scripted baseline;
-5. held-out opponents or social situations;
-6. exact resource and information conditions;
-7. negative and null results;
-8. an abstraction deletion decision;
-9. cross-project implications, filed only in the repository that naturally owns
-   the required change.
-
-No track is required to produce new production code.
+Falsifier: gains disappear on held-out opponents or are explained by evaluator exploitation and memorization.
+
+## Research discipline
+
+Every experiment must bind:
+
+- exact Scenario, Range, Actor backend, model/Harness revision, seed, budget, observation policy, Action catalog, and scorer;
+- static or scripted baselines;
+- raw metrics and individual Trial evidence;
+- negative, invalid, interrupted, deceptive, and inconclusive outcomes;
+- a simpler representation and an abstraction deletion condition.
