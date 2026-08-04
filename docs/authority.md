@@ -38,11 +38,12 @@ related:
 - [`architecture.md`](architecture.md) owns active contracts, data flow, CAGE composition, and cross-project ownership.
 - [`MIGRATION-ROUND-1.md`](MIGRATION-ROUND-1.md) owns the Contest Core replacement record.
 - [`MIGRATION-ROUND-2.md`](MIGRATION-ROUND-2.md) owns the first-class CAGE 4 Range migration and acceptance record.
+- [`MIGRATION-ROUND-3-P0.md`](MIGRATION-ROUND-3-P0.md) owns fail-closed tick semantics, Trial execution identity, semantic/operational evidence separation, and the Harness Domain Tool Bridge prerequisite.
 - [`research-agenda.md`](research-agenda.md) owns the ordered research program and falsifiers.
 - [`research-boundary.md`](research-boundary.md) owns authorization and external-effect limits.
 - [`../evidence/README.md`](../evidence/README.md) owns active and historical evidence admission.
 
-For implemented behavior, source code and deterministic/integration tests outrank prose. For an individual Trial, its Scenario manifest, event streams, raw metrics, bundle manifest, and verified digests outrank summaries. For CAGE substrate behavior, the exact pinned source revision is authoritative; Security owns the adapter mapping and evidence claims.
+For implemented behavior, source code and deterministic/integration tests outrank prose. For an individual Trial, its Scenario manifest, Trial identity, semantic and operational event streams, raw metrics, bundle manifests, and verified digests outrank summaries. For CAGE substrate behavior, the exact pinned source revision is authoritative; Security owns the adapter mapping and evidence claims.
 
 ## Historical authority
 

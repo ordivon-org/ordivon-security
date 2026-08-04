@@ -1,6 +1,11 @@
 """Stable public facade for the active Security Contest core."""
 
-from .actors import ActorBackend, SequenceActorBackend
+from .actors import (
+    ActorBackend,
+    ActorProposalFailure,
+    ActorProposalFailureCode,
+    SequenceActorBackend,
+)
 from .contest import (
     ActionAdmission,
     ActionProposal,
@@ -11,7 +16,13 @@ from .contest import (
     ScenarioManifest,
 )
 from .contest.runner import ContestRunner
-from .evidence import EvidenceBundle, EvidenceRecorder, verify_evidence_bundle
+from .evidence import (
+    EvidenceBundle,
+    EvidenceRecorder,
+    OperationalEvidenceEvent,
+    verify_evidence_bundle,
+    verify_operational_evidence,
+)
 from .ranges import (
     CAGE4_NATIVE_PLAN,
     CAGE4_PLANS,
@@ -29,6 +40,8 @@ __all__ = [
     "ActionProposal",
     "ActorActionResult",
     "ActorBackend",
+    "ActorProposalFailure",
+    "ActorProposalFailureCode",
     "ActorBinding",
     "ActorObservation",
     "CAGE4_NATIVE_PLAN",
@@ -42,9 +55,11 @@ __all__ = [
     "ContestRunner",
     "EvidenceBundle",
     "EvidenceRecorder",
+    "OperationalEvidenceEvent",
     "MicroContestRange",
     "RangeBackend",
     "ScenarioManifest",
     "SequenceActorBackend",
     "verify_evidence_bundle",
+    "verify_operational_evidence",
 ]

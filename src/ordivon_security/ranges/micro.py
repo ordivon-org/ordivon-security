@@ -12,6 +12,7 @@ from ordivon_security.contest.model import (
     ScenarioManifest,
     WorldTruthSnapshot,
 )
+from ordivon_security.identity import security_source_identity
 
 from .protocol import RangeDestroyReceipt, RangeInstance, RangeTerminal
 
@@ -52,6 +53,14 @@ class MicroContestRange:
 
     def __init__(self) -> None:
         self._states: dict[str, _MicroState] = {}
+
+    @property
+    def execution_identity(self) -> JsonObject:
+        return {
+            "rangeId": self.range_id,
+            "adapterRevision": "micro-range-adapter-v1",
+            "implementation": security_source_identity(),
+        }
 
     def create(self, trial_id: str, manifest: ScenarioManifest, seed: int) -> RangeInstance:
         del seed

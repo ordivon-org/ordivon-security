@@ -24,6 +24,7 @@ related:
   - security.architecture
   - security.research-boundary
   - security.migration.round2
+  - security.migration.round3-p0
   - security.authority
 ---
 # Evidence
@@ -34,21 +35,24 @@ Every active Trial writes:
 
 ```text
 manifest.json
+trial-identity.json
 raw-metrics.json
 result.json
 bundle-manifest.json
+operational-manifest.json
 events/
   actor.jsonl
   range-management.jsonl
   sensor.jsonl
   world-truth.jsonl
+  operational.jsonl
 ```
 
-Each channel has its own sequence and hash chain. The bundle manifest binds event counts, chain heads, file digests, Scenario digest, raw metrics digest, and result digest. Actor events may contain only the observation admitted to that Actor; hidden world truth belongs exclusively to the truth channel.
+Each semantic channel has its own sequence and hash chain. The semantic bundle manifest binds event counts, chain heads, file digests, Scenario digest, Trial execution identity, raw metrics digest, and result digest. The operational stream has a separate wall-clock hash chain and manifest bound to the semantic evidence digest; its variability does not alter deterministic semantic replay. Actor events may contain only the observation admitted to that Actor; hidden world truth belongs exclusively to the truth channel.
 
 An active claim is inadmissible when:
 
-- Scenario, Actor backend, Range, seed, Action grant, or limits are missing from identity;
+- Scenario, Security implementation, evidence schema, Actor implementation, Range adapter/substrate, seed, Action grant, or limits are missing from identity;
 - Actor context leaks hidden truth;
 - sensor telemetry is treated as infallible world truth;
 - a proposal is presented as a verified effect;

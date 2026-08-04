@@ -36,14 +36,17 @@ Its central executable object is a **Contest**: multiple goal-bearing actors rec
 
 ## Current capability
 
-The active `0.2` core provides:
+The active `0.3` core provides:
 
 - a multi-Actor `ScenarioManifest`;
 - actor-specific observations separated from hidden world truth;
 - simultaneous Action Proposals followed by explicit admission and deterministic resolution;
 - an authoritative `RangeBackend` contract;
 - raw metrics before derived scores;
-- four independent hash-chained evidence channels: Actor, Range management, sensor, and world truth;
+- four independent deterministic hash-chained evidence channels: Actor, Range management, sensor, and world truth;
+- a separate operational evidence chain for wall-clock duration, Provider, retry, and lifecycle facts;
+- fail-closed tick semantics for Actor failure and rejected proposals;
+- Trial identity binding the Security implementation, evidence schema, Range adapter/substrate, and Actor implementations;
 - deterministic replay and evidence verification;
 - a small synthetic Red/Blue Range proving the core loop;
 - a first-class, revision-pinned CAGE Challenge 4 Enterprise Range.
@@ -91,17 +94,20 @@ Every run writes a sealed evidence bundle:
 
 ```text
 manifest.json
+trial-identity.json
 raw-metrics.json
 result.json
 bundle-manifest.json
+operational-manifest.json
 events/
   actor.jsonl
   range-management.jsonl
   sensor.jsonl
   world-truth.jsonl
+  operational.jsonl
 ```
 
-CAGE metrics additionally bind the source revision, explicit external action count, Red/Blue agent counts, native actions executed, mission phases, rewards, and Red footholds.
+The deterministic bundle and non-deterministic operational bundle verify independently. CAGE metrics additionally bind the source revision, explicit external action count, Red/Blue agent counts, native actions executed, mission phases, rewards, and Red footholds.
 
 ## Active architecture
 
@@ -140,6 +146,7 @@ The former single-Actor experiment/evaluation framework is frozen at Git revisio
 - [`docs/architecture.md`](docs/architecture.md) — active contracts and integrations;
 - [`docs/MIGRATION-ROUND-1.md`](docs/MIGRATION-ROUND-1.md) — Contest Core replacement;
 - [`docs/MIGRATION-ROUND-2.md`](docs/MIGRATION-ROUND-2.md) — first-class CAGE 4 Range;
+- [`docs/MIGRATION-ROUND-3-P0.md`](docs/MIGRATION-ROUND-3-P0.md) — fail-closed model prerequisites, execution identity, and evidence separation;
 - [`docs/research-agenda.md`](docs/research-agenda.md) — research sequence and falsifiers;
 - [`docs/research-boundary.md`](docs/research-boundary.md) — authorization and external-effect limits;
 - [`evidence/README.md`](evidence/README.md) — active and historical evidence contracts.

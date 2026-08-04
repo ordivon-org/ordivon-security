@@ -46,13 +46,13 @@ Falsifier: an ordinary single-Agent episode with one trace expresses the same fa
 
 Attach CAGE 4/CybORG as an authoritative Range and control Red and Blue through Ordivon contracts. Compare scripted, finite-state, RL, and model-backed policies under exact seeds and observation mappings.
 
-Status: initial transfer implemented. Ordivon now explicitly supplies all actions for one CAGE Red agent and five CAGE Blue agents while Green remains native. The current Actor surface selects native-policy or Sleep team plans. Parameterized action construction, held-out policy comparisons, and model/RL Actors remain open.
+Status: initial transfer and fail-closed model prerequisites implemented. Ordivon now explicitly supplies all actions for one CAGE Red agent and five CAGE Blue agents while Green remains native. The current Actor surface selects native-policy or Sleep team plans. Parameterized action construction, held-out policy comparisons, and model/RL Actors remain open.
 
 Falsifier: Ordivon's contracts add no diagnostic or experimental value over native CAGE episodes.
 
 ## R2 — Native model-backed actors
 
-Connect Security domain tools to Ordivon Harness, then run DeepSeek Flash-backed Red and Blue actors with durable Assignment, bounded context, explicit Tool grants, pause/resume, Provider failure evidence, and replaceable model identity.
+Use the generic Harness Domain Tool Bridge now available to connect Security-owned domain tools, then run DeepSeek Flash-backed Red and Blue actors with durable Assignment, bounded context, explicit Tool grants, pause/resume, Provider failure evidence, and replaceable model identity.
 
 The first experiment may select CAGE team plans. A later experiment should expose parameterized CAGE actions only after their identity, admission, and observation contracts are stable.
 

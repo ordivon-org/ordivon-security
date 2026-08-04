@@ -20,6 +20,7 @@ from ordivon_security.contest.model import (
     WorldTruthSnapshot,
     json_object,
 )
+from ordivon_security.identity import security_source_identity
 
 from .protocol import RangeDestroyReceipt, RangeInstance, RangeTerminal
 
@@ -95,6 +96,16 @@ class Cage4RangeBackend:
     def __init__(self, config: Cage4RangeConfig) -> None:
         self.config = config
         self._states: dict[str, _Cage4State] = {}
+
+    @property
+    def execution_identity(self) -> JsonObject:
+        return {
+            "rangeId": self.range_id,
+            "adapterRevision": "cage4-team-plan-adapter-v2",
+            "adapterImplementation": security_source_identity(),
+            "substrate": self.config.identity_dict(),
+            "rangeConfigDigest": self.config.digest,
+        }
 
     def create(self, trial_id: str, manifest: ScenarioManifest, seed: int) -> RangeInstance:
         if manifest.range_id != self.range_id:
