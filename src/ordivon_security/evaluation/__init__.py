@@ -51,6 +51,17 @@ from .static import (
     StaticAnalyzerResult,
 )
 from .vault import SampleVault
+from .windows_kvm import (
+    WindowsKvmBaseImage,
+    WindowsKvmEvaluationBackend,
+    WindowsKvmProviderConfig,
+    windows_kvm_qemu_arguments,
+)
+from .windows_kvm_build import (
+    WindowsKvmBaseBuildConfig,
+    build_windows_kvm_base,
+    windows_kvm_install_arguments,
+)
 
 __all__ = [
     "ArchiveInventoryAnalyzer",
@@ -94,5 +105,12 @@ __all__ = [
     "verify_case_snapshot_against_root",
     "verify_evaluation_evidence",
     "verify_evaluation_operational_evidence",
+    "WindowsKvmBaseBuildConfig",
+    "WindowsKvmBaseImage",
+    "WindowsKvmEvaluationBackend",
+    "WindowsKvmProviderConfig",
+    "build_windows_kvm_base",
+    "windows_kvm_install_arguments",
+    "windows_kvm_qemu_arguments",
     "write_quarantine_audit",
 ]
