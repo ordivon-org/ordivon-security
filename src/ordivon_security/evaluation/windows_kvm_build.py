@@ -42,7 +42,6 @@ class WindowsKvmBaseBuildConfig:
     runuser_path: Path = Path("/usr/bin/runuser")
     mkfs_fat_path: Path = Path("/usr/bin/mkfs.fat")
     mcopy_path: Path = Path("/usr/bin/mcopy")
-    xorriso_path: Path = Path("/usr/bin/xorriso")
     firmware_code_path: Path = Path("/usr/share/edk2/x64/OVMF_CODE.secboot.4m.fd")
     firmware_vars_template_path: Path = Path("/usr/share/edk2/x64/OVMF_VARS.4m.fd")
     run_user: str = "qemu"
@@ -52,6 +51,7 @@ class WindowsKvmBaseBuildConfig:
     disk_size_gib: int = 80
     installation_timeout_seconds: int = 7200
     qmp_ready_timeout_seconds: int = 90
+    boot_prompt_key_delay_seconds: int = 2
 
     def __post_init__(self) -> None:
         if (
@@ -61,6 +61,7 @@ class WindowsKvmBaseBuildConfig:
                 self.disk_size_gib,
                 self.installation_timeout_seconds,
                 self.qmp_ready_timeout_seconds,
+                self.boot_prompt_key_delay_seconds,
             )
             < 1
         ):
@@ -72,7 +73,6 @@ class WindowsKvmBaseBuildConfig:
             self.runuser_path,
             self.mkfs_fat_path,
             self.mcopy_path,
-            self.xorriso_path,
         ):
             if not path.is_file() or not path.resolve().is_file():
                 raise ValueError(f"Windows KVM build tool is missing or unsafe: {path}")
@@ -135,6 +135,27 @@ def _create_fat_image(config: WindowsKvmBaseBuildConfig, path: Path, *, size_mib
     _run_checked([str(config.mkfs_fat_path), "-n", _BUILD_LABEL, str(path)])
 
 
+def _copy_to_fat(
+    config: WindowsKvmBaseBuildConfig,
+    image_path: Path,
+    source_path: Path,
+    destination_name: str,
+) -> None:
+    environment = {**os.environ, "MTOOLS_SKIP_CHECK": "1"}
+    _run_checked(
+        [
+            str(config.mcopy_path),
+            "-o",
+            "-i",
+            str(image_path),
+            str(source_path),
+            f"::/{destination_name}",
+        ],
+        timeout_seconds=30,
+        environment=environment,
+    )
+
+
 def _start_swtpm(
     config: WindowsKvmBaseBuildConfig,
     *,
@@ -181,7 +202,7 @@ def windows_kvm_install_arguments(
     config: WindowsKvmBaseBuildConfig,
     base_image_path: Path,
     vars_path: Path,
-    install_iso_path: Path,
+    source_iso_path: Path,
     result_disk_path: Path,
     qmp_path: Path,
     tpm_socket_path: Path,
@@ -227,11 +248,13 @@ def windows_kvm_install_arguments(
         "-device",
         "ide-hd,drive=osdisk,bus=ide.0",
         "-drive",
-        f"file={install_iso_path},if=none,format=raw,readonly=on,id=installcd",
+        f"file={source_iso_path},if=none,format=raw,readonly=on,id=installcd",
         "-device",
         "ide-cd,drive=installcd,bus=ide.1",
         "-device",
         "qemu-xhci,id=xhci",
+        "-device",
+        "usb-kbd,bus=xhci.0",
         "-drive",
         f"file={result_disk_path},if=none,format=raw,cache=none,aio=threads,id=resultdisk",
         "-device",
@@ -280,10 +303,13 @@ def _build_windows_kvm_base_impl(
     guest_runner_path = _resource_path("guest-runner.ps1")
     base_finalize_path = _resource_path("base-finalize.ps1")
     setup_complete_path = _resource_path("SetupComplete.cmd")
+    install_bootstrap_path = _resource_path("install-bootstrap.ps1")
     unattend_template_path = _resource_path("Autounattend.xml.in")
     guest_runner_digest, guest_runner_bytes = _digest_path(guest_runner_path)
-    base_finalize_digest, _ = _digest_path(base_finalize_path)
-    setup_complete_digest, _ = _digest_path(setup_complete_path)
+    base_finalize_digest, base_finalize_bytes = _digest_path(base_finalize_path)
+    setup_complete_digest, setup_complete_bytes = _digest_path(setup_complete_path)
+    install_bootstrap_digest, install_bootstrap_bytes = _digest_path(install_bootstrap_path)
+    unattend_template_digest, unattend_template_bytes = _digest_path(unattend_template_path)
     firmware_digest, _ = _digest_path(config.firmware_code_path)
     if build_path.exists():
         raise FileExistsError(f"Windows KVM base build path already exists: {build_path}")
@@ -292,47 +318,16 @@ def _build_windows_kvm_base_impl(
 
     base_image_path = build_path / "windows-11-enterprise-eval-25h2-base.qcow2"
     vars_path = build_path / "OVMF_VARS.4m.fd"
-    install_iso_path = build_path / "windows-autoinstall.iso"
     result_disk_path = build_path / "build-result.img"
     qmp_path = build_path / "qmp.sock"
     qemu_stdout_path = build_path / "qemu.stdout.log"
     qemu_stderr_path = build_path / "qemu.stderr.log"
-    oem_path = build_path / "oem"
-    guest_destination = oem_path / "$1" / "ProgramData" / "Ordivon" / "guest-runner.ps1"
-    finalize_destination = oem_path / "$1" / "ProgramData" / "Ordivon" / "base-finalize.ps1"
-    setup_destination = oem_path / "$$" / "Setup" / "Scripts" / "SetupComplete.cmd"
-    guest_destination.parent.mkdir(parents=True)
-    setup_destination.parent.mkdir(parents=True)
-    shutil.copyfile(guest_runner_path, guest_destination)
-    shutil.copyfile(base_finalize_path, finalize_destination)
-    shutil.copyfile(setup_complete_path, setup_destination)
     password = secrets.token_urlsafe(32)
     unattend = unattend_template_path.read_text(encoding="utf-8").replace("@@PASSWORD@@", password)
     unattend_path = build_path / "Autounattend.xml"
     _write_private(unattend_path, unattend.encode("utf-8"))
     password = ""
 
-    _run_checked(
-        [
-            str(config.xorriso_path),
-            "-indev",
-            str(config.source_iso_path),
-            "-outdev",
-            str(install_iso_path),
-            "-map",
-            str(unattend_path),
-            "/Autounattend.xml",
-            "-map",
-            str(oem_path),
-            "/sources/$OEM$",
-            "-boot_image",
-            "any",
-            "replay",
-        ],
-        timeout_seconds=1800,
-    )
-    install_iso_path.chmod(0o600)
-    _set_owner(install_iso_path, user=config.run_user, group=config.run_group)
     _run_checked(
         [
             str(config.qemu_img_path),
@@ -348,13 +343,21 @@ def _build_windows_kvm_base_impl(
     for path in (base_image_path, vars_path):
         path.chmod(0o600)
         _set_owner(path, user=config.run_user, group=config.run_group)
-    _create_fat_image(config, result_disk_path, size_mib=16)
+    _create_fat_image(config, result_disk_path, size_mib=32)
+    for source_path, destination_name in (
+        (unattend_path, "Autounattend.xml"),
+        (install_bootstrap_path, "install-bootstrap.ps1"),
+        (guest_runner_path, "guest-runner.ps1"),
+        (base_finalize_path, "base-finalize.ps1"),
+        (setup_complete_path, "SetupComplete.cmd"),
+    ):
+        _copy_to_fat(config, result_disk_path, source_path, destination_name)
     swtpm_pid, tpm_socket_path = _start_swtpm(config, build_path=build_path)
     arguments = windows_kvm_install_arguments(
         config=config,
         base_image_path=base_image_path,
         vars_path=vars_path,
-        install_iso_path=install_iso_path,
+        source_iso_path=config.source_iso_path,
         result_disk_path=result_disk_path,
         qmp_path=qmp_path,
         tpm_socket_path=tpm_socket_path,
@@ -369,6 +372,7 @@ def _build_windows_kvm_base_impl(
     network_device_count = -1
     qemu_status: JsonObject = {}
     qmp_pci: JsonValue = []
+    boot_prompt_key_sent_at_ms = 0
     try:
         with (
             qemu_stdout_path.open("xb") as stdout_handle,
@@ -386,6 +390,18 @@ def _build_windows_kvm_base_impl(
                 if network_devices:
                     qmp.execute("quit")
                     raise RuntimeError("Windows KVM base build exposed a network device")
+                time.sleep(config.boot_prompt_key_delay_seconds)
+                qmp.execute(
+                    "send-key",
+                    {
+                        "keys": cast(
+                            list[JsonValue],
+                            [{"type": "qcode", "data": "spc"}],
+                        ),
+                        "hold-time": 100,
+                    },
+                )
+                boot_prompt_key_sent_at_ms = time.time_ns() // 1_000_000
             try:
                 process.wait(timeout=config.installation_timeout_seconds)
             except subprocess.TimeoutExpired as error:
@@ -427,6 +443,12 @@ def _build_windows_kvm_base_impl(
         "baseVarsDigest": base_vars_digest,
         "firmwareCodeDigest": firmware_digest,
         "guestRunnerDigest": guest_runner_digest,
+        "baseFinalizeDigest": base_finalize_digest,
+        "setupCompleteDigest": setup_complete_digest,
+        "installBootstrapDigest": install_bootstrap_digest,
+        "unattendTemplateDigest": unattend_template_digest,
+        "sourceMediaMode": "original-udf-read-only",
+        "bootPromptAssist": "qmp-send-key:spc",
         "windowsBuild": windows_build,
         "machine": "q35,accel=kvm,smm=on",
         "cpu": "host",
@@ -472,12 +494,18 @@ def _build_windows_kvm_base_impl(
             "guestRunner": guest_runner_digest,
             "baseFinalize": base_finalize_digest,
             "setupComplete": setup_complete_digest,
+            "installBootstrap": install_bootstrap_digest,
+            "unattendTemplate": unattend_template_digest,
         },
         "byteLengths": {
             "sourceIso": source_iso_bytes,
             "baseImage": base_image_bytes,
             "baseVars": base_vars_bytes,
             "guestRunner": guest_runner_bytes,
+            "baseFinalize": base_finalize_bytes,
+            "setupComplete": setup_complete_bytes,
+            "installBootstrap": install_bootstrap_bytes,
+            "unattendTemplate": unattend_template_bytes,
         },
         "guest": base_ready,
         "buildHostCpu": _host_cpu_identity(),
@@ -489,6 +517,11 @@ def _build_windows_kvm_base_impl(
             "networkDeviceCount": network_device_count,
             "qmpInitialStatus": qemu_status,
             "runUser": config.run_user,
+            "sourceMediaMode": "original-udf-read-only",
+            "configurationDiskLabel": _BUILD_LABEL,
+            "bootPromptAssist": "qmp-send-key:spc",
+            "bootPromptKeyDelaySeconds": config.boot_prompt_key_delay_seconds,
+            "bootPromptKeySentAtMs": boot_prompt_key_sent_at_ms,
         },
         "build": {
             "startedAtMs": started_at_ms,
@@ -508,6 +541,10 @@ def _build_windows_kvm_base_impl(
         "sourceIsoDigest": source_iso_digest,
         "windowsBuild": windows_build,
         "networkDevicePresent": False,
+        "sourceMediaMode": "original-udf-read-only",
+        "configurationDiskLabel": _BUILD_LABEL,
+        "bootPromptAssist": "qmp-send-key:spc",
+        "bootPromptKeySentAtMs": boot_prompt_key_sent_at_ms,
         "completedAtMs": completed_at_ms,
     }
     _write_private(receipt_path, canonical_bytes(receipt) + b"\n")
@@ -521,6 +558,8 @@ def _build_windows_kvm_base_impl(
                 "status": qemu_status,
                 "pci": qmp_pci,
                 "networkDevicePresent": network_device_count > 0,
+                "bootPromptAssist": "qmp-send-key:spc",
+                "bootPromptKeySentAtMs": boot_prompt_key_sent_at_ms,
             }
         )
         + b"\n",

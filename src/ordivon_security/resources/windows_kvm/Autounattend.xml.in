@@ -28,6 +28,16 @@
     </component>
   </settings>
   <settings pass="specialize">
+    <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <RunSynchronous>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>1</Order>
+          <Description>Install Ordivon base scripts</Description>
+          <Path>powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$v=Get-Volume -FileSystemLabel 'ORDIVONBLD' -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -eq $v -or $null -eq $v.DriveLetter) { exit 20 }; &amp; (Join-Path ($v.DriveLetter + ':\') 'install-bootstrap.ps1')"</Path>
+          <WillReboot>Never</WillReboot>
+        </RunSynchronousCommand>
+      </RunSynchronous>
+    </component>
     <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <ComputerName>ORDIVON-BASE</ComputerName><TimeZone>UTC</TimeZone><RegisteredOwner>Ordivon</RegisteredOwner><RegisteredOrganization>Ordivon</RegisteredOrganization>
     </component>

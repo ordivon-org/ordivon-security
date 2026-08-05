@@ -9,7 +9,7 @@ from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
-from ordivon_security._canonical import JsonObject, canonical_digest
+from ordivon_security._canonical import JsonObject, JsonValue, canonical_digest
 from ordivon_security.evaluation import (
     AuthorityManifest,
     EnvironmentIdentity,
@@ -55,7 +55,6 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.fake_mdir = self.tools / "mdir"
         self.fake_mcopy.symlink_to(fake_mtools)
         self.fake_mdir.symlink_to(fake_mtools)
-        self.fake_xorriso = self._tool("xorriso", "xorriso test")
         self.firmware = self.root / "OVMF_CODE.fd"
         self.firmware.write_bytes(b"firmware")
         self.vars = self.root / "OVMF_VARS.fd"
@@ -63,7 +62,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.base_image = self.root / "base.qcow2"
         self.base_image.write_bytes(b"sealed-base-image")
         self.manifest_path = self.root / "base.manifest.json"
-        environment_identity = {
+        environment_identity: JsonObject = {
             "sourceIsoDigest": "sha256:" + "1" * 64,
             "baseImageDigest": _digest(self.base_image),
             "baseVarsDigest": _digest(self.vars),
@@ -223,7 +222,6 @@ class WindowsKvmP0Tests(unittest.TestCase):
             runuser_path=self.fake_runuser,
             mkfs_fat_path=self.fake_mkfs,
             mcopy_path=self.fake_mcopy,
-            xorriso_path=self.fake_xorriso,
             firmware_code_path=self.firmware,
             firmware_vars_template_path=self.vars,
             run_user="root",
@@ -236,7 +234,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             config=build_config,
             base_image_path=self.root / "build.qcow2",
             vars_path=self.root / "build-vars.fd",
-            install_iso_path=self.root / "autoinstall.iso",
+            source_iso_path=source_iso,
             result_disk_path=self.root / "build-result.img",
             qmp_path=self.root / "build-qmp.sock",
             tpm_socket_path=self.root / "build-tpm.sock",
@@ -244,6 +242,8 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertEqual(arguments[arguments.index("-nic") + 1], "none")
         self.assertNotIn("-netdev", arguments)
         self.assertIn("order=c,once=d,menu=off", arguments)
+        self.assertIn(f"file={source_iso},if=none,format=raw,readonly=on,id=installcd", arguments)
+        self.assertIn("usb-kbd,bus=xhci.0", arguments)
 
     def test_fat_labels_are_valid_and_finalize_uses_build_label(self) -> None:
         from ordivon_security.evaluation.windows_kvm import _RUN_LABEL
@@ -260,6 +260,26 @@ class WindowsKvmP0Tests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn(_BUILD_LABEL, finalize)
         self.assertNotIn("ORDIVON_BUILD", finalize)
+        unattend = (
+            Path(__file__).parents[2]
+            / "src"
+            / "ordivon_security"
+            / "resources"
+            / "windows_kvm"
+            / "Autounattend.xml.in"
+        ).read_text(encoding="utf-8")
+        bootstrap = (
+            Path(__file__).parents[2]
+            / "src"
+            / "ordivon_security"
+            / "resources"
+            / "windows_kvm"
+            / "install-bootstrap.ps1"
+        ).read_text(encoding="utf-8")
+        self.assertIn(_BUILD_LABEL, unattend)
+        self.assertIn("install-bootstrap.ps1", unattend)
+        self.assertIn(_BUILD_LABEL, bootstrap)
+        self.assertIn("SetupComplete.cmd", bootstrap)
 
     def test_fat_image_is_private_before_formatter_runs(self) -> None:
         source_iso = self.root / "private-source.iso"
@@ -279,7 +299,6 @@ class WindowsKvmP0Tests(unittest.TestCase):
             runuser_path=self.fake_runuser,
             mkfs_fat_path=formatter,
             mcopy_path=self.fake_mcopy,
-            xorriso_path=self.fake_xorriso,
             firmware_code_path=self.firmware,
             firmware_vars_template_path=self.vars,
             run_user="root",
@@ -305,7 +324,6 @@ class WindowsKvmP0Tests(unittest.TestCase):
             runuser_path=self.fake_runuser,
             mkfs_fat_path=self.fake_mkfs,
             mcopy_path=self.fake_mcopy,
-            xorriso_path=self.fake_xorriso,
             firmware_code_path=self.firmware,
             firmware_vars_template_path=self.vars,
             run_user="root",
@@ -346,8 +364,8 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertEqual(stat.S_IMODE(receipts[0].stat().st_mode), 0o600)
 
     def test_qmp_network_class_detection(self) -> None:
-        no_network = [{"bus": 0, "devices": [{"class_info": {"class": 0x0106}}]}]
-        with_network = [
+        no_network: JsonValue = [{"bus": 0, "devices": [{"class_info": {"class": 0x0106}}]}]
+        with_network: JsonValue = [
             {
                 "bus": 0,
                 "devices": [
@@ -466,6 +484,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "base-finalize.ps1",
             "benign_fixture.c",
             "guest-runner.ps1",
+            "install-bootstrap.ps1",
         }
         self.assertEqual({path.name for path in resource_root.iterdir()}, expected)
         fixture_source = (resource_root / "benign_fixture.c").read_text(encoding="utf-8").lower()
