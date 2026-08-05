@@ -28,11 +28,17 @@ DEFAULT_ALLOWED_ACTIONS = (
 )
 
 
-def _text(value: str, label: str, *, prefix: str | None = None) -> str:
+def _text(
+    value: str,
+    label: str,
+    *,
+    prefix: str | None = None,
+    max_bytes: int = 500,
+) -> str:
     if not value or value != value.strip():
         raise ValueError(f"{label} must be non-empty and trimmed")
-    if len(value.encode("utf-8")) > 500:
-        raise ValueError(f"{label} exceeds 500 UTF-8 bytes")
+    if len(value.encode("utf-8")) > max_bytes:
+        raise ValueError(f"{label} exceeds {max_bytes} UTF-8 bytes")
     if prefix is not None and not value.startswith(prefix + ":"):
         raise ValueError(f"{label} must start with {prefix}:")
     return value
@@ -147,7 +153,7 @@ class AgentTurnEvidence:
         _text(self.assignment_id, "Assignment identity", prefix="assignment")
         _digest(self.context_digest, "Agent turn Context digest")
         _text(self.selected_action, "Agent selected action")
-        _text(self.rationale, "Agent rationale")
+        _text(self.rationale, "Agent rationale", max_bytes=8_000)
         _text(self.stop_code, "Harness stop code")
         validate_json(self.trace)
         _digest(self.trace_digest, "Harness Trace digest")

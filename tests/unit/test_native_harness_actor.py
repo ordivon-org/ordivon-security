@@ -34,6 +34,7 @@ class _FakeDriver:
     host_mode: str = "not-consumed-security-domain-session"
     runtime_mode: str = "not-consumed-domain-action"
     credential: str = "credential-scope:deepseek:flash:0"
+    rationale: str = "Selected the bounded team plan."
 
     @property
     def credential_scope_id(self) -> str:
@@ -115,7 +116,7 @@ class _FakeDriver:
             assignment_id=f"assignment:{actor_id.removeprefix('actor:')}:{observation.tick}",
             context_digest=canonical_digest(observation.to_dict()),
             selected_action=self.selected_action,
-            rationale="Selected the bounded team plan.",
+            rationale=self.rationale,
             stop_code="candidate_completed",
             trace=trace,
             trace_digest=canonical_digest(trace),
@@ -243,6 +244,28 @@ class NativeHarnessActorP0Tests(unittest.TestCase):
         )
         self.assertNotIn(_SECRET_SENTINEL, retained)
         self.assertNotIn("apiKey", retained)
+
+    def test_long_conclusion_is_preserved_but_proposal_rationale_is_bounded(self) -> None:
+        full_summary = "decision evidence and caveats " * 80
+        backend = _backend(_FakeDriver(rationale=full_summary.strip()))
+        binding = _binding(backend)
+        session = backend.start(binding, _scenario(binding))
+        proposal = backend.propose(
+            session,
+            ActorObservation("actor:red", 0, {"bounded": True}, _ACTIONS),
+        )
+        receipt = backend.stop(session)
+        self.assertIsNotNone(proposal.rationale)
+        assert proposal.rationale is not None
+        self.assertLessEqual(len(proposal.rationale.encode("utf-8")), 300)
+        self.assertTrue(proposal.rationale.endswith("…"))
+        self.assertEqual(
+            proposal.arguments["conclusionSummaryBytes"],
+            len(full_summary.strip().encode("utf-8")),
+        )
+        turns = receipt.details["turns"]
+        assert isinstance(turns, list)
+        self.assertEqual(turns[0]["rationale"], full_summary.strip())
 
     def test_ungranted_action_fails_closed(self) -> None:
         backend = _backend(_FakeDriver(selected_action="cage.team.ungranted"))
