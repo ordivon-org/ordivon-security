@@ -66,7 +66,6 @@ class WindowsKvmBaseBuildConfig:
         ):
             raise ValueError("Windows KVM build limits must be positive")
         for path in (
-            self.source_iso_path,
             self.qemu_path,
             self.qemu_img_path,
             self.swtpm_path,
@@ -74,11 +73,16 @@ class WindowsKvmBaseBuildConfig:
             self.mkfs_fat_path,
             self.mcopy_path,
             self.xorriso_path,
+        ):
+            if not path.is_file() or not path.resolve().is_file():
+                raise ValueError(f"Windows KVM build tool is missing or unsafe: {path}")
+        for path in (
+            self.source_iso_path,
             self.firmware_code_path,
             self.firmware_vars_template_path,
         ):
             if path.is_symlink() or not path.is_file():
-                raise ValueError(f"Windows KVM build dependency is missing or unsafe: {path}")
+                raise ValueError(f"Windows KVM build identity file is missing or unsafe: {path}")
 
 
 def _resource_path(name: str) -> Path:

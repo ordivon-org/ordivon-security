@@ -45,8 +45,11 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.fake_swtpm = self._tool("swtpm", "TPM emulator version test")
         self.fake_runuser = self._tool("runuser", "runuser test")
         self.fake_mkfs = self._tool("mkfs.fat", "mkfs test")
-        self.fake_mcopy = self._tool("mcopy", "mcopy test")
-        self.fake_mdir = self._tool("mdir", "mdir test")
+        fake_mtools = self._tool("mtools", "mtools test")
+        self.fake_mcopy = self.tools / "mcopy"
+        self.fake_mdir = self.tools / "mdir"
+        self.fake_mcopy.symlink_to(fake_mtools)
+        self.fake_mdir.symlink_to(fake_mtools)
         self.fake_xorriso = self._tool("xorriso", "xorriso test")
         self.firmware = self.root / "OVMF_CODE.fd"
         self.firmware.write_bytes(b"firmware")
