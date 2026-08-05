@@ -12,7 +12,7 @@
     "both P0-C Runtime Jobs retained stdout and terminal-evidence Artifact digests, four typed foreign references, unique client-request recovery lookup, exact replay confirmation, and terminal-clean process trees",
     "Runtime remained physical execution authority only; Host retained semantic completion authority and Security retained action admission and Range authority",
     "semantic and operational Contest evidence verified independently for both variants",
-    "retained Contest, Host, request-spool, and acceptance evidence passed private-mode and secret-value scans"
+    "private Contest, Host, and request-spool evidence passed private-mode and secret-value scans; the public sanitized acceptance index passed a separate secret-value scan"
   ],
   "controlledVariables": {
     "securityRevision": "d64e006487c80098737d640372275a5df5b8a92b",
@@ -401,13 +401,15 @@
     }
   },
   "secretAndPermissionScan": {
-    "filesScanned": 95,
-    "directoriesScanned": 19,
-    "secretValueHits": 0,
-    "forbiddenCredentialMetadataHits": 0,
-    "permissionIssues": 0,
-    "requiredDirectoryMode": "0700",
-    "requiredFileMode": "0600"
+    "privateEvidenceFilesScanned": 94,
+    "privateEvidenceDirectoriesScanned": 19,
+    "privateSecretValueHits": 0,
+    "privateForbiddenCredentialMetadataHits": 0,
+    "privatePermissionIssues": 0,
+    "privateRequiredDirectoryMode": "0700",
+    "privateRequiredFileMode": "0600",
+    "publicAcceptanceIndexSecretValueHits": 0,
+    "publicAcceptanceIndexPermissionPolicy": "repository-managed; no private-mode claim"
   },
   "historicalBaselines": [
     {
