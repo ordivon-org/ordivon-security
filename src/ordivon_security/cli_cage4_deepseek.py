@@ -254,14 +254,14 @@ def main() -> None:
     )
     budget = HarnessBudgetConfig(
         max_model_calls=args.model_calls,
-        max_tool_calls=2,
+        max_tool_calls=3,
         max_observation_bytes=131_072,
         max_wall_time_ms=args.wall_time_ms,
         max_total_tokens=args.total_tokens,
         max_model_retries=args.model_retries,
         max_tool_corrections=1,
         max_observation_only_turns=1,
-        max_no_progress_turns=1,
+        max_no_progress_turns=2,
         max_model_observation_bytes=args.model_observation_bytes,
     )
     red = _build_actor(
