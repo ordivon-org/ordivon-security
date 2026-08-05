@@ -257,6 +257,8 @@ Each model Actor binds:
 - explicit prior-result memory mode;
 - all Run budgets and retry/correction bounds.
 
+The default Run-wide token ceiling is deliberately loose at `1,000,000`. It is a runaway guard, not a spending target. Model-call count, wall time, Tool-call count, model-observation bytes, and the per-response output ceiling remain the operative controls. Individual experiments may still bind a lower value, and that exact value remains part of Actor and Trial identity.
+
 ### Host and Runtime
 
 - exact source revision;
