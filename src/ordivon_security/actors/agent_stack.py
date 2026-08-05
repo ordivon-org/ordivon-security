@@ -147,6 +147,15 @@ class AgentTurnEvidence:
     requested_model_id: str
     effective_model_ids: tuple[str, ...]
     credential_scope_id: str
+    host_task_id: str | None = None
+    host_task_revision: int | None = None
+    host_task_contract_digest: str | None = None
+    host_context_object_digest: str | None = None
+    host_assignment_digest: str | None = None
+    host_run_receipt_digest: str | None = None
+    host_completion_proposal_digest: str | None = None
+    host_completion_decision_digest: str | None = None
+    host_completion_accepted: bool | None = None
 
     def __post_init__(self) -> None:
         _text(self.harness_run_id, "Harness Run identity", prefix="harness-run")
@@ -164,6 +173,66 @@ class AgentTurnEvidence:
             raise ValueError("Agent turn requires an effective model identity")
         for model_id in self.effective_model_ids:
             _text(model_id, "effective model identity")
+        host_values = (
+            self.host_task_id,
+            self.host_task_revision,
+            self.host_task_contract_digest,
+            self.host_context_object_digest,
+            self.host_assignment_digest,
+            self.host_run_receipt_digest,
+            self.host_completion_proposal_digest,
+            self.host_completion_decision_digest,
+            self.host_completion_accepted,
+        )
+        if any(value is not None for value in host_values):
+            if any(value is None for value in host_values):
+                raise ValueError("Host lifecycle evidence must be complete when present")
+            assert self.host_task_id is not None
+            assert self.host_task_revision is not None
+            assert self.host_task_contract_digest is not None
+            assert self.host_context_object_digest is not None
+            assert self.host_assignment_digest is not None
+            assert self.host_run_receipt_digest is not None
+            assert self.host_completion_proposal_digest is not None
+            assert self.host_completion_decision_digest is not None
+            assert self.host_completion_accepted is not None
+            _text(self.host_task_id, "Host Task identity", prefix="task")
+            if self.host_task_revision < 1:
+                raise ValueError("Host Task revision must be positive")
+            for value, label in (
+                (self.host_task_contract_digest, "Host Task Contract digest"),
+                (self.host_context_object_digest, "Host Context object digest"),
+                (self.host_assignment_digest, "Host Assignment digest"),
+                (self.host_run_receipt_digest, "Host Run receipt digest"),
+                (self.host_completion_proposal_digest, "Host CompletionProposal digest"),
+                (self.host_completion_decision_digest, "Host CompletionDecision digest"),
+            ):
+                _digest(value, label)
+            if self.host_context_object_digest != self.context_digest:
+                raise ValueError("Agent turn Context differs from the Host Context object")
+
+    def host_lifecycle_dict(self) -> JsonObject | None:
+        if self.host_task_id is None:
+            return None
+        assert self.host_task_revision is not None
+        assert self.host_task_contract_digest is not None
+        assert self.host_context_object_digest is not None
+        assert self.host_assignment_digest is not None
+        assert self.host_run_receipt_digest is not None
+        assert self.host_completion_proposal_digest is not None
+        assert self.host_completion_decision_digest is not None
+        assert self.host_completion_accepted is not None
+        return {
+            "taskId": self.host_task_id,
+            "taskRevision": self.host_task_revision,
+            "taskContractDigest": self.host_task_contract_digest,
+            "contextObjectDigest": self.host_context_object_digest,
+            "assignmentDigest": self.host_assignment_digest,
+            "runReceiptDigest": self.host_run_receipt_digest,
+            "completionProposalDigest": self.host_completion_proposal_digest,
+            "completionDecisionDigest": self.host_completion_decision_digest,
+            "completionAccepted": self.host_completion_accepted,
+        }
 
     def to_dict(self, *, include_trace: bool) -> JsonObject:
         value: JsonObject = {
@@ -181,6 +250,9 @@ class AgentTurnEvidence:
         }
         if include_trace:
             value["trace"] = self.trace
+        host_lifecycle = self.host_lifecycle_dict()
+        if host_lifecycle is not None:
+            value["hostLifecycle"] = host_lifecycle
         return value
 
 

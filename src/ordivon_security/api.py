@@ -10,6 +10,7 @@ from .actors import (
     AgentTurnEvidence,
     DeepSeekHarnessTurnDriver,
     HarnessBudgetConfig,
+    HostAssignedDeepSeekHarnessTurnDriver,
     NativeHarnessActorBackend,
     SequenceActorBackend,
 )
@@ -124,6 +125,7 @@ __all__ = [
     "Finding",
     "FixtureEvaluationBackend",
     "DeepSeekHarnessTurnDriver",
+    "HostAssignedDeepSeekHarnessTurnDriver",
     "HarnessBudgetConfig",
     "GuardianPolicy",
     "GuardianRecord",

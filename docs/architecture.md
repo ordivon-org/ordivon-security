@@ -97,13 +97,13 @@ Starts an Actor session, receives only that Actor's observation, returns an `Act
 Active implementations:
 
 - scripted sequence baseline;
-- `NativeHarnessActorBackend`, using DeepSeek Flash through the bounded Harness domain loop.
+- `NativeHarnessActorBackend`, using DeepSeek Flash through the bounded Harness domain loop;
+- `HostAssignedDeepSeekHarnessTurnDriver`, adding the durable Host Task, compiled Context, external Assignment, Run receipt, CompletionProposal, and CompletionDecision while keeping Runtime unconsumed.
 
-The first model-backed variant is P0-A: Provider and Harness are consumed, while exact Host and Runtime revisions plus explicit non-consumption modes remain in Actor identity. P0-B and P0-C add Host and Runtime one layer at a time. See [`AGENT-EXPERIMENT-P0.md`](AGENT-EXPERIMENT-P0.md).
+The first model-backed variant is P0-A: Provider and Harness are consumed, while exact Host and Runtime revisions plus explicit non-consumption modes remain in Actor identity. P0-B is implemented and awaits a sealed real acceptance Trial; P0-C adds Runtime only after that gate. See [`AGENT-EXPERIMENT-P0.md`](AGENT-EXPERIMENT-P0.md).
 
 Planned implementations:
 
-- Host-assigned Native Harness Actor;
 - Runtime-executed Native Harness Actor;
 - delegated Codex/Hermes Harness backend;
 - PettingZoo/RL policy adapter.
@@ -237,8 +237,8 @@ Security may request a Harness or Runtime change but must not copy their state m
 ## Next integration sequence
 
 1. retain the implemented Security CAGE team-plan catalog, Domain Tool Bridge, Native Harness Actor, and fail-closed Provider mapping;
-2. complete the first retained DeepSeek Flash Red/Blue P0-A Contest;
-3. add the Host-assigned P0-B variant without changing the Security workload;
+2. retain the accepted DeepSeek Flash Red/Blue P0-A Contest;
+3. complete a sealed real P0-B Trial for the implemented Host-assigned variant without changing the Security workload;
 4. add the Runtime-executed P0-C variant and compare recovery/cancellation effects;
 5. expand from team-plan control to parameterized CAGE Action Proposals where experiments require it;
 6. add Campaign and organization state only when multi-Actor experiments consume it;

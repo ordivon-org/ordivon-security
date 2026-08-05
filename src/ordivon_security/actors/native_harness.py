@@ -147,6 +147,21 @@ class NativeHarnessActorBackend:
             )
         proposal_rationale = _bounded_proposal_rationale(turn.rationale)
         conclusion_digest = canonical_digest({"summary": turn.rationale})
+        proposal_arguments: JsonObject = {
+            "agentStackIdentityDigest": canonical_digest(self.driver.execution_identity),
+            "harnessRunId": turn.harness_run_id,
+            "harnessTraceDigest": turn.trace_digest,
+            "credentialScopeId": turn.credential_scope_id,
+            "requestedModelId": turn.requested_model_id,
+            "effectiveModelIds": list(turn.effective_model_ids),
+            "harnessStopCode": turn.stop_code,
+            "usage": turn.usage,
+            "conclusionSummaryDigest": conclusion_digest,
+            "conclusionSummaryBytes": len(turn.rationale.encode("utf-8")),
+        }
+        host_lifecycle = turn.host_lifecycle_dict()
+        if host_lifecycle is not None:
+            proposal_arguments["hostLifecycle"] = host_lifecycle
         try:
             proposal = ActionProposal(
                 proposal_id=(
@@ -156,18 +171,7 @@ class NativeHarnessActorBackend:
                 actor_id=self.actor_id,
                 tick=observation.tick,
                 action_type=turn.selected_action,
-                arguments={
-                    "agentStackIdentityDigest": canonical_digest(self.driver.execution_identity),
-                    "harnessRunId": turn.harness_run_id,
-                    "harnessTraceDigest": turn.trace_digest,
-                    "credentialScopeId": turn.credential_scope_id,
-                    "requestedModelId": turn.requested_model_id,
-                    "effectiveModelIds": list(turn.effective_model_ids),
-                    "harnessStopCode": turn.stop_code,
-                    "usage": turn.usage,
-                    "conclusionSummaryDigest": conclusion_digest,
-                    "conclusionSummaryBytes": len(turn.rationale.encode("utf-8")),
-                },
+                arguments=proposal_arguments,
                 objective_refs=(f"objective:{self.actor_id.removeprefix('actor:')}",),
                 authority_refs=(f"authority:{self.actor_id.removeprefix('actor:')}",),
                 rationale=proposal_rationale,

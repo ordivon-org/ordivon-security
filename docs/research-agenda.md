@@ -47,15 +47,15 @@ Falsifier: an ordinary single-Agent episode with one trace expresses the same fa
 
 Attach CAGE 4/CybORG as an authoritative Range and control Red and Blue through Ordivon contracts. Compare scripted, finite-state, RL, and model-backed policies under exact seeds and observation mappings.
 
-Status: initial transfer and the first real P0-A DeepSeek Flash/Harness Trial are accepted. Ordivon supplied all six Red/Blue actions for one CAGE tick while Green remained native; no default Red/Blue actions were used. Host/Runtime layer ablations, parameterized action construction, held-out policy comparisons, and RL Actors remain open.
+Status: initial transfer and the first real P0-A DeepSeek Flash/Harness Trial are accepted. Ordivon supplied all six Red/Blue actions for one CAGE tick while Green remained native; no default Red/Blue actions were used. The P0-B Host lifecycle is implemented and has passed a deterministic real-Host smoke, but its sealed model/CAGE acceptance Trial remains open. Runtime ablation, parameterized action construction, held-out policy comparisons, and RL Actors remain open.
 
 Falsifier: Ordivon's contracts add no diagnostic or experimental value over native CAGE episodes.
 
 ## R2 — Native model-backed actors
 
-Use the generic Harness Domain Tool Bridge now available to connect Security-owned domain tools, then run DeepSeek Flash-backed Red and Blue actors with durable Assignment, bounded context, explicit Tool grants, pause/resume, Provider failure evidence, and replaceable model identity.
+Use the generic Harness Domain Tool Bridge to connect Security-owned domain tools, then compare DeepSeek Flash-backed Red and Blue actors across controlled Provider/Harness/Host/Runtime variants with bounded Context, durable identity, Provider failure evidence, and replaceable model identity.
 
-The first P0-A experiment has now selected CAGE team plans through Harness while Host and Runtime non-consumption remained explicit in Trial identity. P0-B adds Host Assignment, P0-C adds Runtime execution, and only then should a later experiment expose parameterized CAGE actions.
+The accepted P0-A experiment selects CAGE team plans through Harness while Host and Runtime non-consumption remain explicit in Trial identity. The implemented P0-B variant adds durable Host TaskContract, Context selection, external Assignment, Run receipt, CompletionProposal, and CompletionDecision while preserving Runtime non-consumption. P0-C adds Runtime execution only after a sealed P0-B acceptance Trial, and only then should a later experiment expose parameterized CAGE actions.
 
 Falsifier: direct stateless model calls perform equivalently and no continuity or effect-reconciliation distinction appears.
 

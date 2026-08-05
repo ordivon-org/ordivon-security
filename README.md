@@ -66,12 +66,13 @@ The active `0.8` core provides:
 - a QEMU/KVM disposable Windows Provider candidate restricted to the maintained benign fixture;
 - a DeepSeek Flash `NativeHarnessActorBackend` with exact Provider, Harness, Host, Runtime, Protocol, prompt, budget, and credential-scope identity;
 - a P0-A CAGE path where Harness is consumed while Host and Runtime non-consumption remain explicit experimental facts;
+- a P0-B implementation where Host owns the durable Task, compiled Context, committed Assignment, Run receipt, CompletionProposal, and CompletionDecision while Runtime remains explicitly unconsumed;
 - management-plane QMP network-device checks and disposable qcow2, UEFI, TPM, and FAT Run state;
 - evidence-bound Findings and mandatory residual-closure receipts.
 
 In the CAGE adapter, one Security Red Actor controls the CAGE Red team and one Security Blue Actor controls five CAGE Blue agents. Every Red and Blue CAGE action is explicitly supplied by Ordivon to the joint step; Green agents remain CAGE-controlled environmental actors. The current action surface is intentionally narrow: each side selects either the pinned native team policy or Sleep. Parameter-level model control is a later integration.
 
-It does **not yet** provide Host-assigned or Runtime-executed model Actor variants, an admitted unknown-Sample Windows execution path, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The Windows KVM Provider is a benign-fixture-only candidate until its clean-revision base build and real acceptance Run pass. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
+It does **not yet** provide an accepted Host-assigned model Actor baseline, a Runtime-executed model Actor variant, an admitted unknown-Sample Windows execution path, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The P0-B Host path is implemented but remains experimental until a real DeepSeek/CAGE Trial is sealed and independently verified. The Windows KVM Provider is a benign-fixture-only candidate until its clean-revision base build and real acceptance Run pass. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
 
 ## Run a local Evaluation Trial dry run
 
@@ -160,6 +161,23 @@ uv run --extra cage ordivon-security-cage4-deepseek \
 ```
 
 P0-A consumes DeepSeek and Ordivon Harness. Host and Runtime are deliberately not consumed and their exact revisions plus non-consumption reasons remain in Trial identity. The first real accepted Trial completed one CAGE tick with two distinct Flash credential scopes and six explicit external Red/Blue actions. The model may select only `cage.team.native-policy` or `cage.team.sleep`; it receives no shell or Runtime Tool. This is a team-plan baseline, not a robustness or strategic-superiority claim. See [`docs/AGENT-EXPERIMENT-P0.md`](docs/AGENT-EXPERIMENT-P0.md).
+
+To run the implemented P0-B Host variant from a fresh private state root:
+
+```bash
+uv run --extra cage ordivon-security-cage4-deepseek \
+  --variant p0b \
+  --source .cache/cage4 \
+  --output /var/lib/ordivon/security/contests/cage4-deepseek-p0b \
+  --host-state-root /var/lib/ordivon/security/host/cage4-deepseek-p0b \
+  --host-state-namespace host-state:security:cage4-deepseek-p0b \
+  --steps 1 \
+  --seed 1 \
+  --red-secret /root/.config/ordivon/secrets/deepseek.json \
+  --blue-secret /root/.config/ordivon/secrets/deepseek1.json
+```
+
+P0-B uses the same Provider, Harness loop, prompt, actions, credentials, and CAGE workload. Host compiles the model Context and owns the durable Task lifecycle; Runtime remains unconsumed. The Host state root must be absolute, empty, private, and disjoint from the Contest evidence root.
 
 ## Run the pinned CAGE 4 Range
 
