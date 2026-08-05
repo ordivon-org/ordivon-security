@@ -495,10 +495,12 @@ class RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver(HostAssignedDeepSeekHar
                 if len(matching) != 1:
                     raise
                 submitted = _object(matching[0], "recovered Runtime Job")
-            runtime_job_id = _text(submitted.get("jobId"), "Runtime Job identity", prefix="job")
-            runtime_attempt_id = _text(
-                submitted.get("attemptId"), "Runtime Attempt identity", prefix="attempt"
-            )
+            runtime_job_id = _text(submitted.get("jobId"), "Runtime Job identity")
+            runtime_attempt_id = _text(submitted.get("attemptId"), "Runtime Attempt identity")
+            if not runtime_job_id.startswith("job-"):
+                raise RuntimeMcpError("Runtime Job identity does not use the Runtime form")
+            if not runtime_attempt_id.startswith("attempt-"):
+                raise RuntimeMcpError("Runtime Attempt identity does not use the Runtime form")
             replay = client.call_tool("workspace.exec", run_request)
             exact_replay_confirmed = bool(
                 replay.get("jobId") == runtime_job_id

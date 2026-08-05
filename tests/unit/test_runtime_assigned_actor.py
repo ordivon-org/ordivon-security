@@ -51,8 +51,8 @@ def _runtime_evidence() -> AgentTurnEvidence:
         host_completion_proposal_digest=_DIGESTS[4],
         host_completion_decision_digest=_DIGESTS[5],
         host_completion_accepted=True,
-        runtime_job_id="job:security-p0c-red",
-        runtime_attempt_id="attempt:security-p0c-red:1",
+        runtime_job_id="job-019fd1c9-test-red",
+        runtime_attempt_id="attempt-019fd1c9-test-red",
         runtime_client_request_id="request:security-p0c:red:g1:test",
         runtime_workspace_id="security-p0c-red-test",
         runtime_source_revision="runtime:test",
@@ -158,7 +158,7 @@ class RuntimeAssignedActorTests(unittest.TestCase):
         receipt = backend.stop(session)
 
         runtime = proposal.arguments["runtimeLifecycle"]
-        self.assertEqual(runtime["jobId"], "job:security-p0c-red")
+        self.assertEqual(runtime["jobId"], "job-019fd1c9-test-red")
         self.assertTrue(runtime["exactReplayConfirmed"])
         self.assertTrue(runtime["recoveryLookupConfirmed"])
         turns = receipt.details["turns"]
