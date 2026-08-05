@@ -1,6 +1,20 @@
 """Ordivon Security public package."""
 
-from .api import ContestResult, ContestRunner, ScenarioManifest
+from .api import (
+    ContestResult,
+    ContestRunner,
+    EvaluationResult,
+    EvaluationRunner,
+    EvaluationSpec,
+    ScenarioManifest,
+)
 
-__all__ = ["ContestResult", "ContestRunner", "ScenarioManifest"]
-__version__ = "0.3.0"
+__all__ = [
+    "ContestResult",
+    "ContestRunner",
+    "EvaluationResult",
+    "EvaluationRunner",
+    "EvaluationSpec",
+    "ScenarioManifest",
+]
+__version__ = "0.4.0"

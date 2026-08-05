@@ -14,8 +14,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-04
-summary: Canonical architecture for fail-closed multi-Actor Contest execution, complete execution identity, semantic and operational evidence, CAGE Ranges, and staged model integration.
+updated: 2026-08-05
+summary: Canonical architecture for fail-closed Contest execution and authorized software Evaluation Trials with exact identity, separated authorities, residual closure, and sealed evidence.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -23,6 +23,7 @@ applies_to:
 related:
   - security.charter
   - security.research-boundary
+  - security.evaluation-trial-p0
   - security.migration.round2
   - security.migration.round3-p0
   - security.authority
@@ -35,7 +36,7 @@ Ordivon Security is the adversarial domain layer. It defines who is contesting w
 
 It composes rather than replaces Host, Harness, Runtime, external ranges, model Providers, and classical security tools.
 
-## Active `0.3` flow
+## Active `0.4` flows
 
 ```text
 ScenarioManifest
@@ -58,6 +59,16 @@ ContestRunner
   9. record sensor telemetry and hidden truth independently
  10. repeat until Range terminal or tick limit
  11. seal semantic and operational evidence independently
+
+EvaluationSpec
+  1. validate Sample, Authority, Environment, Guardian, Observation plan, and actions
+  2. verify Sample bytes from the local content-addressed Vault
+  3. create one exact backend instance
+  4. stage the Sample without exposing bytes to evidence
+  5. collect Observer records, Guardian decisions, facts, metrics, and Artifact identities
+  6. destroy the instance and require residual closure
+  7. derive evidence-bound Findings and a conservative disposition
+  8. seal semantic and operational evidence independently
 ```
 
 The ordered Actor list is part of the Scenario identity. Trial identity additionally binds the Security implementation, evidence schema revision, Range adapter and substrate, and each Actor implementation identity. Actor invocation is sequential in the current process, but all proposals are collected before any world mutation; therefore the semantic tick is simultaneous.
@@ -96,6 +107,18 @@ Planned fidelity levels:
 - S0: deterministic local and CAGE/CybORG simulations;
 - E1: containerlab/Docker isolated emulation;
 - E2: Proxmox/KVM VM range when required.
+
+## Evaluation Trial P0
+
+Evaluation Trial is a separate Security execution path for authorized software assessment. It does not reuse the Contest state machine and does not model a software Sample as an Actor.
+
+The active local contracts are `SampleIdentity`, `SampleVault`, `AuthorityManifest`, `GuardianPolicy`, `ObservationPlan`, `EnvironmentIdentity`, `EvaluationSpec`, `EvaluationRangeBackend`, `Finding`, `EvaluationDisposition`, and `EvaluationResult`.
+
+The first `FixtureEvaluationBackend` verifies staged bytes and emits configured records but declares `sampleExecution: false` and never invokes Sample code. It proves admission, identity, failure handling, destruction, residual closure, and evidence before a disposable-machine provider is admitted.
+
+Observer and Guardian are separate authorities. Observer records may support a Finding but cannot alter the environment. Guardian decisions represent hard boundary enforcement and may terminate a Run without inventing a Finding. A Run is invalid when Sample verification, backend execution, or residual closure is incomplete.
+
+Current Runtime `contained_local` remains outside this execution path because it does not provide the isolation, egress control, and disposable-machine semantics required by later stages. See [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md).
 
 ### Action path
 
@@ -176,6 +199,7 @@ Its deletion condition is not merely the existence of CAGE: it can be removed on
 | Native Agent loop, Provider turns, Tool recovery, external Harness drivers | Harness |
 | Workspace, Job, Attempt, process, artifact, physical recovery | Runtime |
 | external provider/private operator adapters when needed | World |
+| disposable-machine isolation, snapshots, and controlled egress | external Sandbox or hypervisor provider; not current Runtime |
 | Scenario, Contest, Campaign, organization, Range semantics, scoring | Security |
 | promoted cross-domain protocols | Computing |
 
@@ -191,6 +215,14 @@ Security may request a Harness or Runtime change but must not copy their state m
 6. introduce containerlab, an independent management plane, and Zeek telemetry;
 7. add CALDERA as a TTP execution adapter, not as Campaign authority;
 8. connect Codex and Hermes as delegated Harness baselines in planner-only, Tool-proxy, and black-box modes.
+
+Evaluation integration proceeds independently:
+
+1. retain P0 local contracts and fixture acceptance;
+2. admit one external disposable-machine backend only after management-plane isolation, deny-all egress, bounded execution, evidence export, destruction, and residual closure are proven;
+3. add Guest and network Observers without giving them Guardian authority;
+4. run owned benign and purpose-built fixtures before any untrusted Sample;
+5. connect Harness only to structured evidence summaries, never raw Sample bytes.
 
 ## Explicit non-goals
 

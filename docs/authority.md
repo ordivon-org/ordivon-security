@@ -15,8 +15,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-04
-summary: Authority map for the active Contest core, CAGE Range, migration records, research program, authorization boundary, evidence, and frozen Round 1 materials.
+updated: 2026-08-05
+summary: Authority map for the active Contest core, CAGE Range, software Evaluation Trial P0, research program, authorization boundary, evidence, and frozen Round 1 materials.
 evidence_status: not_applicable
 readiness: READY
 applies_to:
@@ -25,6 +25,7 @@ related:
   - security.start
   - security.charter
   - security.architecture
+  - security.evaluation-trial-p0
   - security.research-agenda
   - security.research-boundary
   - security.evidence
@@ -39,11 +40,12 @@ related:
 - [`MIGRATION-ROUND-1.md`](MIGRATION-ROUND-1.md) owns the Contest Core replacement record.
 - [`MIGRATION-ROUND-2.md`](MIGRATION-ROUND-2.md) owns the first-class CAGE 4 Range migration and acceptance record.
 - [`MIGRATION-ROUND-3-P0.md`](MIGRATION-ROUND-3-P0.md) owns fail-closed tick semantics, Trial execution identity, semantic/operational evidence separation, and the Harness Domain Tool Bridge prerequisite.
+- [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md) owns the local non-executing software Evaluation contracts, SampleVault boundary, Observer/Guardian distinction, residual closure, evidence, and next-backend admission gate.
 - [`research-agenda.md`](research-agenda.md) owns the ordered research program and falsifiers.
 - [`research-boundary.md`](research-boundary.md) owns authorization and external-effect limits.
 - [`../evidence/README.md`](../evidence/README.md) owns active and historical evidence admission.
 
-For implemented behavior, source code and deterministic/integration tests outrank prose. For an individual Trial, its Scenario manifest, Trial identity, semantic and operational event streams, raw metrics, bundle manifests, and verified digests outrank summaries. For CAGE substrate behavior, the exact pinned source revision is authoritative; Security owns the adapter mapping and evidence claims.
+For implemented behavior, source code and deterministic/integration tests outrank prose. For an individual Contest Trial, its Scenario manifest, Trial identity, semantic and operational event streams, raw metrics, bundle manifests, and verified digests outrank summaries. For an individual Evaluation Run, its Evaluation Spec, execution identity, Sample identity, separated event streams, residual-closure receipt, Findings, result, bundle manifests, and verified digests outrank summaries. For CAGE substrate behavior, the exact pinned source revision is authoritative; Security owns the adapter mapping and evidence claims.
 
 ## Historical authority
 
@@ -53,4 +55,4 @@ The former single-Actor experiment/evaluation framework is frozen at `92c0f94977
 
 ## Reopen conditions
 
-Revisit this map when a Harness, model-backed Actor, container Range, Campaign, organization, or delegated Harness integration becomes active; when the CAGE action surface expands; when a public API is stabilized; or when two sources claim the same current fact.
+Revisit this map when a Harness, model-backed Actor, container Range, external Evaluation backend, Campaign, organization, or delegated Harness integration becomes active; when the CAGE action surface expands; when a public API is stabilized; or when two sources claim the same current fact.

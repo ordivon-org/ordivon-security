@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ordivon-security"
-version = "0.3.0"
+version = "0.4.0"
 description = "Authorized multi-actor adversarial contest and cyber-range research core"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -28,6 +28,7 @@ cage = [
 [project.scripts]
 ordivon-security-micro = "ordivon_security.cli:main"
 ordivon-security-cage4 = "ordivon_security.cli_cage4:main"
+ordivon-security-evaluation-dry-run = "ordivon_security.cli_evaluation:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
