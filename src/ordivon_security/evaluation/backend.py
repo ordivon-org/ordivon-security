@@ -56,12 +56,19 @@ class EvaluationArtifact:
     kind: str
     digest: str
     byte_length: int
+    media_type: str = "application/octet-stream"
+    logical_name: str | None = None
+    source_path: Path | None = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         if not self.artifact_id.startswith("artifact:") or not self.kind:
             raise ValueError("Evaluation Artifact identity or kind is invalid")
         if not self.digest.startswith("sha256:") or self.byte_length < 0:
             raise ValueError("Evaluation Artifact digest or byte length is invalid")
+        if not self.media_type:
+            raise ValueError("Evaluation Artifact media type must be non-empty")
+        if self.logical_name is not None and not self.logical_name:
+            raise ValueError("Evaluation Artifact logical name must be non-empty")
 
     def to_dict(self) -> JsonObject:
         return {
@@ -69,6 +76,8 @@ class EvaluationArtifact:
             "kind": self.kind,
             "digest": self.digest,
             "byteLength": self.byte_length,
+            "mediaType": self.media_type,
+            "logicalName": self.logical_name,
         }
 
 
@@ -206,8 +215,11 @@ class FixtureEvaluationBackend:
     ) -> JsonObject:
         self.stage_calls += 1
         self._fail("stage")
-        digest = hashlib.sha256(sample_path.read_bytes()).hexdigest()
-        if f"sha256:{digest}" != sample.sha256:
+        digest = hashlib.sha256()
+        with sample_path.open("rb") as handle:
+            while chunk := handle.read(4 * 1024 * 1024):
+                digest.update(chunk)
+        if f"sha256:{digest.hexdigest()}" != sample.sha256:
             raise ValueError("Fixture stage received bytes outside the admitted Sample identity")
         instance.state["sampleDigest"] = sample.sha256
         return {
