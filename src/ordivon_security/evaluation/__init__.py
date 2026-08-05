@@ -10,6 +10,15 @@ from .backend import (
     ObserverRecord,
     ResidualClosureReceipt,
 )
+from .case import (
+    CaseExecutionStatus,
+    CaseSnapshotBundle,
+    audit_quarantine_tree,
+    create_case_snapshot,
+    verify_case_snapshot,
+    verify_case_snapshot_against_root,
+    write_quarantine_audit,
+)
 from .evidence import (
     EvaluationEvidenceBundle,
     EvaluationEvidenceChannel,
@@ -47,6 +56,8 @@ __all__ = [
     "ArchiveInventoryAnalyzer",
     "AuthorityManifest",
     "AuthenticodeReportAnalyzer",
+    "CaseExecutionStatus",
+    "CaseSnapshotBundle",
     "ClamAvAnalyzer",
     "ClamAvReportAnalyzer",
     "EVALUATION_EVIDENCE_SCHEMA_REVISION",
@@ -76,7 +87,12 @@ __all__ = [
     "SampleVault",
     "StaticAnalyzer",
     "StaticAnalyzerResult",
+    "audit_quarantine_tree",
+    "create_case_snapshot",
     "harden_quarantine_tree",
+    "verify_case_snapshot",
+    "verify_case_snapshot_against_root",
     "verify_evaluation_evidence",
     "verify_evaluation_operational_evidence",
+    "write_quarantine_audit",
 ]

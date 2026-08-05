@@ -15,7 +15,7 @@ audience:
   - maintainer
   - agent
 updated: 2026-08-05
-summary: Evidence contract for active Contest, CAGE, software Evaluation, static native-report Artifacts, and frozen Round 1 reports.
+summary: Evidence contract for active Contest, CAGE, software Evaluation, static native-report Artifacts, Case Snapshots, and frozen Round 1 reports.
 evidence_status: verified
 readiness: READY
 applies_to:
@@ -25,6 +25,7 @@ related:
   - security.research-boundary
   - security.evaluation-trial-p0
   - security.static-evaluation-p0
+  - security.case-snapshot-p0
   - security.migration.round2
   - security.migration.round3-p0
   - security.authority
@@ -88,6 +89,19 @@ The Sample channel contains identity and digest references only. Sample bytes re
 An Evaluation claim is inadmissible when Authority does not bind the exact Sample and environment, identity omits a relevant policy or image revision, Observer and Guardian authority are conflated, residual closure is incomplete, Findings omit exact evidence references, or any event or manifest fails verification. `no-issue-observed` is bounded to the exact Run and is not a general software-safety guarantee.
 
 The fixture backend never invokes Sample bytes. The static backend permits admitted analyzers to read bytes as data but never loads, installs, or invokes the Sample. A static antivirus match is an Observer result, not independent proof of runtime behavior. Imported reports must state that they were produced before the current Trial and remain bounded by their retained bytes and limitations. Artifact tampering invalidates verification.
+
+## Active Case Snapshot bundle
+
+An evolving local Case may be retained as:
+
+```text
+case-manifest.json
+snapshot-receipt.json
+```
+
+The manifest binds relative paths, types, modes, file byte lengths and SHA-256 identities, execution status, explicit limitations, linked Evaluation Run identities, quarantine-policy summary, and Security source revision. The receipt retains the machine-local root and record time without changing semantic snapshot identity.
+
+A Case Snapshot is not Evaluation Evidence. `external-uncontrolled-execution` material may prove that a command produced retained bytes, but it does not establish an admitted environment, deny-all egress, independent observation, Guardian enforcement, machine destruction, residual closure, or behavioral truth. A human summary cannot promote such material into `controlled-trial`.
 
 ## CAGE evidence
 

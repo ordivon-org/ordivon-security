@@ -15,7 +15,7 @@ audience:
   - evaluator
   - agent
 updated: 2026-08-05
-summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, streaming SampleVault, and local static software Evaluation foundation.
+summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, streaming SampleVault, local static Evaluation, and evolving Case snapshots.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -25,6 +25,7 @@ related:
   - security.architecture
   - security.evaluation-trial-p0
   - security.static-evaluation-p0
+  - security.case-snapshot-p0
   - security.research-agenda
   - security.research-boundary
   - security.evidence
@@ -38,7 +39,7 @@ Its central executable object is a **Contest**: multiple goal-bearing actors rec
 
 ## Current capability
 
-The active `0.5` core provides:
+The active `0.6` core provides:
 
 - a multi-Actor `ScenarioManifest`;
 - actor-specific observations separated from hidden world truth;
@@ -58,11 +59,13 @@ The active `0.5` core provides:
 - file identity, 7-Zip inventory, ClamAV, historical report, and bounded Authenticode-summary adapters;
 - separate Observer, Guardian, management, Sample, truth, and operational evidence;
 - native report Artifacts bound into Evaluation Evidence schema revision 2;
+- read-only quarantine drift audits;
+- digest-bound Case Snapshots with explicit static, uncontrolled, or controlled execution status;
 - evidence-bound Findings and mandatory residual-closure receipts.
 
 In the CAGE adapter, one Security Red Actor controls the CAGE Red team and one Security Blue Actor controls five CAGE Blue agents. Every Red and Blue CAGE action is explicitly supplied by Ordivon to the joint step; Green agents remain CAGE-controlled environmental actors. The current action surface is intentionally narrow: each side selects either the pinned native team policy or Sleep. Parameter-level model control is a later integration.
 
-It does **not yet** provide model-backed actors, disposable-machine execution, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. Static analyzers may read Sample bytes as data, but current Ordivon Runtime is not used to load or invoke untrusted Sample bytes.
+It does **not yet** provide model-backed actors, an admitted disposable Windows execution provider, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. Static analyzers may read Sample bytes as data. A historical local Wine run is explicitly outside the admitted Evaluation path and must not be treated as controlled execution.
 
 ## Run a local Evaluation Trial dry run
 
@@ -91,6 +94,24 @@ uv run ordivon-security-static-evaluation \
 ```
 
 This path streams the Sample into the private Vault, invokes only the admitted static analyzers, binds native reports as Artifacts, removes temporary analysis state, and seals the Trial. It never executes the Sample. Historical ClamAV or custom Authenticode summaries may be imported by digest with explicit limitations. See [`docs/STATIC-EVALUATION-P0.md`](docs/STATIC-EVALUATION-P0.md).
+
+## Audit and snapshot an evolving Case
+
+```bash
+uv run ordivon-security-audit-quarantine \
+  --root /path/to/quarantine/case \
+  --receipt /var/lib/ordivon/security/receipts/case-audit.json \
+  --fail-on-violation
+
+uv run ordivon-security-case-snapshot \
+  --root /path/to/quarantine/case \
+  --output /var/lib/ordivon/security/case-snapshots/case-v1 \
+  --case-id case:software-assessment \
+  --execution-status external-uncontrolled-execution \
+  --limitation "A component was executed outside an admitted disposable backend."
+```
+
+The audit is read-only. The snapshot binds the current directory tree, file modes, byte lengths, and complete SHA-256 identities without copying Sample bytes. It does not create Evaluation truth or retroactively control an external execution. See [`docs/CASE-SNAPSHOT-P0.md`](docs/CASE-SNAPSHOT-P0.md).
 
 ## Run the deterministic Contest
 
@@ -194,6 +215,7 @@ The former single-Actor experiment/evaluation framework is frozen at Git revisio
 - [`docs/MIGRATION-ROUND-3-P0.md`](docs/MIGRATION-ROUND-3-P0.md) — fail-closed model prerequisites, execution identity, and evidence separation;
 - [`docs/EVALUATION-TRIAL-P0.md`](docs/EVALUATION-TRIAL-P0.md) — local Sample, authority, environment, Observer/Guardian, residual closure, and evidence contracts;
 - [`docs/STATIC-EVALUATION-P0.md`](docs/STATIC-EVALUATION-P0.md) — streaming Vault, static analyzers, native report Artifacts, quarantine hardening, and limitations;
+- [`docs/CASE-SNAPSHOT-P0.md`](docs/CASE-SNAPSHOT-P0.md) — read-only drift audit, evolving Case identity, uncontrolled-execution status, and snapshot verification;
 - [`docs/research-agenda.md`](docs/research-agenda.md) — research sequence and falsifiers;
 - [`docs/research-boundary.md`](docs/research-boundary.md) — authorization and external-effect limits;
 - [`evidence/README.md`](evidence/README.md) — active and historical evidence contracts.

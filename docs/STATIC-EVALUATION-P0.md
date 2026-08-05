@@ -24,6 +24,7 @@ related:
   - security.start
   - security.architecture
   - security.evaluation-trial-p0
+  - security.case-snapshot-p0
   - security.evidence
   - security.authority
 ---
@@ -245,6 +246,11 @@ The command first walks the complete tree and rejects symbolic links or special
 files. Only after a successful preflight does it set directories to `0700` and
 regular files to `0600`.
 
+Hardening is point-in-time normalization, not persistent enforcement. Later tools
+may create `0644` files, `0755` directories, or executable files. Use the
+read-only audit and Case Snapshot flow after each analysis phase; see
+[`CASE-SNAPSHOT-P0.md`](CASE-SNAPSHOT-P0.md).
+
 ## P0 acceptance
 
 The test suite proves:
@@ -267,6 +273,10 @@ The test suite proves:
 Static P0 is complete when a real retained Sample can be imported through the
 streaming Vault and its existing static reports can be sealed from a clean
 Security revision.
+
+A later local Wine fuzz run was outside this gate and outside the formal Static
+Evaluation. Its outputs must remain `external-uncontrolled-execution` Case
+material and cannot be promoted to Observer, Guardian, or world-truth evidence.
 
 The following remain outside this gate:
 
