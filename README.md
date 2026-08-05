@@ -159,7 +159,7 @@ uv run --extra cage ordivon-security-cage4-deepseek \
   --blue-secret /root/.config/ordivon/secrets/deepseek1.json
 ```
 
-P0-A consumes DeepSeek and Ordivon Harness. Host and Runtime are deliberately not consumed and their exact revisions plus non-consumption reasons remain in Trial identity. The model may select only `cage.team.native-policy` or `cage.team.sleep`; it receives no shell or Runtime Tool. See [`docs/AGENT-EXPERIMENT-P0.md`](docs/AGENT-EXPERIMENT-P0.md).
+P0-A consumes DeepSeek and Ordivon Harness. Host and Runtime are deliberately not consumed and their exact revisions plus non-consumption reasons remain in Trial identity. The first real accepted Trial completed one CAGE tick with two distinct Flash credential scopes and six explicit external Red/Blue actions. The model may select only `cage.team.native-policy` or `cage.team.sleep`; it receives no shell or Runtime Tool. This is a team-plan baseline, not a robustness or strategic-superiority claim. See [`docs/AGENT-EXPERIMENT-P0.md`](docs/AGENT-EXPERIMENT-P0.md).
 
 ## Run the pinned CAGE 4 Range
 

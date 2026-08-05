@@ -1,0 +1,291 @@
+{
+  "acceptanceClaims": [
+    "two distinct DeepSeek Flash credential scopes produced admitted Red and Blue proposals",
+    "both Harness Runs completed with exact requested/effective model identity",
+    "one CAGE tick executed with six explicit external Red/Blue actions",
+    "Host and Runtime non-consumption remained explicit in Actor identity",
+    "semantic and operational evidence verified independently",
+    "retained evidence contained no API key, Bearer token, apiKey field, or secret path"
+  ],
+  "actors": [
+    {
+      "actorId": "actor:red",
+      "agentStackIdentityDigest": "sha256:672d9be3504624bd9461f5210d0308ce1ef703ad8e5ba959abb8bd8acd199ae3",
+      "harness": {
+        "budget": {
+          "maxModelCalls": 3,
+          "maxModelObservationBytes": 262144,
+          "maxModelRetries": 1,
+          "maxNoProgressTurns": 2,
+          "maxObservationBytes": 131072,
+          "maxObservationOnlyTurns": 1,
+          "maxToolCalls": 3,
+          "maxToolCorrections": 1,
+          "maxTotalTokens": 16384,
+          "maxWallTimeMs": 180000
+        },
+        "componentId": "ordivon-harness",
+        "declaredVersion": "0.6.0",
+        "memoryMode": "explicit-prior-results",
+        "mode": "domain-tool-loop-v1",
+        "protocolSourceRevision": "b5bc1348f2a48c6319c9d4dfbe77add34b5dbfe3",
+        "runtimeMetadataVersion": "0.5.0",
+        "sessionMode": "fresh-per-tick",
+        "sourceRevision": "796e9f07899a250ea4d87ae3e96f38c7172ff674"
+      },
+      "host": {
+        "componentId": "ordivon-host",
+        "configuration": {
+          "experimentalVariant": "security-harness-provider",
+          "reason": "Security Contest owns Actor lifecycle and action admission in P0-A; no durable Host Task or Assignment is created."
+        },
+        "consumed": false,
+        "mode": "not-consumed-security-domain-session",
+        "revision": "1a4027bb26d77a2e051ca933bf664578f071a5a9"
+      },
+      "provider": {
+        "adapterId": "deepseek.chat-completions.non-thinking.v1",
+        "baseUrl": "https://api.deepseek.com",
+        "credentialScopeId": "credential-scope:deepseek:flash:0",
+        "maxOutputTokens": 1024,
+        "maxResponseBytes": 4194304,
+        "providerId": "provider:deepseek",
+        "requestedModelId": "deepseek-v4-flash",
+        "thinking": "disabled",
+        "timeoutSeconds": 90.0
+      },
+      "runtime": {
+        "componentId": "ordivon-runtime",
+        "configuration": {
+          "experimentalVariant": "security-harness-provider",
+          "reason": "CAGE team-plan selection creates a Security ActionProposal and no physical Runtime effect."
+        },
+        "consumed": false,
+        "mode": "not-consumed-domain-action",
+        "revision": "ce061a5995d7a59246a103dcc51f0539245209a6"
+      },
+      "security": {
+        "actorBackendId": "backend:native-harness-deepseek-v1",
+        "allowedActions": [
+          "cage.team.native-policy",
+          "cage.team.sleep"
+        ],
+        "component": {
+          "componentId": "ordivon-security",
+          "packageVersion": "0.8.0",
+          "revision": "git:1597bcc9b22ee51d0c6ed4f9e53f184c7cb8f9bf",
+          "revisionKind": "git-commit"
+        },
+        "contextProjectionRevision": "cage-team-plan-summary-v1",
+        "domainId": "domain:ordivon-security-cage-team-plan",
+        "observationBoundary": "actor-specific-visible-state-only",
+        "promptRevision": "security-cage-team-plan-v2",
+        "toolName": "select_team_plan"
+      }
+    },
+    {
+      "actorId": "actor:blue",
+      "agentStackIdentityDigest": "sha256:fc8fdd208902d591bb3af27eedda7e9cdd4f238badaffde5c7bb3665812e075c",
+      "harness": {
+        "budget": {
+          "maxModelCalls": 3,
+          "maxModelObservationBytes": 262144,
+          "maxModelRetries": 1,
+          "maxNoProgressTurns": 2,
+          "maxObservationBytes": 131072,
+          "maxObservationOnlyTurns": 1,
+          "maxToolCalls": 3,
+          "maxToolCorrections": 1,
+          "maxTotalTokens": 16384,
+          "maxWallTimeMs": 180000
+        },
+        "componentId": "ordivon-harness",
+        "declaredVersion": "0.6.0",
+        "memoryMode": "explicit-prior-results",
+        "mode": "domain-tool-loop-v1",
+        "protocolSourceRevision": "b5bc1348f2a48c6319c9d4dfbe77add34b5dbfe3",
+        "runtimeMetadataVersion": "0.5.0",
+        "sessionMode": "fresh-per-tick",
+        "sourceRevision": "796e9f07899a250ea4d87ae3e96f38c7172ff674"
+      },
+      "host": {
+        "componentId": "ordivon-host",
+        "configuration": {
+          "experimentalVariant": "security-harness-provider",
+          "reason": "Security Contest owns Actor lifecycle and action admission in P0-A; no durable Host Task or Assignment is created."
+        },
+        "consumed": false,
+        "mode": "not-consumed-security-domain-session",
+        "revision": "1a4027bb26d77a2e051ca933bf664578f071a5a9"
+      },
+      "provider": {
+        "adapterId": "deepseek.chat-completions.non-thinking.v1",
+        "baseUrl": "https://api.deepseek.com",
+        "credentialScopeId": "credential-scope:deepseek:flash:1",
+        "maxOutputTokens": 1024,
+        "maxResponseBytes": 4194304,
+        "providerId": "provider:deepseek",
+        "requestedModelId": "deepseek-v4-flash",
+        "thinking": "disabled",
+        "timeoutSeconds": 90.0
+      },
+      "runtime": {
+        "componentId": "ordivon-runtime",
+        "configuration": {
+          "experimentalVariant": "security-harness-provider",
+          "reason": "CAGE team-plan selection creates a Security ActionProposal and no physical Runtime effect."
+        },
+        "consumed": false,
+        "mode": "not-consumed-domain-action",
+        "revision": "ce061a5995d7a59246a103dcc51f0539245209a6"
+      },
+      "security": {
+        "actorBackendId": "backend:native-harness-deepseek-v1",
+        "allowedActions": [
+          "cage.team.native-policy",
+          "cage.team.sleep"
+        ],
+        "component": {
+          "componentId": "ordivon-security",
+          "packageVersion": "0.8.0",
+          "revision": "git:1597bcc9b22ee51d0c6ed4f9e53f184c7cb8f9bf",
+          "revisionKind": "git-commit"
+        },
+        "contextProjectionRevision": "cage-team-plan-summary-v1",
+        "domainId": "domain:ordivon-security-cage-team-plan",
+        "observationBoundary": "actor-specific-visible-state-only",
+        "promptRevision": "security-cage-team-plan-v2",
+        "toolName": "select_team_plan"
+      }
+    }
+  ],
+  "kind": "ordivon.security.agent-experiment-acceptance",
+  "limitations": [
+    "one seed and one tick only",
+    "team-plan choice only; no parameterized CAGE action construction",
+    "Host and Runtime were not consumed",
+    "does not establish strategic superiority, robustness, or production readiness"
+  ],
+  "negativePredecessors": [
+    {
+      "operationalEvidenceDigest": "sha256:325d8ee00341bee6e9f976f12d06c1ae81cb8df365385d8450d6ff4100cddeef",
+      "runLabel": "run0",
+      "semanticEvidenceDigest": "sha256:706ce2cc57e91f70e33bd6865d0347ebecd4a08a938459220c9e5dda1f35e85f",
+      "terminalReason": "actor-failure:actor-stopped",
+      "ticksAttempted": 1,
+      "ticksExecuted": 0,
+      "trialId": "trial:30177f13f53a01fa687e02d3"
+    },
+    {
+      "operationalEvidenceDigest": "sha256:0e4e700ad4f49ca6cb9b6eb2286cf43a4213036f9d0f74b312a2948f28abecd2",
+      "runLabel": "run1",
+      "semanticEvidenceDigest": "sha256:20e1f72f1b7667fe0e6250aaaf1ec7f3312a44723dc69ed153e00030e18cea5d",
+      "terminalReason": "actor-failure:actor-stopped",
+      "ticksAttempted": 1,
+      "ticksExecuted": 0,
+      "trialId": "trial:9213e3fcc5adfdaa9f4e90fe"
+    },
+    {
+      "operationalEvidenceDigest": "sha256:21e4d2124db98b02fe8cc14be3f45335850d324e19ce41dd0f669194621d31f0",
+      "runLabel": "run3",
+      "semanticEvidenceDigest": "sha256:28af8bf568033cf409fe543ff18a95fdf91816c37bf0740abce27b332fcc1c8c",
+      "terminalReason": "actor-failure:actor-stopped",
+      "ticksAttempted": 1,
+      "ticksExecuted": 0,
+      "trialId": "trial:e0eb80b16148db75bbdae644"
+    }
+  ],
+  "operationalEvidenceDigest": "sha256:f7458b82be8f4a0161ec9647089a470e8832ccbcb8d901ecd8ccb56952369603",
+  "proposals": [
+    {
+      "actionType": "cage.team.native-policy",
+      "actorId": "actor:red",
+      "conclusionSummaryDigest": "sha256:d0b00b7784e8d21c20bac51affe51b202c97d985c4c6aa43fcd03ad09fcb5bda",
+      "credentialScopeId": "credential-scope:deepseek:flash:0",
+      "effectiveModelIds": [
+        "deepseek-v4-flash"
+      ],
+      "harnessTraceDigest": "sha256:414d5e3c74d6f5365e986248318bf0366e14fb4045ce85b00b6bde70e760c3e4",
+      "modelCalls": 2,
+      "providerAttempts": 2,
+      "requestedModelId": "deepseek-v4-flash",
+      "totalTokens": 2983
+    },
+    {
+      "actionType": "cage.team.native-policy",
+      "actorId": "actor:blue",
+      "conclusionSummaryDigest": "sha256:0cd8be3521f9d1730970202f0db47951985b5d8d80463832c4636a88a55a5391",
+      "credentialScopeId": "credential-scope:deepseek:flash:1",
+      "effectiveModelIds": [
+        "deepseek-v4-flash"
+      ],
+      "harnessTraceDigest": "sha256:e64daf7afa69e9ef2ce97a1d763ce9264a53d411b3a871710a495e285dcbf29d",
+      "modelCalls": 2,
+      "providerAttempts": 2,
+      "requestedModelId": "deepseek-v4-flash",
+      "totalTokens": 6792
+    }
+  ],
+  "range": {
+    "adapterImplementation": {
+      "componentId": "ordivon-security",
+      "packageVersion": "0.8.0",
+      "revision": "git:1597bcc9b22ee51d0c6ed4f9e53f184c7cb8f9bf",
+      "revisionKind": "git-commit"
+    },
+    "adapterRevision": "cage4-team-plan-adapter-v2",
+    "rangeConfigDigest": "sha256:3f3f18e6d4c39e0bfde8fc2bd38f9c566ba1812ddc8abdfeb6573600281c3f5d",
+    "rangeId": "range:cage4-enterprise-v1",
+    "substrate": {
+      "bluePolicy": "cc4-random",
+      "redPolicy": "finite-state",
+      "sourceRepository": "https://github.com/cage-challenge/cage-challenge-4.git",
+      "sourceRevision": "8c3c50ca54b176c2de199847944e8dcc035497e3"
+    }
+  },
+  "rawMetrics": {
+    "cage.actions.counts": {
+      "DiscoverRemoteSystems": 1,
+      "Monitor": 1,
+      "Remove": 1,
+      "Restore": 1,
+      "Sleep": 2
+    },
+    "cage.blue.agent_count": 5,
+    "cage.blue.reward.cumulative": -5.0,
+    "cage.default_red_blue_actions.used": 0,
+    "cage.external_actions.submitted": 6,
+    "cage.mission_phases.seen": [
+      0
+    ],
+    "cage.native_episode_steps": 2,
+    "cage.red.agent_count": 1,
+    "cage.red.foothold_hosts.current": 1,
+    "cage.red.foothold_hosts.maximum": 1,
+    "cage.red.reward.cumulative": 0.0,
+    "cage.source.revision": "8c3c50ca54b176c2de199847944e8dcc035497e3",
+    "cage.ticks": 1,
+    "contest.actor_failures": 0,
+    "contest.seed": 1,
+    "contest.terminal_reason": "cage-terminal",
+    "contest.ticks.attempted": 1,
+    "contest.ticks.executed": 1
+  },
+  "scenarioDigest": "sha256:d894d3a66b8c1d1884ae331415858fca9d0ddb4038bca6a4b9b9a0fad097f396",
+  "schemaVersion": 1,
+  "security": {
+    "componentId": "ordivon-security",
+    "packageVersion": "0.8.0",
+    "revision": "git:1597bcc9b22ee51d0c6ed4f9e53f184c7cb8f9bf",
+    "revisionKind": "git-commit"
+  },
+  "seed": 1,
+  "semanticEvidenceDigest": "sha256:5e98f1f3872ac5380cff48d5634edff5ba770ab97c91d009e4b58bf43648599d",
+  "status": "accepted-for-team-plan-baseline",
+  "terminalReason": "cage-terminal",
+  "ticksAttempted": 1,
+  "ticksExecuted": 1,
+  "trialId": "trial:2a1066d2d3953a791bfc646b",
+  "trialIdentityDigest": "sha256:ed029472846e9d783244c121808386da2344025bc71486a54bbc3fb1bce1a0c7",
+  "variant": "P0-A"
+}

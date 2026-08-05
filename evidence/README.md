@@ -107,6 +107,19 @@ The manifest binds relative paths, types, modes, file byte lengths and SHA-256 i
 
 A Case Snapshot is not Evaluation Evidence. `external-uncontrolled-execution` material may prove that a command produced retained bytes, but it does not establish an admitted environment, deny-all egress, independent observation, Guardian enforcement, machine destruction, residual closure, or behavioral truth. A human summary cannot promote such material into `controlled-trial`.
 
+## Agent experiment acceptance
+
+The sanitized P0-A acceptance index is retained at
+[`acceptance/deepseek-cage-p0a-seed1-run4.json`](acceptance/deepseek-cage-p0a-seed1-run4.json).
+It binds the accepted Trial and evidence digests, exact Provider/Harness/Host/
+Runtime/Security identities, credential scopes, budgets, proposal summaries, raw
+metrics, negative predecessor Trials, acceptance claims, and limitations.
+
+The index is not a replacement for the complete Trial bundle. A P0-A claim is
+admissible only when the private semantic and operational bundles independently
+verify to the recorded digests. The index contains no API key, Bearer token,
+secret path, or complete model transcript.
+
 ## CAGE evidence
 
 A CAGE Trial additionally binds:
