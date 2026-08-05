@@ -112,13 +112,18 @@ A Case Snapshot is not Evaluation Evidence. `external-uncontrolled-execution` ma
 The sanitized acceptance indexes are retained at:
 
 - [`acceptance/deepseek-cage-p0a-seed1-run4.json`](acceptance/deepseek-cage-p0a-seed1-run4.json);
-- [`acceptance/deepseek-cage-p0b-seed1-run2.json`](acceptance/deepseek-cage-p0b-seed1-run2.json).
+- [`acceptance/deepseek-cage-p0b-seed1-run2.json`](acceptance/deepseek-cage-p0b-seed1-run2.json);
+- [`acceptance/deepseek-cage-p0bc-c170e6d-seed1.json`](acceptance/deepseek-cage-p0bc-c170e6d-seed1.json).
 
 They bind the accepted Trial and evidence digests, exact Provider/Harness/Host/
 Runtime/Security identities, credential scopes, budgets, proposal summaries, raw
-metrics, negative predecessor Trials, acceptance claims, and limitations. The P0-B
-index additionally binds both Host Task heads, lifecycle object digests, private
-state modes, completion decisions, and the absence of Runtime Job references.
+metrics, negative predecessor Trials, acceptance claims, and limitations. The historical
+P0-B index binds both Host Task heads, lifecycle object digests, private state modes,
+completion decisions, and the absence of Runtime Job references. The controlled
+P0-B/P0-C index additionally binds the shared Harness revision, full Host storage
+and Harness-extension history validation, the isolated Runtime-consumption variable,
+P0-C Job/Attempt and Artifact identities, exact replay, unique recovery lookup,
+four typed foreign references, and terminal process-tree cleanup.
 
 The indexes are not replacements for the complete private Trial bundles. A claim
 is admissible only when the private semantic and operational bundles independently

@@ -98,13 +98,13 @@ Active implementations:
 
 - scripted sequence baseline;
 - `NativeHarnessActorBackend`, using DeepSeek Flash through the bounded Harness domain loop;
-- `HostAssignedDeepSeekHarnessTurnDriver`, adding the durable Host Task, compiled Context, external Assignment, Run receipt, CompletionProposal, and CompletionDecision while keeping Runtime unconsumed.
+- `HostAssignedDeepSeekHarnessTurnDriver`, adding the durable Host Task, compiled Context, external Assignment, Run receipt, CompletionProposal, and CompletionDecision while keeping Runtime unconsumed;
+- `RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver`, preserving that Host lifecycle while binding physical Harness execution to one recoverable Runtime Job/Attempt and verified Artifacts.
 
-The first model-backed variant is P0-A: Provider and Harness are consumed, while exact Host and Runtime revisions plus explicit non-consumption modes remain in Actor identity. P0-B is accepted as the first Host-assigned baseline: both durable Host Tasks completed through Context, Assignment, Run receipt, CompletionProposal, verification, and CompletionDecision while Runtime remained unconsumed. P0-C is the next controlled variant. See [`AGENT-EXPERIMENT-P0.md`](AGENT-EXPERIMENT-P0.md).
+The first model-backed variant is P0-A: Provider and Harness are consumed, while exact Host and Runtime revisions plus explicit non-consumption modes remain in Actor identity. P0-B is accepted as the first Host-assigned baseline. P0-C is accepted as the first Runtime-executed baseline: Runtime owns physical execution and recovery facts, Host owns semantic completion, and Security owns action admission and Range truth. See [`AGENT-EXPERIMENT-P0.md`](AGENT-EXPERIMENT-P0.md).
 
 Planned implementations:
 
-- Runtime-executed Native Harness Actor;
 - delegated Codex/Hermes Harness backend;
 - PettingZoo/RL policy adapter.
 
@@ -238,9 +238,9 @@ Security may request a Harness or Runtime change but must not copy their state m
 
 1. retain the implemented Security CAGE team-plan catalog, Domain Tool Bridge, Native Harness Actor, and fail-closed Provider mapping;
 2. retain the accepted DeepSeek Flash Red/Blue P0-A Contest;
-3. retain the accepted P0-B Host-assigned Trial and its fail-closed negative predecessors;
-4. add the Runtime-executed P0-C variant and compare recovery/cancellation effects;
-5. expand from team-plan control to parameterized CAGE Action Proposals where experiments require it;
+3. retain the accepted controlled P0-B Host baseline and its historical predecessors;
+4. retain the accepted P0-C Runtime-executed baseline and its fail-closed diagnostic predecessors;
+5. expand from team-plan control to typed parameterized CAGE Action Proposals while preserving the P0-C authority boundary;
 6. add Campaign and organization state only when multi-Actor experiments consume it;
 7. introduce containerlab, an independent management plane, and Zeek telemetry;
 8. add CALDERA as a TTP execution adapter, not as Campaign authority;

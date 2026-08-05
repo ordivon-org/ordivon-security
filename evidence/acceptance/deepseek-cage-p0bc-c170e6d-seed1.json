@@ -1,0 +1,465 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.agent-experiment-controlled-acceptance",
+  "status": "accepted-for-runtime-execution-baseline",
+  "variantComparison": "P0-B-control-vs-P0-C",
+  "acceptanceClaims": [
+    "P0-B control and P0-C used the same Security, Harness, Host, Runtime metadata, Protocol, CAGE source revision, seed, action surface, Provider configuration, and bounded one-tick workload",
+    "both variants completed one CAGE tick with six explicit external Red/Blue actions, zero default Red/Blue actions, and zero Actor failures",
+    "both Red and Blue Host Tasks completed at revision 5 and passed full Host storage validation plus Harness-owned historical semantic validation",
+    "P0-B retained zero Runtime Job references and explicit Runtime non-consumption",
+    "P0-C bound each Host Assignment and Harness Run to exactly one succeeded Runtime Job and Attempt",
+    "both P0-C Runtime Jobs retained stdout and terminal-evidence Artifact digests, four typed foreign references, unique client-request recovery lookup, exact replay confirmation, and terminal-clean process trees",
+    "Runtime remained physical execution authority only; Host retained semantic completion authority and Security retained action admission and Range authority",
+    "semantic and operational Contest evidence verified independently for both variants",
+    "retained Contest, Host, request-spool, and acceptance evidence passed private-mode and secret-value scans"
+  ],
+  "controlledVariables": {
+    "securityRevision": "d64e006487c80098737d640372275a5df5b8a92b",
+    "harnessRevision": "c170e6d76483dd1b0c15806837b77e08512f9b9d",
+    "hostRevision": "1a4027bb26d77a2e051ca933bf664578f071a5a9",
+    "runtimeRevision": "ce061a5995d7a59246a103dcc51f0539245209a6",
+    "protocolRepositoryRevision": "b5bc1348f2a48c6319c9d4dfbe77add34b5dbfe3",
+    "cageRevision": "8c3c50ca54b176c2de199847944e8dcc035497e3",
+    "seed": 1,
+    "ticks": 1,
+    "allowedActions": [
+      "cage.team.native-policy",
+      "cage.team.sleep"
+    ],
+    "maxModelCalls": 3,
+    "maxModelRetries": 1,
+    "maxWallTimeMs": 180000,
+    "maxTotalTokens": 1000000,
+    "maxOutputTokens": 1024,
+    "providerTimeoutSeconds": 90.0
+  },
+  "isolatedVariable": {
+    "name": "Runtime physical execution consumption",
+    "p0b": "explicitly not consumed; Harness model turn executed in the caller process and Run receipt runtimeJobRefs remained empty",
+    "p0c": "consumed; each Host Assignment executed as one Runtime Job/Attempt and the Run receipt retained that Job reference"
+  },
+  "checks": {
+    "bothNoActorFailures": true,
+    "bothNoDefaultActions": true,
+    "bothOneTick": true,
+    "hostStorageAndHarnessHistoriesValid": true,
+    "p0bRuntimeAbsent": true,
+    "p0cRuntimePresent": true,
+    "runtimeJobsRecoverable": true,
+    "sameCageRevision": true,
+    "sameExternalActions": true,
+    "sameHarnessRevision": true,
+    "sameSecurityRevision": true
+  },
+  "trials": {
+    "p0b": {
+      "actors": {
+        "actor:blue": {
+          "actionType": "cage.team.native-policy",
+          "hostLifecycle": {
+            "assignmentDigest": "sha256:9e3980b4b4e5ec5bda0238db7a49aa5530aa17d838c7ea6eff34e5f6107374ab",
+            "completionAccepted": true,
+            "completionDecisionDigest": "sha256:fd0fa0295800d8aa2d43df0aedc2ebaf1751808e530b9787704b2c0931aee791",
+            "completionProposalDigest": "sha256:d27446181c2ed279382ab6f9bb1222a357a5dc35a8033f25df3f7ae94cf06cc7",
+            "contextObjectDigest": "sha256:8e60102a09dab2a8627e86148ec6f58993e9c9f553e19f970d932cd37429da2d",
+            "runReceiptDigest": "sha256:2d7821e3ce9c192ac8da104da9c17e960946e84ece131239f8a3ed1960df10f9",
+            "taskContractDigest": "sha256:b6e93ae0bd1e0b915b7c2ecd5d75588e84d6fbca7f0fb0f71442799e36aee557",
+            "taskId": "task:security-host:f6301839539d:blue:tick-0:2dd1612eee434f50",
+            "taskRevision": 5
+          },
+          "modelCalls": 2,
+          "runtimeLifecycle": null,
+          "toolCalls": 1,
+          "totalTokens": 6561
+        },
+        "actor:red": {
+          "actionType": "cage.team.native-policy",
+          "hostLifecycle": {
+            "assignmentDigest": "sha256:5e82bc4fa760400e4f14dcc5a6b27fdc989f83263adcbe3b4c9e72853f013525",
+            "completionAccepted": true,
+            "completionDecisionDigest": "sha256:217897db6a295838c5491b532b129416ee3c4110174de895050a0417c3d313b3",
+            "completionProposalDigest": "sha256:02576bf0cd1fe00c6aaaeeeed5d0436ead15d288795cc8b77c602a13166d8160",
+            "contextObjectDigest": "sha256:b80f17c6b5f5012df7f8ff4b80da5602b4579d702bb0c955b51837e49aebb921",
+            "runReceiptDigest": "sha256:f3adaf6922f1d359cd249bd4f01ebed248c356a1f0cc0649f9174aa17a7578b2",
+            "taskContractDigest": "sha256:f4ce336c3f171f5cf485433bfd085eace2d226ee7d29ec5e1c8c99b18d7fdade",
+            "taskId": "task:security-host:dd5e955c4334:red:tick-0:638dbbf7f74af415",
+            "taskRevision": 5
+          },
+          "modelCalls": 2,
+          "runtimeLifecycle": null,
+          "toolCalls": 1,
+          "totalTokens": 2792
+        }
+      },
+      "harnessRevisions": [
+        "c170e6d76483dd1b0c15806837b77e08512f9b9d"
+      ],
+      "host": {
+        "blue": {
+          "eventKinds": [
+            "task.created",
+            "harness.assignment-committed",
+            "harness.run-recorded",
+            "completion.proposed",
+            "completion.decided"
+          ],
+          "history": {
+            "events": 5,
+            "providerSemanticLinkChecks": 0,
+            "semanticLinkChecks": 9,
+            "semanticReferences": 30,
+            "taskStreams": 1
+          },
+          "revision": 5,
+          "runtimeJobRefs": [],
+          "state": "completed",
+          "storageValidation": {
+            "cachedObjects": 0,
+            "full": true,
+            "hashedObjects": 17,
+            "objectRefs": 17,
+            "taskHeads": 1
+          },
+          "taskId": "task:security-host:f6301839539d:blue:tick-0:2dd1612eee434f50"
+        },
+        "red": {
+          "eventKinds": [
+            "task.created",
+            "harness.assignment-committed",
+            "harness.run-recorded",
+            "completion.proposed",
+            "completion.decided"
+          ],
+          "history": {
+            "events": 5,
+            "providerSemanticLinkChecks": 0,
+            "semanticLinkChecks": 9,
+            "semanticReferences": 30,
+            "taskStreams": 1
+          },
+          "revision": 5,
+          "runtimeJobRefs": [],
+          "state": "completed",
+          "storageValidation": {
+            "cachedObjects": 0,
+            "full": true,
+            "hashedObjects": 17,
+            "objectRefs": 17,
+            "taskHeads": 1
+          },
+          "taskId": "task:security-host:dd5e955c4334:red:tick-0:638dbbf7f74af415"
+        }
+      },
+      "metrics": {
+        "cage.actions.counts": {
+          "DiscoverRemoteSystems": 1,
+          "Monitor": 1,
+          "Remove": 1,
+          "Restore": 1,
+          "Sleep": 2
+        },
+        "cage.blue.agent_count": 5,
+        "cage.blue.reward.cumulative": -5.0,
+        "cage.default_red_blue_actions.used": 0,
+        "cage.external_actions.submitted": 6,
+        "cage.mission_phases.seen": [
+          0
+        ],
+        "cage.native_episode_steps": 2,
+        "cage.red.agent_count": 1,
+        "cage.red.foothold_hosts.current": 1,
+        "cage.red.foothold_hosts.maximum": 1,
+        "cage.red.reward.cumulative": 0.0,
+        "cage.source.revision": "8c3c50ca54b176c2de199847944e8dcc035497e3",
+        "cage.ticks": 1,
+        "contest.actor_failures": 0,
+        "contest.seed": 1,
+        "contest.terminal_reason": "cage-terminal",
+        "contest.ticks.attempted": 1,
+        "contest.ticks.executed": 1
+      },
+      "operationalEvidenceDigest": "sha256:75783e314b0ea218b5c1df4cc43a997e4ed4b4b305c53b9c4a57943ba2cb8a84",
+      "runtimeConsumed": [
+        false
+      ],
+      "securityRevisions": [
+        "git:d64e006487c80098737d640372275a5df5b8a92b"
+      ],
+      "semanticEvidenceDigest": "sha256:a5f4a8caf812ec68e9effc47d5d62511c34fe274b9baabcfe9666f6f99d6e29f",
+      "terminalReason": "cage-terminal",
+      "ticksExecuted": 1,
+      "trialId": "trial:d065fc6b01a3bd9afc93a8ef",
+      "trialIdentityDigest": "sha256:b7092a2a0a7787ab8695b3e8d0f1fd30b33658225f359a329770df2f64676884"
+    },
+    "p0c": {
+      "actors": {
+        "actor:blue": {
+          "actionType": "cage.team.native-policy",
+          "hostLifecycle": {
+            "assignmentDigest": "sha256:5f43d5b62ba3f7c99994ba6f237427837af6fece2fd1e84d936e1f08c24cad74",
+            "completionAccepted": true,
+            "completionDecisionDigest": "sha256:118417673250399cd903c7bae112bb2f0f7bfffd8dd05a23259b0347fd68f28b",
+            "completionProposalDigest": "sha256:a94a997b63205763f46f1c59259c18fa70c847579e2ecd93639bf410ec18559c",
+            "contextObjectDigest": "sha256:0f2b11cc94101a6a5aea615b04b4912f5783d9efd9a54882bbbef9c476466362",
+            "runReceiptDigest": "sha256:5ed4089b5c25410106bf0106e114a31af976b8ef4b5ed045eb677551607d660b",
+            "taskContractDigest": "sha256:b829e9a35334339e7442ba368422e80650579b7ec5a2a5f95aabceaeb35086d5",
+            "taskId": "task:security-host:91c07bcd8b6b:blue:tick-0:2dd1612eee434f50",
+            "taskRevision": 5
+          },
+          "modelCalls": 2,
+          "runtimeLifecycle": {
+            "attemptId": "attempt-019fd1da-e0b1-7261-8596-ef37d9d6b7f6",
+            "clientRequestId": "request:security-p0c:blue:g1:d79a816b1d61ca8c",
+            "exactReplayConfirmed": true,
+            "jobId": "job-019fd1da-e0b1-7261-8596-ef2ef64a685f",
+            "recoveryLookupConfirmed": true,
+            "responseDigest": "sha256:196e3becc6e500a312b8db1b0dbd91e67f4f875003b2bdeaebc94d51cd6a7994",
+            "sourceRevision": "ce061a5995d7a59246a103dcc51f0539245209a6",
+            "stdoutArtifactDigest": "sha256:e7dcce646fb7dfc546369cbf01670f716eb44a5934020e31980e859e63e66484",
+            "terminalEvidenceDigest": "sha256:b9cb540d81b96eb26ab0e7d3214c97e16f21cb4574d59315cc20dd747bc99990",
+            "toolCatalogDigest": "sha256:115e7762e12a8711fbf3338106f483145107b1c09a916a8f1871716eac9ae051",
+            "workspaceId": "security-p0c-blue-d79a816b1d61ca8c"
+          },
+          "toolCalls": 1,
+          "totalTokens": 6609
+        },
+        "actor:red": {
+          "actionType": "cage.team.native-policy",
+          "hostLifecycle": {
+            "assignmentDigest": "sha256:2742b0887182c8bc8a0398eda7f992e244c6e41859a91840c158b2f537d878de",
+            "completionAccepted": true,
+            "completionDecisionDigest": "sha256:be40d9aaf2caaf98156c175dfa81eebc67de8f97a5fd083f0f3588ceaad5a429",
+            "completionProposalDigest": "sha256:8805dfc148b33c9ea3c0c1d2d939ba408eb027a748980e0147fdcbbe274c2b17",
+            "contextObjectDigest": "sha256:a0a194cb1534ed4fc386ea8f5fc44fdae7cd88dcdb422f7c456f73df6f8854c9",
+            "runReceiptDigest": "sha256:824211b3d2548ef4e11b82408978747c66cd62c2d71855e70855dd4c886a04c1",
+            "taskContractDigest": "sha256:de91250caa7a5bdf98995d6137150a930a46081449e2e6eb4ca2d198fa0c2314",
+            "taskId": "task:security-host:ce16fe0f4f0a:red:tick-0:638dbbf7f74af415",
+            "taskRevision": 5
+          },
+          "modelCalls": 2,
+          "runtimeLifecycle": {
+            "attemptId": "attempt-019fd1da-c1ae-7812-b55c-d7201029a72c",
+            "clientRequestId": "request:security-p0c:red:g1:d10fe500aa8af69e",
+            "exactReplayConfirmed": true,
+            "jobId": "job-019fd1da-c1ae-7812-b55c-d717dc40b646",
+            "recoveryLookupConfirmed": true,
+            "responseDigest": "sha256:f51fec364497dbe19957fb0175b256d6f7ffc01b2c20ae9a235e7d7455e0527e",
+            "sourceRevision": "ce061a5995d7a59246a103dcc51f0539245209a6",
+            "stdoutArtifactDigest": "sha256:55f5bb1cc4dbf9cac1c5777c7f5401d33e8d9901c5c1de8de21069b9d31f5db1",
+            "terminalEvidenceDigest": "sha256:f3d8ff2df4d51617610e3ae13342b2e06a2f692f9c5a7a3ee3050ba57b7347f8",
+            "toolCatalogDigest": "sha256:115e7762e12a8711fbf3338106f483145107b1c09a916a8f1871716eac9ae051",
+            "workspaceId": "security-p0c-red-d10fe500aa8af69e"
+          },
+          "toolCalls": 1,
+          "totalTokens": 2805
+        }
+      },
+      "harnessRevisions": [
+        "c170e6d76483dd1b0c15806837b77e08512f9b9d"
+      ],
+      "host": {
+        "blue": {
+          "eventKinds": [
+            "task.created",
+            "harness.assignment-committed",
+            "harness.run-recorded",
+            "completion.proposed",
+            "completion.decided"
+          ],
+          "history": {
+            "events": 5,
+            "providerSemanticLinkChecks": 0,
+            "semanticLinkChecks": 9,
+            "semanticReferences": 30,
+            "taskStreams": 1
+          },
+          "revision": 5,
+          "runtimeJobRefs": [
+            "job-019fd1da-e0b1-7261-8596-ef2ef64a685f"
+          ],
+          "state": "completed",
+          "storageValidation": {
+            "cachedObjects": 0,
+            "full": true,
+            "hashedObjects": 17,
+            "objectRefs": 17,
+            "taskHeads": 1
+          },
+          "taskId": "task:security-host:91c07bcd8b6b:blue:tick-0:2dd1612eee434f50"
+        },
+        "red": {
+          "eventKinds": [
+            "task.created",
+            "harness.assignment-committed",
+            "harness.run-recorded",
+            "completion.proposed",
+            "completion.decided"
+          ],
+          "history": {
+            "events": 5,
+            "providerSemanticLinkChecks": 0,
+            "semanticLinkChecks": 9,
+            "semanticReferences": 30,
+            "taskStreams": 1
+          },
+          "revision": 5,
+          "runtimeJobRefs": [
+            "job-019fd1da-c1ae-7812-b55c-d717dc40b646"
+          ],
+          "state": "completed",
+          "storageValidation": {
+            "cachedObjects": 0,
+            "full": true,
+            "hashedObjects": 17,
+            "objectRefs": 17,
+            "taskHeads": 1
+          },
+          "taskId": "task:security-host:ce16fe0f4f0a:red:tick-0:638dbbf7f74af415"
+        }
+      },
+      "metrics": {
+        "cage.actions.counts": {
+          "DiscoverRemoteSystems": 1,
+          "Monitor": 1,
+          "Remove": 1,
+          "Restore": 1,
+          "Sleep": 2
+        },
+        "cage.blue.agent_count": 5,
+        "cage.blue.reward.cumulative": -5.0,
+        "cage.default_red_blue_actions.used": 0,
+        "cage.external_actions.submitted": 6,
+        "cage.mission_phases.seen": [
+          0
+        ],
+        "cage.native_episode_steps": 2,
+        "cage.red.agent_count": 1,
+        "cage.red.foothold_hosts.current": 1,
+        "cage.red.foothold_hosts.maximum": 1,
+        "cage.red.reward.cumulative": 0.0,
+        "cage.source.revision": "8c3c50ca54b176c2de199847944e8dcc035497e3",
+        "cage.ticks": 1,
+        "contest.actor_failures": 0,
+        "contest.seed": 1,
+        "contest.terminal_reason": "cage-terminal",
+        "contest.ticks.attempted": 1,
+        "contest.ticks.executed": 1
+      },
+      "operationalEvidenceDigest": "sha256:748d832c81e1eba692e008026b106387276e66ebd41e6c0f6157a6637ada4078",
+      "runtimeConsumed": [
+        true
+      ],
+      "securityRevisions": [
+        "git:d64e006487c80098737d640372275a5df5b8a92b"
+      ],
+      "semanticEvidenceDigest": "sha256:5c12be4e7d156053bd75e740548df21b1c5b97aa755ed9c2b7cf719a6893162c",
+      "terminalReason": "cage-terminal",
+      "ticksExecuted": 1,
+      "trialId": "trial:ee3ef0fa1bf4d82aef21fceb",
+      "trialIdentityDigest": "sha256:918e6d58b4d4a62102f3e03567fd51ecf531a0947dcf7a46f9f32735f8cead88"
+    }
+  },
+  "runtime": {
+    "actor:blue": {
+      "artifactDigests": {
+        "stdout": "sha256:e7dcce646fb7dfc546369cbf01670f716eb44a5934020e31980e859e63e66484",
+        "terminalEvidence": "sha256:b9cb540d81b96eb26ab0e7d3214c97e16f21cb4574d59315cc20dd747bc99990"
+      },
+      "attemptId": "attempt-019fd1da-e0b1-7261-8596-ef37d9d6b7f6",
+      "clientRequestId": "request:security-p0c:blue:g1:d79a816b1d61ca8c",
+      "exitCode": 0,
+      "foreignReferenceTypes": [
+        "assignment",
+        "run",
+        "task",
+        "task-attempt"
+      ],
+      "jobId": "job-019fd1da-e0b1-7261-8596-ef2ef64a685f",
+      "processTreeDisposition": "terminal_clean",
+      "status": "succeeded",
+      "uniqueRecoveryLookup": true
+    },
+    "actor:red": {
+      "artifactDigests": {
+        "stdout": "sha256:55f5bb1cc4dbf9cac1c5777c7f5401d33e8d9901c5c1de8de21069b9d31f5db1",
+        "terminalEvidence": "sha256:f3d8ff2df4d51617610e3ae13342b2e06a2f692f9c5a7a3ee3050ba57b7347f8"
+      },
+      "attemptId": "attempt-019fd1da-c1ae-7812-b55c-d7201029a72c",
+      "clientRequestId": "request:security-p0c:red:g1:d10fe500aa8af69e",
+      "exitCode": 0,
+      "foreignReferenceTypes": [
+        "assignment",
+        "run",
+        "task",
+        "task-attempt"
+      ],
+      "jobId": "job-019fd1da-c1ae-7812-b55c-d717dc40b646",
+      "processTreeDisposition": "terminal_clean",
+      "status": "succeeded",
+      "uniqueRecoveryLookup": true
+    }
+  },
+  "secretAndPermissionScan": {
+    "filesScanned": 95,
+    "directoriesScanned": 19,
+    "secretValueHits": 0,
+    "forbiddenCredentialMetadataHits": 0,
+    "permissionIssues": 0,
+    "requiredDirectoryMode": "0700",
+    "requiredFileMode": "0600"
+  },
+  "historicalBaselines": [
+    {
+      "variant": "P0-B",
+      "trialId": "trial:bf48063dd944964a28353c62",
+      "trialIdentityDigest": "sha256:855ae9656213e9d728ce6ab7c591ae1de3275fc7bbcab38aca214e362ee431d2",
+      "semanticEvidenceDigest": "sha256:ff2f45d8f4d4b51ce6460fad339ac65bcafad1652e8e004267036f8751969da3",
+      "operationalEvidenceDigest": "sha256:c49e9bfaf57d6975af6f3940d3b89a6227b23d11fcfe8b381fbb10136a4c1f8f",
+      "disposition": "retained historical Host-lifecycle baseline; superseded for strict P0-B/P0-C comparison because its Harness revision did not event-admit the external TaskContract CAS object"
+    }
+  ],
+  "diagnosticPredecessors": [
+    {
+      "runLabel": "p0c-run0",
+      "trialId": "trial:8a23896ad095fb03f6d31996",
+      "trialIdentityDigest": "sha256:fc3339c0cf1c2006532069ab42b034a6b79df9cf76838447703e25b10dbb737f",
+      "semanticEvidenceDigest": "sha256:a7705a5ba9838126ec5007a470968629e5d931f8ec292eeab2f6882315c51baf",
+      "operationalEvidenceDigest": "sha256:6100bcbd0d61495a928b757eb830048faf279fc4a04323d191ccf2e44c4e6382",
+      "ticksExecuted": 0,
+      "diagnosis": "Runtime adapter validation failed before model action admission; the Contest failed closed and retained request evidence for diagnosis."
+    },
+    {
+      "runLabel": "p0c-run1",
+      "trialId": "trial:690735b476ecf7844e273796",
+      "trialIdentityDigest": "sha256:d92b83aa4ab613cb84dda94f9d47c815a4f7f7b80aa24e3f021da8de300898b1",
+      "semanticEvidenceDigest": "sha256:c9843c1020b8a9250d44deb125e597d02dab75320aff513989c77083280adb91",
+      "operationalEvidenceDigest": "sha256:2a3cd95b26c65ab2dcba959890e7a83ba0b7eccdd02c5598d4702148244d6b0f",
+      "ticksExecuted": 0,
+      "diagnosis": "Security expected protocol-style job: identities while Runtime authoritatively emits job- and attempt- identities; both Actors failed closed before world advance."
+    },
+    {
+      "runLabel": "p0c-run2",
+      "trialId": "trial:53cd4e4830393e4afd34b8a4",
+      "trialIdentityDigest": "sha256:a6d417b0b788f39d4792832f9101697cf8964013e33c15a662fbef77d00b26f5",
+      "semanticEvidenceDigest": "sha256:dcb8cb8651bbac4516f5fd5341188ca6cf9afd142da3d29382d48543f3aa1dd7",
+      "operationalEvidenceDigest": "sha256:62c033c89a03f253e98208db5998266dd9fc89de5303cc0f38911809462ced11",
+      "ticksExecuted": 1,
+      "diagnosis": "Runtime execution succeeded, but strict closeout exposed the inherited external-Assignment TaskContract event-reference gap. It remains diagnostic evidence and is not the accepted P0-C Trial."
+    }
+  ],
+  "limitations": [
+    "one seed and one CAGE tick only",
+    "team-plan selection only; models did not construct parameterized CAGE actions or shell commands",
+    "both Actors selected native-policy, so the comparison does not establish strategic superiority or abstention quality",
+    "exact replay and post-run recovery lookup were verified, but an in-flight transport-loss recovery was not injected into the accepted Trial",
+    "cancellation ownership is implemented by Runtime but was not fault-injected in the accepted comparison",
+    "multi-tick Host continuity, replacement, resume, supersession, and model-memory behavior remain open",
+    "trusted_local Runtime execution is not hostile-code isolation and does not authorize unknown-sample execution",
+    "the result establishes execution attribution and lifecycle closure, not production cyber-operations readiness"
+  ],
+  "nextGate": {
+    "name": "P1-A parameterized CAGE actions",
+    "constraint": "preserve the accepted P0-C execution and authority boundaries while changing only the Security action surface from team-plan selection to typed CAGE actions; do not open arbitrary shell in the same experiment"
+  }
+}
