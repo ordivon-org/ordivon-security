@@ -14,8 +14,8 @@ audience:
   - evaluator
   - maintainer
   - agent
-updated: 2026-08-04
-summary: Evidence contract for active multi-channel Contest and CAGE bundles plus frozen Round 1 reports.
+updated: 2026-08-05
+summary: Evidence contract for active Contest, CAGE, and software Evaluation bundles plus frozen Round 1 reports.
 evidence_status: verified
 readiness: READY
 applies_to:
@@ -23,6 +23,7 @@ applies_to:
 related:
   - security.architecture
   - security.research-boundary
+  - security.evaluation-trial-p0
   - security.migration.round2
   - security.migration.round3-p0
   - security.authority
@@ -59,6 +60,32 @@ An active claim is inadmissible when:
 - raw metrics or individual Trials are discarded in favour of one aggregate score;
 - event bytes, sequence, previous digest, or bundle summaries fail verification;
 - secrets, real endpoints, third-party credentials, packet captures, or unauthorized artifacts enter Git.
+
+## Active Evaluation bundle
+
+Every software Evaluation Run writes:
+
+```text
+evaluation-spec.json
+execution-identity.json
+findings.json
+result.json
+bundle-manifest.json
+operational-manifest.json
+events/
+  sample.jsonl
+  management.jsonl
+  observer.jsonl
+  guardian.jsonl
+  world-truth.jsonl
+  operational.jsonl
+```
+
+The Sample channel contains identity and digest references only. Sample bytes remain in the local SampleVault and are inadmissible in Git, semantic evidence, operational evidence, Host state, or model Provider prompts.
+
+An Evaluation claim is inadmissible when Authority does not bind the exact Sample and environment, identity omits a relevant policy or image revision, Observer and Guardian authority are conflated, residual closure is incomplete, Findings omit exact evidence references, or any event or manifest fails verification. `no-issue-observed` is bounded to the exact Run and is not a general software-safety guarantee.
+
+The current fixture backend never invokes Sample bytes. Its evidence proves the local protocol and failure closure, not software behavior.
 
 ## CAGE evidence
 

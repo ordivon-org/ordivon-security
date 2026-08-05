@@ -1,4 +1,4 @@
-"""Stable public facade for the active Security Contest core."""
+"""Stable public facade for the active Security Contest and Evaluation cores."""
 
 from .actors import (
     ActorBackend,
@@ -16,6 +16,24 @@ from .contest import (
     ScenarioManifest,
 )
 from .contest.runner import ContestRunner
+from .evaluation import (
+    AuthorityManifest,
+    EnvironmentIdentity,
+    EvaluationDisposition,
+    EvaluationResult,
+    EvaluationRunner,
+    EvaluationSpec,
+    Finding,
+    FixtureEvaluationBackend,
+    GuardianPolicy,
+    GuardianRecord,
+    ObservationPlan,
+    ObserverRecord,
+    SampleIdentity,
+    SampleVault,
+    verify_evaluation_evidence,
+    verify_evaluation_operational_evidence,
+)
 from .evidence import (
     EvidenceBundle,
     EvidenceRecorder,
@@ -44,6 +62,7 @@ __all__ = [
     "ActorProposalFailureCode",
     "ActorBinding",
     "ActorObservation",
+    "AuthorityManifest",
     "CAGE4_NATIVE_PLAN",
     "CAGE4_PLANS",
     "CAGE4_RANGE_ID",
@@ -53,13 +72,28 @@ __all__ = [
     "Cage4RangeConfig",
     "ContestResult",
     "ContestRunner",
+    "EnvironmentIdentity",
+    "EvaluationDisposition",
+    "EvaluationResult",
+    "EvaluationRunner",
+    "EvaluationSpec",
     "EvidenceBundle",
     "EvidenceRecorder",
-    "OperationalEvidenceEvent",
+    "Finding",
+    "FixtureEvaluationBackend",
+    "GuardianPolicy",
+    "GuardianRecord",
     "MicroContestRange",
+    "ObservationPlan",
+    "ObserverRecord",
+    "OperationalEvidenceEvent",
     "RangeBackend",
+    "SampleIdentity",
+    "SampleVault",
     "ScenarioManifest",
     "SequenceActorBackend",
+    "verify_evaluation_evidence",
+    "verify_evaluation_operational_evidence",
     "verify_evidence_bundle",
     "verify_operational_evidence",
 ]

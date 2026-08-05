@@ -14,8 +14,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-04
-summary: Canonical entry to the authorized multi-Actor adversarial Contest laboratory, deterministic core, and pinned CAGE 4 Range.
+updated: 2026-08-05
+summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, and local non-executing software Evaluation Trial foundation.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -23,6 +23,7 @@ applies_to:
 related:
   - security.charter
   - security.architecture
+  - security.evaluation-trial-p0
   - security.research-agenda
   - security.research-boundary
   - security.evidence
@@ -36,7 +37,7 @@ Its central executable object is a **Contest**: multiple goal-bearing actors rec
 
 ## Current capability
 
-The active `0.3` core provides:
+The active `0.4` core provides:
 
 - a multi-Actor `ScenarioManifest`;
 - actor-specific observations separated from hidden world truth;
@@ -49,11 +50,29 @@ The active `0.3` core provides:
 - Trial identity binding the Security implementation, evidence schema, Range adapter/substrate, and Actor implementations;
 - deterministic replay and evidence verification;
 - a small synthetic Red/Blue Range proving the core loop;
-- a first-class, revision-pinned CAGE Challenge 4 Enterprise Range.
+- a first-class, revision-pinned CAGE Challenge 4 Enterprise Range;
+- a content-addressed local `SampleVault` with digest verification;
+- exact authority, environment, Guardian, Observation, and Evaluation contracts;
+- a replaceable Evaluation backend and a fixture backend that never invokes Sample bytes;
+- separate Observer, Guardian, management, Sample, truth, and operational evidence;
+- evidence-bound Findings and mandatory residual-closure receipts.
 
 In the CAGE adapter, one Security Red Actor controls the CAGE Red team and one Security Blue Actor controls five CAGE Blue agents. Every Red and Blue CAGE action is explicitly supplied by Ordivon to the joint step; Green agents remain CAGE-controlled environmental actors. The current action surface is intentionally narrow: each side selects either the pinned native team policy or Sleep. Parameter-level model control is a later integration.
 
-It does **not yet** provide model-backed actors, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations.
+It does **not yet** provide model-backed actors, disposable-machine execution, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. Current Ordivon Runtime is not used to invoke untrusted Sample bytes.
+
+## Run a local Evaluation Trial dry run
+
+```bash
+printf 'owned evaluation fixture\n' > /tmp/ordivon-evaluation-fixture.bin
+
+uv run ordivon-security-evaluation-dry-run \
+  --sample /tmp/ordivon-evaluation-fixture.bin \
+  --vault /tmp/ordivon-evaluation-vault \
+  --output /tmp/ordivon-evaluation-evidence
+```
+
+This path verifies Sample identity, checks local authority and environment bindings, runs the non-executing fixture backend, proves residual closure, and seals evidence. It does not load or invoke the Sample as code. See [`docs/EVALUATION-TRIAL-P0.md`](docs/EVALUATION-TRIAL-P0.md).
 
 ## Run the deterministic Contest
 
@@ -120,6 +139,14 @@ ScenarioManifest
   → simultaneous resolution
   → Actor result + sensor telemetry + hidden truth
   → raw metrics + sealed evidence
+
+EvaluationSpec
+  → authority and environment admission
+  → SampleVault verification
+  → EvaluationRangeBackend
+  → Observer records + Guardian decisions + facts
+  → residual closure
+  → Findings + sealed evidence
 ```
 
 Security owns the adversarial domain semantics: Scenario, Contest, Campaign and organization hypotheses, actor information boundaries, domain action admission, Range truth, scoring, and adversarial evaluation.
@@ -147,6 +174,7 @@ The former single-Actor experiment/evaluation framework is frozen at Git revisio
 - [`docs/MIGRATION-ROUND-1.md`](docs/MIGRATION-ROUND-1.md) — Contest Core replacement;
 - [`docs/MIGRATION-ROUND-2.md`](docs/MIGRATION-ROUND-2.md) — first-class CAGE 4 Range;
 - [`docs/MIGRATION-ROUND-3-P0.md`](docs/MIGRATION-ROUND-3-P0.md) — fail-closed model prerequisites, execution identity, and evidence separation;
+- [`docs/EVALUATION-TRIAL-P0.md`](docs/EVALUATION-TRIAL-P0.md) — local Sample, authority, environment, Observer/Guardian, residual closure, and evidence contracts;
 - [`docs/research-agenda.md`](docs/research-agenda.md) — research sequence and falsifiers;
 - [`docs/research-boundary.md`](docs/research-boundary.md) — authorization and external-effect limits;
 - [`evidence/README.md`](evidence/README.md) — active and historical evidence contracts.
