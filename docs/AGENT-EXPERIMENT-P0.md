@@ -148,6 +148,15 @@ Security raw observation
 → Security ActionProposal
 ```
 
+The complete compiled Context remains content-addressed in Host storage and is bound
+by the Assignment and Harness Run `contextDigest`. The model receives a deterministic
+`host-selected-semantics-v1` projection containing only the selected blocks'
+objective, observation, prior action results, and rules. Task/Attempt identities,
+TaskContract payloads, Context manifests, and digests are not repeated in the
+Provider prompt because they already remain authoritative in Host and Harness
+evidence. This preserves the P0-A total-token bound while allowing Host to own
+Context selection rather than merely annotating a Security-built prompt.
+
 The Assignment is deliberately external rather than native: it carries no
 `ToolGrant`, Runtime Job, Workspace, or native Run contract. Security generates a
 stable Harness Run identity from the committed Assignment generation and binds it
