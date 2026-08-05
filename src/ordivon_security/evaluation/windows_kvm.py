@@ -308,11 +308,12 @@ class WindowsKvmProviderConfig:
             self.mkfs_fat_path,
             self.mcopy_path,
             self.mdir_path,
-            self.firmware_code_path,
-            self.base_manifest_path,
         ):
+            if not path.is_file() or not path.resolve().is_file():
+                raise ValueError(f"Windows KVM provider tool is missing or unsafe: {path}")
+        for path in (self.firmware_code_path, self.base_manifest_path):
             if path.is_symlink() or not path.is_file():
-                raise ValueError(f"Windows KVM provider dependency is missing or unsafe: {path}")
+                raise ValueError(f"Windows KVM provider identity file is missing or unsafe: {path}")
 
 
 class _QmpClient:
