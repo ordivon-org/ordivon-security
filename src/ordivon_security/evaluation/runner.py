@@ -38,6 +38,8 @@ class EvaluationRunner:
         self.backend = backend
         self.vault = vault
         self.evidence_root = evidence_root
+        self.evidence_root.mkdir(parents=True, exist_ok=True)
+        self.evidence_root.chmod(0o700)
 
     @staticmethod
     def _wall_ms() -> int:
