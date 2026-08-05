@@ -248,8 +248,8 @@ class WindowsKvmBaseImage:
             base_vars_path=vars_path,
             environment_image_digest=cast(str, digests["environmentImage"]),
             source_iso_digest=cast(str, digests["sourceIso"]),
-            base_image_digest=digests["baseImage"],
-            base_vars_digest=digests["baseVars"],
+            base_image_digest=cast(str, digests["baseImage"]),
+            base_vars_digest=cast(str, digests["baseVars"]),
             firmware_code_digest=cast(str, digests["firmwareCode"]),
             guest_runner_digest=cast(str, digests["guestRunner"]),
             windows_build=windows_build,
@@ -367,8 +367,11 @@ class _QmpClient:
             raise ValueError("QMP message must be an object")
         return cast(JsonObject, value)
 
-    def execute(self, command: str) -> JsonValue:
-        self._writer.write(json.dumps({"execute": command}, separators=(",", ":")) + "\n")
+    def execute(self, command: str, arguments: JsonObject | None = None) -> JsonValue:
+        request: JsonObject = {"execute": command}
+        if arguments is not None:
+            request["arguments"] = arguments
+        self._writer.write(json.dumps(request, separators=(",", ":")) + "\n")
         self._writer.flush()
         while True:
             message = self._read_message()
