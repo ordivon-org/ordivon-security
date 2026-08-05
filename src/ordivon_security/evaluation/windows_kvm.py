@@ -267,7 +267,7 @@ class WindowsKvmProviderConfig:
     mkfs_fat_path: Path = Path("/usr/bin/mkfs.fat")
     mcopy_path: Path = Path("/usr/bin/mcopy")
     mdir_path: Path = Path("/usr/bin/mdir")
-    firmware_code_path: Path = Path("/usr/share/edk2/x64/OVMF_CODE.secboot.4m.fd")
+    firmware_code_path: Path = Path("/usr/share/edk2/x64/OVMF_CODE.4m.fd")
     run_user: str = "qemu"
     run_group: str = "qemu"
     admitted_sample_digest: str = ""
@@ -421,7 +421,7 @@ def windows_kvm_qemu_arguments(
         "-name",
         name,
         "-machine",
-        "q35,accel=kvm,smm=on",
+        "q35,accel=kvm,smm=off",
         "-cpu",
         "host",
         "-smp",
@@ -495,9 +495,11 @@ class WindowsKvmEvaluationBackend:
         configuration: JsonObject = {
             "memoryMiB": self.config.memory_mib,
             "vcpus": self.config.vcpu_count,
-            "machine": "q35,accel=kvm,smm=on",
+            "machine": "q35,accel=kvm,smm=off",
             "cpu": "host",
             "display": "VGA",
+            "secureBoot": False,
+            "smm": False,
             "network": "no-device",
             "systemDisk": "qcow2-overlay",
             "runDisk": "usb-fat",

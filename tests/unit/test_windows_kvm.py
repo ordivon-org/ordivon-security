@@ -29,6 +29,7 @@ from ordivon_security.evaluation.windows_kvm import (
 from ordivon_security.evaluation.windows_kvm_build import (
     _BUILD_LABEL,
     WindowsKvmBaseBuildConfig,
+    _block_read_bytes,
     _create_fat_image,
     build_windows_kvm_base,
     windows_kvm_install_arguments,
@@ -72,6 +73,8 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "machine": "q35,accel=kvm,smm=on",
             "cpu": "host",
             "display": "VGA",
+            "secureBoot": False,
+            "smm": False,
             "network": "no-device",
             "tpm": "swtpm-2.0",
         }
@@ -185,6 +188,14 @@ class WindowsKvmP0Tests(unittest.TestCase):
             },
         )
 
+    def test_boot_media_progress_parser_is_device_scoped(self) -> None:
+        value: JsonValue = [
+            {"device": "osdisk", "stats": {"rd_bytes": 99}},
+            {"device": "installcd", "stats": {"rd_bytes": 20 * 1024 * 1024}},
+        ]
+        self.assertEqual(_block_read_bytes(value, "installcd"), 20 * 1024 * 1024)
+        self.assertEqual(_block_read_bytes(value, "missing"), 0)
+
     def test_base_manifest_loads_and_detects_tampering(self) -> None:
         base = WindowsKvmBaseImage.load(self.manifest_path)
         self.assertEqual(base.base_image_digest, _digest(self.base_image))
@@ -244,9 +255,11 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertEqual(arguments[arguments.index("-nic") + 1], "none")
         self.assertNotIn("-netdev", arguments)
         self.assertIn("order=c,once=d,menu=off", arguments)
+        self.assertIn("q35,accel=kvm,smm=off", arguments)
         self.assertIn(f"file={source_iso},if=none,format=raw,readonly=on,id=installcd", arguments)
         self.assertIn("usb-kbd,bus=xhci.0", arguments)
         self.assertIn("VGA", arguments)
+        self.assertIn("q35,accel=kvm,smm=off", arguments)
 
     def test_fat_labels_are_valid_and_finalize_uses_build_label(self) -> None:
         from ordivon_security.evaluation.windows_kvm import _RUN_LABEL
