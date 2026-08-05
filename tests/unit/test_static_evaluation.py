@@ -119,6 +119,10 @@ class StaticEvaluationP0Tests(unittest.TestCase):
         self.assertEqual(resolved.read_bytes(), self.sample_bytes)
         self.assertEqual(stat.S_IMODE(resolved.stat().st_mode), 0o600)
         self.assertEqual(stat.S_IMODE(resolved.parent.stat().st_mode), 0o700)
+        self.assertEqual(
+            stat.S_IMODE((self.vault.root / "objects").stat().st_mode),
+            0o700,
+        )
         repeated = self.vault.import_path(self.sample_source, media_type="application/x-other")
         self.assertEqual(repeated, self.sample)
         self.assertEqual(list(self.vault.imports_root.iterdir()), [])
@@ -190,6 +194,7 @@ class StaticEvaluationP0Tests(unittest.TestCase):
         self.assertEqual(len(result.findings), 1)
         self.assertEqual(result.findings[0].behavior_class, "antivirus-signature-detection")
         evidence_path = Path(result.evidence_path)
+        self.assertEqual(stat.S_IMODE(evidence_path.parent.stat().st_mode), 0o700)
         self.assertEqual(verify_evaluation_evidence(evidence_path), result.evidence_digest)
         self.assertEqual(
             verify_evaluation_operational_evidence(evidence_path),

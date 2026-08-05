@@ -42,13 +42,20 @@ class SampleVault:
         if chunk_bytes < 1:
             raise ValueError("Sample Vault chunk size must be positive")
         self.root = root
-        self.objects_root = root / "objects" / "sha256"
+        self.objects_parent = root / "objects"
+        self.objects_root = self.objects_parent / "sha256"
         self.receipts_root = root / "receipts"
         self.imports_root = root / "imports"
         self.max_sample_bytes = max_sample_bytes
         self.max_vault_bytes = max_vault_bytes
         self.chunk_bytes = chunk_bytes
-        for path in (self.root, self.objects_root, self.receipts_root, self.imports_root):
+        for path in (
+            self.root,
+            self.objects_parent,
+            self.objects_root,
+            self.receipts_root,
+            self.imports_root,
+        ):
             path.mkdir(parents=True, exist_ok=True)
             path.chmod(0o700)
 
