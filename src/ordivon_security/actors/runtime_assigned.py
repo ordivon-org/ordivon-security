@@ -241,6 +241,14 @@ class RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver(HostAssignedDeepSeekHar
             raise ValueError("P0-C Agent stack identity is malformed")
         harness["mode"] = "host-assigned-runtime-executed-domain-tool-loop-v1"
         harness["assignmentMode"] = "external-runtime-job-v1"
+        host = identity.get("host")
+        if not isinstance(host, dict):
+            raise ValueError("P0-C Host identity is malformed")
+        host_configuration = host.get("configuration")
+        if not isinstance(host_configuration, dict):
+            raise ValueError("P0-C Host configuration is malformed")
+        host_configuration["assignmentMode"] = "external-runtime-job-v1"
+        host_configuration["experimentalVariant"] = "security-host-runtime-harness-provider"
         security["experimentVariant"] = "security-host-runtime-harness-provider"
         validate_json(identity)
         return identity
@@ -625,6 +633,7 @@ class RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver(HostAssignedDeepSeekHar
         except Exception as error:  # noqa: BLE001 - Runtime transport and process boundary.
             details: JsonObject = {
                 "errorType": type(error).__name__,
+                "errorMessage": str(error)[:500],
                 "runtimeClientRequestId": client_request_id,
                 "runtimeWorkspaceId": workspace_id,
                 "runtimeRequestDigest": request_digest,
