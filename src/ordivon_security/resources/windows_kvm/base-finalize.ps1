@@ -8,9 +8,9 @@ Remove-Item -LiteralPath 'C:\Windows\Panther\unattend.xml' -Force -ErrorAction S
 Remove-Item -LiteralPath 'C:\Windows\Panther\Unattend.xml' -Force -ErrorAction SilentlyContinue
 Remove-Item -Path 'C:\Windows\Panther\UnattendGC\*' -Force -ErrorAction SilentlyContinue
 
-$volume = Get-Volume -FileSystemLabel 'ORDIVON_BUILD' -ErrorAction SilentlyContinue | Select-Object -First 1
+$volume = Get-Volume -FileSystemLabel 'ORDIVONBLD' -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($null -eq $volume -or $null -eq $volume.DriveLetter) {
-    throw 'ORDIVON_BUILD result volume is missing.'
+    throw 'ORDIVONBLD result volume is missing.'
 }
 $resultPath = "$($volume.DriveLetter):\base-ready.json"
 $result = [ordered]@{

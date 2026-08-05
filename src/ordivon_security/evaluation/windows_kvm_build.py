@@ -29,7 +29,7 @@ from .windows_kvm import (
     _terminate_pid,
 )
 
-_BUILD_LABEL = "ORDIVON_BUILD"
+_BUILD_LABEL = "ORDIVONBLD"
 
 
 @dataclass(frozen=True, slots=True)
@@ -128,9 +128,11 @@ def _write_private(path: Path, content: bytes) -> None:
 def _create_fat_image(config: WindowsKvmBaseBuildConfig, path: Path, *, size_mib: int) -> None:
     with path.open("xb") as handle:
         handle.truncate(size_mib * 1024 * 1024)
-    _run_checked([str(config.mkfs_fat_path), "-n", _BUILD_LABEL, str(path)])
+        handle.flush()
+        os.fsync(handle.fileno())
     path.chmod(0o600)
     _set_owner(path, user=config.run_user, group=config.run_group)
+    _run_checked([str(config.mkfs_fat_path), "-n", _BUILD_LABEL, str(path)])
 
 
 def _start_swtpm(
@@ -267,9 +269,14 @@ def _extract_fat_file(
     return True
 
 
-def build_windows_kvm_base(config: WindowsKvmBaseBuildConfig) -> JsonObject:
-    layout = _prepare_provider_layout(config)
-    source_iso_digest, source_iso_bytes = _digest_path(config.source_iso_path)
+def _build_windows_kvm_base_impl(
+    config: WindowsKvmBaseBuildConfig,
+    *,
+    layout: dict[str, Path],
+    source_iso_digest: str,
+    source_iso_bytes: int,
+    build_path: Path,
+) -> JsonObject:
     guest_runner_path = _resource_path("guest-runner.ps1")
     base_finalize_path = _resource_path("base-finalize.ps1")
     setup_complete_path = _resource_path("SetupComplete.cmd")
@@ -278,8 +285,6 @@ def build_windows_kvm_base(config: WindowsKvmBaseBuildConfig) -> JsonObject:
     base_finalize_digest, _ = _digest_path(base_finalize_path)
     setup_complete_digest, _ = _digest_path(setup_complete_path)
     firmware_digest, _ = _digest_path(config.firmware_code_path)
-    build_token = source_iso_digest.removeprefix("sha256:")[:16]
-    build_path = layout["build"] / f"windows-25h2-{build_token}"
     if build_path.exists():
         raise FileExistsError(f"Windows KVM base build path already exists: {build_path}")
     build_path.mkdir(mode=0o700)
@@ -538,3 +543,42 @@ def build_windows_kvm_base(config: WindowsKvmBaseBuildConfig) -> JsonObject:
             destination.chmod(0o600)
     shutil.rmtree(build_path, ignore_errors=True)
     return receipt
+
+
+def build_windows_kvm_base(config: WindowsKvmBaseBuildConfig) -> JsonObject:
+    layout = _prepare_provider_layout(config)
+    source_iso_digest, source_iso_bytes = _digest_path(config.source_iso_path)
+    build_token = source_iso_digest.removeprefix("sha256:")[:16]
+    build_path = layout["build"] / f"windows-25h2-{build_token}"
+    try:
+        return _build_windows_kvm_base_impl(
+            config,
+            layout=layout,
+            source_iso_digest=source_iso_digest,
+            source_iso_bytes=source_iso_bytes,
+            build_path=build_path,
+        )
+    except BaseException as error:
+        shutil.rmtree(build_path, ignore_errors=True)
+        build_path_removed = not build_path.exists()
+        recorded_at_ns = time.time_ns()
+        failure_receipt: JsonObject = {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.windows-kvm-base-build-failure",
+            "security": security_source_identity(),
+            "sourceIsoDigest": source_iso_digest,
+            "buildPath": str(build_path),
+            "errorType": type(error).__name__,
+            "errorMessage": str(error),
+            "buildPathRemoved": build_path_removed,
+            "recordedAtMs": recorded_at_ns // 1_000_000,
+        }
+        receipt_path = (
+            layout["receipts"] / f"windows-kvm-base-failure-{build_token}-{recorded_at_ns}.json"
+        )
+        _write_private(receipt_path, canonical_bytes(failure_receipt) + b"\n")
+        if not build_path_removed:
+            raise RuntimeError(
+                f"Windows KVM build failed and temporary state remains: {build_path}"
+            ) from error
+        raise

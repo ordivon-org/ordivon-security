@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import stat
 import tempfile
 import unittest
 from dataclasses import replace
 from pathlib import Path
+from unittest.mock import patch
 
-from ordivon_security._canonical import canonical_digest
+from ordivon_security._canonical import JsonObject, canonical_digest
 from ordivon_security.evaluation import (
     AuthorityManifest,
     EnvironmentIdentity,
@@ -25,7 +27,10 @@ from ordivon_security.evaluation.windows_kvm import (
     windows_kvm_qemu_arguments,
 )
 from ordivon_security.evaluation.windows_kvm_build import (
+    _BUILD_LABEL,
     WindowsKvmBaseBuildConfig,
+    _create_fat_image,
+    build_windows_kvm_base,
     windows_kvm_install_arguments,
 )
 
@@ -239,6 +244,106 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertEqual(arguments[arguments.index("-nic") + 1], "none")
         self.assertNotIn("-netdev", arguments)
         self.assertIn("order=c,once=d,menu=off", arguments)
+
+    def test_fat_labels_are_valid_and_finalize_uses_build_label(self) -> None:
+        from ordivon_security.evaluation.windows_kvm import _RUN_LABEL
+
+        self.assertLessEqual(len(_BUILD_LABEL), 11)
+        self.assertLessEqual(len(_RUN_LABEL), 11)
+        finalize = (
+            Path(__file__).parents[2]
+            / "src"
+            / "ordivon_security"
+            / "resources"
+            / "windows_kvm"
+            / "base-finalize.ps1"
+        ).read_text(encoding="utf-8")
+        self.assertIn(_BUILD_LABEL, finalize)
+        self.assertNotIn("ORDIVON_BUILD", finalize)
+
+    def test_fat_image_is_private_before_formatter_runs(self) -> None:
+        source_iso = self.root / "private-source.iso"
+        source_iso.write_bytes(b"iso")
+        formatter = self.tools / "private-mkfs"
+        formatter.write_text(
+            '#!/bin/sh\ntest "$(stat -c %a "$3")" = 600\n',
+            encoding="utf-8",
+        )
+        formatter.chmod(0o755)
+        config = WindowsKvmBaseBuildConfig(
+            state_root=self.root / "private-build-state",
+            source_iso_path=source_iso,
+            qemu_path=self.fake_qemu,
+            qemu_img_path=self.fake_qemu_img,
+            swtpm_path=self.fake_swtpm,
+            runuser_path=self.fake_runuser,
+            mkfs_fat_path=formatter,
+            mcopy_path=self.fake_mcopy,
+            xorriso_path=self.fake_xorriso,
+            firmware_code_path=self.firmware,
+            firmware_vars_template_path=self.vars,
+            run_user="root",
+            run_group="root",
+            memory_mib=512,
+            vcpu_count=1,
+            disk_size_gib=1,
+        )
+        image = self.root / "private-result.img"
+        _create_fat_image(config, image, size_mib=1)
+        self.assertEqual(stat.S_IMODE(image.stat().st_mode), 0o600)
+
+    def test_build_failure_removes_secret_state_and_writes_receipt(self) -> None:
+        source_iso = self.root / "failure-source.iso"
+        source_iso.write_bytes(b"synthetic-source")
+        state_root = self.root / "failure-state"
+        config = WindowsKvmBaseBuildConfig(
+            state_root=state_root,
+            source_iso_path=source_iso,
+            qemu_path=self.fake_qemu,
+            qemu_img_path=self.fake_qemu_img,
+            swtpm_path=self.fake_swtpm,
+            runuser_path=self.fake_runuser,
+            mkfs_fat_path=self.fake_mkfs,
+            mcopy_path=self.fake_mcopy,
+            xorriso_path=self.fake_xorriso,
+            firmware_code_path=self.firmware,
+            firmware_vars_template_path=self.vars,
+            run_user="root",
+            run_group="root",
+            memory_mib=512,
+            vcpu_count=1,
+            disk_size_gib=1,
+        )
+
+        def fail_impl(*args: object, **kwargs: object) -> JsonObject:
+            build_path = kwargs["build_path"]
+            assert isinstance(build_path, Path)
+            build_path.mkdir(mode=0o700)
+            secret = build_path / "Autounattend.xml"
+            secret.write_text("Temporary-Bootstrap-Password", encoding="utf-8")
+            secret.chmod(0o600)
+            raise RuntimeError("synthetic build failure")
+
+        with (
+            patch(
+                "ordivon_security.evaluation.windows_kvm_build._build_windows_kvm_base_impl",
+                side_effect=fail_impl,
+            ),
+            self.assertRaisesRegex(RuntimeError, "synthetic build failure"),
+        ):
+            build_windows_kvm_base(config)
+
+        build_root = state_root / "build"
+        self.assertEqual(list(build_root.iterdir()), [])
+        receipts = list((state_root / "receipts").glob("windows-kvm-base-failure-*.json"))
+        self.assertEqual(len(receipts), 1)
+        raw = receipts[0].read_text(encoding="utf-8")
+        receipt = json.loads(raw)
+        self.assertIs(receipt["buildPathRemoved"], True)
+        self.assertEqual(receipt["errorType"], "RuntimeError")
+        self.assertEqual(receipt["errorMessage"], "synthetic build failure")
+        self.assertNotIn("Temporary-Bootstrap-Password", raw)
+        self.assertEqual(stat.S_IMODE(receipts[0].stat().st_mode), 0o600)
 
     def test_qmp_network_class_detection(self) -> None:
         no_network = [{"bus": 0, "devices": [{"class_info": {"class": 0x0106}}]}]

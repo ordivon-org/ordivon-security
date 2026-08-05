@@ -116,7 +116,10 @@ It:
 9. runs `qemu-img check`;
 10. hashes and seals the base image and UEFI state;
 11. retains build command and provider logs;
-12. removes temporary build state after success.
+12. removes temporary build state after success;
+13. on failure, removes the complete temporary build tree and writes a private,
+    non-secret failure receipt containing only source identity, error class, and
+    cleanup status.
 
 The temporary bootstrap password is generated per build, retained only in the
 private build workspace and autoinstall ISO, and removed with that workspace. The
