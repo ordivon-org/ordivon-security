@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
-$volume = Get-Volume -FileSystemLabel 'ORDIVONBLD' -ErrorAction SilentlyContinue | Select-Object -First 1
+$volume = Get-Volume -FileSystemLabel 'ORDIVONCFG' -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($null -eq $volume -or $null -eq $volume.DriveLetter) {
-    throw 'ORDIVONBLD configuration volume is missing.'
+    throw 'ORDIVONCFG configuration volume is missing.'
 }
 $sourceRoot = "$($volume.DriveLetter):\"
 $programRoot = 'C:\ProgramData\Ordivon'

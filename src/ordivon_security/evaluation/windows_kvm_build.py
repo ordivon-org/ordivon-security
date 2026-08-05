@@ -30,6 +30,7 @@ from .windows_kvm import (
 )
 
 _BUILD_LABEL = "ORDIVONBLD"
+_CONFIG_LABEL = "ORDIVONCFG"
 
 
 @dataclass(frozen=True, slots=True)
@@ -131,14 +132,22 @@ def _write_private(path: Path, content: bytes) -> None:
     path.chmod(0o600)
 
 
-def _create_fat_image(config: WindowsKvmBaseBuildConfig, path: Path, *, size_mib: int) -> None:
+def _create_fat_image(
+    config: WindowsKvmBaseBuildConfig,
+    path: Path,
+    *,
+    size_mib: int,
+    label: str,
+) -> None:
     with path.open("xb") as handle:
         handle.truncate(size_mib * 1024 * 1024)
         handle.flush()
         os.fsync(handle.fileno())
     path.chmod(0o600)
     _set_owner(path, user=config.run_user, group=config.run_group)
-    _run_checked([str(config.mkfs_fat_path), "-n", _BUILD_LABEL, str(path)])
+    if not label or len(label) > 11:
+        raise ValueError("FAT volume label must contain 1 to 11 characters")
+    _run_checked([str(config.mkfs_fat_path), "-n", label, str(path)])
 
 
 def _copy_to_fat(
@@ -209,6 +218,7 @@ def windows_kvm_install_arguments(
     base_image_path: Path,
     vars_path: Path,
     source_iso_path: Path,
+    config_disk_path: Path,
     result_disk_path: Path,
     qmp_path: Path,
     tpm_socket_path: Path,
@@ -264,9 +274,13 @@ def windows_kvm_install_arguments(
         "-device",
         "usb-kbd,bus=xhci.0",
         "-drive",
+        f"file={config_disk_path},if=none,format=raw,readonly=on,id=configdisk",
+        "-device",
+        f"usb-storage,drive=configdisk,bus=xhci.0,removable=on,serial={_CONFIG_LABEL}",
+        "-drive",
         f"file={result_disk_path},if=none,format=raw,cache=none,aio=threads,id=resultdisk",
         "-device",
-        "usb-storage,drive=resultdisk,bus=xhci.0",
+        f"usb-storage,drive=resultdisk,bus=xhci.0,removable=off,serial={_BUILD_LABEL}",
         "-device",
         "virtio-rng-pci",
         "-rtc",
@@ -380,6 +394,7 @@ def _build_windows_kvm_base_impl(
 
     base_image_path = build_path / "windows-11-enterprise-eval-25h2-base.qcow2"
     vars_path = build_path / "OVMF_VARS.4m.fd"
+    config_disk_path = build_path / "build-config.img"
     result_disk_path = build_path / "build-result.img"
     qmp_path = build_path / "qmp.sock"
     qemu_stdout_path = build_path / "qemu.stdout.log"
@@ -406,7 +421,8 @@ def _build_windows_kvm_base_impl(
     for path in (base_image_path, vars_path):
         path.chmod(0o600)
         _set_owner(path, user=config.run_user, group=config.run_group)
-    _create_fat_image(config, result_disk_path, size_mib=32)
+    _create_fat_image(config, config_disk_path, size_mib=16, label=_CONFIG_LABEL)
+    _create_fat_image(config, result_disk_path, size_mib=16, label=_BUILD_LABEL)
     for source_path, destination_name in (
         (unattend_path, "Autounattend.xml"),
         (install_bootstrap_path, "install-bootstrap.ps1"),
@@ -414,13 +430,14 @@ def _build_windows_kvm_base_impl(
         (base_finalize_path, "base-finalize.ps1"),
         (setup_complete_path, "SetupComplete.cmd"),
     ):
-        _copy_to_fat(config, result_disk_path, source_path, destination_name)
+        _copy_to_fat(config, config_disk_path, source_path, destination_name)
     swtpm_pid, tpm_socket_path = _start_swtpm(config, build_path=build_path)
     arguments = windows_kvm_install_arguments(
         config=config,
         base_image_path=base_image_path,
         vars_path=vars_path,
         source_iso_path=config.source_iso_path,
+        config_disk_path=config_disk_path,
         result_disk_path=result_disk_path,
         qmp_path=qmp_path,
         tpm_socket_path=tpm_socket_path,
@@ -510,6 +527,10 @@ def _build_windows_kvm_base_impl(
         "installBootstrapDigest": install_bootstrap_digest,
         "unattendTemplateDigest": unattend_template_digest,
         "sourceMediaMode": "original-udf-read-only",
+        "configurationMedia": "usb-fat-read-only-removable",
+        "resultMedia": "usb-fat-writable-fixed",
+        "configurationDiskLabel": _CONFIG_LABEL,
+        "resultDiskLabel": _BUILD_LABEL,
         "secureBoot": False,
         "smm": False,
         "bootPromptAssist": "bounded-qmp-send-key:spc",
@@ -584,7 +605,12 @@ def _build_windows_kvm_base_impl(
             "runUser": config.run_user,
             "display": "VGA",
             "sourceMediaMode": "original-udf-read-only",
-            "configurationDiskLabel": _BUILD_LABEL,
+            "configurationDiskLabel": _CONFIG_LABEL,
+            "resultDiskLabel": _BUILD_LABEL,
+            "configurationDiskReadOnly": True,
+            "configurationDiskRemovable": True,
+            "resultDiskReadOnly": False,
+            "resultDiskRemovable": False,
             "secureBoot": False,
             "smm": False,
             "bootPromptAssist": "bounded-qmp-send-key:spc",
@@ -615,7 +641,10 @@ def _build_windows_kvm_base_impl(
         "windowsBuild": windows_build,
         "networkDevicePresent": False,
         "sourceMediaMode": "original-udf-read-only",
-        "configurationDiskLabel": _BUILD_LABEL,
+        "configurationDiskLabel": _CONFIG_LABEL,
+        "resultDiskLabel": _BUILD_LABEL,
+        "configurationDiskReadOnly": True,
+        "configurationDiskRemovable": True,
         "secureBoot": False,
         "smm": False,
         "bootPromptAssist": "bounded-qmp-send-key:spc",

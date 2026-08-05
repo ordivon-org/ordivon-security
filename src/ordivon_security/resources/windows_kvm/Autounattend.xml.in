@@ -33,7 +33,7 @@
         <RunSynchronousCommand wcm:action="add">
           <Order>1</Order>
           <Description>Install Ordivon base scripts</Description>
-          <Path>powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$v=Get-Volume -FileSystemLabel 'ORDIVONBLD' -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -eq $v -or $null -eq $v.DriveLetter) { exit 20 }; &amp; (Join-Path ($v.DriveLetter + ':\') 'install-bootstrap.ps1')"</Path>
+          <Path>powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$v=Get-Volume -FileSystemLabel 'ORDIVONCFG' -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -eq $v -or $null -eq $v.DriveLetter) { exit 20 }; &amp; (Join-Path ($v.DriveLetter + ':\') 'install-bootstrap.ps1')"</Path>
           <WillReboot>Never</WillReboot>
         </RunSynchronousCommand>
       </RunSynchronous>

@@ -28,6 +28,7 @@ from ordivon_security.evaluation.windows_kvm import (
 )
 from ordivon_security.evaluation.windows_kvm_build import (
     _BUILD_LABEL,
+    _CONFIG_LABEL,
     WindowsKvmBaseBuildConfig,
     _block_read_bytes,
     _create_fat_image,
@@ -248,6 +249,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             base_image_path=self.root / "build.qcow2",
             vars_path=self.root / "build-vars.fd",
             source_iso_path=source_iso,
+            config_disk_path=self.root / "build-config.img",
             result_disk_path=self.root / "build-result.img",
             qmp_path=self.root / "build-qmp.sock",
             tpm_socket_path=self.root / "build-tpm.sock",
@@ -259,12 +261,25 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertIn(f"file={source_iso},if=none,format=raw,readonly=on,id=installcd", arguments)
         self.assertIn("usb-kbd,bus=xhci.0", arguments)
         self.assertIn("VGA", arguments)
+        self.assertIn(
+            f"file={self.root / 'build-config.img'},if=none,format=raw,readonly=on,id=configdisk",
+            arguments,
+        )
+        self.assertIn(
+            f"usb-storage,drive=configdisk,bus=xhci.0,removable=on,serial={_CONFIG_LABEL}",
+            arguments,
+        )
+        self.assertIn(
+            f"usb-storage,drive=resultdisk,bus=xhci.0,removable=off,serial={_BUILD_LABEL}",
+            arguments,
+        )
         self.assertIn("q35,accel=kvm,smm=off", arguments)
 
     def test_fat_labels_are_valid_and_finalize_uses_build_label(self) -> None:
         from ordivon_security.evaluation.windows_kvm import _RUN_LABEL
 
         self.assertLessEqual(len(_BUILD_LABEL), 11)
+        self.assertLessEqual(len(_CONFIG_LABEL), 11)
         self.assertLessEqual(len(_RUN_LABEL), 11)
         finalize = (
             Path(__file__).parents[2]
@@ -292,9 +307,10 @@ class WindowsKvmP0Tests(unittest.TestCase):
             / "windows_kvm"
             / "install-bootstrap.ps1"
         ).read_text(encoding="utf-8")
-        self.assertIn(_BUILD_LABEL, unattend)
+        self.assertIn(_CONFIG_LABEL, unattend)
         self.assertIn("install-bootstrap.ps1", unattend)
-        self.assertIn(_BUILD_LABEL, bootstrap)
+        self.assertIn(_CONFIG_LABEL, bootstrap)
+        self.assertNotIn(_BUILD_LABEL, unattend)
         self.assertIn("SetupComplete.cmd", bootstrap)
 
     def test_fat_image_is_private_before_formatter_runs(self) -> None:
@@ -324,7 +340,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             disk_size_gib=1,
         )
         image = self.root / "private-result.img"
-        _create_fat_image(config, image, size_mib=1)
+        _create_fat_image(config, image, size_mib=1, label=_BUILD_LABEL)
         self.assertEqual(stat.S_IMODE(image.stat().st_mode), 0o600)
 
     def test_build_failure_removes_secret_state_and_writes_receipt(self) -> None:
