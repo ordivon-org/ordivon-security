@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ordivon-security"
-version = "0.6.0"
+version = "0.7.0"
 description = "Authorized multi-actor adversarial contest and cyber-range research core"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -33,9 +33,14 @@ ordivon-security-static-evaluation = "ordivon_security.cli_static_evaluation:mai
 ordivon-security-harden-quarantine = "ordivon_security.cli_quarantine:main"
 ordivon-security-audit-quarantine = "ordivon_security.cli_quarantine_audit:main"
 ordivon-security-case-snapshot = "ordivon_security.cli_case_snapshot:main"
+ordivon-security-windows-kvm-build = "ordivon_security.cli_windows_kvm_build:main"
+ordivon-security-windows-kvm-acceptance = "ordivon_security.cli_windows_kvm_acceptance:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+ordivon_security = ["resources/windows_kvm/*"]
 
 [tool.ruff]
 target-version = "py312"

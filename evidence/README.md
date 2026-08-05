@@ -15,7 +15,7 @@ audience:
   - maintainer
   - agent
 updated: 2026-08-05
-summary: Evidence contract for active Contest, CAGE, software Evaluation, static native-report Artifacts, Case Snapshots, and frozen Round 1 reports.
+summary: Evidence contract for active Contest, CAGE, software Evaluation, static native-report Artifacts, Case Snapshots, candidate Windows KVM Runs, and frozen Round 1 reports.
 evidence_status: verified
 readiness: READY
 applies_to:
@@ -26,6 +26,7 @@ related:
   - security.evaluation-trial-p0
   - security.static-evaluation-p0
   - security.case-snapshot-p0
+  - security.windows-kvm-p0
   - security.migration.round2
   - security.migration.round3-p0
   - security.authority
@@ -89,6 +90,8 @@ The Sample channel contains identity and digest references only. Sample bytes re
 An Evaluation claim is inadmissible when Authority does not bind the exact Sample and environment, identity omits a relevant policy or image revision, Observer and Guardian authority are conflated, residual closure is incomplete, Findings omit exact evidence references, or any event or manifest fails verification. `no-issue-observed` is bounded to the exact Run and is not a general software-safety guarantee.
 
 The fixture backend never invokes Sample bytes. The static backend permits admitted analyzers to read bytes as data but never loads, installs, or invokes the Sample. A static antivirus match is an Observer result, not independent proof of runtime behavior. Imported reports must state that they were produced before the current Trial and remain bounded by their retained bytes and limitations. Artifact tampering invalidates verification.
+
+A candidate Windows KVM Run additionally binds the sealed base image, disposable overlay configuration, UEFI and TPM identity, QEMU and swtpm binaries, management-plane QMP status, and no-network PCI result. Guest and fixture results may be retained as Artifacts, but they cannot establish QEMU topology or residual closure. The Run is inadmissible when any network-class PCI device appears, the exact benign fixture contract differs, Guest result identity differs, QEMU or swtpm remains alive, or the disposable Run directory survives destruction. Until real benign acceptance is retained, no unknown Sample Run is admissible.
 
 ## Active Case Snapshot bundle
 

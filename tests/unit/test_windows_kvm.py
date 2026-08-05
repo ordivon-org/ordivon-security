@@ -1,0 +1,369 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import tempfile
+import unittest
+from dataclasses import replace
+from pathlib import Path
+
+from ordivon_security._canonical import canonical_digest
+from ordivon_security.evaluation import (
+    AuthorityManifest,
+    EnvironmentIdentity,
+    EvaluationInstance,
+    EvaluationSpec,
+    GuardianPolicy,
+    ObservationPlan,
+    SampleIdentity,
+)
+from ordivon_security.evaluation.windows_kvm import (
+    WindowsKvmBaseImage,
+    WindowsKvmEvaluationBackend,
+    WindowsKvmProviderConfig,
+    _pci_network_devices,
+    windows_kvm_qemu_arguments,
+)
+from ordivon_security.evaluation.windows_kvm_build import (
+    WindowsKvmBaseBuildConfig,
+    windows_kvm_install_arguments,
+)
+
+
+def _digest(path: Path) -> str:
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+class WindowsKvmP0Tests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        self.tools = self.root / "tools"
+        self.tools.mkdir()
+        self.fake_qemu = self._tool("qemu-system-x86_64", "QEMU emulator version test")
+        self.fake_qemu_img = self._tool("qemu-img", "qemu-img version test")
+        self.fake_swtpm = self._tool("swtpm", "TPM emulator version test")
+        self.fake_runuser = self._tool("runuser", "runuser test")
+        self.fake_mkfs = self._tool("mkfs.fat", "mkfs test")
+        self.fake_mcopy = self._tool("mcopy", "mcopy test")
+        self.fake_mdir = self._tool("mdir", "mdir test")
+        self.fake_xorriso = self._tool("xorriso", "xorriso test")
+        self.firmware = self.root / "OVMF_CODE.fd"
+        self.firmware.write_bytes(b"firmware")
+        self.vars = self.root / "OVMF_VARS.fd"
+        self.vars.write_bytes(b"vars")
+        self.base_image = self.root / "base.qcow2"
+        self.base_image.write_bytes(b"sealed-base-image")
+        self.manifest_path = self.root / "base.manifest.json"
+        environment_identity = {
+            "sourceIsoDigest": "sha256:" + "1" * 64,
+            "baseImageDigest": _digest(self.base_image),
+            "baseVarsDigest": _digest(self.vars),
+            "firmwareCodeDigest": _digest(self.firmware),
+            "guestRunnerDigest": "sha256:" + "2" * 64,
+            "windowsBuild": "10.0.26200.6584",
+            "machine": "q35,accel=kvm,smm=on",
+            "cpu": "host",
+            "network": "no-device",
+            "tpm": "swtpm-2.0",
+        }
+        manifest = {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.windows-kvm-base-image",
+            "providerId": "provider:windows-kvm",
+            "paths": {
+                "baseImage": str(self.base_image),
+                "baseVars": str(self.vars),
+            },
+            "digests": {
+                "environmentImage": canonical_digest(environment_identity),
+                "sourceIso": "sha256:" + "1" * 64,
+                "baseImage": _digest(self.base_image),
+                "baseVars": _digest(self.vars),
+                "firmwareCode": _digest(self.firmware),
+                "guestRunner": "sha256:" + "2" * 64,
+            },
+            "guest": {
+                "status": "ready",
+                "windowsBuild": "10.0.26200.6584",
+            },
+        }
+        self.manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        self.config = WindowsKvmProviderConfig(
+            state_root=self.root / "state",
+            base_manifest_path=self.manifest_path,
+            qemu_path=self.fake_qemu,
+            qemu_img_path=self.fake_qemu_img,
+            swtpm_path=self.fake_swtpm,
+            runuser_path=self.fake_runuser,
+            mkfs_fat_path=self.fake_mkfs,
+            mcopy_path=self.fake_mcopy,
+            mdir_path=self.fake_mdir,
+            firmware_code_path=self.firmware,
+            run_user="root",
+            run_group="root",
+            admitted_sample_digest="sha256:" + "3" * 64,
+            fixture_attestation_digest="sha256:" + "4" * 64,
+            memory_mib=512,
+            vcpu_count=1,
+        )
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    def _tool(self, name: str, version: str) -> Path:
+        path = self.tools / name
+        path.write_text(f"#!/bin/sh\nprintf '%s\\n' '{version}'\n", encoding="utf-8")
+        path.chmod(0o755)
+        return path
+
+    def _spec(self, backend: WindowsKvmEvaluationBackend) -> EvaluationSpec:
+        sample = SampleIdentity.create(
+            sha256="sha256:" + "3" * 64,
+            byte_length=18_944,
+            media_type="application/vnd.microsoft.portable-executable",
+            original_name="ordivon-benign-v1.exe",
+        )
+        guardian = GuardianPolicy(
+            policy_id="guardian-policy:windows-kvm-test",
+            revision="1",
+            network_mode="deny-all",
+            max_runtime_ms=600_000,
+            max_memory_mib=512,
+            max_processes=64,
+            max_artifact_bytes=32 * 1024 * 1024,
+            terminate_on=("network-device", "runtime-limit"),
+        )
+        observation = ObservationPlan(
+            plan_id="observation-plan:windows-kvm-test",
+            revision="1",
+            channels=("sample", "management", "observer", "guardian", "world-truth"),
+            capture_memory="never",
+            max_event_bytes=512 * 1024,
+        )
+        environment = EnvironmentIdentity(
+            environment_id="environment:windows-kvm-test",
+            provider_id=backend.provider_id,
+            provider_revision="1",
+            image_digest=backend.base.environment_image_digest,
+            configuration_digest=canonical_digest(backend.execution_identity),
+            guardian_policy_digest=guardian.digest,
+            observation_plan_digest=observation.digest,
+        )
+        authority = AuthorityManifest(
+            authority_id="authority:windows-kvm-test",
+            revision="1",
+            sample_digest=sample.sha256,
+            operator_id="operator:test",
+            authorization_basis="Owned benign fixture for Provider acceptance.",
+            permitted_environment_ids=(environment.environment_id,),
+            permitted_actions=("execute-benign-fixture",),
+            prohibited_actions=("network-access", "execute-unknown-sample"),
+            max_runtime_ms=guardian.max_runtime_ms,
+            allow_network=False,
+        )
+        return EvaluationSpec(
+            evaluation_id="evaluation:windows-kvm-test",
+            revision="1",
+            sample=sample,
+            authority=authority,
+            environment=environment,
+            guardian_policy=guardian,
+            observation_plan=observation,
+            requested_actions=("execute-benign-fixture",),
+            metadata={
+                "fixtureId": "ordivon-benign-v1",
+                "fixtureCompilationDigest": "sha256:" + "4" * 64,
+            },
+        )
+
+    def test_base_manifest_loads_and_detects_tampering(self) -> None:
+        base = WindowsKvmBaseImage.load(self.manifest_path)
+        self.assertEqual(base.base_image_digest, _digest(self.base_image))
+        self.assertEqual(base.windows_build, "10.0.26200.6584")
+        self.base_image.write_bytes(b"tampered")
+        with self.assertRaisesRegex(ValueError, "base image digest differs"):
+            WindowsKvmBaseImage.load(self.manifest_path)
+
+    def test_runtime_qemu_topology_has_no_network_path(self) -> None:
+        arguments = windows_kvm_qemu_arguments(
+            config=self.config,
+            overlay_path=self.root / "overlay.qcow2",
+            vars_path=self.root / "vars-copy.fd",
+            run_disk_path=self.root / "run.img",
+            qmp_path=self.root / "qmp.sock",
+            tpm_socket_path=self.root / "swtpm.sock",
+            name="ordivon-test",
+        )
+        self.assertIn("-nic", arguments)
+        self.assertEqual(arguments[arguments.index("-nic") + 1], "none")
+        self.assertNotIn("-netdev", arguments)
+        joined = " ".join(arguments).lower()
+        self.assertNotIn("e1000", joined)
+        self.assertNotIn("virtio-net", joined)
+        self.assertIn("runuser -u root --", joined)
+
+    def test_install_qemu_topology_has_no_network_path(self) -> None:
+        source_iso = self.root / "source.iso"
+        source_iso.write_bytes(b"iso")
+        build_config = WindowsKvmBaseBuildConfig(
+            state_root=self.root / "build-state",
+            source_iso_path=source_iso,
+            qemu_path=self.fake_qemu,
+            qemu_img_path=self.fake_qemu_img,
+            swtpm_path=self.fake_swtpm,
+            runuser_path=self.fake_runuser,
+            mkfs_fat_path=self.fake_mkfs,
+            mcopy_path=self.fake_mcopy,
+            xorriso_path=self.fake_xorriso,
+            firmware_code_path=self.firmware,
+            firmware_vars_template_path=self.vars,
+            run_user="root",
+            run_group="root",
+            memory_mib=512,
+            vcpu_count=1,
+            disk_size_gib=1,
+        )
+        arguments = windows_kvm_install_arguments(
+            config=build_config,
+            base_image_path=self.root / "build.qcow2",
+            vars_path=self.root / "build-vars.fd",
+            install_iso_path=self.root / "autoinstall.iso",
+            result_disk_path=self.root / "build-result.img",
+            qmp_path=self.root / "build-qmp.sock",
+            tpm_socket_path=self.root / "build-tpm.sock",
+        )
+        self.assertEqual(arguments[arguments.index("-nic") + 1], "none")
+        self.assertNotIn("-netdev", arguments)
+        self.assertIn("order=c,once=d,menu=off", arguments)
+
+    def test_qmp_network_class_detection(self) -> None:
+        no_network = [{"bus": 0, "devices": [{"class_info": {"class": 0x0106}}]}]
+        with_network = [
+            {
+                "bus": 0,
+                "devices": [
+                    {"class_info": {"class": 0x0106}},
+                    {"class_info": {"class": 0x0200, "desc": "Ethernet controller"}},
+                ],
+            }
+        ]
+        self.assertEqual(_pci_network_devices(no_network), [])
+        self.assertEqual(len(_pci_network_devices(with_network)), 1)
+
+    def test_provider_accepts_only_exact_benign_contract(self) -> None:
+        backend = WindowsKvmEvaluationBackend(self.config)
+        spec = self._spec(backend)
+        backend._validate_spec(spec)
+
+        wrong_action_authority = replace(
+            spec.authority,
+            permitted_actions=("execute-unknown-sample",),
+            prohibited_actions=("network-access",),
+        )
+        wrong_action = replace(
+            spec,
+            authority=wrong_action_authority,
+            requested_actions=("execute-unknown-sample",),
+        )
+        with self.assertRaisesRegex(ValueError, "admits only the benign fixture"):
+            backend._validate_spec(wrong_action)
+
+        network_authority = replace(spec.authority, allow_network=True)
+        network_spec = replace(spec, authority=network_authority)
+        with self.assertRaisesRegex(ValueError, "deny-all network"):
+            backend._validate_spec(network_spec)
+
+        wrong_media = replace(
+            spec,
+            sample=replace(spec.sample, media_type="application/octet-stream"),
+        )
+        with self.assertRaisesRegex(ValueError, "requires a PE executable"):
+            backend._validate_spec(wrong_media)
+
+        wrong_fixture = replace(
+            spec,
+            metadata={
+                "fixtureId": "unknown",
+                "fixtureCompilationDigest": "sha256:" + "4" * 64,
+            },
+        )
+        with self.assertRaisesRegex(ValueError, "exact benign fixture"):
+            backend._validate_spec(wrong_fixture)
+
+        wrong_digest = "sha256:" + "5" * 64
+        wrong_sample = SampleIdentity.create(
+            sha256=wrong_digest,
+            byte_length=spec.sample.byte_length,
+            media_type=spec.sample.media_type,
+            original_name=spec.sample.original_name,
+        )
+        wrong_bytes = replace(
+            spec,
+            sample=wrong_sample,
+            authority=replace(spec.authority, sample_digest=wrong_digest),
+        )
+        with self.assertRaisesRegex(ValueError, "differs from the admitted benign fixture"):
+            backend._validate_spec(wrong_bytes)
+
+        wrong_attestation = replace(
+            spec,
+            metadata={
+                "fixtureId": "ordivon-benign-v1",
+                "fixtureCompilationDigest": "sha256:" + "6" * 64,
+            },
+        )
+        with self.assertRaisesRegex(ValueError, "attestation differs"):
+            backend._validate_spec(wrong_attestation)
+
+        small_guardian = replace(spec.guardian_policy, max_processes=1)
+        small_environment = replace(
+            spec.environment,
+            guardian_policy_digest=small_guardian.digest,
+        )
+        too_few_processes = replace(
+            spec,
+            guardian_policy=small_guardian,
+            environment=small_environment,
+        )
+        with self.assertRaisesRegex(ValueError, "requires two admitted processes"):
+            backend._validate_spec(too_few_processes)
+
+    def test_destroy_removes_complete_run_directory(self) -> None:
+        backend = WindowsKvmEvaluationBackend(self.config)
+        run_path = self.root / "state" / "runs" / "destroy-test"
+        run_path.mkdir(mode=0o700)
+        (run_path / "overlay.qcow2").write_bytes(b"overlay")
+        instance = EvaluationInstance(
+            instance_id="evaluation-instance:destroy-test",
+            generation="windows-kvm:test",
+            state={
+                "runPath": str(run_path),
+                "qemuPid": 0,
+                "swtpmPid": 0,
+            },
+        )
+        receipt = backend.destroy(instance)
+        self.assertTrue(receipt.clean)
+        self.assertFalse(run_path.exists())
+        self.assertEqual(receipt.details["residualObjects"], [])
+
+    def test_packaged_resources_are_present(self) -> None:
+        resource_root = (
+            Path(__file__).parents[2] / "src" / "ordivon_security" / "resources" / "windows_kvm"
+        )
+        expected = {
+            "Autounattend.xml.in",
+            "SetupComplete.cmd",
+            "base-finalize.ps1",
+            "benign_fixture.c",
+            "guest-runner.ps1",
+        }
+        self.assertEqual({path.name for path in resource_root.iterdir()}, expected)
+        fixture_source = (resource_root / "benign_fixture.c").read_text(encoding="utf-8").lower()
+        for token in ("ws2_32", "wininet", "winhttp", "urlmon", "socket(", "connect("):
+            self.assertNotIn(token, fixture_source)
+
+
+if __name__ == "__main__":
+    unittest.main()

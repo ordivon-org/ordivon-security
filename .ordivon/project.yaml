@@ -22,6 +22,7 @@ managed_paths:
   - docs/EVALUATION-TRIAL-P0.md
   - docs/STATIC-EVALUATION-P0.md
   - docs/CASE-SNAPSHOT-P0.md
+  - docs/WINDOWS-KVM-P0.md
   - docs/research-agenda.md
   - docs/research-boundary.md
   - evidence/README.md
@@ -30,4 +31,4 @@ enforcement: strict
 maintainers:
   - zycxfyh
 public_projection: ordivon-web
-description: Authorized Contest and software Evaluation laboratory with static analysis, evolving Case snapshots, deterministic and pinned Ranges, exact authority, residual closure, and evidence.
+description: Authorized Contest and software Evaluation laboratory with static analysis, evolving Case snapshots, a candidate disposable Windows KVM Provider, deterministic and pinned Ranges, exact authority, residual closure, and evidence.

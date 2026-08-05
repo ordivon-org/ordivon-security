@@ -15,7 +15,7 @@ audience:
   - operator
   - agent
 updated: 2026-08-05
-summary: Local non-executing foundation for authorized software Evaluation Trials, Sample identity, authority, environment binding, Observer and Guardian separation, residual closure, and sealed evidence.
+summary: Authorized software Evaluation foundation for non-executing local paths and a candidate benign-only disposable Windows KVM backend with exact identity, separated authority, residual closure, and sealed evidence.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -26,6 +26,7 @@ related:
   - security.research-boundary
   - security.static-evaluation-p0
   - security.case-snapshot-p0
+  - security.windows-kvm-p0
   - security.evidence
   - security.authority
 ---
@@ -35,7 +36,7 @@ related:
 
 Evaluation Trial is the Security-owned protocol for determining what one exact software Sample did under one exact authorized environment and which conclusions are supported by retained evidence.
 
-P0 prepares the local control and evidence infrastructure without executing unknown software. It deliberately stops before KVM, CAPE, hostile-code isolation, controlled egress, Guest monitoring, or real malware analysis. A later execution performed directly through Wine on the WSL host is outside this protocol and does not become an Evaluation Run retroactively.
+P0 prepares the control and evidence infrastructure without executing unknown software. The local fixture and static paths remain non-executing. A candidate QEMU/KVM backend may execute only the Ordivon-maintained benign fixture while proving the disposable-machine lifecycle. CAPE, unknown Samples, general hostile-code analysis, controlled simulated egress, and full Guest monitoring remain outside this gate. A prior Wine execution on the WSL host remains external uncontrolled material and does not become an Evaluation Run retroactively.
 
 ## Ownership
 
@@ -124,6 +125,10 @@ This backend exists to test the protocol before a hostile-code isolation provide
 
 The static backend invokes only admitted analyzers that treat the Sample as data. Active P0 analyzers cover complete file identity, archive listing, ClamAV, historical report import, and a bounded custom Authenticode-summary import. The backend and truth channel both state `sampleExecution: false`. Temporary analyzer state is destroyed before residual closure; native reports are staged separately and sealed as digest-bound Artifacts. See [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md).
 
+### `WindowsKvmEvaluationBackend` candidate
+
+The Windows KVM backend integrates QEMU/KVM rather than implementing a hypervisor. It binds a sealed Windows base image, creates a disposable overlay, UEFI state, software TPM, FAT Run disk, and QMP socket, configures no NIC, checks PCI topology from the management plane, and requires deletion of the complete Run state. P0 admits only `execute-benign-fixture`, the exact compiled Sample digest, and its compilation-attestation digest; unknown or relabelled Sample bytes fail admission. The backend remains a candidate until a clean-revision base build and real benign acceptance are retained. See [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
+
 ## Observer and Guardian separation
 
 P0 preserves two distinct authorities:
@@ -209,11 +214,12 @@ The unit suite proves:
 - incomplete residual closure invalidates success;
 - semantic evidence tampering is detected;
 - operational evidence is independently verifiable;
-- streamed large-file import, quotas, abandoned-import recovery, report Artifact sealing, Artifact tamper detection, and quarantine hardening are covered by Static P0 tests.
+- streamed large-file import, quotas, abandoned-import recovery, report Artifact sealing, Artifact tamper detection, and quarantine hardening are covered by Static P0 tests;
+- the Windows KVM candidate binds no-network QEMU topology, exact benign admission, base-image tamper rejection, QMP network-class detection, and complete Run-directory deletion in unit and local KVM topology tests.
 
 ## Next gate
 
-P0-B may add one external hostile-code isolation provider only after its local owner can prove:
+P0-B admits the Windows KVM candidate only after its local owner can prove with the maintained benign fixture:
 
 1. clean disposable machine creation from an exact image;
 2. management-plane separation;
@@ -223,4 +229,4 @@ P0-B may add one external hostile-code isolation provider only after its local o
 6. destruction and residual closure;
 7. no Sample or credential leakage into Git, Runtime logs, Host state, or model Provider prompts.
 
-The first real backend should remain an integration behind `EvaluationRangeBackend`; it must not turn Security or Runtime into a hypervisor or malware-sandbox implementation. Evolving directories and external uncontrolled outputs belong to Case Snapshot P0 until such a backend exists.
+The backend remains an integration behind `EvaluationRangeBackend`; Security does not implement CPU virtualization or Windows internals. Even after benign acceptance, a separate explicit gate is required before any unknown Sample. Evolving directories and external uncontrolled outputs remain Case Snapshot material until linked to an admitted Run.

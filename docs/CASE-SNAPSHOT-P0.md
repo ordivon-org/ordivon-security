@@ -25,6 +25,7 @@ related:
   - security.architecture
   - security.evaluation-trial-p0
   - security.static-evaluation-p0
+  - security.windows-kvm-p0
   - security.evidence
   - security.authority
 ---
@@ -222,12 +223,15 @@ The next work order is:
 1. retain a read-only audit receipt for the current Case drift;
 2. normalize permissions and create one exact Case Snapshot;
 3. treat the historical Wine run as uncontrolled material only;
-4. admit a real disposable Windows provider before any further unknown-component
-   execution;
-5. then add complete Authenticode and safe archive-expansion adapters when they
+4. build and accept the benign-only Windows KVM candidate before any further
+   unknown-component execution;
+5. require another explicit admission decision before linking this Case to a dynamic
+   unknown-Sample Run;
+6. then add complete Authenticode and safe archive-expansion adapters when they
    improve a measured evidence gap.
 
-Windows Sandbox or Hyper-V availability has not yet been established by the
-current WSL control path. No dynamic backend should be claimed until the provider
-can be queried, configured, and destroyed through an independently verified
-management plane.
+The host audit established that Windows Sandbox and the complete Hyper-V VM
+management stack are unavailable on the current Windows 11 Home host, while WSL
+provides functional KVM. The candidate QEMU/KVM Provider is documented in
+[`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md). Its benign acceptance does not by itself
+authorize this retained Case or another unknown Sample.
