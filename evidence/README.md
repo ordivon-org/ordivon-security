@@ -15,7 +15,7 @@ audience:
   - maintainer
   - agent
 updated: 2026-08-05
-summary: Evidence contract for active Contest, CAGE, and software Evaluation bundles plus frozen Round 1 reports.
+summary: Evidence contract for active Contest, CAGE, software Evaluation, static native-report Artifacts, and frozen Round 1 reports.
 evidence_status: verified
 readiness: READY
 applies_to:
@@ -24,6 +24,7 @@ related:
   - security.architecture
   - security.research-boundary
   - security.evaluation-trial-p0
+  - security.static-evaluation-p0
   - security.migration.round2
   - security.migration.round3-p0
   - security.authority
@@ -72,6 +73,7 @@ findings.json
 result.json
 bundle-manifest.json
 operational-manifest.json
+artifacts/                 # optional schema-v2 native reports
 events/
   sample.jsonl
   management.jsonl
@@ -81,11 +83,11 @@ events/
   operational.jsonl
 ```
 
-The Sample channel contains identity and digest references only. Sample bytes remain in the local SampleVault and are inadmissible in Git, semantic evidence, operational evidence, Host state, or model Provider prompts.
+The Sample channel contains identity and digest references only. Sample bytes remain in the local SampleVault and are inadmissible in Git, semantic evidence, operational evidence, Host state, or model Provider prompts. Evaluation Evidence schema revision 2 may retain native analyzer reports under `artifacts/`; each entry binds identity, kind, digest, byte length, media type, logical name, and relative path.
 
 An Evaluation claim is inadmissible when Authority does not bind the exact Sample and environment, identity omits a relevant policy or image revision, Observer and Guardian authority are conflated, residual closure is incomplete, Findings omit exact evidence references, or any event or manifest fails verification. `no-issue-observed` is bounded to the exact Run and is not a general software-safety guarantee.
 
-The current fixture backend never invokes Sample bytes. Its evidence proves the local protocol and failure closure, not software behavior.
+The fixture backend never invokes Sample bytes. The static backend permits admitted analyzers to read bytes as data but never loads, installs, or invokes the Sample. A static antivirus match is an Observer result, not independent proof of runtime behavior. Imported reports must state that they were produced before the current Trial and remain bounded by their retained bytes and limitations. Artifact tampering invalidates verification.
 
 ## CAGE evidence
 

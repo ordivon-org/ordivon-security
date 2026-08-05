@@ -24,6 +24,7 @@ related:
   - security.start
   - security.architecture
   - security.research-boundary
+  - security.static-evaluation-p0
   - security.evidence
   - security.authority
 ---
@@ -61,9 +62,13 @@ Binds the SHA-256 digest, byte length, media type, and optional original name. T
 
 Stores Sample bytes outside Git in a content-addressed local filesystem. It:
 
-- writes files and manifests with owner-only permissions;
+- streams path imports through private staging instead of loading complete files into memory;
+- writes directories as `0700` and files and manifests as `0600`;
+- hashes while copying, flushes staged content, and commits by atomic rename;
+- supports per-Sample and total Vault byte limits;
 - verifies the complete digest and byte length on import and every resolve;
-- rejects symlink imports;
+- rejects symlink and non-regular imports;
+- emits an explicit recovery receipt for abandoned imports;
 - exposes only identity and a local path to an admitted backend;
 - never places Sample bytes in semantic or operational evidence;
 - emits an explicit purge receipt.
@@ -114,6 +119,10 @@ The first backend is deterministic and local. It verifies staged bytes and emits
 
 This backend exists to test the protocol before a hostile-code isolation provider is admitted.
 
+### `LocalStaticEvaluationBackend`
+
+The static backend invokes only admitted analyzers that treat the Sample as data. Active P0 analyzers cover complete file identity, archive listing, ClamAV, historical report import, and a bounded custom Authenticode-summary import. The backend and truth channel both state `sampleExecution: false`. Temporary analyzer state is destroyed before residual closure; native reports are staged separately and sealed as digest-bound Artifacts. See [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md).
+
 ## Observer and Guardian separation
 
 P0 preserves two distinct authorities:
@@ -141,6 +150,7 @@ findings.json
 result.json
 bundle-manifest.json
 operational-manifest.json
+artifacts/                 # optional native reports in schema revision 2
 events/
   sample.jsonl
   management.jsonl
@@ -152,7 +162,7 @@ events/
 
 Each semantic channel has its own sequence, previous digest, event digest, file digest, count, and chain head. Operational timing is independently chained and bound to the semantic bundle without changing semantic identity.
 
-Sample bytes are not evidence content. Evidence contains only Sample identity and digest references.
+Sample bytes are not evidence content. Evidence contains only Sample identity and digest references. Static native-report Artifacts may be copied into schema revision 2 after complete digest and byte-length verification, subject to the Guardian Artifact byte bound.
 
 ## Findings and disposition
 
@@ -197,7 +207,8 @@ The unit suite proves:
 - backend failure still invokes destruction and seals an invalid Trial;
 - incomplete residual closure invalidates success;
 - semantic evidence tampering is detected;
-- operational evidence is independently verifiable.
+- operational evidence is independently verifiable;
+- streamed large-file import, quotas, abandoned-import recovery, report Artifact sealing, Artifact tamper detection, and quarantine hardening are covered by Static P0 tests.
 
 ## Next gate
 

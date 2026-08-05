@@ -15,7 +15,7 @@ audience:
   - evaluator
   - agent
 updated: 2026-08-05
-summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, and local non-executing software Evaluation Trial foundation.
+summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, streaming SampleVault, and local static software Evaluation foundation.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -24,6 +24,7 @@ related:
   - security.charter
   - security.architecture
   - security.evaluation-trial-p0
+  - security.static-evaluation-p0
   - security.research-agenda
   - security.research-boundary
   - security.evidence
@@ -37,7 +38,7 @@ Its central executable object is a **Contest**: multiple goal-bearing actors rec
 
 ## Current capability
 
-The active `0.4` core provides:
+The active `0.5` core provides:
 
 - a multi-Actor `ScenarioManifest`;
 - actor-specific observations separated from hidden world truth;
@@ -51,15 +52,17 @@ The active `0.4` core provides:
 - deterministic replay and evidence verification;
 - a small synthetic Red/Blue Range proving the core loop;
 - a first-class, revision-pinned CAGE Challenge 4 Enterprise Range;
-- a content-addressed local `SampleVault` with digest verification;
+- a streaming, content-addressed local `SampleVault` with private staging, quotas, recovery, and complete digest verification;
 - exact authority, environment, Guardian, Observation, and Evaluation contracts;
-- a replaceable Evaluation backend and a fixture backend that never invokes Sample bytes;
+- a replaceable Evaluation backend, a non-executing fixture backend, and a local static-analysis backend;
+- file identity, 7-Zip inventory, ClamAV, historical report, and bounded Authenticode-summary adapters;
 - separate Observer, Guardian, management, Sample, truth, and operational evidence;
+- native report Artifacts bound into Evaluation Evidence schema revision 2;
 - evidence-bound Findings and mandatory residual-closure receipts.
 
 In the CAGE adapter, one Security Red Actor controls the CAGE Red team and one Security Blue Actor controls five CAGE Blue agents. Every Red and Blue CAGE action is explicitly supplied by Ordivon to the joint step; Green agents remain CAGE-controlled environmental actors. The current action surface is intentionally narrow: each side selects either the pinned native team policy or Sleep. Parameter-level model control is a later integration.
 
-It does **not yet** provide model-backed actors, disposable-machine execution, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. Current Ordivon Runtime is not used to invoke untrusted Sample bytes.
+It does **not yet** provide model-backed actors, disposable-machine execution, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. Static analyzers may read Sample bytes as data, but current Ordivon Runtime is not used to load or invoke untrusted Sample bytes.
 
 ## Run a local Evaluation Trial dry run
 
@@ -73,6 +76,21 @@ uv run ordivon-security-evaluation-dry-run \
 ```
 
 This path verifies Sample identity, checks local authority and environment bindings, runs the non-executing fixture backend, proves residual closure, and seals evidence. It does not load or invoke the Sample as code. See [`docs/EVALUATION-TRIAL-P0.md`](docs/EVALUATION-TRIAL-P0.md).
+
+## Run a local Static Evaluation
+
+```bash
+uv run ordivon-security-static-evaluation \
+  --sample /path/to/owned-sample.7z \
+  --media-type application/x-7z-compressed \
+  --authorization-basis "Owned local copy submitted for static analysis" \
+  --vault /var/lib/ordivon/security/vault \
+  --output /var/lib/ordivon/security/evidence \
+  --archive-inventory \
+  --clamav
+```
+
+This path streams the Sample into the private Vault, invokes only the admitted static analyzers, binds native reports as Artifacts, removes temporary analysis state, and seals the Trial. It never executes the Sample. Historical ClamAV or custom Authenticode summaries may be imported by digest with explicit limitations. See [`docs/STATIC-EVALUATION-P0.md`](docs/STATIC-EVALUATION-P0.md).
 
 ## Run the deterministic Contest
 
@@ -175,6 +193,7 @@ The former single-Actor experiment/evaluation framework is frozen at Git revisio
 - [`docs/MIGRATION-ROUND-2.md`](docs/MIGRATION-ROUND-2.md) — first-class CAGE 4 Range;
 - [`docs/MIGRATION-ROUND-3-P0.md`](docs/MIGRATION-ROUND-3-P0.md) — fail-closed model prerequisites, execution identity, and evidence separation;
 - [`docs/EVALUATION-TRIAL-P0.md`](docs/EVALUATION-TRIAL-P0.md) — local Sample, authority, environment, Observer/Guardian, residual closure, and evidence contracts;
+- [`docs/STATIC-EVALUATION-P0.md`](docs/STATIC-EVALUATION-P0.md) — streaming Vault, static analyzers, native report Artifacts, quarantine hardening, and limitations;
 - [`docs/research-agenda.md`](docs/research-agenda.md) — research sequence and falsifiers;
 - [`docs/research-boundary.md`](docs/research-boundary.md) — authorization and external-effect limits;
 - [`evidence/README.md`](evidence/README.md) — active and historical evidence contracts.

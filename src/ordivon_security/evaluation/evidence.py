@@ -2,13 +2,22 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
+from ordivon_security._canonical import (
+    JsonObject,
+    JsonValue,
+    canonical_bytes,
+    canonical_digest,
+    validate_json,
+)
 from ordivon_security.evidence.operational import OperationalEvidenceEvent
+
+from .backend import EvaluationArtifact
 
 
 class EvaluationEvidenceChannel(StrEnum):
@@ -98,6 +107,21 @@ class EvaluationEvidenceBundle:
     operational_digest: str
 
 
+def _write_private(path: Path, content: bytes) -> None:
+    path.write_bytes(content)
+    path.chmod(0o600)
+
+
+def _digest_path(path: Path) -> tuple[str, int]:
+    digest = hashlib.sha256()
+    byte_length = 0
+    with path.open("rb") as handle:
+        while chunk := handle.read(4 * 1024 * 1024):
+            digest.update(chunk)
+            byte_length += len(chunk)
+    return "sha256:" + digest.hexdigest(), byte_length
+
+
 class EvaluationEvidenceRecorder:
     def __init__(self, run_id: str) -> None:
         self.run_id = run_id
@@ -159,18 +183,23 @@ class EvaluationEvidenceRecorder:
         execution_identity: JsonObject,
         findings: JsonObject,
         result: JsonObject,
+        artifacts: tuple[EvaluationArtifact, ...] = (),
     ) -> EvaluationEvidenceBundle:
         if output_path.exists() and any(output_path.iterdir()):
             raise FileExistsError(f"Evaluation evidence path is not empty: {output_path}")
+        output_path.mkdir(parents=True, exist_ok=True)
+        output_path.chmod(0o700)
         events_path = output_path / "events"
-        events_path.mkdir(parents=True, exist_ok=True)
+        events_path.mkdir(exist_ok=True)
+        events_path.chmod(0o700)
+
         channel_manifest: JsonObject = {}
         for channel in EvaluationEvidenceChannel:
             file_path = events_path / f"{channel.value}.jsonl"
             raw = b"".join(
                 canonical_bytes(event.to_dict()) + b"\n" for event in self._events[channel]
             )
-            file_path.write_bytes(raw)
+            _write_private(file_path, raw)
             channel_manifest[channel.value] = {
                 "path": f"events/{channel.value}.jsonl",
                 "eventCount": len(self._events[channel]),
@@ -179,6 +208,30 @@ class EvaluationEvidenceRecorder:
                 else self._events[channel][-1].event_digest,
                 "fileDigest": "sha256:" + hashlib.sha256(raw).hexdigest(),
             }
+
+        artifact_manifest: list[JsonValue] = []
+        if artifacts:
+            artifacts_path = output_path / "artifacts"
+            artifacts_path.mkdir()
+            artifacts_path.chmod(0o700)
+            for index, artifact in enumerate(artifacts):
+                source = artifact.source_path
+                if source is None or not source.is_file() or source.is_symlink():
+                    raise ValueError("Evaluation Artifact source is missing or unsafe")
+                digest, byte_length = _digest_path(source)
+                if digest != artifact.digest or byte_length != artifact.byte_length:
+                    raise ValueError("Evaluation Artifact source differs from declared identity")
+                destination = artifacts_path / (
+                    f"{index:03d}-{artifact.digest.removeprefix('sha256:')[:16]}.bin"
+                )
+                with source.open("rb") as source_handle, destination.open("xb") as target_handle:
+                    shutil.copyfileobj(source_handle, target_handle, length=4 * 1024 * 1024)
+                    target_handle.flush()
+                destination.chmod(0o600)
+                entry = artifact.to_dict()
+                entry["path"] = str(destination.relative_to(output_path))
+                artifact_manifest.append(entry)
+
         named_objects = {
             "evaluation-spec.json": evaluation_spec,
             "execution-identity.json": execution_identity,
@@ -186,9 +239,9 @@ class EvaluationEvidenceRecorder:
             "result.json": result,
         }
         for name, value in named_objects.items():
-            (output_path / name).write_bytes(canonical_bytes(value) + b"\n")
+            _write_private(output_path / name, canonical_bytes(value) + b"\n")
         manifest: JsonObject = {
-            "schemaVersion": 1,
+            "schemaVersion": 2,
             "kind": "ordivon.security.evaluation-evidence-bundle",
             "runId": self.run_id,
             "evaluationSpecDigest": canonical_digest(evaluation_spec),
@@ -196,15 +249,16 @@ class EvaluationEvidenceRecorder:
             "findingsDigest": canonical_digest(findings),
             "resultDigest": canonical_digest(result),
             "channels": channel_manifest,
+            "artifacts": artifact_manifest,
         }
-        (output_path / "bundle-manifest.json").write_bytes(canonical_bytes(manifest) + b"\n")
+        _write_private(output_path / "bundle-manifest.json", canonical_bytes(manifest) + b"\n")
         semantic_digest = canonical_digest(manifest)
 
         operational_path = events_path / "operational.jsonl"
         operational_raw = b"".join(
             canonical_bytes(event.to_dict()) + b"\n" for event in self._operational_events
         )
-        operational_path.write_bytes(operational_raw)
+        _write_private(operational_path, operational_raw)
         operational_manifest: JsonObject = {
             "schemaVersion": 1,
             "kind": "ordivon.security.evaluation-operational-evidence",
@@ -217,8 +271,9 @@ class EvaluationEvidenceRecorder:
             else self._operational_events[-1].event_digest,
             "fileDigest": "sha256:" + hashlib.sha256(operational_raw).hexdigest(),
         }
-        (output_path / "operational-manifest.json").write_bytes(
-            canonical_bytes(operational_manifest) + b"\n"
+        _write_private(
+            output_path / "operational-manifest.json",
+            canonical_bytes(operational_manifest) + b"\n",
         )
         return EvaluationEvidenceBundle(
             path=output_path,
@@ -237,7 +292,7 @@ def _load_object(path: Path, label: str) -> JsonObject:
 
 def verify_evaluation_evidence(path: Path) -> str:
     manifest = _load_object(path / "bundle-manifest.json", "Evaluation bundle manifest")
-    if manifest.get("schemaVersion") != 1:
+    if manifest.get("schemaVersion") not in {1, 2}:
         raise ValueError("Evaluation evidence schema revision is unsupported")
     run_id = manifest.get("runId")
     channels = manifest.get("channels")
@@ -276,6 +331,23 @@ def verify_evaluation_evidence(path: Path) -> str:
             count += 1
         if count != metadata.get("eventCount") or previous != metadata.get("headDigest"):
             raise ValueError("Evaluation channel summary differs")
+
+    artifacts = manifest.get("artifacts", [])
+    if not isinstance(artifacts, list):
+        raise ValueError("Evaluation Artifact manifest must be a list")
+    for metadata in artifacts:
+        if not isinstance(metadata, dict):
+            raise ValueError("Evaluation Artifact metadata must be an object")
+        relative_path = metadata.get("path")
+        if not isinstance(relative_path, str):
+            raise ValueError("Evaluation Artifact path is invalid")
+        artifact_path = path / relative_path
+        if not artifact_path.is_file() or artifact_path.is_symlink():
+            raise ValueError("Evaluation Artifact file is missing or unsafe")
+        digest, byte_length = _digest_path(artifact_path)
+        if digest != metadata.get("digest") or byte_length != metadata.get("byteLength"):
+            raise ValueError("Evaluation Artifact digest or byte length differs")
+
     named = (
         ("evaluation-spec.json", "evaluationSpecDigest"),
         ("execution-identity.json", "executionIdentityDigest"),

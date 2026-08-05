@@ -31,7 +31,7 @@ related:
 
 ## Mission
 
-Ordivon Security builds the experimental conditions required to study autonomous intelligent opposition. It must make Red, Blue, neutral, service, observer, and evaluator actors first-class participants in authorized contested worlds—not reduce security to static vulnerabilities, compliance checks, or one-sided safety evaluation.
+Ordivon Security builds the experimental conditions required to study autonomous intelligent opposition and authorized execution subjects. It must make Red, Blue, neutral, service, observer, and evaluator actors first-class participants in contested worlds, while also preserving exact identity, authority, evidence, and control for software Evaluation. Static analysis remains one evidence source; it does not replace active opposition or dynamic effect verification.
 
 ## Central executable object
 

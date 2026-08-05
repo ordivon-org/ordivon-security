@@ -24,6 +24,7 @@ related:
   - security.charter
   - security.research-boundary
   - security.evaluation-trial-p0
+  - security.static-evaluation-p0
   - security.migration.round2
   - security.migration.round3-p0
   - security.authority
@@ -36,7 +37,7 @@ Ordivon Security is the adversarial domain layer. It defines who is contesting w
 
 It composes rather than replaces Host, Harness, Runtime, external ranges, model Providers, and classical security tools.
 
-## Active `0.4` flows
+## Active `0.5` flows
 
 ```text
 ScenarioManifest
@@ -114,11 +115,13 @@ Evaluation Trial is a separate Security execution path for authorized software a
 
 The active local contracts are `SampleIdentity`, `SampleVault`, `AuthorityManifest`, `GuardianPolicy`, `ObservationPlan`, `EnvironmentIdentity`, `EvaluationSpec`, `EvaluationRangeBackend`, `Finding`, `EvaluationDisposition`, and `EvaluationResult`.
 
-The first `FixtureEvaluationBackend` verifies staged bytes and emits configured records but declares `sampleExecution: false` and never invokes Sample code. It proves admission, identity, failure handling, destruction, residual closure, and evidence before a disposable-machine provider is admitted.
+The `FixtureEvaluationBackend` verifies staged bytes and emits configured records but declares `sampleExecution: false` and never invokes Sample code. It proves admission, identity, failure handling, destruction, residual closure, and evidence before a disposable-machine provider is admitted.
+
+The `LocalStaticEvaluationBackend` invokes admitted classical analyzers without loading or invoking Sample code. SampleVault revision 2 streams large imports through private staging and supports quotas and recovery. Native analyzer reports are staged before backend destruction and sealed as verified Artifacts in Evaluation Evidence schema revision 2. Current analyzers cover file identity, 7-Zip inventory, ClamAV, and imported native reports; they remain Observers rather than truth or Guardian authorities.
 
 Observer and Guardian are separate authorities. Observer records may support a Finding but cannot alter the environment. Guardian decisions represent hard boundary enforcement and may terminate a Run without inventing a Finding. A Run is invalid when Sample verification, backend execution, or residual closure is incomplete.
 
-Current Runtime `contained_local` remains outside this execution path because it does not provide the isolation, egress control, and disposable-machine semantics required by later stages. See [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md).
+Current Runtime `contained_local` remains outside dynamic Sample execution because it does not provide the isolation, egress control, and disposable-machine semantics required by later stages. Static Evaluation runs locally but permits only declared non-executing analyzers. See [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md) and [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md).
 
 ### Action path
 
@@ -218,11 +221,12 @@ Security may request a Harness or Runtime change but must not copy their state m
 
 Evaluation integration proceeds independently:
 
-1. retain P0 local contracts and fixture acceptance;
-2. admit one external disposable-machine backend only after management-plane isolation, deny-all egress, bounded execution, evidence export, destruction, and residual closure are proven;
-3. add Guest and network Observers without giving them Guardian authority;
-4. run owned benign and purpose-built fixtures before any untrusted Sample;
-5. connect Harness only to structured evidence summaries, never raw Sample bytes.
+1. retain P0 local contracts, streaming Vault, static backend, report Artifacts, and fixture acceptance;
+2. add mature static analyzers only through exact adapters and preserve their native reports;
+3. admit one external disposable-machine backend only after management-plane isolation, deny-all egress, bounded execution, evidence export, destruction, and residual closure are proven;
+4. add Guest and network Observers without giving them Guardian authority;
+5. run owned benign and purpose-built fixtures before any untrusted Sample;
+6. connect Harness only to structured evidence summaries, never raw Sample bytes.
 
 ## Explicit non-goals
 

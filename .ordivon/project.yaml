@@ -20,6 +20,7 @@ managed_paths:
   - docs/MIGRATION-ROUND-1.md
   - docs/MIGRATION-ROUND-2.md
   - docs/EVALUATION-TRIAL-P0.md
+  - docs/STATIC-EVALUATION-P0.md
   - docs/research-agenda.md
   - docs/research-boundary.md
   - evidence/README.md
@@ -28,4 +29,4 @@ enforcement: strict
 maintainers:
   - zycxfyh
 public_projection: ordivon-web
-description: Authorized Contest and software Evaluation laboratory with deterministic and pinned Ranges, exact authority, residual closure, and evidence.
+description: Authorized Contest and software Evaluation laboratory with static analysis, deterministic and pinned Ranges, exact authority, residual closure, and evidence.

@@ -1,32 +1,28 @@
 from __future__ import annotations
 
+import hashlib
+import os
+import shutil
 import time
+from dataclasses import replace
 from pathlib import Path
 
-from ordivon_security._canonical import (
-    JsonObject,
-    JsonValue,
-    canonical_bytes,
-    canonical_digest,
-    validate_json,
-)
+from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
 from ordivon_security.identity import security_source_identity
 
 from .backend import (
+    EvaluationArtifact,
     EvaluationInstance,
     EvaluationRangeBackend,
     ObserverRecord,
     ResidualClosureReceipt,
 )
-from .evidence import (
-    EvaluationEvidenceChannel,
-    EvaluationEvidenceRecorder,
-)
+from .evidence import EvaluationEvidenceChannel, EvaluationEvidenceRecorder
 from .findings import choose_disposition, derive_findings
 from .models import EvaluationResult, EvaluationSpec
 from .vault import SampleVault
 
-EVALUATION_EVIDENCE_SCHEMA_REVISION = "1"
+EVALUATION_EVIDENCE_SCHEMA_REVISION = "2"
 
 
 class EvaluationRunner:
@@ -82,6 +78,59 @@ class EvaluationRunner:
             payload={**payload, "durationMs": max(0, self._mono_ms() - started_ms)},
         )
 
+    def _stage_artifacts(
+        self,
+        artifacts: tuple[EvaluationArtifact, ...],
+        *,
+        run_id: str,
+        max_artifact_bytes: int,
+    ) -> tuple[tuple[EvaluationArtifact, ...], Path | None]:
+        if not artifacts:
+            return (), None
+        artifact_ids = tuple(artifact.artifact_id for artifact in artifacts)
+        if len(artifact_ids) != len(set(artifact_ids)):
+            raise ValueError("Evaluation Artifact identities must be unique")
+        staging_root = (
+            self.evidence_root / ".artifact-staging" / run_id.removeprefix("evaluation-run:")
+        )
+        if staging_root.exists():
+            raise FileExistsError(
+                f"Evaluation Artifact staging path already exists: {staging_root}"
+            )
+        staging_root.mkdir(parents=True)
+        staging_root.chmod(0o700)
+        staged: list[EvaluationArtifact] = []
+        total_bytes = 0
+        try:
+            for index, artifact in enumerate(artifacts):
+                source = artifact.source_path
+                if source is None or not source.is_file() or source.is_symlink():
+                    raise ValueError("Evaluation Artifact source is missing or unsafe")
+                partial = staging_root / f"{index:03d}.partial"
+                destination = staging_root / f"{index:03d}.bin"
+                digest = hashlib.sha256()
+                byte_length = 0
+                with source.open("rb") as source_handle, partial.open("xb") as target_handle:
+                    partial.chmod(0o600)
+                    while chunk := source_handle.read(4 * 1024 * 1024):
+                        byte_length += len(chunk)
+                        total_bytes += len(chunk)
+                        if total_bytes > max_artifact_bytes:
+                            raise ValueError("Evaluation Artifacts exceed the Guardian byte bound")
+                        digest.update(chunk)
+                        target_handle.write(chunk)
+                    target_handle.flush()
+                    os.fsync(target_handle.fileno())
+                actual_digest = "sha256:" + digest.hexdigest()
+                if actual_digest != artifact.digest or byte_length != artifact.byte_length:
+                    raise ValueError("Evaluation Artifact source differs from declared identity")
+                os.replace(partial, destination)
+                staged.append(replace(artifact, source_path=destination))
+            return tuple(staged), staging_root
+        except BaseException:
+            shutil.rmtree(staging_root, ignore_errors=True)
+            raise
+
     def run(self, spec: EvaluationSpec, *, run_index: int = 0) -> EvaluationResult:
         if run_index < 0:
             raise ValueError("Evaluation run index must be non-negative")
@@ -115,7 +164,8 @@ class EvaluationRunner:
         instance: EvaluationInstance | None = None
         observed_with_refs: list[tuple[ObserverRecord, str]] = []
         raw_metrics: JsonObject = {}
-        artifacts: list[JsonValue] = []
+        artifacts: tuple[EvaluationArtifact, ...] = ()
+        artifact_staging_root: Path | None = None
 
         try:
             if spec.environment.provider_id != self.backend.provider_id:
@@ -224,12 +274,17 @@ class EvaluationRunner:
                 event_type="evaluation.world-facts",
                 payload=execution.world_facts,
             )
-            artifacts = [artifact.to_dict() for artifact in execution.artifacts]
+            artifacts, artifact_staging_root = self._stage_artifacts(
+                execution.artifacts,
+                run_id=run_id,
+                max_artifact_bytes=spec.guardian_policy.max_artifact_bytes,
+            )
             raw_metrics = {
                 **execution.raw_metrics,
                 "evaluation.guardian_terminated": guardian_terminated,
                 "evaluation.observer_event_count": len(execution.observer_records),
-                "evaluation.artifact_count": len(execution.artifacts),
+                "evaluation.artifact_count": len(artifacts),
+                "evaluation.artifact_bytes": sum(artifact.byte_length for artifact in artifacts),
             }
             valid_trial = True
         except Exception as error:
@@ -294,7 +349,7 @@ class EvaluationRunner:
             "disposition": disposition.value,
             "residualClosed": residual_receipt.clean,
             "rawMetrics": raw_metrics,
-            "artifacts": artifacts,
+            "artifacts": [artifact.to_dict() for artifact in artifacts],
         }
         findings_payload: JsonObject = {
             "schemaVersion": 1,
@@ -316,13 +371,21 @@ class EvaluationRunner:
             payload={"terminalReason": terminal_reason, "disposition": disposition.value},
         )
         output_path = self.evidence_root / run_id.removeprefix("evaluation-run:")
-        bundle = recorder.seal(
-            output_path,
-            evaluation_spec=spec.to_dict(),
-            execution_identity=execution_identity,
-            findings=findings_payload,
-            result=result_payload,
-        )
+        try:
+            bundle = recorder.seal(
+                output_path,
+                evaluation_spec=spec.to_dict(),
+                execution_identity=execution_identity,
+                findings=findings_payload,
+                result=result_payload,
+                artifacts=artifacts,
+            )
+        finally:
+            if artifact_staging_root is not None:
+                shutil.rmtree(artifact_staging_root, ignore_errors=True)
+                parent = artifact_staging_root.parent
+                if parent.exists() and not any(parent.iterdir()):
+                    parent.rmdir()
         return EvaluationResult(
             run_id=run_id,
             evaluation_spec_digest=spec.digest,

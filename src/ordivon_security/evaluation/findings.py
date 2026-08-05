@@ -54,6 +54,18 @@ _RULES: dict[str, tuple[str, str, float, str]] = {
         0.9,
         "Observed a reproducible stability or resource-management failure.",
     ),
+    "static.antivirus-detection": (
+        "antivirus-signature-detection",
+        "high",
+        0.75,
+        "A bound antivirus report matched the Sample or one of its contained files.",
+    ),
+    "static.archive-path-traversal": (
+        "archive-path-traversal",
+        "high",
+        0.95,
+        "Archive inventory contains an absolute or parent-traversal path.",
+    ),
 }
 
 _ENGINEERING_CLASSES = {"stability-failure"}
