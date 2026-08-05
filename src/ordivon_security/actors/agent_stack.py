@@ -93,7 +93,7 @@ class HarnessBudgetConfig:
     max_tool_calls: int = 3
     max_observation_bytes: int = 131_072
     max_wall_time_ms: int = 180_000
-    max_total_tokens: int = 16_384
+    max_total_tokens: int = 1_000_000
     max_model_retries: int = 1
     max_tool_corrections: int = 1
     max_observation_only_turns: int = 1

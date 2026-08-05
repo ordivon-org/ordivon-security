@@ -286,7 +286,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model-calls", type=int, default=3)
     parser.add_argument("--model-retries", type=int, default=1)
     parser.add_argument("--wall-time-ms", type=int, default=180_000)
-    parser.add_argument("--total-tokens", type=int, default=16_384)
+    parser.add_argument(
+        "--total-tokens",
+        type=int,
+        default=1_000_000,
+        help=(
+            "Run-wide token safety ceiling. This is a runaway guard, not a cost target; "
+            "model-call, wall-time, tool-call, and output bounds remain primary."
+        ),
+    )
     parser.add_argument("--max-output-tokens", type=int, default=1_024)
     parser.add_argument("--model-observation-bytes", type=int, default=262_144)
     parser.add_argument(

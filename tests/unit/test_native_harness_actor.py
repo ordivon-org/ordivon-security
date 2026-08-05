@@ -356,6 +356,7 @@ class NativeHarnessActorP0Tests(unittest.TestCase):
 
         budget = HarnessBudgetConfig()
         self.assertEqual(budget.max_tool_calls, 3)
+        self.assertEqual(budget.max_total_tokens, 1_000_000)
         self.assertEqual(budget.max_no_progress_turns, 2)
         self.assertEqual(budget.max_model_observation_bytes, 262_144)
 
@@ -451,6 +452,7 @@ class NativeHarnessActorP0Tests(unittest.TestCase):
             ]
         )
         self.assertEqual(args.max_output_tokens, 1_024)
+        self.assertEqual(args.total_tokens, 1_000_000)
         self.assertEqual(args.model_observation_bytes, 262_144)
 
     def test_binding_drift_is_rejected_before_model_call(self) -> None:
