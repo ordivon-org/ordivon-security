@@ -223,7 +223,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model-retries", type=int, default=1)
     parser.add_argument("--wall-time-ms", type=int, default=180_000)
     parser.add_argument("--total-tokens", type=int, default=16_384)
-    parser.add_argument("--max-output-tokens", type=int, default=4_096)
+    parser.add_argument("--max-output-tokens", type=int, default=1_024)
     parser.add_argument("--model-observation-bytes", type=int, default=262_144)
     parser.add_argument(
         "--allow-incomplete",

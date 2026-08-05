@@ -439,6 +439,20 @@ class NativeHarnessActorP0Tests(unittest.TestCase):
         self.assertEqual(summary["sessionTypeCounts"], {"UNKNOWN": 80})
         self.assertNotIn("Processes", json.dumps(first))
 
+    def test_p0a_cli_uses_accepted_output_bound_by_default(self) -> None:
+        from ordivon_security.cli_cage4_deepseek import build_parser
+
+        args = build_parser().parse_args(
+            [
+                "--red-secret",
+                "/private/red.json",
+                "--blue-secret",
+                "/private/blue.json",
+            ]
+        )
+        self.assertEqual(args.max_output_tokens, 1_024)
+        self.assertEqual(args.model_observation_bytes, 262_144)
+
     def test_binding_drift_is_rejected_before_model_call(self) -> None:
         driver = _FakeDriver()
         backend = _backend(driver)

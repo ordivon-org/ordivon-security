@@ -380,7 +380,7 @@ class DeepSeekHarnessTurnDriver:
         budget: HarnessBudgetConfig | None = None,
         timeout_seconds: float = 90.0,
         max_response_bytes: int = 4_194_304,
-        max_output_tokens: int = 4_096,
+        max_output_tokens: int = 1_024,
     ) -> None:
         if len(allowed_actions) < 2 or len(allowed_actions) != len(set(allowed_actions)):
             raise ValueError("Security model Actor requires unique competing actions")

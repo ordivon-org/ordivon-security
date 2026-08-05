@@ -59,6 +59,45 @@ revision, non-consumption mode, and reason remain in the Actor backend identity.
 This makes the baseline falsifiable and prevents later code from silently adding a
 layer while claiming the same experiment.
 
+## Status
+
+P0-A is accepted as the first real team-plan baseline. P0-B and P0-C remain open.
+The accepted Trial is intentionally narrow: one seed, one CAGE tick, two distinct
+DeepSeek Flash credential scopes, and the two-plan action surface.
+
+Accepted Trial:
+
+```text
+trial:2a1066d2d3953a791bfc646b
+```
+
+Identity and evidence:
+
+```text
+trial identity:
+sha256:ed029472846e9d783244c121808386da2344025bc71486a54bbc3fb1bce1a0c7
+
+semantic evidence:
+sha256:5e98f1f3872ac5380cff48d5634edff5ba770ab97c91d009e4b58bf43648599d
+
+operational evidence:
+sha256:f7458b82be8f4a0161ec9647089a470e8832ccbcb8d901ecd8ccb56952369603
+```
+
+The repository retains a sanitized acceptance index at
+[`../evidence/acceptance/deepseek-cage-p0a-seed1-run4.json`](../evidence/acceptance/deepseek-cage-p0a-seed1-run4.json).
+The complete private Trial remains outside Git.
+
+Three sealed predecessor Trials remain useful negative evidence:
+
+- `run0` exposed an insufficient Tool budget and oversized raw observation;
+- `run1` exposed conclusion-state and conservative token-bound failures;
+- `run3` isolated an oversized per-call output bound after Context Projection.
+
+A fourth attempt, `run2`, failed after model completion but before Trial sealing due
+to a rationale post-processing limit. Its Runtime Job remains the authority for
+that software exception; it is not represented as a sealed Contest Trial.
+
 ## P0-A active implementation
 
 `NativeHarnessActorBackend` implements the Security `ActorBackend` contract. Each
@@ -144,7 +183,8 @@ Each model Actor binds:
 - requested Flash model;
 - adapter revision;
 - credential scope;
-- timeout, response-byte, output-token, and thinking configuration.
+- timeout, response-byte, output-token, and thinking configuration;
+- an accepted default output bound of 1,024 tokens for the two-plan workload.
 
 ### Harness
 
@@ -225,7 +265,7 @@ do.
 
 ## P0-B gate
 
-P0-B may start only after P0-A produces a valid real Contest. It must preserve the
+P0-A has satisfied this gate. P0-B must preserve the
 same CAGE scenario, prompt, action catalog, credentials, model bounds, seed, and
 Harness loop while adding:
 
