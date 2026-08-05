@@ -42,6 +42,18 @@ def _text(value: str, label: str, *, prefix: str | None = None) -> str:
     return value
 
 
+def _bounded_proposal_rationale(value: str, *, max_bytes: int = 300) -> str:
+    encoded = value.encode("utf-8")
+    if len(encoded) <= max_bytes:
+        return value
+    suffix = "…"
+    prefix = encoded[: max_bytes - len(suffix.encode("utf-8"))]
+    bounded = prefix.decode("utf-8", errors="ignore").rstrip() + suffix
+    if not bounded.strip():
+        raise ValueError("Agent conclusion cannot produce a bounded rationale")
+    return bounded
+
+
 @dataclass(slots=True)
 class _ActorState:
     binding: ActorBinding
@@ -133,29 +145,49 @@ class NativeHarnessActorBackend:
                 "Harness selected an action outside the Actor grant",
                 details={"selectedAction": turn.selected_action},
             )
-        state.turns.append(turn)
-        return ActionProposal(
-            proposal_id=(
-                f"proposal:{self.actor_id.removeprefix('actor:')}:{observation.tick}:"
-                f"{turn.trace_digest[-12:]}"
-            ),
-            actor_id=self.actor_id,
-            tick=observation.tick,
-            action_type=turn.selected_action,
-            arguments={
-                "agentStackIdentityDigest": canonical_digest(self.driver.execution_identity),
+        proposal_rationale = _bounded_proposal_rationale(turn.rationale)
+        conclusion_digest = canonical_digest({"summary": turn.rationale})
+        try:
+            proposal = ActionProposal(
+                proposal_id=(
+                    f"proposal:{self.actor_id.removeprefix('actor:')}:{observation.tick}:"
+                    f"{turn.trace_digest[-12:]}"
+                ),
+                actor_id=self.actor_id,
+                tick=observation.tick,
+                action_type=turn.selected_action,
+                arguments={
+                    "agentStackIdentityDigest": canonical_digest(self.driver.execution_identity),
+                    "harnessRunId": turn.harness_run_id,
+                    "harnessTraceDigest": turn.trace_digest,
+                    "credentialScopeId": turn.credential_scope_id,
+                    "requestedModelId": turn.requested_model_id,
+                    "effectiveModelIds": list(turn.effective_model_ids),
+                    "harnessStopCode": turn.stop_code,
+                    "usage": turn.usage,
+                    "conclusionSummaryDigest": conclusion_digest,
+                    "conclusionSummaryBytes": len(turn.rationale.encode("utf-8")),
+                },
+                objective_refs=(f"objective:{self.actor_id.removeprefix('actor:')}",),
+                authority_refs=(f"authority:{self.actor_id.removeprefix('actor:')}",),
+                rationale=proposal_rationale,
+            )
+        except ValueError as error:
+            failure: JsonObject = {
+                "errorType": type(error).__name__,
+                "reason": "proposal-postprocessing-failed",
                 "harnessRunId": turn.harness_run_id,
-                "harnessTraceDigest": turn.trace_digest,
-                "credentialScopeId": turn.credential_scope_id,
-                "requestedModelId": turn.requested_model_id,
-                "effectiveModelIds": list(turn.effective_model_ids),
-                "harnessStopCode": turn.stop_code,
-                "usage": turn.usage,
-            },
-            objective_refs=(f"objective:{self.actor_id.removeprefix('actor:')}",),
-            authority_refs=(f"authority:{self.actor_id.removeprefix('actor:')}",),
-            rationale=turn.rationale,
-        )
+                "traceDigest": turn.trace_digest,
+                "conclusionSummaryDigest": conclusion_digest,
+            }
+            state.failed_turns.append(failure)
+            raise ActorProposalFailure(
+                ActorProposalFailureCode.MALFORMED,
+                "Harness result could not be converted into a Security proposal",
+                details=failure,
+            ) from error
+        state.turns.append(turn)
+        return proposal
 
     def observe_result(self, session: ActorSession, result: ActorActionResult) -> None:
         state = self._state(session)
