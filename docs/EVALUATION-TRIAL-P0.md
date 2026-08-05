@@ -25,6 +25,7 @@ related:
   - security.architecture
   - security.research-boundary
   - security.static-evaluation-p0
+  - security.case-snapshot-p0
   - security.evidence
   - security.authority
 ---
@@ -34,7 +35,7 @@ related:
 
 Evaluation Trial is the Security-owned protocol for determining what one exact software Sample did under one exact authorized environment and which conclusions are supported by retained evidence.
 
-P0 prepares the local control and evidence infrastructure without executing unknown software. It deliberately stops before KVM, CAPE, hostile-code isolation, controlled egress, Guest monitoring, or real malware analysis.
+P0 prepares the local control and evidence infrastructure without executing unknown software. It deliberately stops before KVM, CAPE, hostile-code isolation, controlled egress, Guest monitoring, or real malware analysis. A later execution performed directly through Wine on the WSL host is outside this protocol and does not become an Evaluation Run retroactively.
 
 ## Ownership
 
@@ -222,4 +223,4 @@ P0-B may add one external hostile-code isolation provider only after its local o
 6. destruction and residual closure;
 7. no Sample or credential leakage into Git, Runtime logs, Host state, or model Provider prompts.
 
-The first real backend should remain an integration behind `EvaluationRangeBackend`; it must not turn Security or Runtime into a hypervisor or malware-sandbox implementation.
+The first real backend should remain an integration behind `EvaluationRangeBackend`; it must not turn Security or Runtime into a hypervisor or malware-sandbox implementation. Evolving directories and external uncontrolled outputs belong to Case Snapshot P0 until such a backend exists.

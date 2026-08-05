@@ -25,6 +25,7 @@ related:
   - security.research-boundary
   - security.evaluation-trial-p0
   - security.static-evaluation-p0
+  - security.case-snapshot-p0
   - security.migration.round2
   - security.migration.round3-p0
   - security.authority
@@ -37,7 +38,7 @@ Ordivon Security is the adversarial domain layer. It defines who is contesting w
 
 It composes rather than replaces Host, Harness, Runtime, external ranges, model Providers, and classical security tools.
 
-## Active `0.5` flows
+## Active `0.6` flows
 
 ```text
 ScenarioManifest
@@ -70,6 +71,13 @@ EvaluationSpec
   6. destroy the instance and require residual closure
   7. derive evidence-bound Findings and a conservative disposition
   8. seal semantic and operational evidence independently
+
+Case root
+  1. audit permission, link, executable, and special-file drift without mutation
+  2. declare static, external-uncontrolled, or controlled execution status
+  3. hash every regular file and bind every relative path and mode
+  4. fail closed if the tree changes during capture
+  5. write a private atomic Case Snapshot outside the Case root
 ```
 
 The ordered Actor list is part of the Scenario identity. Trial identity additionally binds the Security implementation, evidence schema revision, Range adapter and substrate, and each Actor implementation identity. Actor invocation is sequential in the current process, but all proposals are collected before any world mutation; therefore the semantic tick is simultaneous.
@@ -122,6 +130,12 @@ The `LocalStaticEvaluationBackend` invokes admitted classical analyzers without 
 Observer and Guardian are separate authorities. Observer records may support a Finding but cannot alter the environment. Guardian decisions represent hard boundary enforcement and may terminate a Run without inventing a Finding. A Run is invalid when Sample verification, backend execution, or residual closure is incomplete.
 
 Current Runtime `contained_local` remains outside dynamic Sample execution because it does not provide the isolation, egress control, and disposable-machine semantics required by later stages. Static Evaluation runs locally but permits only declared non-executing analyzers. See [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md) and [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md).
+
+## Case Snapshot P0
+
+Case Snapshot is a separate metadata path for analysis directories that evolve after a sealed Evaluation. It does not reuse Evaluation truth, Findings, Guardian authority, or residual closure. A read-only quarantine audit records permission and executable drift. A snapshot binds relative paths, modes, byte lengths, complete file digests, execution status, limitations, linked Evaluation Run identities, and exact Security source identity.
+
+A local Wine fuzz run of one retained component occurred outside an admitted disposable-machine backend. Its stdout and stderr remain historical material under `external-uncontrolled-execution`; they do not prove the stronger behavioral conclusions later written into a human report. See [`CASE-SNAPSHOT-P0.md`](CASE-SNAPSHOT-P0.md).
 
 ### Action path
 
@@ -221,12 +235,13 @@ Security may request a Harness or Runtime change but must not copy their state m
 
 Evaluation integration proceeds independently:
 
-1. retain P0 local contracts, streaming Vault, static backend, report Artifacts, and fixture acceptance;
-2. add mature static analyzers only through exact adapters and preserve their native reports;
+1. retain P0 local contracts, streaming Vault, static backend, report Artifacts, quarantine audits, and Case Snapshots;
+2. preserve external uncontrolled executions as limited historical Case material rather than Evaluation truth;
 3. admit one external disposable-machine backend only after management-plane isolation, deny-all egress, bounded execution, evidence export, destruction, and residual closure are proven;
 4. add Guest and network Observers without giving them Guardian authority;
 5. run owned benign and purpose-built fixtures before any untrusted Sample;
-6. connect Harness only to structured evidence summaries, never raw Sample bytes.
+6. add mature static analyzers only when an observed evidence gap justifies the adapter;
+7. connect Harness only to structured evidence summaries, never raw Sample bytes.
 
 ## Explicit non-goals
 
