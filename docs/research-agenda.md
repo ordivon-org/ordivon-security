@@ -25,6 +25,7 @@ related:
   - security.architecture
   - security.research-boundary
   - security.authority
+  - security.agent-experiment-p0
 ---
 # Autonomous adversarial systems research agenda
 
@@ -46,7 +47,7 @@ Falsifier: an ordinary single-Agent episode with one trace expresses the same fa
 
 Attach CAGE 4/CybORG as an authoritative Range and control Red and Blue through Ordivon contracts. Compare scripted, finite-state, RL, and model-backed policies under exact seeds and observation mappings.
 
-Status: initial transfer and fail-closed model prerequisites implemented. Ordivon now explicitly supplies all actions for one CAGE Red agent and five CAGE Blue agents while Green remains native. The current Actor surface selects native-policy or Sleep team plans. Parameterized action construction, held-out policy comparisons, and model/RL Actors remain open.
+Status: initial transfer and fail-closed model prerequisites implemented. Ordivon explicitly supplies all Red and Blue actions while Green remains native. The P0-A DeepSeek Flash/Harness Actor now selects native-policy or Sleep through a Security-owned Tool bridge; real retained acceptance, Host/Runtime layer ablations, parameterized action construction, held-out policy comparisons, and RL Actors remain open.
 
 Falsifier: Ordivon's contracts add no diagnostic or experimental value over native CAGE episodes.
 
@@ -54,7 +55,7 @@ Falsifier: Ordivon's contracts add no diagnostic or experimental value over nati
 
 Use the generic Harness Domain Tool Bridge now available to connect Security-owned domain tools, then run DeepSeek Flash-backed Red and Blue actors with durable Assignment, bounded context, explicit Tool grants, pause/resume, Provider failure evidence, and replaceable model identity.
 
-The first experiment may select CAGE team plans. A later experiment should expose parameterized CAGE actions only after their identity, admission, and observation contracts are stable.
+The first P0-A experiment selects CAGE team plans through Harness while Host and Runtime non-consumption remain explicit in Trial identity. P0-B adds Host Assignment, P0-C adds Runtime execution, and only then should a later experiment expose parameterized CAGE actions.
 
 Falsifier: direct stateless model calls perform equivalently and no continuity or effect-reconciliation distinction appears.
 
