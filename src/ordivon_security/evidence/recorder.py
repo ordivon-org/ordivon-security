@@ -21,6 +21,11 @@ class EvidenceBundle:
     operational_digest: str
 
 
+def _write_private(path: Path, content: bytes) -> None:
+    path.write_bytes(content)
+    path.chmod(0o600)
+
+
 class EvidenceRecorder:
     def __init__(self, trial_id: str) -> None:
         self.trial_id = trial_id
@@ -83,17 +88,22 @@ class EvidenceRecorder:
         raw_metrics: JsonObject,
         result: JsonObject,
     ) -> EvidenceBundle:
-        if output_path.exists() and any(output_path.iterdir()):
+        if output_path.is_symlink():
+            raise ValueError("Evidence output path must not be a symbolic link")
+        if output_path.exists() and (not output_path.is_dir() or any(output_path.iterdir())):
             raise FileExistsError(f"Evidence output path is not empty: {output_path}")
+        output_path.mkdir(parents=True, exist_ok=True, mode=0o700)
+        output_path.chmod(0o700)
         events_path = output_path / "events"
-        events_path.mkdir(parents=True, exist_ok=True)
+        events_path.mkdir(exist_ok=True, mode=0o700)
+        events_path.chmod(0o700)
         channel_manifest: JsonObject = {}
         for channel in EvidenceChannel:
             file_path = events_path / f"{channel.value}.jsonl"
             lines = b"".join(
                 canonical_bytes(event.to_dict()) + b"\n" for event in self._events[channel]
             )
-            file_path.write_bytes(lines)
+            _write_private(file_path, lines)
             channel_manifest[channel.value] = {
                 "path": f"events/{channel.value}.jsonl",
                 "eventCount": len(self._events[channel]),
@@ -102,10 +112,22 @@ class EvidenceRecorder:
                 else self._events[channel][-1].event_digest,
                 "fileDigest": "sha256:" + hashlib.sha256(lines).hexdigest(),
             }
-        (output_path / "manifest.json").write_bytes(canonical_bytes(scenario_manifest) + b"\n")
-        (output_path / "trial-identity.json").write_bytes(canonical_bytes(trial_identity) + b"\n")
-        (output_path / "raw-metrics.json").write_bytes(canonical_bytes(raw_metrics) + b"\n")
-        (output_path / "result.json").write_bytes(canonical_bytes(result) + b"\n")
+        _write_private(
+            output_path / "manifest.json",
+            canonical_bytes(scenario_manifest) + b"\n",
+        )
+        _write_private(
+            output_path / "trial-identity.json",
+            canonical_bytes(trial_identity) + b"\n",
+        )
+        _write_private(
+            output_path / "raw-metrics.json",
+            canonical_bytes(raw_metrics) + b"\n",
+        )
+        _write_private(
+            output_path / "result.json",
+            canonical_bytes(result) + b"\n",
+        )
         bundle_manifest: JsonObject = {
             "schemaVersion": 2,
             "kind": "ordivon.security.evidence-bundle",
@@ -116,14 +138,17 @@ class EvidenceRecorder:
             "resultDigest": canonical_digest(result),
             "channels": channel_manifest,
         }
-        (output_path / "bundle-manifest.json").write_bytes(canonical_bytes(bundle_manifest) + b"\n")
+        _write_private(
+            output_path / "bundle-manifest.json",
+            canonical_bytes(bundle_manifest) + b"\n",
+        )
         semantic_digest = canonical_digest(bundle_manifest)
 
         operational_path = events_path / "operational.jsonl"
         operational_lines = b"".join(
             canonical_bytes(event.to_dict()) + b"\n" for event in self._operational_events
         )
-        operational_path.write_bytes(operational_lines)
+        _write_private(operational_path, operational_lines)
         operational_manifest: JsonObject = {
             "schemaVersion": 1,
             "kind": "ordivon.security.operational-evidence",
@@ -136,8 +161,9 @@ class EvidenceRecorder:
             else self._operational_events[-1].event_digest,
             "fileDigest": "sha256:" + hashlib.sha256(operational_lines).hexdigest(),
         }
-        (output_path / "operational-manifest.json").write_bytes(
-            canonical_bytes(operational_manifest) + b"\n"
+        _write_private(
+            output_path / "operational-manifest.json",
+            canonical_bytes(operational_manifest) + b"\n",
         )
         return EvidenceBundle(
             output_path,

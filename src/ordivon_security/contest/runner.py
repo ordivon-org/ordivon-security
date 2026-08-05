@@ -27,6 +27,12 @@ class ContestRunner:
         *,
         evidence_root: Path,
     ) -> None:
+        if evidence_root.is_symlink():
+            raise ValueError("Contest evidence root must not be a symbolic link")
+        if evidence_root.exists() and not evidence_root.is_dir():
+            raise ValueError("Contest evidence root must be a directory")
+        evidence_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+        evidence_root.chmod(0o700)
         self.range_backend = range_backend
         self.actor_backends = dict(actor_backends)
         self.evidence_root = evidence_root

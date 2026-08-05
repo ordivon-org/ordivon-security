@@ -1,8 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import cast
 
-from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
+from ordivon_security._canonical import (
+    JsonObject,
+    JsonValue,
+    canonical_digest,
+    validate_json,
+)
 from ordivon_security.contest.model import (
     ActionProposal,
     ActorActionResult,
@@ -41,6 +47,7 @@ class _ActorState:
     binding: ActorBinding
     scenario_digest: str
     turns: list[AgentTurnEvidence] = field(default_factory=list)
+    failed_turns: list[JsonObject] = field(default_factory=list)
     results: list[ActorActionResult] = field(default_factory=list)
 
 
@@ -114,6 +121,7 @@ class NativeHarnessActorBackend:
                 prior_results=tuple(state.results),
             )
         except AgentTurnDriverError as error:
+            state.failed_turns.append(error.details)
             raise ActorProposalFailure(
                 error.code,
                 str(error),
@@ -170,8 +178,10 @@ class NativeHarnessActorBackend:
                 "credentialScopeId": self.driver.credential_scope_id,
                 "requestedModelId": self.driver.requested_model_id,
                 "turnCount": len(state.turns),
+                "failedTurnCount": len(state.failed_turns),
                 "observedResultCount": len(state.results),
                 "turns": [turn.to_dict(include_trace=True) for turn in state.turns],
+                "failedTurns": cast(list[JsonValue], state.failed_turns),
             },
         )
 

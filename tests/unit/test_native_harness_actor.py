@@ -274,7 +274,65 @@ class NativeHarnessActorP0Tests(unittest.TestCase):
             caught.exception.details["providerFailureCode"],
             "unavailable",
         )
-        backend.stop(session)
+        receipt = backend.stop(session)
+        self.assertEqual(receipt.details["failedTurnCount"], 1)
+        self.assertEqual(
+            receipt.details["failedTurns"][0]["providerFailureCode"],
+            "unavailable",
+        )
+
+    def test_harness_stop_trace_is_retained_in_failure_receipt(self) -> None:
+        trace = {
+            "schemaVersion": 1,
+            "kind": "ordivon.harness-trace",
+            "harnessRunId": "harness-run:red:failed",
+            "events": [
+                {
+                    "sequence": 1,
+                    "kind": "run_stopped",
+                    "occurredAtMs": 2,
+                    "payload": {"stopCode": "budget_exhausted"},
+                }
+            ],
+        }
+        failure = AgentTurnDriverError(
+            ActorProposalFailureCode.ACTOR_STOPPED,
+            "injected Harness budget stop",
+            details={
+                "harnessRunId": "harness-run:red:failed",
+                "assignmentId": "assignment:red:failed",
+                "contextDigest": "sha256:" + "1" * 64,
+                "stopCode": "budget_exhausted",
+                "selectedAction": "cage.team.native-policy",
+                "trace": trace,
+                "traceDigest": canonical_digest(trace),
+                "usage": {"modelCalls": 2, "toolCalls": 1},
+                "requestedModelId": "deepseek-v4-flash",
+                "effectiveModelIds": ["deepseek-v4-flash"],
+                "credentialScopeId": "credential-scope:deepseek:flash:0",
+            },
+        )
+        backend = _backend(_FakeDriver(fail=failure))
+        binding = _binding(backend)
+        session = backend.start(binding, _scenario(binding))
+        with self.assertRaises(ActorProposalFailure):
+            backend.propose(
+                session,
+                ActorObservation("actor:red", 0, {"bounded": True}, _ACTIONS),
+            )
+        receipt = backend.stop(session)
+        self.assertEqual(receipt.details["failedTurnCount"], 1)
+        failed = receipt.details["failedTurns"][0]
+        self.assertEqual(failed["stopCode"], "budget_exhausted")
+        self.assertEqual(failed["trace"]["kind"], "ordivon.harness-trace")
+        self.assertEqual(failed["selectedAction"], "cage.team.native-policy")
+
+    def test_default_budget_allows_domain_action_and_conclusion(self) -> None:
+        from ordivon_security.actors.agent_stack import HarnessBudgetConfig
+
+        budget = HarnessBudgetConfig()
+        self.assertEqual(budget.max_tool_calls, 2)
+        self.assertEqual(budget.max_model_observation_bytes, 262_144)
 
     def test_binding_drift_is_rejected_before_model_call(self) -> None:
         driver = _FakeDriver()
