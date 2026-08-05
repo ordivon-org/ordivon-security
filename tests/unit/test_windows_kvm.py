@@ -311,6 +311,10 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertIn("install-bootstrap.ps1", unattend)
         self.assertIn(_CONFIG_LABEL, bootstrap)
         self.assertNotIn(_BUILD_LABEL, unattend)
+        self.assertIn("BypassSecureBootCheck", unattend)
+        self.assertNotIn("BypassTPMCheck", unattend)
+        self.assertNotIn("BypassCPUCheck", unattend)
+        self.assertNotIn("BypassRAMCheck", unattend)
         self.assertIn("SetupComplete.cmd", bootstrap)
 
     def test_fat_image_is_private_before_formatter_runs(self) -> None:
