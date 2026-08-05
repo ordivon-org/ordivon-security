@@ -17,7 +17,8 @@ from ordivon_security.identity import security_source_identity
 
 from .protocol import ActorProposalFailureCode
 
-PROMPT_REVISION = "security-cage-team-plan-v1"
+PROMPT_REVISION = "security-cage-team-plan-v2"
+CONTEXT_PROJECTION_REVISION = "cage-team-plan-summary-v1"
 BACKEND_ID = "backend:native-harness-deepseek-v1"
 DOMAIN_ID = "domain:ordivon-security-cage-team-plan"
 TOOL_NAME = "select_team_plan"
@@ -83,14 +84,14 @@ class AgentLayerBinding:
 @dataclass(frozen=True, slots=True)
 class HarnessBudgetConfig:
     max_model_calls: int = 3
-    max_tool_calls: int = 2
+    max_tool_calls: int = 3
     max_observation_bytes: int = 131_072
     max_wall_time_ms: int = 180_000
     max_total_tokens: int = 16_384
     max_model_retries: int = 1
     max_tool_corrections: int = 1
     max_observation_only_turns: int = 1
-    max_no_progress_turns: int = 1
+    max_no_progress_turns: int = 2
     max_model_observation_bytes: int = 262_144
 
     def __post_init__(self) -> None:
@@ -175,6 +176,109 @@ class AgentTurnEvidence:
         if include_trace:
             value["trace"] = self.trace
         return value
+
+
+def project_cage_team_plan_observation(observation: ActorObservation) -> JsonObject:
+    state = observation.visible_state
+    agent_observations = state.get("agentObservations")
+    action_space = state.get("actionSpaceSummary")
+    if not isinstance(agent_observations, dict) or not isinstance(action_space, dict):
+        raise ValueError("CAGE team-plan observation lacks Agent or Action summaries")
+    agent_summaries: list[JsonValue] = []
+    for agent_id in sorted(agent_observations):
+        raw_agent = agent_observations[agent_id]
+        if not isinstance(agent_id, str) or not isinstance(raw_agent, dict):
+            raise ValueError("CAGE Agent observation is malformed")
+        host_ids = sorted(
+            key
+            for key, value in raw_agent.items()
+            if key != "success" and isinstance(key, str) and isinstance(value, dict)
+        )
+        host_types = {"router": 0, "server": 0, "user": 0, "other": 0}
+        record_counts = {"interfaces": 0, "processes": 0, "sessions": 0, "users": 0}
+        session_types: dict[str, int] = {}
+        operating_systems: dict[str, int] = {}
+        subnets: set[str] = set()
+        for host_id in host_ids:
+            raw_host = raw_agent[host_id]
+            if not isinstance(raw_host, dict):
+                continue
+            if "_router" in host_id:
+                host_types["router"] += 1
+            elif "_server_" in host_id:
+                host_types["server"] += 1
+            elif "_user_" in host_id:
+                host_types["user"] += 1
+            else:
+                host_types["other"] += 1
+            interfaces = raw_host.get("Interface", [])
+            processes = raw_host.get("Processes", [])
+            sessions = raw_host.get("Sessions", [])
+            users = raw_host.get("User Info", [])
+            for key, records in (
+                ("interfaces", interfaces),
+                ("processes", processes),
+                ("sessions", sessions),
+                ("users", users),
+            ):
+                if isinstance(records, list):
+                    record_counts[key] += len(records)
+            if isinstance(interfaces, list):
+                for interface in interfaces:
+                    if isinstance(interface, dict):
+                        subnet = interface.get("Subnet")
+                        if isinstance(subnet, str):
+                            subnets.add(subnet)
+            if isinstance(sessions, list):
+                for session in sessions:
+                    if isinstance(session, dict):
+                        session_type = session.get("Type")
+                        if isinstance(session_type, str):
+                            session_types[session_type] = session_types.get(session_type, 0) + 1
+            system_info = raw_host.get("System info")
+            if isinstance(system_info, dict):
+                os_type = system_info.get("OSType")
+                distribution = system_info.get("OSDistribution")
+                if isinstance(os_type, str):
+                    label = (
+                        os_type
+                        if not isinstance(distribution, str)
+                        else f"{os_type}:{distribution}"
+                    )
+                    operating_systems[label] = operating_systems.get(label, 0) + 1
+        summary: JsonObject = {
+            "agentId": agent_id,
+            "success": raw_agent.get("success"),
+            "hostCount": len(host_ids),
+            "hostTypeCounts": cast(JsonObject, host_types),
+            "hostIds": cast(list[JsonValue], host_ids),
+            "recordCounts": cast(JsonObject, record_counts),
+            "sessionTypeCounts": cast(JsonObject, session_types),
+            "operatingSystemCounts": cast(JsonObject, operating_systems),
+            "subnets": cast(list[JsonValue], sorted(subnets)),
+        }
+        validate_json(summary)
+        agent_summaries.append(summary)
+    projection: JsonObject = {
+        "schemaVersion": 1,
+        "kind": "ordivon.security-cage-team-plan-context",
+        "projectionRevision": CONTEXT_PROJECTION_REVISION,
+        "sourceObservationDigest": canonical_digest(observation.to_dict()),
+        "sourceVisibleStateDigest": canonical_digest(state),
+        "actorId": observation.actor_id,
+        "tick": observation.tick,
+        "range": state.get("range"),
+        "sourceRevision": state.get("sourceRevision"),
+        "team": state.get("team"),
+        "missionPhase": state.get("missionPhase"),
+        "lastTeamReward": state.get("lastTeamReward"),
+        "controlledAgents": state.get("controlledAgents"),
+        "planOptions": state.get("planOptions"),
+        "actionSpaceSummary": action_space,
+        "agentObservationSummaries": agent_summaries,
+    }
+    validate_json(projection)
+    return projection
 
 
 class AgentTurnDriver(Protocol):
@@ -359,6 +463,7 @@ class DeepSeekHarnessTurnDriver:
                 "component": security_source_identity(),
                 "actorBackendId": BACKEND_ID,
                 "promptRevision": PROMPT_REVISION,
+                "contextProjectionRevision": CONTEXT_PROJECTION_REVISION,
                 "domainId": DOMAIN_ID,
                 "toolName": TOOL_NAME,
                 "allowedActions": list(self.allowed_actions),
@@ -422,14 +527,25 @@ class DeepSeekHarnessTurnDriver:
                 ActorProposalFailureCode.MALFORMED,
                 "Harness driver received another Actor's observation",
             )
+        try:
+            observation_projection = project_cage_team_plan_observation(observation)
+        except ValueError as error:
+            raise AgentTurnDriverError(
+                ActorProposalFailureCode.MALFORMED,
+                "Security Context Projection rejected the Actor observation",
+                details={"errorType": type(error).__name__},
+            ) from error
         context: JsonObject = {
             "schemaVersion": 1,
             "kind": "ordivon.security-agent-turn-context",
             "promptRevision": PROMPT_REVISION,
+            "contextProjectionRevision": CONTEXT_PROJECTION_REVISION,
             "actorId": actor_id,
             "side": side,
             "objective": objective,
-            "observation": observation.to_dict(),
+            "sourceObservationDigest": canonical_digest(observation.to_dict()),
+            "observationProjection": observation_projection,
+            "observationProjectionDigest": canonical_digest(observation_projection),
             "priorActionResults": [result.to_dict() for result in prior_results[-4:]],
             "rules": {
                 "hiddenTruthAvailable": False,
@@ -468,7 +584,10 @@ class DeepSeekHarnessTurnDriver:
                     "You are one bounded actor in an authorized adversarial simulation. "
                     "Use only the actor-specific visible observation. Never infer hidden "
                     "world truth. Call select_team_plan exactly once, then submit a "
-                    "candidate_completed conclusion explaining the decision."
+                    "candidate_completed conclusion explaining the decision. This assignment "
+                    "is complete when one granted plan is selected. For candidate_completed, "
+                    "unresolved_unknowns MUST be an empty array; describe world uncertainty "
+                    "as caveats in the summary instead."
                 ),
             },
             {
@@ -582,8 +701,10 @@ __all__ = [
     "AgentTurnDriverError",
     "AgentTurnEvidence",
     "BACKEND_ID",
+    "CONTEXT_PROJECTION_REVISION",
     "DEFAULT_ALLOWED_ACTIONS",
     "DeepSeekHarnessTurnDriver",
     "HarnessBudgetConfig",
     "PROMPT_REVISION",
+    "project_cage_team_plan_observation",
 ]

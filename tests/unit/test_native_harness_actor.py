@@ -9,6 +9,7 @@ from ordivon_security.actors.agent_stack import (
     AgentLayerBinding,
     AgentTurnDriverError,
     AgentTurnEvidence,
+    project_cage_team_plan_observation,
 )
 from ordivon_security.actors.native_harness import NativeHarnessActorBackend
 from ordivon_security.actors.protocol import (
@@ -331,8 +332,89 @@ class NativeHarnessActorP0Tests(unittest.TestCase):
         from ordivon_security.actors.agent_stack import HarnessBudgetConfig
 
         budget = HarnessBudgetConfig()
-        self.assertEqual(budget.max_tool_calls, 2)
+        self.assertEqual(budget.max_tool_calls, 3)
+        self.assertEqual(budget.max_no_progress_turns, 2)
         self.assertEqual(budget.max_model_observation_bytes, 262_144)
+
+    def test_cage_context_projection_is_bounded_and_binds_source(self) -> None:
+        hosts = {}
+        for index in range(80):
+            host_id = f"zone_user_host_{index}"
+            hosts[host_id] = {
+                "Interface": [
+                    {
+                        "Subnet": "10.0.0.0/24",
+                        "interface_name": "eth0",
+                        "ip_address": f"10.0.0.{index + 1}",
+                    }
+                ],
+                "Processes": [{"PID": index + 1, "username": "ubuntu"}],
+                "Sessions": [
+                    {
+                        "PID": index + 1,
+                        "Type": "UNKNOWN",
+                        "agent": "blue_agent_0",
+                        "session_id": index,
+                        "username": "ubuntu",
+                    }
+                ],
+                "System info": {
+                    "Architecture": "x64",
+                    "Hostname": host_id,
+                    "OSDistribution": "KALI",
+                    "OSType": "LINUX",
+                    "OSVersion": "K2019_4",
+                },
+                "User Info": [
+                    {"username": "root", "Groups": [{"GID": 0}]},
+                    {"username": "user", "Groups": [{"GID": 1}]},
+                ],
+            }
+        hosts["success"] = "UNKNOWN"
+        observation = ActorObservation(
+            "actor:blue",
+            0,
+            {
+                "range": "range:cage4-enterprise-v1",
+                "sourceRevision": "8c3c50c",
+                "team": "blue",
+                "tick": 0,
+                "missionPhase": 0,
+                "lastTeamReward": 0.0,
+                "controlledAgents": ["blue_agent_0"],
+                "planOptions": list(_ACTIONS),
+                "actionSpaceSummary": {
+                    "blue_agent_0": {
+                        "enabledActions": ["Analyse", "Sleep"],
+                        "allowedSubnets": ["zone"],
+                        "enabledParameterCounts": {"hostname": 80},
+                    }
+                },
+                "agentObservations": {"blue_agent_0": hosts},
+            },
+            _ACTIONS,
+        )
+        raw_bytes = len(
+            json.dumps(
+                observation.to_dict(),
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        )
+        first = project_cage_team_plan_observation(observation)
+        second = project_cage_team_plan_observation(observation)
+        projected_bytes = len(json.dumps(first, sort_keys=True, separators=(",", ":")).encode())
+        self.assertEqual(first, second)
+        self.assertEqual(
+            first["sourceObservationDigest"],
+            canonical_digest(observation.to_dict()),
+        )
+        self.assertLess(projected_bytes, raw_bytes // 3)
+        summary = first["agentObservationSummaries"][0]
+        self.assertEqual(summary["hostCount"], 80)
+        self.assertEqual(summary["recordCounts"]["sessions"], 80)
+        self.assertEqual(summary["sessionTypeCounts"], {"UNKNOWN": 80})
+        self.assertNotIn("Processes", json.dumps(first))
 
     def test_binding_drift_is_rejected_before_model_call(self) -> None:
         driver = _FakeDriver()
