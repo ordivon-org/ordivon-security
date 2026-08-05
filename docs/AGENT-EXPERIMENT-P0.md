@@ -61,9 +61,9 @@ layer while claiming the same experiment.
 
 ## Status
 
-P0-A is accepted as the first real team-plan baseline. The P0-B implementation and a deterministic real-Host lifecycle smoke are complete; a sealed DeepSeek/CAGE acceptance Trial remains pending. P0-C remains open. The accepted P0-A Trial is intentionally narrow: one seed, one CAGE tick, two distinct DeepSeek Flash credential scopes, and the two-plan action surface.
+P0-A is accepted as the first real team-plan baseline. P0-B is accepted as the first Host-assigned baseline. P0-C remains open. Both accepted Trials are intentionally narrow: one seed, one CAGE tick, two distinct DeepSeek Flash credential scopes, and the two-plan action surface. P0-B proves the durable Host lifecycle is genuinely consumed; it does not yet prove multi-tick continuity, replacement recovery, or Runtime value.
 
-Accepted Trial:
+Accepted P0-A Trial:
 
 ```text
 trial:2a1066d2d3953a791bfc646b
@@ -86,7 +86,35 @@ The repository retains a sanitized acceptance index at
 [`../evidence/acceptance/deepseek-cage-p0a-seed1-run4.json`](../evidence/acceptance/deepseek-cage-p0a-seed1-run4.json).
 The complete private Trial remains outside Git.
 
-Three sealed predecessor Trials remain useful negative evidence:
+Accepted P0-B Trial:
+
+```text
+trial:bf48063dd944964a28353c62
+```
+
+Identity and evidence:
+
+```text
+trial identity:
+sha256:855ae9656213e9d728ce6ab7c591ae1de3275fc7bbcab38aca214e362ee431d2
+
+semantic evidence:
+sha256:ff2f45d8f4d4b51ce6460fad339ac65bcafad1652e8e004267036f8751969da3
+
+operational evidence:
+sha256:c49e9bfaf57d6975af6f3940d3b89a6227b23d11fcfe8b381fbb10136a4c1f8f
+```
+
+The repository retains a sanitized acceptance index at
+[`../evidence/acceptance/deepseek-cage-p0b-seed1-run2.json`](../evidence/acceptance/deepseek-cage-p0b-seed1-run2.json).
+The complete private Contest bundle and Host state remain outside Git.
+
+Two sealed P0-B predecessor Trials remain useful diagnostic evidence:
+
+- `run0` proved fail-closed behavior when the full compiled Context envelope exceeded the conservative second-call token preflight;
+- `run1` proved Blue could complete the corrected Host-selected semantic projection while Red stopped in `provider_state_unknown` after an ambiguous transport close, leaving its original Host Task waiting rather than replaying the Provider call.
+
+For P0-A, three sealed predecessor Trials remain useful negative evidence:
 
 - `run0` exposed an insufficient Tool budget and oversized raw observation;
 - `run1` exposed conclusion-state and conservative token-bound failures;
@@ -126,7 +154,7 @@ Actor session and no durable Goal or Task is created. Runtime is not consumed
 because selecting a CAGE team plan creates a Security proposal but no physical
 process or workspace effect.
 
-## P0-B active implementation
+## P0-B accepted implementation
 
 `HostAssignedDeepSeekHarnessTurnDriver` wraps the P0-A model/Harness turn without
 changing its Provider, action catalog, budgets, or Runtime boundary. For every
@@ -345,27 +373,37 @@ The Host state root and Contest evidence root must be disjoint. The command reje
 relative, non-empty, or non-private Host state roots and keeps the machine-local
 path out of semantic identity.
 
-## P0-B gate
+## P0-B acceptance
 
-P0-A satisfied the workload-isolation gate. The implementation now preserves the
-same CAGE scenario, prompt, action catalog, credentials, model bounds, seed, and
-Harness loop while adding:
+The accepted Trial preserved the P0-A CAGE scenario, prompt, action catalog,
+credentials, model-call and output bounds, seed, and Harness loop while adding:
 
-- durable Host Task Contract;
-- compiled Context identity;
-- Harness Assignment generation;
-- supersession and replay-blocking semantics;
-- explicit Host verification route.
+- durable Host Task Contracts;
+- compiled Context identity and selected semantic model input;
+- committed external Harness Assignment generations;
+- Harness Run receipts;
+- CompletionProposals, independent verification, and CompletionDecisions;
+- replay blocking for pre-existing Tasks.
 
-A real DeepSeek/CAGE Trial must still prove that both actors complete this lifecycle,
-that Host state and evidence remain private and secret-free, and that Runtime stays
-unconsumed. Only then is P0-B accepted. The primary comparison is whether Host
-continuity improves validity, replaceability, diagnosis, or held-out behavior enough
-to justify its cost.
+Both Red and Blue Host Tasks reached `completed` at revision 5. Both completion
+decisions were accepted. One CAGE tick executed with six explicit external actions,
+zero default Red/Blue actions, and zero Runtime Job references. Semantic and
+operational Contest evidence verified independently; Host state passed full
+validation; Contest and Host files retained private `0700`/`0600` modes; and exact
+credential values, secret paths, Bearer metadata, and `apiKey` fields were absent.
+
+The accepted Trial retained the historical `16,384` total-token ceiling to keep the
+P0-A/P0-B comparison controlled. Later code raises the default ceiling to
+`1,000,000`, treating it as a runaway guard rather than a cost target. This does not
+rewrite the accepted Trial identity.
+
+P0-B remains a Host-lifecycle baseline, not a proof that Host improves strategy.
+Multi-tick continuity, replacement, resume, supersession, and held-out comparisons
+remain open.
 
 ## P0-C gate
 
-P0-C may start only after P0-B. It must preserve the same semantic workload while
+P0-C is now the next controlled variant. It must preserve the same semantic workload while
 executing the Harness process through Runtime and binding:
 
 - Workspace source state;
