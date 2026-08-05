@@ -6,6 +6,7 @@ from .agent_stack import (
     DeepSeekHarnessTurnDriver,
     HarnessBudgetConfig,
 )
+from .host_assigned import HostAssignedDeepSeekHarnessTurnDriver
 from .native_harness import NativeHarnessActorBackend
 from .protocol import (
     ActorBackend,
@@ -27,6 +28,7 @@ __all__ = [
     "ActorProposalFailureCode",
     "ActorSession",
     "DeepSeekHarnessTurnDriver",
+    "HostAssignedDeepSeekHarnessTurnDriver",
     "HarnessBudgetConfig",
     "NativeHarnessActorBackend",
     "SequenceActorBackend",

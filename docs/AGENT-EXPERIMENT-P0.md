@@ -61,9 +61,7 @@ layer while claiming the same experiment.
 
 ## Status
 
-P0-A is accepted as the first real team-plan baseline. P0-B and P0-C remain open.
-The accepted Trial is intentionally narrow: one seed, one CAGE tick, two distinct
-DeepSeek Flash credential scopes, and the two-plan action surface.
+P0-A is accepted as the first real team-plan baseline. The P0-B implementation and a deterministic real-Host lifecycle smoke are complete; a sealed DeepSeek/CAGE acceptance Trial remains pending. P0-C remains open. The accepted P0-A Trial is intentionally narrow: one seed, one CAGE tick, two distinct DeepSeek Flash credential scopes, and the two-plan action surface.
 
 Accepted Trial:
 
@@ -127,6 +125,59 @@ Host is not consumed in P0-A because Security already owns the short-lived Conte
 Actor session and no durable Goal or Task is created. Runtime is not consumed
 because selecting a CAGE team plan creates a Security proposal but no physical
 process or workspace effect.
+
+## P0-B active implementation
+
+`HostAssignedDeepSeekHarnessTurnDriver` wraps the P0-A model/Harness turn without
+changing its Provider, action catalog, budgets, or Runtime boundary. For every
+actor tick it creates a durable Host lifecycle:
+
+```text
+Security raw observation
+→ deterministic Security projection
+→ Host Task + TaskContract
+→ Host ContextBlock selection
+→ HarnessContextCompiler
+→ content-addressed Context object
+→ committed external Harness Assignment
+→ DeepSeek/Harness model turn
+→ HarnessRunReceipt
+→ CompletionProposal
+→ Security acceptance verifier
+→ CompletionDecision
+→ Security ActionProposal
+```
+
+The Assignment is deliberately external rather than native: it carries no
+`ToolGrant`, Runtime Job, Workspace, or native Run contract. Security generates a
+stable Harness Run identity from the committed Assignment generation and binds it
+to the Trace, Run receipt, proposal, decision, and Contest evidence. Runtime
+therefore remains `consumed=false` in P0-B.
+
+Host owns Task state and revision, TaskContract identity, selected Context,
+Assignment generation, Run receipt, CompletionProposal, verification, and final
+CompletionDecision. The model can only submit a candidate conclusion. Security
+accepts completion only when the proposed action remains in the two-plan grant,
+the source observation and Harness Trace digests match, and Runtime consumption
+remains false.
+
+Host/Protocol canonical JSON forbids floating-point values, while CAGE observations
+contain rewards and related floats. The Security→Host boundary therefore replaces
+each finite float with a deterministic object:
+
+```json
+{"kind":"ordivon.canonical-float","decimal":"0.5"}
+```
+
+The original actor observation digest remains bound in the Task, ContextBlock, and
+completion verification. Non-finite floats fail closed. The model instruction
+explicitly defines the canonical-float representation.
+
+Each P0-B Trial uses a fresh, absolute, empty private Host state root. The root is
+`0700`; the Host database and content-addressed objects are `0600`. The state root
+is excluded from semantic identity, while a non-secret `host-state:` namespace is
+included. Reusing an existing Task blocks Provider replay rather than silently
+starting a second model call.
 
 ## Action surface
 
@@ -227,7 +278,8 @@ Every successful proposal binds:
 - requested and effective model identities;
 - Harness stop code;
 - usage and budget facts;
-- selected action and rationale.
+- selected action and rationale;
+- for P0-B, Host Task revision plus TaskContract, Context object, Assignment, Run receipt, CompletionProposal, and CompletionDecision digests.
 
 The complete bounded Harness Trace is retained in the Actor stop receipt and
 therefore enters Contest management evidence. API keys are excluded.
@@ -263,20 +315,42 @@ The command requires clean local Harness, Host, Runtime, and Computing source
 trees. Machine-local source paths do not become semantic identity; exact revisions
 do.
 
+## P0-B command
+
+```bash
+uv run --extra cage ordivon-security-cage4-deepseek \
+  --variant p0b \
+  --source .cache/cage4 \
+  --output /var/lib/ordivon/security/contests/cage4-deepseek-p0b \
+  --host-state-root /var/lib/ordivon/security/host/cage4-deepseek-p0b \
+  --host-state-namespace host-state:security:cage4-deepseek-p0b \
+  --steps 1 \
+  --seed 1 \
+  --red-secret /root/.config/ordivon/secrets/deepseek.json \
+  --blue-secret /root/.config/ordivon/secrets/deepseek1.json
+```
+
+The Host state root and Contest evidence root must be disjoint. The command rejects
+relative, non-empty, or non-private Host state roots and keeps the machine-local
+path out of semantic identity.
+
 ## P0-B gate
 
-P0-A has satisfied this gate. P0-B must preserve the
+P0-A satisfied the workload-isolation gate. The implementation now preserves the
 same CAGE scenario, prompt, action catalog, credentials, model bounds, seed, and
 Harness loop while adding:
 
 - durable Host Task Contract;
 - compiled Context identity;
 - Harness Assignment generation;
-- replacement and supersession semantics;
+- supersession and replay-blocking semantics;
 - explicit Host verification route.
 
-The primary comparison is whether Host continuity improves validity,
-replaceability, diagnosis, or held-out behavior enough to justify its cost.
+A real DeepSeek/CAGE Trial must still prove that both actors complete this lifecycle,
+that Host state and evidence remain private and secret-free, and that Runtime stays
+unconsumed. Only then is P0-B accepted. The primary comparison is whether Host
+continuity improves validity, replaceability, diagnosis, or held-out behavior enough
+to justify its cost.
 
 ## P0-C gate
 
