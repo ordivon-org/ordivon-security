@@ -27,6 +27,7 @@ related:
   - security.static-evaluation-p0
   - security.case-snapshot-p0
   - security.windows-kvm-p0
+  - security.agent-experiment-p0
   - security.migration.round2
   - security.migration.round3-p0
   - security.authority

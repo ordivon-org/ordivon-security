@@ -29,6 +29,7 @@ related:
   - security.static-evaluation-p0
   - security.case-snapshot-p0
   - security.windows-kvm-p0
+  - security.agent-experiment-p0
   - security.research-agenda
   - security.research-boundary
   - security.evidence
@@ -47,6 +48,7 @@ related:
 - [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md) owns SampleVault revision 2, static analyzer admission, native-report Artifact evidence, quarantine hardening, historical report limitations, and the no-execution static profile.
 - [`CASE-SNAPSHOT-P0.md`](CASE-SNAPSHOT-P0.md) owns read-only quarantine drift, evolving Case identity, external uncontrolled execution status, snapshot verification, and the boundary between Case material and Evaluation evidence.
 - [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md) owns the candidate disposable Windows Provider, sealed image identity, management-plane no-network authority, benign fixture admission, and residual-closure gate.
+- [`AGENT-EXPERIMENT-P0.md`](AGENT-EXPERIMENT-P0.md) owns the Provider/Harness/Host/Runtime experiment variants, credential-scope identity, and model-Actor admission boundary.
 - [`research-agenda.md`](research-agenda.md) owns the ordered research program and falsifiers.
 - [`research-boundary.md`](research-boundary.md) owns authorization and external-effect limits.
 - [`../evidence/README.md`](../evidence/README.md) owns active and historical evidence admission.

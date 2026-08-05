@@ -27,6 +27,7 @@ related:
   - security.static-evaluation-p0
   - security.case-snapshot-p0
   - security.windows-kvm-p0
+  - security.agent-experiment-p0
   - security.migration.round2
   - security.migration.round3-p0
   - security.authority
@@ -39,7 +40,7 @@ Ordivon Security is the adversarial domain layer. It defines who is contesting w
 
 It composes rather than replaces Host, Harness, Runtime, external ranges, model Providers, and classical security tools.
 
-## Active `0.7` flows
+## Active `0.8` flows
 
 ```text
 ScenarioManifest
@@ -93,13 +94,17 @@ Binds Scenario revision, Range identity, ordered Actors, backend identities and 
 
 Starts an Actor session, receives only that Actor's observation, returns an `ActionProposal`, receives the resolved result, and produces a stop receipt.
 
-Active implementation:
+Active implementations:
 
-- scripted sequence baseline.
+- scripted sequence baseline;
+- `NativeHarnessActorBackend`, using DeepSeek Flash through the bounded Harness domain loop.
+
+The first model-backed variant is P0-A: Provider and Harness are consumed, while exact Host and Runtime revisions plus explicit non-consumption modes remain in Actor identity. P0-B and P0-C add Host and Runtime one layer at a time. See [`AGENT-EXPERIMENT-P0.md`](AGENT-EXPERIMENT-P0.md).
 
 Planned implementations:
 
-- Native Ordivon Harness Actor using model APIs such as DeepSeek;
+- Host-assigned Native Harness Actor;
+- Runtime-executed Native Harness Actor;
 - delegated Codex/Hermes Harness backend;
 - PettingZoo/RL policy adapter.
 
@@ -231,14 +236,15 @@ Security may request a Harness or Runtime change but must not copy their state m
 
 ## Next integration sequence
 
-1. define the Security-owned CAGE team-plan catalog using the implemented Harness `DomainToolCatalog`;
-2. implement the Security `DomainToolBridge` and Native Harness Actor failure mapping;
-3. run DeepSeek Flash-backed Native Harness Red and Blue Actors;
-4. expand from team-plan control to parameterized CAGE Action Proposals where experiments require it;
-5. add Campaign and organization state only when multi-Actor experiments consume it;
-6. introduce containerlab, an independent management plane, and Zeek telemetry;
-7. add CALDERA as a TTP execution adapter, not as Campaign authority;
-8. connect Codex and Hermes as delegated Harness baselines in planner-only, Tool-proxy, and black-box modes.
+1. retain the implemented Security CAGE team-plan catalog, Domain Tool Bridge, Native Harness Actor, and fail-closed Provider mapping;
+2. complete the first retained DeepSeek Flash Red/Blue P0-A Contest;
+3. add the Host-assigned P0-B variant without changing the Security workload;
+4. add the Runtime-executed P0-C variant and compare recovery/cancellation effects;
+5. expand from team-plan control to parameterized CAGE Action Proposals where experiments require it;
+6. add Campaign and organization state only when multi-Actor experiments consume it;
+7. introduce containerlab, an independent management plane, and Zeek telemetry;
+8. add CALDERA as a TTP execution adapter, not as Campaign authority;
+9. connect Codex and Hermes as delegated Harness baselines in planner-only, Tool-proxy, and black-box modes.
 
 Evaluation integration proceeds independently:
 

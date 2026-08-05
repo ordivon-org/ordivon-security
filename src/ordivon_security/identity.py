@@ -15,7 +15,7 @@ def _package_version() -> str:
     try:
         return version("ordivon-security")
     except PackageNotFoundError:
-        return "0.7.0-dev"
+        return "0.8.0-dev"
 
 
 def _repository_root() -> Path | None:

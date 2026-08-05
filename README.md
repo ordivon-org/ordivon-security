@@ -15,7 +15,7 @@ audience:
   - evaluator
   - agent
 updated: 2026-08-05
-summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, streaming SampleVault, static Evaluation, evolving Case snapshots, and a benign-only disposable Windows KVM candidate.
+summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, controlled DeepSeek/Harness Actors, streaming SampleVault, static Evaluation, evolving Case snapshots, and a benign-only disposable Windows KVM candidate.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -27,6 +27,7 @@ related:
   - security.static-evaluation-p0
   - security.case-snapshot-p0
   - security.windows-kvm-p0
+  - security.agent-experiment-p0
   - security.research-agenda
   - security.research-boundary
   - security.evidence
@@ -40,7 +41,7 @@ Its central executable object is a **Contest**: multiple goal-bearing actors rec
 
 ## Current capability
 
-The active `0.7` core provides:
+The active `0.8` core provides:
 
 - a multi-Actor `ScenarioManifest`;
 - actor-specific observations separated from hidden world truth;
@@ -63,12 +64,14 @@ The active `0.7` core provides:
 - read-only quarantine drift audits;
 - digest-bound Case Snapshots with explicit static, uncontrolled, or controlled execution status;
 - a QEMU/KVM disposable Windows Provider candidate restricted to the maintained benign fixture;
+- a DeepSeek Flash `NativeHarnessActorBackend` with exact Provider, Harness, Host, Runtime, Protocol, prompt, budget, and credential-scope identity;
+- a P0-A CAGE path where Harness is consumed while Host and Runtime non-consumption remain explicit experimental facts;
 - management-plane QMP network-device checks and disposable qcow2, UEFI, TPM, and FAT Run state;
 - evidence-bound Findings and mandatory residual-closure receipts.
 
 In the CAGE adapter, one Security Red Actor controls the CAGE Red team and one Security Blue Actor controls five CAGE Blue agents. Every Red and Blue CAGE action is explicitly supplied by Ordivon to the joint step; Green agents remain CAGE-controlled environmental actors. The current action surface is intentionally narrow: each side selects either the pinned native team policy or Sleep. Parameter-level model control is a later integration.
 
-It does **not yet** provide model-backed actors, an admitted unknown-Sample Windows execution path, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The Windows KVM Provider is a benign-fixture-only candidate until its clean-revision base build and real acceptance Run pass. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
+It does **not yet** provide Host-assigned or Runtime-executed model Actor variants, an admitted unknown-Sample Windows execution path, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The Windows KVM Provider is a benign-fixture-only candidate until its clean-revision base build and real acceptance Run pass. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
 
 ## Run a local Evaluation Trial dry run
 
@@ -143,6 +146,20 @@ uv run ordivon-security-micro --output .artifacts/sleepy --blue sleepy
 ```
 
 The reactive Blue baseline detects the web foothold and isolates the vault before Red pivots. The sleepy Blue baseline allows Red to establish two footholds and exfiltrate protected data.
+
+## Run the DeepSeek Harness Actor baseline
+
+```bash
+uv run --extra cage ordivon-security-cage4-deepseek \
+  --source .cache/cage4 \
+  --output .artifacts/cage4-deepseek-p0a \
+  --steps 1 \
+  --seed 1 \
+  --red-secret /root/.config/ordivon/secrets/deepseek.json \
+  --blue-secret /root/.config/ordivon/secrets/deepseek1.json
+```
+
+P0-A consumes DeepSeek and Ordivon Harness. Host and Runtime are deliberately not consumed and their exact revisions plus non-consumption reasons remain in Trial identity. The model may select only `cage.team.native-policy` or `cage.team.sleep`; it receives no shell or Runtime Tool. See [`docs/AGENT-EXPERIMENT-P0.md`](docs/AGENT-EXPERIMENT-P0.md).
 
 ## Run the pinned CAGE 4 Range
 
@@ -236,6 +253,7 @@ The former single-Actor experiment/evaluation framework is frozen at Git revisio
 - [`docs/STATIC-EVALUATION-P0.md`](docs/STATIC-EVALUATION-P0.md) — streaming Vault, static analyzers, native report Artifacts, quarantine hardening, and limitations;
 - [`docs/CASE-SNAPSHOT-P0.md`](docs/CASE-SNAPSHOT-P0.md) — read-only drift audit, evolving Case identity, uncontrolled-execution status, and snapshot verification;
 - [`docs/WINDOWS-KVM-P0.md`](docs/WINDOWS-KVM-P0.md) — sealed Windows image, no-network QMP authority, benign fixture acceptance, and residual closure;
+- [`docs/AGENT-EXPERIMENT-P0.md`](docs/AGENT-EXPERIMENT-P0.md) — controlled Provider/Harness/Host/Runtime variants and the DeepSeek Harness baseline;
 - [`docs/research-agenda.md`](docs/research-agenda.md) — research sequence and falsifiers;
 - [`docs/research-boundary.md`](docs/research-boundary.md) — authorization and external-effect limits;
 - [`evidence/README.md`](evidence/README.md) — active and historical evidence contracts.
