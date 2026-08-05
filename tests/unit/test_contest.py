@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import stat
 import tempfile
 import unittest
 from pathlib import Path
@@ -70,6 +71,18 @@ class ContestCoreTests(unittest.TestCase):
                 result.operational_evidence_digest,
             )
             self.assertTrue((Path(result.evidence_path) / "trial-identity.json").is_file())
+
+    def test_evidence_bundle_is_private_by_default(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "contest-evidence"
+            result = self._run(root, ("wait",) * 5)
+            trial = Path(result.evidence_path)
+            self.assertEqual(stat.S_IMODE(root.stat().st_mode), 0o700)
+            self.assertEqual(stat.S_IMODE(trial.stat().st_mode), 0o700)
+            self.assertEqual(stat.S_IMODE((trial / "events").stat().st_mode), 0o700)
+            for path in trial.rglob("*"):
+                if path.is_file():
+                    self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
 
     def test_simultaneous_isolation_blocks_pivot(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -83,7 +83,7 @@ class AgentLayerBinding:
 @dataclass(frozen=True, slots=True)
 class HarnessBudgetConfig:
     max_model_calls: int = 3
-    max_tool_calls: int = 1
+    max_tool_calls: int = 2
     max_observation_bytes: int = 131_072
     max_wall_time_ms: int = 180_000
     max_total_tokens: int = 16_384
@@ -91,7 +91,7 @@ class HarnessBudgetConfig:
     max_tool_corrections: int = 1
     max_observation_only_turns: int = 1
     max_no_progress_turns: int = 1
-    max_model_observation_bytes: int = 65_536
+    max_model_observation_bytes: int = 262_144
 
     def __post_init__(self) -> None:
         primary = (
@@ -212,6 +212,7 @@ class AgentTurnDriverError(RuntimeError):
         super().__init__(message)
         self.code = code
         self.details = {} if details is None else details
+        validate_json(self.details)
 
 
 class _PlanSelectionBridge:
@@ -511,13 +512,31 @@ class DeepSeekHarnessTurnDriver:
                 details=details,
             ) from error
         stop_code = str(getattr(result.stop_code, "value", result.stop_code))
+        trace = _json_object_copy(result.trace.to_dict())
+        trace_digest = canonical_digest(trace)
+        usage = _json_object_copy(result.usage)
+        raw_effective = usage.get("effectiveModelIds", [])
+        effective_models = (
+            tuple(item for item in raw_effective if isinstance(item, str))
+            if isinstance(raw_effective, list)
+            else ()
+        )
         if stop_code != "candidate_completed":
             raise AgentTurnDriverError(
                 ActorProposalFailureCode.ACTOR_STOPPED,
                 f"Harness stopped before a candidate action: {stop_code}",
                 details={
+                    "harnessRunId": harness_run_id,
+                    "assignmentId": assignment_id,
+                    "contextDigest": context_digest,
                     "stopCode": stop_code,
-                    "usage": _json_object_copy(result.usage),
+                    "selectedAction": bridge.selected_action,
+                    "trace": trace,
+                    "traceDigest": trace_digest,
+                    "usage": usage,
+                    "requestedModelId": self.requested_model_id,
+                    "effectiveModelIds": list(effective_models),
+                    "credentialScopeId": self.credential_scope_id,
                 },
             )
         if bridge.selected_action is None:
@@ -530,14 +549,6 @@ class DeepSeekHarnessTurnDriver:
                 ActorProposalFailureCode.MALFORMED,
                 "Harness candidate completion omitted its conclusion",
             )
-        trace = _json_object_copy(result.trace.to_dict())
-        usage = _json_object_copy(result.usage)
-        raw_effective = usage.get("effectiveModelIds", [])
-        effective_models = (
-            tuple(item for item in raw_effective if isinstance(item, str))
-            if isinstance(raw_effective, list)
-            else ()
-        )
         if not effective_models:
             effective_models = (self.requested_model_id,)
         if any(model != self.requested_model_id for model in effective_models):
@@ -557,7 +568,7 @@ class DeepSeekHarnessTurnDriver:
             rationale=str(result.conclusion.summary),
             stop_code=stop_code,
             trace=trace,
-            trace_digest=canonical_digest(trace),
+            trace_digest=trace_digest,
             usage=usage,
             requested_model_id=self.requested_model_id,
             effective_model_ids=effective_models,

@@ -224,6 +224,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--wall-time-ms", type=int, default=180_000)
     parser.add_argument("--total-tokens", type=int, default=16_384)
     parser.add_argument("--max-output-tokens", type=int, default=4_096)
+    parser.add_argument("--model-observation-bytes", type=int, default=262_144)
+    parser.add_argument(
+        "--allow-incomplete",
+        action="store_true",
+        help="Retain an incomplete or actor-failed Trial without returning exit status 2.",
+    )
     parser.add_argument("--provider-timeout-seconds", type=float, default=90.0)
     return parser
 
@@ -248,7 +254,7 @@ def main() -> None:
     )
     budget = HarnessBudgetConfig(
         max_model_calls=args.model_calls,
-        max_tool_calls=1,
+        max_tool_calls=2,
         max_observation_bytes=131_072,
         max_wall_time_ms=args.wall_time_ms,
         max_total_tokens=args.total_tokens,
@@ -256,7 +262,7 @@ def main() -> None:
         max_tool_corrections=1,
         max_observation_only_turns=1,
         max_no_progress_turns=1,
-        max_model_observation_bytes=65_536,
+        max_model_observation_bytes=args.model_observation_bytes,
     )
     red = _build_actor(
         actor_id="actor:red",
@@ -297,6 +303,8 @@ def main() -> None:
         evidence_root=args.output,
     ).run(manifest, seed=args.seed)
     print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2, sort_keys=True))
+    if result.ticks_executed != args.steps and not args.allow_incomplete:
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":
