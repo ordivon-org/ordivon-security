@@ -42,7 +42,7 @@ class WindowsKvmBaseBuildConfig:
     runuser_path: Path = Path("/usr/bin/runuser")
     mkfs_fat_path: Path = Path("/usr/bin/mkfs.fat")
     mcopy_path: Path = Path("/usr/bin/mcopy")
-    firmware_code_path: Path = Path("/usr/share/edk2/x64/OVMF_CODE.secboot.4m.fd")
+    firmware_code_path: Path = Path("/usr/share/edk2/x64/OVMF_CODE.4m.fd")
     firmware_vars_template_path: Path = Path("/usr/share/edk2/x64/OVMF_VARS.4m.fd")
     run_user: str = "qemu"
     run_group: str = "qemu"
@@ -51,7 +51,10 @@ class WindowsKvmBaseBuildConfig:
     disk_size_gib: int = 80
     installation_timeout_seconds: int = 7200
     qmp_ready_timeout_seconds: int = 90
-    boot_prompt_key_delay_seconds: int = 2
+    boot_prompt_initial_delay_seconds: int = 1
+    boot_prompt_key_interval_ms: int = 750
+    boot_prompt_max_attempts: int = 16
+    boot_media_read_threshold_bytes: int = 16 * 1024 * 1024
 
     def __post_init__(self) -> None:
         if (
@@ -61,7 +64,10 @@ class WindowsKvmBaseBuildConfig:
                 self.disk_size_gib,
                 self.installation_timeout_seconds,
                 self.qmp_ready_timeout_seconds,
-                self.boot_prompt_key_delay_seconds,
+                self.boot_prompt_initial_delay_seconds,
+                self.boot_prompt_key_interval_ms,
+                self.boot_prompt_max_attempts,
+                self.boot_media_read_threshold_bytes,
             )
             < 1
         ):
@@ -216,7 +222,7 @@ def windows_kvm_install_arguments(
         "-name",
         "ordivon-windows-base-build",
         "-machine",
-        "q35,accel=kvm,smm=on",
+        "q35,accel=kvm,smm=off",
         "-cpu",
         "host",
         "-smp",
@@ -270,6 +276,60 @@ def windows_kvm_install_arguments(
         "-nic",
         "none",
     ]
+
+
+def _block_read_bytes(value: JsonValue, device: str) -> int:
+    if not isinstance(value, list):
+        return 0
+    for item in value:
+        if not isinstance(item, dict) or item.get("device") != device:
+            continue
+        stats = item.get("stats")
+        if not isinstance(stats, dict):
+            return 0
+        read_bytes = stats.get("rd_bytes")
+        return read_bytes if isinstance(read_bytes, int) and read_bytes >= 0 else 0
+    return 0
+
+
+def _assist_optical_boot(
+    qmp: _QmpClient,
+    *,
+    config: WindowsKvmBaseBuildConfig,
+    boot_screen_path: Path,
+) -> tuple[int, int, int]:
+    time.sleep(config.boot_prompt_initial_delay_seconds)
+    first_key_at_ms = 0
+    for attempt in range(1, config.boot_prompt_max_attempts + 1):
+        qmp.execute(
+            "send-key",
+            {
+                "keys": cast(
+                    list[JsonValue],
+                    [{"type": "qcode", "data": "spc"}],
+                ),
+                "hold-time": 80,
+            },
+        )
+        sent_at_ms = time.time_ns() // 1_000_000
+        if first_key_at_ms == 0:
+            first_key_at_ms = sent_at_ms
+        time.sleep(config.boot_prompt_key_interval_ms / 1000)
+        block_stats = qmp.execute("query-blockstats")
+        install_media_read_bytes = _block_read_bytes(block_stats, "installcd")
+        if install_media_read_bytes >= config.boot_media_read_threshold_bytes:
+            qmp.execute(
+                "screendump",
+                {"filename": str(boot_screen_path), "format": "ppm"},
+            )
+            return attempt, first_key_at_ms, install_media_read_bytes
+    qmp.execute(
+        "screendump",
+        {"filename": str(boot_screen_path), "format": "ppm"},
+    )
+    raise RuntimeError(
+        "Windows KVM optical boot prompt was not accepted within the bounded key window"
+    )
 
 
 def _extract_fat_file(
@@ -375,7 +435,9 @@ def _build_windows_kvm_base_impl(
     network_device_count = -1
     qemu_status: JsonObject = {}
     qmp_pci: JsonValue = []
+    boot_prompt_key_attempts = 0
     boot_prompt_key_sent_at_ms = 0
+    boot_media_read_bytes = 0
     try:
         with (
             qemu_stdout_path.open("xb") as stdout_handle,
@@ -393,22 +455,14 @@ def _build_windows_kvm_base_impl(
                 if network_devices:
                     qmp.execute("quit")
                     raise RuntimeError("Windows KVM base build exposed a network device")
-                time.sleep(config.boot_prompt_key_delay_seconds)
-                qmp.execute(
-                    "send-key",
-                    {
-                        "keys": cast(
-                            list[JsonValue],
-                            [{"type": "qcode", "data": "spc"}],
-                        ),
-                        "hold-time": 100,
-                    },
-                )
-                boot_prompt_key_sent_at_ms = time.time_ns() // 1_000_000
-                time.sleep(5)
-                qmp.execute(
-                    "screendump",
-                    {"filename": str(boot_screen_path), "format": "ppm"},
+                (
+                    boot_prompt_key_attempts,
+                    boot_prompt_key_sent_at_ms,
+                    boot_media_read_bytes,
+                ) = _assist_optical_boot(
+                    qmp,
+                    config=config,
+                    boot_screen_path=boot_screen_path,
                 )
             try:
                 process.wait(timeout=config.installation_timeout_seconds)
@@ -456,9 +510,11 @@ def _build_windows_kvm_base_impl(
         "installBootstrapDigest": install_bootstrap_digest,
         "unattendTemplateDigest": unattend_template_digest,
         "sourceMediaMode": "original-udf-read-only",
-        "bootPromptAssist": "qmp-send-key:spc",
+        "secureBoot": False,
+        "smm": False,
+        "bootPromptAssist": "bounded-qmp-send-key:spc",
         "windowsBuild": windows_build,
-        "machine": "q35,accel=kvm,smm=on",
+        "machine": "q35,accel=kvm,smm=off",
         "cpu": "host",
         "display": "VGA",
         "network": "no-device",
@@ -529,9 +585,16 @@ def _build_windows_kvm_base_impl(
             "display": "VGA",
             "sourceMediaMode": "original-udf-read-only",
             "configurationDiskLabel": _BUILD_LABEL,
-            "bootPromptAssist": "qmp-send-key:spc",
-            "bootPromptKeyDelaySeconds": config.boot_prompt_key_delay_seconds,
+            "secureBoot": False,
+            "smm": False,
+            "bootPromptAssist": "bounded-qmp-send-key:spc",
+            "bootPromptInitialDelaySeconds": config.boot_prompt_initial_delay_seconds,
+            "bootPromptKeyIntervalMs": config.boot_prompt_key_interval_ms,
+            "bootPromptMaxAttempts": config.boot_prompt_max_attempts,
+            "bootPromptKeyAttempts": boot_prompt_key_attempts,
             "bootPromptKeySentAtMs": boot_prompt_key_sent_at_ms,
+            "bootMediaReadThresholdBytes": config.boot_media_read_threshold_bytes,
+            "bootMediaReadBytesAtAcceptance": boot_media_read_bytes,
         },
         "build": {
             "startedAtMs": started_at_ms,
@@ -553,8 +616,12 @@ def _build_windows_kvm_base_impl(
         "networkDevicePresent": False,
         "sourceMediaMode": "original-udf-read-only",
         "configurationDiskLabel": _BUILD_LABEL,
-        "bootPromptAssist": "qmp-send-key:spc",
+        "secureBoot": False,
+        "smm": False,
+        "bootPromptAssist": "bounded-qmp-send-key:spc",
+        "bootPromptKeyAttempts": boot_prompt_key_attempts,
         "bootPromptKeySentAtMs": boot_prompt_key_sent_at_ms,
+        "bootMediaReadBytesAtAcceptance": boot_media_read_bytes,
         "completedAtMs": completed_at_ms,
     }
     _write_private(receipt_path, canonical_bytes(receipt) + b"\n")
@@ -568,8 +635,10 @@ def _build_windows_kvm_base_impl(
                 "status": qemu_status,
                 "pci": qmp_pci,
                 "networkDevicePresent": network_device_count > 0,
-                "bootPromptAssist": "qmp-send-key:spc",
+                "bootPromptAssist": "bounded-qmp-send-key:spc",
+                "bootPromptKeyAttempts": boot_prompt_key_attempts,
                 "bootPromptKeySentAtMs": boot_prompt_key_sent_at_ms,
+                "bootMediaReadBytesAtAcceptance": boot_media_read_bytes,
             }
         )
         + b"\n",
