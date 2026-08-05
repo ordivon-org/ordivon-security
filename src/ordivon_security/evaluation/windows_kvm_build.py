@@ -252,6 +252,8 @@ def windows_kvm_install_arguments(
         "-device",
         "ide-cd,drive=installcd,bus=ide.1",
         "-device",
+        "VGA",
+        "-device",
         "qemu-xhci,id=xhci",
         "-device",
         "usb-kbd,bus=xhci.0",
@@ -322,6 +324,7 @@ def _build_windows_kvm_base_impl(
     qmp_path = build_path / "qmp.sock"
     qemu_stdout_path = build_path / "qemu.stdout.log"
     qemu_stderr_path = build_path / "qemu.stderr.log"
+    boot_screen_path = build_path / "boot-screen.ppm"
     password = secrets.token_urlsafe(32)
     unattend = unattend_template_path.read_text(encoding="utf-8").replace("@@PASSWORD@@", password)
     unattend_path = build_path / "Autounattend.xml"
@@ -402,6 +405,11 @@ def _build_windows_kvm_base_impl(
                     },
                 )
                 boot_prompt_key_sent_at_ms = time.time_ns() // 1_000_000
+                time.sleep(5)
+                qmp.execute(
+                    "screendump",
+                    {"filename": str(boot_screen_path), "format": "ppm"},
+                )
             try:
                 process.wait(timeout=config.installation_timeout_seconds)
             except subprocess.TimeoutExpired as error:
@@ -452,6 +460,7 @@ def _build_windows_kvm_base_impl(
         "windowsBuild": windows_build,
         "machine": "q35,accel=kvm,smm=on",
         "cpu": "host",
+        "display": "VGA",
         "network": "no-device",
         "tpm": "swtpm-2.0",
     }
@@ -517,6 +526,7 @@ def _build_windows_kvm_base_impl(
             "networkDeviceCount": network_device_count,
             "qmpInitialStatus": qemu_status,
             "runUser": config.run_user,
+            "display": "VGA",
             "sourceMediaMode": "original-udf-read-only",
             "configurationDiskLabel": _BUILD_LABEL,
             "bootPromptAssist": "qmp-send-key:spc",
@@ -568,12 +578,15 @@ def _build_windows_kvm_base_impl(
         layout["receipts"] / f"windows-kvm-base-{environment_image_digest[-16:]}-evidence"
     )
     evidence_path.mkdir(mode=0o700)
+    if boot_screen_path.is_file():
+        boot_screen_path.chmod(0o600)
     for path in (
         base_ready_path,
         qemu_stdout_path,
         qemu_stderr_path,
         command_path,
         qmp_topology_path,
+        boot_screen_path,
         build_path / "swtpm.log",
     ):
         if path.is_file():

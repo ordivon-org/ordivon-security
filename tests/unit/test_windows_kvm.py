@@ -71,6 +71,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "windowsBuild": "10.0.26200.6584",
             "machine": "q35,accel=kvm,smm=on",
             "cpu": "host",
+            "display": "VGA",
             "network": "no-device",
             "tpm": "swtpm-2.0",
         }
@@ -209,6 +210,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertNotIn("e1000", joined)
         self.assertNotIn("virtio-net", joined)
         self.assertIn("runuser -u root --", joined)
+        self.assertIn("VGA", arguments)
 
     def test_install_qemu_topology_has_no_network_path(self) -> None:
         source_iso = self.root / "source.iso"
@@ -244,6 +246,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertIn("order=c,once=d,menu=off", arguments)
         self.assertIn(f"file={source_iso},if=none,format=raw,readonly=on,id=installcd", arguments)
         self.assertIn("usb-kbd,bus=xhci.0", arguments)
+        self.assertIn("VGA", arguments)
 
     def test_fat_labels_are_valid_and_finalize_uses_build_label(self) -> None:
         from ordivon_security.evaluation.windows_kvm import _RUN_LABEL
