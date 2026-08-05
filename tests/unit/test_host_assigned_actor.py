@@ -9,7 +9,10 @@ from pathlib import Path
 
 from ordivon_security._canonical import JsonObject, canonical_digest
 from ordivon_security.actors.agent_stack import AgentTurnEvidence
-from ordivon_security.actors.host_assigned import _host_json_value
+from ordivon_security.actors.host_assigned import (
+    _host_json_value,
+    _model_context_from_compiled,
+)
 from ordivon_security.actors.native_harness import NativeHarnessActorBackend
 from ordivon_security.cli_cage4_deepseek import (
     _paths_overlap,
@@ -145,6 +148,41 @@ def _scenario(backend: NativeHarnessActorBackend) -> ScenarioManifest:
     )
 
 
+class _CompiledContextFixture:
+    def to_dict(self) -> JsonObject:
+        return {
+            "schemaVersion": 1,
+            "kind": "ordivon.compiled-context",
+            "payload": {
+                "taskId": "task:fixture",
+                "taskAttemptId": "task-attempt:fixture:1",
+                "taskContractDigest": _DIGESTS[0],
+                "objective": {"large": "duplicated and intentionally omitted"},
+                "acceptanceCriteria": {"large": "duplicated and intentionally omitted"},
+                "constraints": ["Use only selected Context."],
+                "blocks": [
+                    {
+                        "blockId": "context-block:fixture:selected",
+                        "payloadDigest": _DIGESTS[1],
+                        "payload": {
+                            "actorId": "actor:red",
+                            "objective": "Select one admitted plan.",
+                            "observationProjection": {"bounded": True},
+                            "priorActionResults": [],
+                            "rules": {"mustChooseExactlyOnePlan": True},
+                        },
+                    }
+                ],
+            },
+            "manifest": {
+                "selectedBlockIds": ["context-block:fixture:selected"],
+                "omittedBlockIds": [],
+                "tokenBudget": 12_000,
+                "estimatedTokens": 100,
+            },
+        }
+
+
 class HostAssignedActorTests(unittest.TestCase):
     def test_host_lifecycle_enters_action_proposal_and_receipt(self) -> None:
         backend = _backend()
@@ -211,6 +249,29 @@ class HostAssignedActorTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "non-finite"):
             _host_json_value(math.inf)
+
+    def test_model_context_uses_selected_host_blocks_without_storage_duplication(self) -> None:
+        model_context = _model_context_from_compiled(
+            _CompiledContextFixture(),
+            context_object_digest=_DIGESTS[2],
+        )
+        self.assertEqual(
+            model_context["selectedContext"],
+            [
+                {
+                    "objective": "Select one admitted plan.",
+                    "observation": {"bounded": True},
+                    "priorActionResults": [],
+                    "rules": {"mustChooseExactlyOnePlan": True},
+                }
+            ],
+        )
+        self.assertNotIn("hostContextObjectDigest", model_context)
+        self.assertNotIn("taskContractDigest", model_context)
+        self.assertNotIn("taskId", model_context)
+        self.assertNotIn("taskAttemptId", model_context)
+        self.assertNotIn("constraints", model_context)
+        self.assertNotIn("manifest", model_context)
 
     def test_private_host_state_root_is_empty_private_and_disjoint(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -73,6 +73,83 @@ def _host_json_object(value: JsonObject) -> JsonObject:
     return normalized
 
 
+def _model_context_from_compiled(
+    compiled_context: Any,
+    *,
+    context_object_digest: str,
+) -> JsonObject:
+    _digest(context_object_digest, "Host Context object digest")
+    value = compiled_context.to_dict()
+    if not isinstance(value, dict):
+        raise TypeError("compiled Host Context must encode as an object")
+    payload = value.get("payload")
+    manifest = value.get("manifest")
+    if not isinstance(payload, dict) or not isinstance(manifest, dict):
+        raise ValueError("compiled Host Context lacks payload or manifest")
+    task_contract_digest = payload.get("taskContractDigest")
+    if not isinstance(task_contract_digest, str):
+        raise ValueError("compiled Host Context Task Contract identity is malformed")
+    _digest(task_contract_digest, "compiled Host Task Contract digest")
+
+    blocks = payload.get("blocks")
+    selected_ids = manifest.get("selectedBlockIds")
+    if (
+        not isinstance(blocks, list)
+        or not blocks
+        or not isinstance(selected_ids, list)
+        or any(not isinstance(item, str) for item in selected_ids)
+    ):
+        raise ValueError("compiled Host Context selection is malformed")
+    selected: list[JsonValue] = []
+    seen: list[str] = []
+    for block in blocks:
+        if not isinstance(block, dict):
+            raise ValueError("compiled Host Context block is malformed")
+        block_id = block.get("blockId")
+        payload_value = block.get("payload")
+        payload_digest = block.get("payloadDigest")
+        if (
+            not isinstance(block_id, str)
+            or not isinstance(payload_value, dict)
+            or not isinstance(payload_digest, str)
+        ):
+            raise ValueError("compiled Host Context block identity is malformed")
+        _text(block_id, "compiled Host Context block identity", prefix="context-block")
+        _digest(payload_digest, "compiled Host Context block payload digest")
+        objective = payload_value.get("objective")
+        observation = payload_value.get("observationProjection")
+        prior_results = payload_value.get("priorActionResults")
+        rules = payload_value.get("rules")
+        if (
+            not isinstance(objective, str)
+            or not isinstance(observation, dict)
+            or not isinstance(prior_results, list)
+            or not isinstance(rules, dict)
+        ):
+            raise ValueError("selected Host Context block lacks model semantics")
+        validate_json(observation)
+        validate_json(prior_results)
+        validate_json(rules)
+        seen.append(block_id)
+        selected.append(
+            {
+                "objective": objective,
+                "observation": observation,
+                "priorActionResults": prior_results,
+                "rules": rules,
+            }
+        )
+    if seen != selected_ids:
+        raise ValueError("compiled Host Context blocks differ from its selection manifest")
+    model_context: JsonObject = {
+        "schemaVersion": 1,
+        "kind": "ordivon.security-host-model-context",
+        "selectedContext": selected,
+    }
+    validate_json(model_context)
+    return model_context
+
+
 class HostAssignedDeepSeekHarnessTurnDriver:
     """P0-B: Host owns the durable lifecycle around one bounded DeepSeek Harness turn."""
 
@@ -129,6 +206,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                 "experimentalVariant": "security-host-harness-provider",
                 "stateNamespaceId": host_state_namespace,
                 "contextCompiler": "HarnessContextCompiler",
+                "modelInputProjection": "host-selected-semantics-v1",
                 "assignmentMode": "external-no-runtime-v1",
                 "completionVerifier": "security-cage-team-plan-verifier-v1",
                 "ownedLifecycle": [
@@ -514,6 +592,10 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                 context_object = storage.put_object(
                     compiled_context.to_dict(), kind="compiled-context"
                 )
+                model_context = _model_context_from_compiled(
+                    compiled_context,
+                    context_object_digest=context_object.digest,
+                )
                 catalog = self.delegate._catalog()
                 manifest = self._harness_ordivon_module.ordivon_harness_manifest()
                 assignment = lifecycle.assign(
@@ -533,7 +615,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                     evidence = self._run_model(
                         actor_id=actor_id,
                         side=side,
-                        model_context=_json_object_copy(compiled_context.to_dict()),
+                        model_context=model_context,
                         context_digest=assignment.assignment.context_object_digest,
                         assignment_id=assignment.assignment.assignment_id,
                         harness_run_id=run_id,

@@ -177,7 +177,7 @@ uv run --extra cage ordivon-security-cage4-deepseek \
   --blue-secret /root/.config/ordivon/secrets/deepseek1.json
 ```
 
-P0-B uses the same Provider, Harness loop, prompt, actions, credentials, and CAGE workload. Host compiles the model Context and owns the durable Task lifecycle; Runtime remains unconsumed. The Host state root must be absolute, empty, private, and disjoint from the Contest evidence root.
+P0-B uses the same Provider, Harness loop, prompt, actions, credentials, model bounds, and CAGE workload. Host compiles and stores the durable Context, then derives the model input only from the selected blocks' objective, observation, prior results, and rules; persistence envelopes and identity digests remain bound in Host and Harness evidence rather than being repeated in the prompt. Host owns the durable Task lifecycle, and Runtime remains unconsumed. The Host state root must be absolute, empty, private, and disjoint from the Contest evidence root.
 
 ## Run the pinned CAGE 4 Range
 
