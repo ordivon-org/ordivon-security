@@ -327,6 +327,12 @@ class HostAssignedDeepSeekHarnessTurnDriver:
         context_digest: str,
         assignment_id: str,
         harness_run_id: str,
+        host_task_id: str | None = None,
+        host_task_revision: int | None = None,
+        host_task_attempt_id: str | None = None,
+        host_task_contract_digest: str | None = None,
+        host_assignment_digest: str | None = None,
+        host_assignment_generation: int | None = None,
     ) -> AgentTurnEvidence:
         _digest(context_digest, "Host-assigned Context digest")
         _text(assignment_id, "Host Assignment identity", prefix="assignment")
@@ -485,6 +491,15 @@ class HostAssignedDeepSeekHarnessTurnDriver:
             observation=observation,
             prior_results=prior_results,
         )
+        runtime_layer = self.execution_identity.get("runtime")
+        runtime_consumed = bool(
+            isinstance(runtime_layer, dict) and runtime_layer.get("consumed") is True
+        )
+        experiment_variant = (
+            "security-host-runtime-harness-provider"
+            if runtime_consumed
+            else "security-host-harness-provider"
+        )
         source_observation_digest = canonical_digest(observation.to_dict())
         token = source_observation_digest.removeprefix("sha256:")[:16]
         namespace_token = canonical_digest(
@@ -492,13 +507,11 @@ class HostAssignedDeepSeekHarnessTurnDriver:
         ).removeprefix("sha256:")[:12]
         actor_token = actor_id.removeprefix("actor:")
         task_id = (
-            f"task:security-host:{namespace_token}:{actor_token}:"
-            f"tick-{observation.tick}:{token}"
+            f"task:security-host:{namespace_token}:{actor_token}:tick-{observation.tick}:{token}"
         )
         goal_id = f"goal:security-host:{namespace_token}:{actor_token}:{side}"
         node_id = (
-            f"node:security-host:{namespace_token}:{actor_token}:"
-            f"tick-{observation.tick}:decide"
+            f"node:security-host:{namespace_token}:{actor_token}:tick-{observation.tick}:decide"
         )
         event_id = (
             f"event:security-host:{namespace_token}:{actor_token}:"
@@ -533,7 +546,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                     task_id=task_id,
                     goal_id=goal_id,
                     payload={
-                        "experimentVariant": "security-host-harness-provider",
+                        "experimentVariant": experiment_variant,
                         "actorId": actor_id,
                         "side": side,
                         "tick": observation.tick,
@@ -555,12 +568,22 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                         "allowedActionTypes": list(self.allowed_actions),
                         "requireHarnessTrace": True,
                         "requireHostCompletionDecision": True,
-                        "runtimeConsumed": False,
+                        "runtimeConsumed": runtime_consumed,
                     },
                     constraints=(
                         "Use only the deterministic Security Context Projection selected by Host.",
                         "Choose exactly one admitted team plan.",
-                        "Do not claim Runtime execution or durable completion from the model turn.",
+                        (
+                            (
+                                "Bind physical Harness execution to one Runtime Job without "
+                                "granting Runtime semantic completion authority."
+                            )
+                            if runtime_consumed
+                            else (
+                                "Do not claim Runtime execution or durable completion from "
+                                "the model turn."
+                            )
+                        ),
                     ),
                 )
                 lifecycle = self._harness_module.HarnessHost(
@@ -571,8 +594,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                 attempt = lifecycle.start_attempt(task_id, task_contract=task_contract)
                 block = self._host_cognition_module.ContextBlock(
                     block_id=(
-                        f"context-block:security-host:{actor_token}:"
-                        f"tick-{observation.tick}:{token}"
+                        f"context-block:security-host:{actor_token}:tick-{observation.tick}:{token}"
                     ),
                     kind=self._host_cognition_module.BlockKind.TASK,
                     priority=100,
@@ -619,6 +641,12 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                         context_digest=assignment.assignment.context_object_digest,
                         assignment_id=assignment.assignment.assignment_id,
                         harness_run_id=run_id,
+                        host_task_id=task_id,
+                        host_task_revision=assignment.task_revision,
+                        host_task_attempt_id=attempt.descriptor.task_attempt_id,
+                        host_task_contract_digest=task_contract.digest,
+                        host_assignment_digest=assignment.assignment.digest,
+                        host_assignment_generation=assignment.assignment.generation,
                     )
                 except AgentTurnDriverError as error:
                     details = _json_object_copy(error.details)
@@ -643,7 +671,9 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                     event_digest=evidence.trace_digest,
                     context_digest=assignment.assignment.context_object_digest,
                     tool_catalog_digest=assignment.assignment.tool_catalog_digest,
-                    runtime_job_refs=(),
+                    runtime_job_refs=(
+                        () if evidence.runtime_job_id is None else (evidence.runtime_job_id,)
+                    ),
                     artifact_refs=(),
                     usage=evidence.usage,
                     termination_code=evidence.stop_code,
@@ -666,7 +696,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                         "allowedActionTypes": list(self.allowed_actions),
                         "sourceObservationDigest": source_observation_digest,
                         "harnessTraceDigest": evidence.trace_digest,
-                        "runtimeConsumed": False,
+                        "runtimeConsumed": runtime_consumed,
                     },
                     usage=evidence.usage,
                 )
@@ -679,7 +709,8 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                         and action in self.allowed_actions
                         and results.get("sourceObservationDigest") == source_observation_digest
                         and results.get("harnessTraceDigest") == evidence.trace_digest
-                        and results.get("runtimeConsumed") is False
+                        and results.get("runtimeConsumed") is runtime_consumed
+                        and (evidence.runtime_job_id is not None) is runtime_consumed
                         and proposal.harness_run_id == evidence.harness_run_id
                     )
                     return (

@@ -162,6 +162,9 @@ class NativeHarnessActorBackend:
         host_lifecycle = turn.host_lifecycle_dict()
         if host_lifecycle is not None:
             proposal_arguments["hostLifecycle"] = host_lifecycle
+        runtime_lifecycle = turn.runtime_lifecycle_dict()
+        if runtime_lifecycle is not None:
+            proposal_arguments["runtimeLifecycle"] = runtime_lifecycle
         try:
             proposal = ActionProposal(
                 proposal_id=(
