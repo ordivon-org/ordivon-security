@@ -246,8 +246,12 @@ class AgentTurnEvidence:
             assert self.runtime_stdout_artifact_digest is not None
             assert self.runtime_tool_catalog_digest is not None
             assert self.runtime_response_digest is not None
-            _text(self.runtime_job_id, "Runtime Job identity", prefix="job")
-            _text(self.runtime_attempt_id, "Runtime Attempt identity", prefix="attempt")
+            _text(self.runtime_job_id, "Runtime Job identity")
+            _text(self.runtime_attempt_id, "Runtime Attempt identity")
+            if not self.runtime_job_id.startswith("job-"):
+                raise ValueError("Runtime Job identity must start with job-")
+            if not self.runtime_attempt_id.startswith("attempt-"):
+                raise ValueError("Runtime Attempt identity must start with attempt-")
             _text(self.runtime_client_request_id, "Runtime request identity", prefix="request")
             _text(self.runtime_workspace_id, "Runtime Workspace identity")
             _text(self.runtime_source_revision, "Runtime source revision")
