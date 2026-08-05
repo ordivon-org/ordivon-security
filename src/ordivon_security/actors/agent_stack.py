@@ -156,6 +156,17 @@ class AgentTurnEvidence:
     host_completion_proposal_digest: str | None = None
     host_completion_decision_digest: str | None = None
     host_completion_accepted: bool | None = None
+    runtime_job_id: str | None = None
+    runtime_attempt_id: str | None = None
+    runtime_client_request_id: str | None = None
+    runtime_workspace_id: str | None = None
+    runtime_source_revision: str | None = None
+    runtime_terminal_evidence_digest: str | None = None
+    runtime_stdout_artifact_digest: str | None = None
+    runtime_tool_catalog_digest: str | None = None
+    runtime_response_digest: str | None = None
+    runtime_exact_replay_confirmed: bool | None = None
+    runtime_recovery_lookup_confirmed: bool | None = None
 
     def __post_init__(self) -> None:
         _text(self.harness_run_id, "Harness Run identity", prefix="harness-run")
@@ -210,6 +221,43 @@ class AgentTurnEvidence:
                 _digest(value, label)
             if self.host_context_object_digest != self.context_digest:
                 raise ValueError("Agent turn Context differs from the Host Context object")
+        runtime_values = (
+            self.runtime_job_id,
+            self.runtime_attempt_id,
+            self.runtime_client_request_id,
+            self.runtime_workspace_id,
+            self.runtime_source_revision,
+            self.runtime_terminal_evidence_digest,
+            self.runtime_stdout_artifact_digest,
+            self.runtime_tool_catalog_digest,
+            self.runtime_response_digest,
+            self.runtime_exact_replay_confirmed,
+            self.runtime_recovery_lookup_confirmed,
+        )
+        if any(value is not None for value in runtime_values):
+            if any(value is None for value in runtime_values):
+                raise ValueError("Runtime lifecycle evidence must be complete when present")
+            assert self.runtime_job_id is not None
+            assert self.runtime_attempt_id is not None
+            assert self.runtime_client_request_id is not None
+            assert self.runtime_workspace_id is not None
+            assert self.runtime_source_revision is not None
+            assert self.runtime_terminal_evidence_digest is not None
+            assert self.runtime_stdout_artifact_digest is not None
+            assert self.runtime_tool_catalog_digest is not None
+            assert self.runtime_response_digest is not None
+            _text(self.runtime_job_id, "Runtime Job identity", prefix="job")
+            _text(self.runtime_attempt_id, "Runtime Attempt identity", prefix="attempt")
+            _text(self.runtime_client_request_id, "Runtime request identity", prefix="request")
+            _text(self.runtime_workspace_id, "Runtime Workspace identity")
+            _text(self.runtime_source_revision, "Runtime source revision")
+            for value, label in (
+                (self.runtime_terminal_evidence_digest, "Runtime terminal evidence digest"),
+                (self.runtime_stdout_artifact_digest, "Runtime stdout Artifact digest"),
+                (self.runtime_tool_catalog_digest, "Runtime Tool catalog digest"),
+                (self.runtime_response_digest, "Runtime response digest"),
+            ):
+                _digest(value, label)
 
     def host_lifecycle_dict(self) -> JsonObject | None:
         if self.host_task_id is None:
@@ -234,6 +282,33 @@ class AgentTurnEvidence:
             "completionAccepted": self.host_completion_accepted,
         }
 
+    def runtime_lifecycle_dict(self) -> JsonObject | None:
+        if self.runtime_job_id is None:
+            return None
+        assert self.runtime_attempt_id is not None
+        assert self.runtime_client_request_id is not None
+        assert self.runtime_workspace_id is not None
+        assert self.runtime_source_revision is not None
+        assert self.runtime_terminal_evidence_digest is not None
+        assert self.runtime_stdout_artifact_digest is not None
+        assert self.runtime_tool_catalog_digest is not None
+        assert self.runtime_response_digest is not None
+        assert self.runtime_exact_replay_confirmed is not None
+        assert self.runtime_recovery_lookup_confirmed is not None
+        return {
+            "jobId": self.runtime_job_id,
+            "attemptId": self.runtime_attempt_id,
+            "clientRequestId": self.runtime_client_request_id,
+            "workspaceId": self.runtime_workspace_id,
+            "sourceRevision": self.runtime_source_revision,
+            "terminalEvidenceDigest": self.runtime_terminal_evidence_digest,
+            "stdoutArtifactDigest": self.runtime_stdout_artifact_digest,
+            "toolCatalogDigest": self.runtime_tool_catalog_digest,
+            "responseDigest": self.runtime_response_digest,
+            "exactReplayConfirmed": self.runtime_exact_replay_confirmed,
+            "recoveryLookupConfirmed": self.runtime_recovery_lookup_confirmed,
+        }
+
     def to_dict(self, *, include_trace: bool) -> JsonObject:
         value: JsonObject = {
             "harnessRunId": self.harness_run_id,
@@ -253,6 +328,9 @@ class AgentTurnEvidence:
         host_lifecycle = self.host_lifecycle_dict()
         if host_lifecycle is not None:
             value["hostLifecycle"] = host_lifecycle
+        runtime_lifecycle = self.runtime_lifecycle_dict()
+        if runtime_lifecycle is not None:
+            value["runtimeLifecycle"] = runtime_lifecycle
         return value
 
 
@@ -463,6 +541,10 @@ class DeepSeekHarnessTurnDriver:
         _text(harness_source_revision, "Harness source revision")
         _text(harness_declared_version, "Harness declared version")
         _text(harness_protocol_revision, "Harness protocol revision")
+        self.secret_path = secret_path.resolve()
+        self.timeout_seconds = timeout_seconds
+        self.max_response_bytes = max_response_bytes
+        self.max_output_tokens = max_output_tokens
         self._allowed_actions = allowed_actions
         self.budget = HarnessBudgetConfig() if budget is None else budget
         self.harness_source_revision = harness_source_revision

@@ -15,6 +15,7 @@ from .actors.agent_stack import (
 )
 from .actors.host_assigned import HostAssignedDeepSeekHarnessTurnDriver
 from .actors.native_harness import NativeHarnessActorBackend
+from .actors.runtime_assigned import RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver
 from .contest.model import ActorBinding, ScenarioManifest
 from .contest.runner import ContestRunner
 from .ranges.cage4 import (
@@ -62,12 +63,12 @@ def _project_version(path: Path, label: str) -> str:
     return version
 
 
-def _prepare_private_host_state_root(path: Path) -> Path:
+def _prepare_private_state_root(path: Path, label: str) -> Path:
     if path.exists():
         if path.is_symlink() or not path.is_dir():
-            raise ValueError("Host state root must be a private directory")
+            raise ValueError(f"{label} must be a private directory")
         if any(path.iterdir()):
-            raise ValueError("Host state root must be empty for a new P0-B Trial")
+            raise ValueError(f"{label} must be empty for a new Trial")
     else:
         path.mkdir(parents=True, mode=0o700)
     path.chmod(0o700)
@@ -77,9 +78,11 @@ def _prepare_private_host_state_root(path: Path) -> Path:
 def _paths_overlap(first: Path, second: Path) -> bool:
     first_resolved = first.resolve()
     second_resolved = second.resolve()
-    return first_resolved == second_resolved or first_resolved.is_relative_to(
-        second_resolved
-    ) or second_resolved.is_relative_to(first_resolved)
+    return (
+        first_resolved == second_resolved
+        or first_resolved.is_relative_to(second_resolved)
+        or second_resolved.is_relative_to(first_resolved)
+    )
 
 
 def _insert_agent_sources(
@@ -120,6 +123,16 @@ def _build_actor(
     host_state_root: Path | None,
     host_state_namespace: str | None,
     host_context_token_budget: int,
+    runtime_endpoint: str,
+    runtime_token_file: Path,
+    runtime_request_root: Path | None,
+    security_source_repo: Path,
+    security_source_revision: str,
+    harness_source: Path,
+    host_source: Path,
+    protocol_source: Path,
+    python_executable: Path,
+    runtime_timeout_ms: int,
 ) -> NativeHarnessActorBackend:
     host_binding = AgentLayerBinding(
         component_id="ordivon-host",
@@ -145,9 +158,13 @@ def _build_actor(
                 "physical Runtime effect."
             ),
             "experimentalVariant": (
-                "security-host-harness-provider"
-                if variant == "p0b"
-                else "security-harness-provider"
+                "security-host-runtime-harness-provider"
+                if variant == "p0c"
+                else (
+                    "security-host-harness-provider"
+                    if variant == "p0b"
+                    else "security-harness-provider"
+                )
             ),
         },
     )
@@ -163,16 +180,38 @@ def _build_actor(
         max_output_tokens=max_output_tokens,
     )
     driver: AgentTurnDriver = baseline
-    if variant == "p0b":
+    if variant in {"p0b", "p0c"}:
         if host_state_root is None or host_state_namespace is None:
-            raise ValueError("P0-B requires Host state root and namespace")
-        driver = HostAssignedDeepSeekHarnessTurnDriver(
-            delegate=baseline,
-            host_state_root=host_state_root / side,
-            host_state_namespace=f"{host_state_namespace}:{side}",
-            host_source_revision=host_revision,
-            context_token_budget=host_context_token_budget,
-        )
+            raise ValueError("Host-backed variants require Host state root and namespace")
+        if variant == "p0b":
+            driver = HostAssignedDeepSeekHarnessTurnDriver(
+                delegate=baseline,
+                host_state_root=host_state_root / side,
+                host_state_namespace=f"{host_state_namespace}:{side}",
+                host_source_revision=host_revision,
+                context_token_budget=host_context_token_budget,
+            )
+        else:
+            if runtime_request_root is None:
+                raise ValueError("P0-C requires a private Runtime request root")
+            driver = RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver(
+                delegate=baseline,
+                host_state_root=host_state_root / side,
+                host_state_namespace=f"{host_state_namespace}:{side}",
+                host_source_revision=host_revision,
+                runtime_source_revision=runtime_revision,
+                runtime_endpoint=runtime_endpoint,
+                runtime_token_file=runtime_token_file,
+                runtime_request_root=runtime_request_root / side,
+                security_source_repo=security_source_repo,
+                security_source_revision=security_source_revision,
+                harness_source=harness_source,
+                host_source=host_source,
+                protocol_source=protocol_source,
+                python_executable=python_executable,
+                context_token_budget=host_context_token_budget,
+                runtime_timeout_ms=runtime_timeout_ms,
+            )
     return NativeHarnessActorBackend(
         actor_id=actor_id,
         side=side,
@@ -189,11 +228,12 @@ def _manifest(
     steps: int,
     variant: str,
 ) -> ScenarioManifest:
-    host_consumed = variant == "p0b"
+    host_consumed = variant in {"p0b", "p0c"}
+    runtime_consumed = variant == "p0c"
     experiment_variant = (
-        "security-host-harness-provider"
-        if host_consumed
-        else "security-harness-provider"
+        "security-host-runtime-harness-provider"
+        if runtime_consumed
+        else ("security-host-harness-provider" if host_consumed else "security-harness-provider")
     )
     return ScenarioManifest(
         scenario_id=f"scenario:cage4-deepseek-harness-{variant}",
@@ -224,7 +264,7 @@ def _manifest(
             "cage4RangeConfigDigest": config.digest,
             "agentExperimentVariant": experiment_variant,
             "hostConsumed": host_consumed,
-            "runtimeConsumed": False,
+            "runtimeConsumed": runtime_consumed,
         },
     )
 
@@ -238,9 +278,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--variant",
-        choices=("p0a", "p0b"),
+        choices=("p0a", "p0b", "p0c"),
         default="p0a",
-        help="P0-A uses Harness directly; P0-B adds the durable Host lifecycle.",
+        help=(
+            "P0-A uses Harness directly; P0-B adds Host; P0-C executes each "
+            "Host Assignment through Runtime."
+        ),
     )
     parser.add_argument("--source", type=Path, default=Path(".cache/cage4"))
     parser.add_argument("--output", type=Path)
@@ -261,13 +304,34 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--host-state-root",
         type=Path,
-        help="Private Host state parent used only by the P0-B variant.",
+        help="Private Host state parent used by P0-B and P0-C.",
     )
     parser.add_argument(
         "--host-state-namespace",
         help="Non-secret Host state namespace identity; must start with host-state:.",
     )
     parser.add_argument("--host-context-tokens", type=int, default=12_000)
+    parser.add_argument(
+        "--security-source",
+        type=Path,
+        default=Path("."),
+        help="Clean Security Git source used to open the P0-C Runtime Workspace.",
+    )
+    parser.add_argument(
+        "--runtime-endpoint",
+        default="http://127.0.0.1:8897/mcp",
+    )
+    parser.add_argument(
+        "--runtime-token-file",
+        type=Path,
+        default=Path("/etc/ordivon/ordivon-runtime.env"),
+    )
+    parser.add_argument(
+        "--runtime-request-root",
+        type=Path,
+        help="Fresh private request spool used only by P0-C.",
+    )
+    parser.add_argument("--runtime-timeout-ms", type=int, default=300_000)
     parser.add_argument(
         "--runtime-source",
         type=Path,
@@ -316,16 +380,26 @@ def main() -> None:
         parser.error("Red and Blue must use distinct credential files")
     if args.host_context_tokens < 1:
         parser.error("--host-context-tokens must be positive")
-    if args.variant == "p0b":
+    if args.variant in {"p0b", "p0c"}:
         if args.host_state_root is None or args.host_state_namespace is None:
-            parser.error("P0-B requires --host-state-root and --host-state-namespace")
+            parser.error(
+                "Host-backed variants require --host-state-root and --host-state-namespace"
+            )
         if not args.host_state_root.is_absolute():
             parser.error("--host-state-root must be absolute")
         if not args.host_state_namespace.startswith("host-state:"):
             parser.error("--host-state-namespace must start with host-state:")
     elif args.host_state_root is not None or args.host_state_namespace is not None:
-        parser.error("Host state options are valid only with --variant p0b")
+        parser.error("Host state options are valid only with --variant p0b or p0c")
+    if args.variant == "p0c":
+        if args.runtime_request_root is None or not args.runtime_request_root.is_absolute():
+            parser.error("P0-C requires absolute --runtime-request-root")
+        if args.runtime_timeout_ms < 1:
+            parser.error("--runtime-timeout-ms must be positive")
+    elif args.runtime_request_root is not None:
+        parser.error("--runtime-request-root is valid only with --variant p0c")
 
+    security_revision = _git_revision(args.security_source, "Security")
     harness_revision = _git_revision(args.harness_source, "Harness")
     host_revision = _git_revision(args.host_source, "Host")
     runtime_revision = _git_revision(args.runtime_source, "Runtime")
@@ -337,14 +411,28 @@ def main() -> None:
         protocol_source=args.protocol_source,
     )
     host_state_root = args.host_state_root
-    if args.variant == "p0b":
+    if args.variant in {"p0b", "p0c"}:
         assert host_state_root is not None
         try:
-            host_state_root = _prepare_private_host_state_root(host_state_root)
+            host_state_root = _prepare_private_state_root(host_state_root, "Host state root")
         except ValueError as error:
             parser.error(str(error))
         if _paths_overlap(output, host_state_root):
             parser.error("Contest evidence output and Host state root must be disjoint")
+    runtime_request_root = args.runtime_request_root
+    if args.variant == "p0c":
+        assert runtime_request_root is not None
+        try:
+            runtime_request_root = _prepare_private_state_root(
+                runtime_request_root, "Runtime request root"
+            )
+        except ValueError as error:
+            parser.error(str(error))
+        assert host_state_root is not None
+        if _paths_overlap(output, runtime_request_root):
+            parser.error("Contest evidence output and Runtime request root must be disjoint")
+        if _paths_overlap(host_state_root, runtime_request_root):
+            parser.error("Host state root and Runtime request root must be disjoint")
     budget = HarnessBudgetConfig(
         max_model_calls=args.model_calls,
         max_tool_calls=3,
@@ -370,6 +458,16 @@ def main() -> None:
         "host_state_root": host_state_root,
         "host_state_namespace": args.host_state_namespace,
         "host_context_token_budget": args.host_context_tokens,
+        "runtime_endpoint": args.runtime_endpoint,
+        "runtime_token_file": args.runtime_token_file,
+        "runtime_request_root": runtime_request_root,
+        "security_source_repo": args.security_source.resolve(),
+        "security_source_revision": security_revision,
+        "harness_source": args.harness_source.resolve(),
+        "host_source": args.host_source.resolve(),
+        "protocol_source": args.protocol_source.resolve(),
+        "python_executable": Path(sys.executable).resolve(),
+        "runtime_timeout_ms": args.runtime_timeout_ms,
     }
     red = _build_actor(
         actor_id="actor:red",

@@ -16,7 +16,7 @@ from ordivon_security.actors.host_assigned import (
 from ordivon_security.actors.native_harness import NativeHarnessActorBackend
 from ordivon_security.cli_cage4_deepseek import (
     _paths_overlap,
-    _prepare_private_host_state_root,
+    _prepare_private_state_root,
     build_parser,
 )
 from ordivon_security.contest.model import (
@@ -276,13 +276,13 @@ class HostAssignedActorTests(unittest.TestCase):
     def test_private_host_state_root_is_empty_private_and_disjoint(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             parent = Path(directory)
-            root = _prepare_private_host_state_root(parent / "host-state")
+            root = _prepare_private_state_root(parent / "host-state", "Host state root")
             self.assertEqual(stat.S_IMODE(root.stat().st_mode), 0o700)
             self.assertTrue(_paths_overlap(root, root / "red"))
             self.assertFalse(_paths_overlap(root, parent / "evidence"))
             (root / "residual").write_text("occupied", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "must be empty"):
-                _prepare_private_host_state_root(root)
+                _prepare_private_state_root(root, "Host state root")
 
     def test_cli_exposes_p0b_without_changing_p0a_default(self) -> None:
         parser = build_parser()
