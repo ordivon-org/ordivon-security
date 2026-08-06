@@ -40,7 +40,7 @@ class WindowsKvmBaseBuildConfig:
     qemu_path: Path = Path("/usr/bin/qemu-system-x86_64")
     qemu_img_path: Path = Path("/usr/bin/qemu-img")
     swtpm_path: Path = Path("/usr/bin/swtpm")
-    runuser_path: Path = Path("/usr/bin/runuser")
+    setpriv_path: Path = Path("/usr/bin/setpriv")
     mkfs_fat_path: Path = Path("/usr/bin/mkfs.fat")
     mcopy_path: Path = Path("/usr/bin/mcopy")
     firmware_code_path: Path = Path("/usr/share/edk2/x64/OVMF_CODE.4m.fd")
@@ -77,7 +77,7 @@ class WindowsKvmBaseBuildConfig:
             self.qemu_path,
             self.qemu_img_path,
             self.swtpm_path,
-            self.runuser_path,
+            self.setpriv_path,
             self.mkfs_fat_path,
             self.mcopy_path,
         ):
@@ -184,9 +184,12 @@ def _start_swtpm(
     log_path = build_path / "swtpm.log"
     _run_checked(
         [
-            str(config.runuser_path),
-            "-u",
+            str(config.setpriv_path),
+            "--reuid",
             config.run_user,
+            "--regid",
+            config.run_group,
+            "--init-groups",
             "--",
             str(config.swtpm_path),
             "socket",
@@ -224,9 +227,12 @@ def windows_kvm_install_arguments(
     tpm_socket_path: Path,
 ) -> list[str]:
     return [
-        str(config.runuser_path),
-        "-u",
+        str(config.setpriv_path),
+        "--reuid",
         config.run_user,
+        "--regid",
+        config.run_group,
+        "--init-groups",
         "--",
         str(config.qemu_path),
         "-name",
@@ -541,6 +547,7 @@ def _build_windows_kvm_base_impl(
         "display": "VGA",
         "network": "no-device",
         "tpm": "swtpm-2.0",
+        "privilegeDrop": "setpriv",
     }
     environment_image_digest = canonical_digest(environment_image)
     final_base_path = (
@@ -604,6 +611,8 @@ def _build_windows_kvm_base_impl(
             "networkDeviceCount": network_device_count,
             "qmpInitialStatus": qemu_status,
             "runUser": config.run_user,
+            "runGroup": config.run_group,
+            "privilegeDrop": "setpriv",
             "display": "VGA",
             "sourceMediaMode": "original-udf-read-only",
             "configurationDiskLabel": _CONFIG_LABEL,

@@ -50,7 +50,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.fake_qemu = self._tool("qemu-system-x86_64", "QEMU emulator version test")
         self.fake_qemu_img = self._tool("qemu-img", "qemu-img version test")
         self.fake_swtpm = self._tool("swtpm", "TPM emulator version test")
-        self.fake_runuser = self._tool("runuser", "runuser test")
+        self.fake_setpriv = self._tool("setpriv", "setpriv test")
         self.fake_mkfs = self._tool("mkfs.fat", "mkfs test")
         fake_mtools = self._tool("mtools", "mtools test")
         self.fake_mcopy = self.tools / "mcopy"
@@ -107,7 +107,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             qemu_path=self.fake_qemu,
             qemu_img_path=self.fake_qemu_img,
             swtpm_path=self.fake_swtpm,
-            runuser_path=self.fake_runuser,
+            setpriv_path=self.fake_setpriv,
             mkfs_fat_path=self.fake_mkfs,
             mcopy_path=self.fake_mcopy,
             mdir_path=self.fake_mdir,
@@ -221,7 +221,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
         joined = " ".join(arguments).lower()
         self.assertNotIn("e1000", joined)
         self.assertNotIn("virtio-net", joined)
-        self.assertIn("runuser -u root --", joined)
+        self.assertIn("setpriv --reuid root --regid root --init-groups --", joined)
         self.assertIn("VGA", arguments)
 
     def test_install_qemu_topology_has_no_network_path(self) -> None:
@@ -233,7 +233,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             qemu_path=self.fake_qemu,
             qemu_img_path=self.fake_qemu_img,
             swtpm_path=self.fake_swtpm,
-            runuser_path=self.fake_runuser,
+            setpriv_path=self.fake_setpriv,
             mkfs_fat_path=self.fake_mkfs,
             mcopy_path=self.fake_mcopy,
             firmware_code_path=self.firmware,
@@ -274,6 +274,10 @@ class WindowsKvmP0Tests(unittest.TestCase):
             arguments,
         )
         self.assertIn("q35,accel=kvm,smm=off", arguments)
+        self.assertEqual(
+            arguments[:7],
+            [str(self.fake_setpriv), "--reuid", "root", "--regid", "root", "--init-groups", "--"],
+        )
 
     def test_fat_labels_are_valid_and_finalize_uses_build_label(self) -> None:
         from ordivon_security.evaluation.windows_kvm import _RUN_LABEL
@@ -335,7 +339,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             qemu_path=self.fake_qemu,
             qemu_img_path=self.fake_qemu_img,
             swtpm_path=self.fake_swtpm,
-            runuser_path=self.fake_runuser,
+            setpriv_path=self.fake_setpriv,
             mkfs_fat_path=formatter,
             mcopy_path=self.fake_mcopy,
             firmware_code_path=self.firmware,
@@ -360,7 +364,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             qemu_path=self.fake_qemu,
             qemu_img_path=self.fake_qemu_img,
             swtpm_path=self.fake_swtpm,
-            runuser_path=self.fake_runuser,
+            setpriv_path=self.fake_setpriv,
             mkfs_fat_path=self.fake_mkfs,
             mcopy_path=self.fake_mcopy,
             firmware_code_path=self.firmware,
