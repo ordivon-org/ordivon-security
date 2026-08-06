@@ -1,0 +1,109 @@
+{
+  "caseId": "case:davinci-resolve-studio-21.0.3.7",
+  "decision": {
+    "attachToGuest": false,
+    "chainComplete": false,
+    "executeInstaller": false,
+    "executionAuthorized": false,
+    "installOnHost": false,
+    "outcome": "reject-execution-profile",
+    "startWindows": false
+  },
+  "decisionRevision": "git:bf272ab4f709162f6a880e6947a5d732b9765e66",
+  "evidenceReferences": {
+    "privateIndependentStaticCloseout": {
+      "byteLength": 2476,
+      "logicalName": "windows-kvm-p1-davinci-static-independent-closeout-bf272ab.json",
+      "sha256": "sha256:498e9fa34f0acb7785390917b1aee5965bb087d2d058cfa8cfd251aba4c67694"
+    },
+    "privateMediaManifest": {
+      "byteLength": 3333,
+      "logicalName": "windows-kvm-p1-davinci-media-manifest-136a8a7.json",
+      "sha256": "sha256:f58fe7faa5a2173e5d31e15b786192991792f8fcfd76a7fe5aefcea39a087a1b"
+    },
+    "privateMediaRemoval": {
+      "byteLength": 1239,
+      "logicalName": "windows-kvm-p1-davinci-media-removed-bf272ab.json",
+      "sha256": "sha256:bda863bf99854182c7dc9100a58252a776456eef214579e0707032e2f065580e"
+    },
+    "publicMediaGate": {
+      "byteLength": 2886,
+      "logicalName": "windows-kvm-p1-davinci-media-136a8a7.json",
+      "sha256": "sha256:7882caac48b67c705d9a0ca037e6be5a699c7724bd424ffbb7d75bc9f2ec85ea"
+    },
+    "publicStaticDecision": {
+      "byteLength": 2943,
+      "logicalName": "windows-kvm-p1-davinci-static-91f08e0.json",
+      "sha256": "sha256:43b6c26bb1e941689d7905de512d18e72347151911bddff946c379a52a4e3e27"
+    }
+  },
+  "identities": {
+    "archive": {
+      "byteLength": 7428655207,
+      "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e"
+    },
+    "crackDll": {
+      "byteLength": 152576,
+      "digest": "sha256:737ba26966f648a4383ab28faae13a02a20b91f2d779a5e1ad24b4a4589e5f34"
+    },
+    "downloaderScript": {
+      "byteLength": 2910,
+      "digest": "sha256:fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397"
+    },
+    "mainExecutable": {
+      "byteLength": 580153816,
+      "digest": "sha256:77fd83a5a7cd5a9e50797b41e1d76addf9b372efff7d1a95fc7af77249cf7539"
+    },
+    "nestedMsi": {
+      "byteLength": 4998144,
+      "digest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3"
+    },
+    "outerMsi": {
+      "byteLength": 2872387,
+      "digest": "sha256:44ae022b71782a8a4693abbc182f8fce59ef15200defd4088d7196595f64f6cf"
+    },
+    "wrapper": {
+      "byteLength": 4585876,
+      "digest": "sha256:ee98ffe8a4b681caa0958704816cba7426c46842298e042e4a8ce34ad2a1d40c"
+    }
+  },
+  "kind": "ordivon.security.windows-kvm-p1-case-closeout",
+  "limitations": [
+    "the exact invocation edge from the outer wrapper or MSI to the nested malicious MSI remains unresolved",
+    "that unresolved edge does not weaken rejection because the distributed package contains the first-install downloader MSI",
+    "the generic Windows installer observer remains a contract rather than an admitted execution backend"
+  ],
+  "media": {
+    "allocatedBytesRemoved": 7472373760,
+    "imageByteLength": 8589934592,
+    "imageDigest": "sha256:45cde41942c7536ef13ce5acce9317bf0260c5b2bba852c1bb4e5d8816aa351a",
+    "imageRetained": false,
+    "manifestRetained": true,
+    "preparationGatePassed": true
+  },
+  "schemaVersion": 1,
+  "scope": {
+    "currentPackageMayBeExecuted": false,
+    "currentPackageMayBeInstalled": false,
+    "p1GenericObserverImplemented": false,
+    "p1GenericThirdPartyExecutionAdmitted": false
+  },
+  "status": "closed-rejected",
+  "unresolvedQuestions": [
+    "the exact runtime invocation edge from the wrapper or outer MSI to the nested malicious MSI has not been fully traced",
+    "no Guest execution is needed to decide that the current package must not be admitted for installation"
+  ],
+  "verifiedFacts": {
+    "bitsAndWebClientPresent": true,
+    "externalDownloadUrlPresent": true,
+    "firstInstallDataSetterSequence6401": true,
+    "firstInstallPowerShellSequence6402": true,
+    "highestPrivilegeScheduledTaskPresent": true,
+    "nestedMsiManufacturerGetintoWay": true,
+    "outerMsiContainsOriginalAndReplacementIntlDll": true,
+    "outerMsiContainsPatchesTxt": true,
+    "recursiveExeExecutionPresent": true,
+    "wrapperIncludesNestedMsiArchive": true,
+    "wrapperNamesOuterMsi": true
+  }
+}

@@ -67,3 +67,11 @@ The exact runtime edge from the wrapper or outer MSI to the nested MSI is not ye
 Future third-party installer execution requires the canonical profile at [`../research/profiles/windows-kvm-installer-observation-p1.json`](../research/profiles/windows-kvm-installer-observation-p1.json). It requires pre/post snapshots for files, Registry, services, drivers, scheduled tasks, BITS jobs, startup entries, installed products, users/groups, certificates, Defender, and Event Logs. It also requires a complete process tree, PowerShell script-block evidence, MSI and Task Scheduler events, QMP topology authority, host media identity, and residual closure.
 
 The observation contract is evidence infrastructure only. It does not change `executionAuthorized`, bind an installer path, attach the current media, or start Windows.
+
+## DaVinci Case closeout
+
+The current DaVinci package is closed as **rejected**, not promoted to an execution Trial. Independent table-level verification reproduced the wrapper identity, the original and replacement `intl.dll` entries, the nested GetintoWAY MSI, first-install sequences 6401 and 6402, the external downloader, BITS/WebClient transports, highest-privilege scheduled-task creation, and recursive execution of downloaded EXE files.
+
+The final sanitized Case index is [`../evidence/acceptance/windows-kvm-p1-davinci-case-closeout-bf272ab.json`](../evidence/acceptance/windows-kvm-p1-davinci-case-closeout-bf272ab.json). The prepared 8 GiB NTFS image was deleted after its manifest, content identity, preparation provenance, media acceptance, static rejection, and removal receipt were retained. No QEMU, Windows Guest, archive, MSI, DLL, or installer execution was used for this decision.
+
+This closes the **current DaVinci Case only**. P1 itself remains a candidate infrastructure track: the observation profile is defined, but the generic Guest observer and third-party installer execution backend are not implemented or admitted.

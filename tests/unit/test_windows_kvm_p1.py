@@ -57,7 +57,13 @@ class WindowsKvmP1Tests(unittest.TestCase):
             / "windows-kvm-p1-davinci-media-136a8a7.json"
         )
         index = __import__("json").loads(path.read_text(encoding="utf-8"))
-        self.assertEqual(index["status"], "media-preparation-accepted-execution-not-authorized")
+        self.assertEqual(index["status"], "superseded-by-static-rejection")
+        self.assertIs(index["current"], False)
+        self.assertIs(index["mediaRetained"], False)
+        self.assertEqual(
+            index["supersededBy"],
+            "windows-kvm-p1-davinci-case-closeout-bf272ab.json",
+        )
         self.assertIs(index["authorization"]["prepareAuthorizedMedia"], True)
         self.assertIs(index["authorization"]["attachToGuest"], False)
         self.assertIs(index["authorization"]["executeArchiveOrInstaller"], False)
@@ -124,6 +130,26 @@ class WindowsKvmP1Tests(unittest.TestCase):
         incomplete["snapshotDomains"] = ["files"]
         with self.assertRaisesRegex(ValueError, "snapshot domains are incomplete"):
             WindowsKvmInstallerObservationProfile.from_dict(incomplete)
+
+    def test_public_davinci_case_closeout_rejects_execution_and_removes_media(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "evidence"
+            / "acceptance"
+            / "windows-kvm-p1-davinci-case-closeout-bf272ab.json"
+        )
+        index = __import__("json").loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(index["status"], "closed-rejected")
+        self.assertEqual(index["decision"]["outcome"], "reject-execution-profile")
+        self.assertIs(index["decision"]["executionAuthorized"], False)
+        self.assertIs(index["decision"]["attachToGuest"], False)
+        self.assertIs(index["decision"]["startWindows"], False)
+        self.assertIs(index["decision"]["executeInstaller"], False)
+        self.assertIs(index["decision"]["installOnHost"], False)
+        self.assertIs(index["media"]["imageRetained"], False)
+        self.assertIs(index["media"]["manifestRetained"], True)
+        self.assertIs(index["scope"]["p1GenericObserverImplemented"], False)
+        self.assertIs(index["scope"]["p1GenericThirdPartyExecutionAdmitted"], False)
 
     def test_public_static_gate_is_a_rejection_not_execution_admission(self) -> None:
         path = (

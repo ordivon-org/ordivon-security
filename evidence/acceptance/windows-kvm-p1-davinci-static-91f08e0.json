@@ -1,5 +1,7 @@
 {
+  "caseCloseout": "windows-kvm-p1-davinci-case-closeout-bf272ab.json",
   "caseId": "case:davinci-resolve-studio-21.0.3.7",
+  "caseStatus": "closed-rejected",
   "decision": {
     "attachToGuest": false,
     "chainComplete": false,
