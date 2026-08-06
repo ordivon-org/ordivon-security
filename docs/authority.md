@@ -15,8 +15,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-05
-summary: Authority map for the active Contest core, CAGE Range, software Evaluation, Static P0, Case Snapshot P0, candidate Windows KVM Provider, research program, authorization boundary, evidence, and frozen Round 1 materials.
+updated: 2026-08-06
+summary: Authority map for the active Contest core, CAGE Range, software Evaluation, Static P0, Case Snapshot P0, P0-admitted Windows KVM Provider, research program, authorization boundary, evidence, and frozen Round 1 materials.
 evidence_status: not_applicable
 readiness: READY
 applies_to:
@@ -47,13 +47,13 @@ related:
 - [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md) owns the general local software Evaluation contracts, SampleVault boundary, Observer/Guardian distinction, residual closure, evidence, and next-backend admission gate.
 - [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md) owns SampleVault revision 2, static analyzer admission, native-report Artifact evidence, quarantine hardening, historical report limitations, and the no-execution static profile.
 - [`CASE-SNAPSHOT-P0.md`](CASE-SNAPSHOT-P0.md) owns read-only quarantine drift, evolving Case identity, external uncontrolled execution status, snapshot verification, and the boundary between Case material and Evaluation evidence.
-- [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md) owns the candidate disposable Windows Provider, sealed image identity, management-plane no-network authority, benign fixture admission, and residual-closure gate.
+- [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md) owns the P0-admitted disposable Windows Provider, sealed image identity, management-plane no-network authority, exact benign fixture admission, and residual-closure gate.
 - [`AGENT-EXPERIMENT-P0.md`](AGENT-EXPERIMENT-P0.md) owns the Provider/Harness/Host/Runtime experiment variants, credential-scope identity, and model-Actor admission boundary.
 - [`research-agenda.md`](research-agenda.md) owns the ordered research program and falsifiers.
 - [`research-boundary.md`](research-boundary.md) owns authorization and external-effect limits.
 - [`../evidence/README.md`](../evidence/README.md) owns active and historical evidence admission.
 
-For implemented behavior, source code and deterministic/integration tests outrank prose. A static analyzer owns only its native report and declared tool result; it does not own runtime behavior, intent, or independent world truth. An imported historical report is authoritative only for the bytes and statements retained under its bound digest. A Case Snapshot owns exact directory metadata and file digests, not runtime behavior. External uncontrolled stdout, stderr, scripts, and human reports cannot establish Guardian enforcement, world truth, or residual closure. For Windows KVM, QMP and the host process lifecycle own network-device and machine-lifecycle facts; Guest PowerShell and fixture JSON are Observers only. Before retained benign acceptance, the Provider remains a candidate and cannot authorize unknown Sample execution. For an individual Contest Trial, its Scenario manifest, Trial identity, semantic and operational event streams, raw metrics, bundle manifests, and verified digests outrank summaries. For an individual Evaluation Run, its Evaluation Spec, execution identity, Sample identity, separated event streams, residual-closure receipt, Findings, result, bundle manifests, and verified digests outrank summaries. For CAGE substrate behavior, the exact pinned source revision is authoritative; Security owns the adapter mapping and evidence claims.
+For implemented behavior, source code and deterministic/integration tests outrank prose. A static analyzer owns only its native report and declared tool result; it does not own runtime behavior, intent, or independent world truth. An imported historical report is authoritative only for the bytes and statements retained under its bound digest. A Case Snapshot owns exact directory metadata and file digests, not runtime behavior. External uncontrolled stdout, stderr, scripts, and human reports cannot establish Guardian enforcement, world truth, or residual closure. For Windows KVM, QMP and the host process lifecycle own network-device and machine-lifecycle facts; Guest PowerShell and fixture JSON are Observers only. Retained benign acceptance authorizes only the exact maintained fixture; it does not authorize unknown Sample execution or third-party installers. For an individual Contest Trial, its Scenario manifest, Trial identity, semantic and operational event streams, raw metrics, bundle manifests, and verified digests outrank summaries. For an individual Evaluation Run, its Evaluation Spec, execution identity, Sample identity, separated event streams, residual-closure receipt, Findings, result, bundle manifests, and verified digests outrank summaries. For CAGE substrate behavior, the exact pinned source revision is authoritative; Security owns the adapter mapping and evidence claims.
 
 ## Historical authority
 

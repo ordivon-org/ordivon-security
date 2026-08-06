@@ -14,10 +14,10 @@ audience:
   - evaluator
   - operator
   - agent
-updated: 2026-08-05
-summary: Candidate disposable Windows Evaluation Provider using QEMU/KVM, exact sealed images, management-plane no-network verification, benign-fixture-only admission, evidence export, and residual closure.
-evidence_status: partially_verified
-readiness: EXPERIMENTAL
+updated: 2026-08-06
+summary: P0-admitted disposable Windows Evaluation Provider using QEMU/KVM, exact sealed images, management-plane no-network verification, benign-fixture-only admission, evidence export, and residual closure.
+evidence_status: verified
+readiness: READY
 applies_to:
   - ordivon-security-windows-kvm
 related:
@@ -32,20 +32,45 @@ related:
 
 ## Status
 
-The Provider implementation and its local KVM topology have passed unit, type,
-package, and management-plane topology checks. The exact base-image gate passed
-from clean revision `52da5ca`: Windows build `10.0.26200.0` emitted Guest-ready
-evidence, QMP reported zero network devices, and the sealed image passed
-`qemu-img check`. The Provider remains a **candidate** until the second real gate
-succeeds:
+Windows KVM Provider P0 is **admitted for one exact bounded action**:
 
-1. **passed** — build and seal one exact Windows base image using the validated
-   local baseline of 5120 MiB RAM, 4 vCPUs, and an 80 GiB sparse system disk;
-2. **pending** — complete one disposable Run using only the Ordivon-maintained
-   benign fixture, including residual closure.
+```text
+execute-benign-fixture
+```
 
-No unknown Sample is admitted by P0. The retained 目标产品B Case and every other
-third-party executable remain outside this Provider until a later explicit gate.
+The admission is bound to:
+
+- sealed environment image digest
+  `sha256:58d02c9d7b800b8f63ecabe451843c5d06725077f540ecffc99e24549f9412c1`;
+- Windows build `10.0.26200.0`;
+- implementation revision `5c6a854` for disposable Run execution and closure;
+- the locally compiled `ordivon-benign-v1` fixture and its exact compilation
+  attestation;
+- 5120 MiB RAM, 4 vCPUs, deny-all networking, and QMP verification of zero
+  emulated network devices.
+
+The retained receipts prove all P0 gates:
+
+1. the exact Windows base image was built, emitted Guest-ready evidence, shut
+   down automatically, passed `qemu-img check`, and was sealed;
+2. the exact benign fixture completed with `no-issue-observed` and complete
+   residual closure;
+3. a wrong Sample digest and an unknown action were rejected before a Run
+   directory, QEMU process, or swtpm process was created;
+4. a 20-second Guardian runtime bound terminated the Run and removed all
+   disposable state;
+5. an external Ordivon Runtime cancellation produced an invalid Trial, while
+   still closing QEMU, swtpm, the Run directory, and the compiled fixture.
+
+The consolidated private receipt is:
+
+```text
+/var/lib/ordivon/security/providers/windows-kvm/receipts/
+  windows-kvm-p0-admission-5c6a854.json
+```
+
+This is a **limited P0 admission**, not a general-purpose malware sandbox. No
+unknown Sample, third-party installer, or retained 目标产品B Case is admitted.
 
 ## Why this Provider exists
 
@@ -149,7 +174,7 @@ new QEMU and swtpm processes
 
 The VM command uses:
 
-- QEMU `q35` with KVM and SMM;
+- QEMU `q35` with KVM, SMM disabled, and Secure Boot disabled for the audited nested environment;
 - host CPU exposure;
 - fixed vCPU and memory bounds;
 - OVMF UEFI;
@@ -255,36 +280,65 @@ written into semantic or operational Evidence.
 - deletion of QMP and TPM sockets;
 - deletion of the complete Run directory.
 
-A PID is terminated only when `/proc/<pid>/cmdline` still identifies the expected
-QEMU or swtpm process. PID reuse cannot authorize killing an unrelated process.
-Any remaining process or path makes the Trial invalid.
+Each QEMU and swtpm process is bound at launch to its PID and Linux process
+start-time from `/proc/<pid>/stat`. The command line remains a secondary identity
+check while it is available. A reused PID with a different start-time is never
+signalled. A matching process that is already exiting or in zombie state is
+waited for or reaped before closure is decided. Runtime `SIGTERM` and `SIGINT`
+are translated into controlled Evaluation cancellation so `destroy` and CLI
+fixture cleanup still run. Any remaining process or path makes the Trial
+invalid.
 
 ## Current verified scope
 
-Before real base-image admission, the repository tests already prove:
+Real execution from the admitted local configuration proves:
 
-- exact base-manifest digest validation and tamper rejection;
-- install and runtime QEMU arguments contain `-nic none` and no `-netdev`;
-- a real KVM/QMP topology starts and reports no network PCI class;
-- QMP network-class detection terminates on an injected Ethernet-class record;
-- only the exact benign action, compiled Sample digest, and compilation attestation are admitted;
-- network authority, wrong media type, wrong image, and process-limit drift fail closed;
-- complete Run-directory deletion is required;
-- all Guest resources are included in the package;
-- the benign fixture source and PE imports contain no admitted network API.
+- the original Microsoft UDF installation media and sealed qcow2/UEFI identities
+  are bound into the base manifest;
+- Windows build `10.0.26200.0` completes unattended setup with 5120 MiB RAM and
+  four vCPUs;
+- QMP reports no PCI network-class device during base construction, benign
+  execution, timeout termination, and cancellation testing;
+- the exact locally compiled benign fixture starts one child process, waits for
+  it, returns exit code zero, declares `networkRequested: false`, and emits
+  bounded Guest evidence;
+- Guest-side hidden pseudo-adapters may be enumerated as `Not Present`; they do
+  not override the management-plane QMP network authority;
+- wrong Sample identity and unknown action fail before VM creation;
+- Guardian timeout closes QEMU, swtpm, overlay, UEFI copy, TPM state, Run disk,
+  sockets, and the Run directory;
+- Runtime cancellation is recorded as an invalid Trial and still produces clean
+  residual closure;
+- PID reuse protection remains active through PID plus process start-time
+  identity.
+
+Repository gates at admission included 17 Windows KVM tests, 75 passing tests in
+the full suite, four environment-dependent skips, Ruff, Mypy, and PowerShell AST
+validation.
 
 ## Admission decision
 
-The Provider is admitted only after a clean-revision base build and benign Run
-produce retained receipts proving:
+**Admitted: Windows KVM Provider P0, exact benign-fixture scope only.**
 
-1. source and base image identity;
-2. QMP-confirmed no-network topology;
-3. exact fixture Sample and execution result;
-4. bounded runtime;
-5. independently verified Evaluation Evidence;
-6. QEMU, swtpm, sockets, overlay, TPM state, and Run directory removed;
-7. no unknown Sample executed.
+The admission permits only:
 
-Until then, this document describes a tested **candidate**, not a production
-sandbox and not authorization to run the retained 目标产品B Case.
+```text
+fixtureId: ordivon-benign-v1
+action: execute-benign-fixture
+network: deny-all
+```
+
+It does not authorize:
+
+- arbitrary PE execution;
+- third-party installers;
+- internet-connected detonation;
+- production secrets or user data;
+- the retained 目标产品B Resolve Case;
+- claims of resistance to hypervisor escape, hardware side channels, or every
+  Windows kernel attack.
+
+Any broader Sample class requires a separate Provider profile, admission schema,
+resource model, evidence plan, and real acceptance gate. The planned Resolve
+work therefore belongs to a later P1 large-Sample path and cannot reuse this P0
+admission by changing a size limit or bypassing the fixture identity checks.
