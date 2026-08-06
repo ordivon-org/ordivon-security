@@ -248,8 +248,8 @@ class WindowsKvmBaseImage:
             base_vars_path=vars_path,
             environment_image_digest=cast(str, digests["environmentImage"]),
             source_iso_digest=cast(str, digests["sourceIso"]),
-            base_image_digest=cast(str, digests["baseImage"]),
-            base_vars_digest=cast(str, digests["baseVars"]),
+            base_image_digest=digests["baseImage"],
+            base_vars_digest=digests["baseVars"],
             firmware_code_digest=cast(str, digests["firmwareCode"]),
             guest_runner_digest=cast(str, digests["guestRunner"]),
             windows_build=windows_build,
@@ -272,7 +272,7 @@ class WindowsKvmProviderConfig:
     run_group: str = "qemu"
     admitted_sample_digest: str = ""
     fixture_attestation_digest: str = ""
-    memory_mib: int = 6144
+    memory_mib: int = 5120
     vcpu_count: int = 4
     qmp_ready_timeout_seconds: int = 60
     shutdown_grace_seconds: int = 15

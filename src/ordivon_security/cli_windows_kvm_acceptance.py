@@ -35,7 +35,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--vault", type=Path, required=True)
     parser.add_argument("--evidence", type=Path, required=True)
     parser.add_argument("--run-index", type=int, default=0)
-    parser.add_argument("--memory-mib", type=int, default=6144)
+    parser.add_argument("--memory-mib", type=int, default=5120)
     parser.add_argument("--vcpus", type=int, default=4)
     return parser
 
