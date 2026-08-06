@@ -271,7 +271,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             arguments,
         )
         self.assertIn(
-            f"usb-storage,drive=resultdisk,bus=xhci.0,removable=off,serial={_BUILD_LABEL}",
+            f"usb-storage,drive=resultdisk,bus=xhci.0,removable=on,serial={_BUILD_LABEL}",
             arguments,
         )
         self.assertIn("q35,accel=kvm,smm=off", arguments)
@@ -312,6 +312,14 @@ class WindowsKvmP0Tests(unittest.TestCase):
             / "windows_kvm"
             / "install-bootstrap.ps1"
         ).read_text(encoding="utf-8")
+        setup_complete = (
+            Path(__file__).parents[2]
+            / "src"
+            / "ordivon_security"
+            / "resources"
+            / "windows_kvm"
+            / "SetupComplete.cmd"
+        ).read_text(encoding="utf-8")
         self.assertIn(_CONFIG_LABEL, unattend)
         self.assertIn("install-bootstrap.ps1", unattend)
         self.assertIn(_CONFIG_LABEL, bootstrap)
@@ -325,6 +333,12 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertNotIn("BypassCPUCheck", unattend)
         self.assertNotIn("BypassRAMCheck", unattend)
         self.assertIn("SetupComplete.cmd", bootstrap)
+        self.assertIn(".ordivon-write-probe", finalize)
+        self.assertIn("base-finalize-status.json", finalize)
+        self.assertIn("Get-Volume -FileSystemLabel 'ORDIVONBLD' -ErrorAction Stop", finalize)
+        self.assertLess(finalize.index(".ordivon-write-probe"), finalize.index("/active:no"))
+        self.assertIn("base-finalize.log", setup_complete)
+        self.assertIn("2>&1", setup_complete)
 
         import xml.etree.ElementTree as ET
 
