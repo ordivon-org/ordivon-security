@@ -5,6 +5,11 @@
       "logicalName": "windows-kvm-p01-sigkill-run20-fixture-residual-d73c8a2.json",
       "sha256": "sha256:e15d3ad1953291497d9c3ed01f36b55d03e7dbd7dd784ab6bacb2bb91f20884f"
     },
+    "runtimeRestartAcceptance": {
+      "byteLength": 1412,
+      "logicalName": "windows-kvm-p01-runtime-restart-acceptance-7b027f0-run22.json",
+      "sha256": "sha256:dadf4d41352a14f7a86e0e0264cede4b77550b4709e387942bc7a5004a6768f2"
+    },
     "sigkillAcceptance": {
       "byteLength": 665,
       "logicalName": "windows-kvm-p01-sigkill-acceptance-bcac3cc-run21.json",
@@ -12,15 +17,15 @@
     }
   },
   "gates": {
-    "runtimeRestartRecovery": "pending",
+    "runtimeRestartRecovery": "passed",
     "sigkillRecovery": "passed",
     "wslShutdownRecovery": "pending"
   },
   "implementationRevision": "git:bcac3cc6072120bc4eeb70bbad75a184d11e6d0a",
   "kind": "ordivon.security.windows-kvm-p01-acceptance",
   "limitations": [
-    "only the owner-process SIGKILL gate is retained",
-    "Runtime service restart and WSL shutdown recovery remain unverified",
+    "WSL shutdown recovery remains unverified",
+    "the SIGKILL and Runtime restart gates do not prove recovery after host power loss",
     "the first SIGKILL attempt exposed an orphan compiled Fixture and is retained as failure evidence"
   ],
   "passedGate": {
@@ -37,6 +42,24 @@
     "reconciledRuns": 1
   },
   "providerId": "provider:windows-kvm",
+  "runtimeRestartGate": {
+    "attemptContinuity": "active-attempt-completed-across-runtime-control-plane-restart",
+    "disposition": "no-issue-observed",
+    "finalState": {
+      "acceptancePids": [],
+      "fixtureFiles": [],
+      "qemuPids": [],
+      "runDirectories": [],
+      "runLedgers": [],
+      "swtpmPids": []
+    },
+    "ledgerPhaseBeforeRestart": "executing",
+    "networkDeviceCount": 0,
+    "residualClosed": true,
+    "restartPrecededResultBySeconds": 30,
+    "sourceRevision": "git:7b027f0e6df8755d8b7df2a6db48e1992b85147c",
+    "terminalReason": "benign-fixture-completed"
+  },
   "schemaVersion": 1,
   "scope": {
     "crashRecoveryFullyAdmitted": false,
