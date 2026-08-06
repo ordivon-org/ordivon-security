@@ -18,6 +18,8 @@ static int write_result(const wchar_t *path, int completed, int identity_match,
                         int write_blocked, DWORD write_error,
                         const char *actual_digest,
                         unsigned long long actual_length,
+                        DWORD volume_wait_ms,
+                        DWORD logical_drive_mask,
                         const char *error_message) {
     FILE *handle = _wfopen(path, L"wb");
     if (handle == NULL) return 90;
@@ -27,10 +29,12 @@ static int write_result(const wchar_t *path, int completed, int identity_match,
         "\"volumeLabel\":\"ORDIVON_P1\",\"archiveName\":\"%s\","
         "\"archiveDigest\":\"sha256:%s\",\"archiveByteLength\":%llu,"
         "\"archiveIdentityMatch\":%s,\"writeBlocked\":%s,\"writeProbeError\":%lu,"
+        "\"volumeWaitMs\":%lu,\"logicalDriveMask\":%lu,"
         "\"error\":\"%s\"}\n",
         completed ? "true" : "false", EXPECTED_ARCHIVE_NAME,
         actual_digest, actual_length, identity_match ? "true" : "false",
         write_blocked ? "true" : "false", (unsigned long)write_error,
+        (unsigned long)volume_wait_ms, (unsigned long)logical_drive_mask,
         error_message == NULL ? "" : error_message);
     fclose(handle);
     return 0;
@@ -96,25 +100,37 @@ int wmain(int argc, wchar_t **argv) {
             archive_name,
             MAX_PATH
         ) == 0) {
-        write_result(result_path, 0, 0, 0, GetLastError(), "", 0,
-                     "archive name conversion failed");
+        write_result(result_path, 0, 0, 0, GetLastError(), "", 0, 0,
+                     GetLogicalDrives(), "archive name conversion failed");
         return 22;
     }
 
-    for (wchar_t drive = L'A'; drive <= L'Z'; drive++) {
-        wchar_t root[] = L"A:\\";
-        root[0] = drive;
-        label[0] = L'\0';
-        if (!GetVolumeInformationW(root, label, MAX_PATH, NULL, NULL, NULL, NULL, 0)) continue;
-        if (wcscmp(label, L"ORDIVON_P1") == 0) {
-            _snwprintf(archive_path, MAX_PATH, L"%ls%ls", root, archive_name);
-            _snwprintf(probe_path, MAX_PATH, L"%ls.ordivon-write-probe", root);
-            found = 1;
-            break;
+    DWORD volume_wait_ms = 0;
+    DWORD logical_drive_mask = 0;
+    for (int attempt = 0; attempt < 120 && !found; attempt++) {
+        logical_drive_mask = GetLogicalDrives();
+        for (wchar_t drive = L'A'; drive <= L'Z'; drive++) {
+            DWORD bit = 1UL << (drive - L'A');
+            if ((logical_drive_mask & bit) == 0) continue;
+            wchar_t root[] = L"A:\\";
+            root[0] = drive;
+            label[0] = L'\0';
+            if (!GetVolumeInformationW(root, label, MAX_PATH, NULL, NULL, NULL, NULL, 0)) continue;
+            if (wcscmp(label, L"ORDIVON_P1") == 0) {
+                _snwprintf(archive_path, MAX_PATH, L"%ls%ls", root, archive_name);
+                _snwprintf(probe_path, MAX_PATH, L"%ls.ordivon-write-probe", root);
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            Sleep(1000);
+            volume_wait_ms += 1000;
         }
     }
     if (!found) {
-        write_result(result_path, 0, 0, 0, 0, "", 0, "sample volume missing");
+        write_result(result_path, 0, 0, 0, 0, "", 0, volume_wait_ms,
+                     logical_drive_mask, "sample volume missing");
         return 21;
     }
 
@@ -138,14 +154,15 @@ int wmain(int argc, wchar_t **argv) {
     int hash_status = hash_file(archive_path, actual_digest, &actual_length);
     if (hash_status != 0) {
         write_result(result_path, 0, 0, write_blocked, write_error,
-                     actual_digest, actual_length, "archive hash failed");
+                     actual_digest, actual_length, volume_wait_ms,
+                     logical_drive_mask, "archive hash failed");
         return hash_status;
     }
     int identity_match = (_stricmp(actual_digest, EXPECTED_ARCHIVE_SHA256) == 0 &&
                           actual_length == (unsigned long long)EXPECTED_ARCHIVE_LENGTH);
     int completed = identity_match && write_blocked;
     write_result(result_path, completed, identity_match, write_blocked,
-                 write_error, actual_digest, actual_length,
-                 completed ? "" : "media verification failed");
+                 write_error, actual_digest, actual_length, volume_wait_ms,
+                 logical_drive_mask, completed ? "" : "media verification failed");
     return completed ? 0 : 40;
 }
