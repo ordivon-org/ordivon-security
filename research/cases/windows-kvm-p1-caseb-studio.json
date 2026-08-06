@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "kind": "ordivon.security.windows-kvm-installer-profile",
   "profileId": "profile:windows-kvm-p1:caseb-studio",
   "revision": "1",
@@ -14,5 +14,9 @@
   "expectedPublisher": null,
   "installerRelativePath": null,
   "arguments": [],
-  "observationProfile": "windows-installer-p1"
+  "observationProfile": "windows-installer-p1",
+  "deploymentAuthorized": false,
+  "evaluationAuthorized": false,
+  "hostModificationAuthorized": false,
+  "targetSurface": "disposable-windows-kvm"
 }

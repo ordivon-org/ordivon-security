@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.capability-case",
+  "caseId": "case:caseb-studio:a-original-repack",
+  "revision": "1",
+  "role": "original-repack",
+  "admission": {
+    "deploymentAuthorized": false,
+    "evaluationAuthorized": true,
+    "hostObservationAuthorized": false,
+    "hostModificationAuthorized": false,
+    "targetSurface": "disposable-windows-kvm"
+  },
+  "source": {
+    "archiveDigest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+    "archiveByteLength": 7428655207,
+    "archiveName": "目标产品B_Resolve_Studio_.7z",
+    "staticDecision": "windows-kvm-p1-caseb-static-entry.json"
+  },
+  "observationProfile": "windows-installer-p1",
+  "networkMode": "deny-all",
+  "status": "candidate-observer-and-runner-required",
+  "controls": {
+    "realC2": false,
+    "unknownSecondaryExecution": "block",
+    "fakeNetworkService": "local-record-only",
+    "exportableArtifact": false,
+    "destroyOverlayAfterRun": true
+  }
+}

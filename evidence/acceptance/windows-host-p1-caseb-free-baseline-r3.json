@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-host-caseb-free-baseline-acceptance",
+  "status": "identity-captured-read-only",
+  "caseId": "case:目标产品B-caseb-free-:c-host-control",
+  "caseDigest": "sha256:390198f8a4499d71640dc98881f47e42e3eafb7b3db80858831b211e880e058e",
+  "capturedFacts": {
+    "product": "目标产品B Resolve Free",
+    "version": "",
+    "windowsProductVersion": "21.0.30007",
+    "resolveExe": {
+      "digest": "sha256:3a35bca1214d7463803033e2a94742a30db470c125b420f4daa89ce126f409aa",
+      "byteLength": 574885744,
+      "signatureStatus": "Valid"
+    },
+    "intlDll": {
+      "digest": "sha256:dec4671bdb1946562301c434bef589fbe52bf193b0c1aa9be47faf9661f87f2e",
+      "byteLength": 20848,
+      "signatureStatus": "Valid"
+    }
+  },
+  "authority": {
+    "deploymentAuthorized": false,
+    "evaluationAuthorized": true,
+    "hostObservationAuthorized": true,
+    "hostModificationAuthorized": false,
+    "targetSurface": "windows-host-read-only-baseline"
+  },
+  "limitations": [
+    "identity capture does not yet include UI feature assertions or export workload results",
+    "the host installation was not modified",
+    "Case A and Case B remain disposable-VM candidates"
+  ]
+}

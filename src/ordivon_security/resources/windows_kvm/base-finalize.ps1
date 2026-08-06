@@ -48,6 +48,7 @@ try {
         computerName = $env:COMPUTERNAME
         windowsBuild = [Environment]::OSVersion.Version.ToString()
         guestRunner = 'C:\ProgramData\Ordivon\guest-runner.ps1'
+        p1Observer = 'C:\ProgramData\Ordivon\p1-observer.ps1'
         networkRequired = $false
     }
     [System.IO.File]::WriteAllText(

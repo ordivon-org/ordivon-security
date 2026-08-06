@@ -492,6 +492,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertNotIn("BypassCPUCheck", unattend)
         self.assertNotIn("BypassRAMCheck", unattend)
         self.assertIn("SetupComplete.cmd", bootstrap)
+        self.assertIn("p1-observer.ps1", bootstrap)
         self.assertIn(".ordivon-write-probe", finalize)
         self.assertIn("base-finalize-status.json", finalize)
         self.assertIn("Get-Volume -FileSystemLabel 'ORDIVONBLD' -ErrorAction Stop", finalize)
@@ -769,6 +770,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             )
         )
         self.assertFalse(Path(f"/proc/{process.pid}").exists())
+        process.wait(timeout=5)
 
     def test_create_persists_recoverable_run_state(self) -> None:
         backend = WindowsKvmEvaluationBackend(self.config)
@@ -883,6 +885,8 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "readonly_media_fixture.c.in",
             "guest-runner.ps1",
             "install-bootstrap.ps1",
+            "p1-observer.ps1",
+            "windows-host-caseb-baseline.ps1",
         }
         self.assertEqual({path.name for path in resource_root.iterdir()}, expected)
         fixture_source = (resource_root / "benign_fixture.c").read_text(encoding="utf-8").lower()

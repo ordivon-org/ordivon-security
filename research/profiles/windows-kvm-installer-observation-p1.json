@@ -48,5 +48,14 @@
     "suspicious-inconclusive",
     "prohibited-behavior-observed",
     "invalid-trial"
-  ]
+  ],
+  "implementation": {
+    "guestObserverResource": "resources/windows_kvm/p1-observer.ps1",
+    "baseImageIntegration": "implemented-rebuild-required",
+    "executionBackend": "not-yet-admitted",
+    "prePostCapture": "implemented-resource",
+    "processTreeCapture": "requires-p1-runner",
+    "qmpTopology": "existing-provider-authority",
+    "residualClosure": "existing-provider-plus-p1-reconcile"
+  }
 }

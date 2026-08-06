@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-residual-closure-correction-index",
+  "status": "corrected-and-removed",
+  "caseId": "case:caseb-studio",
+  "corrects": "windows-kvm-p1-caseb-case-closeout-bf272ab.json",
+  "finding": "an 8 GiB prepared non-executable NTFS image remained in the separate P1 state root",
+  "removedMedia": {
+    "digest": "sha256:0ac2df1b60b18554937ea163017303666d367c981fbf4b8a6fe6d57116388794",
+    "byteLength": 8589934592,
+    "allocatedBytes": 7472373760
+  },
+  "retainedReceipt": {
+    "logicalName": "windows-kvm-p1-residual-correction-4bcd9ef1cc2c0d2e.json",
+    "private": true
+  },
+  "authority": {
+    "evaluationAuthorized": false,
+    "hostModificationAuthorized": false,
+    "removed": true
+  },
+  "rootCause": "the earlier closeout inspected the primary Windows KVM state root but not the separate windows-kvm-p1 state root"
+}
