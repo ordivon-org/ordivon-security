@@ -96,6 +96,8 @@ A P0-admitted Windows KVM Run additionally binds the sealed base image, disposab
 
 The sanitized Windows KVM P0 acceptance index is retained at [`acceptance/windows-kvm-p0-5c6a854.json`](acceptance/windows-kvm-p0-5c6a854.json). It binds the sealed environment identity, six passed gates, private receipt digests, exact admission scope, diagnostic cleanup outcome, and explicit limitations without exposing Sample bytes, temporary installation secrets, or machine-local paths.
 
+P0.1 reconciliation receipts bind the scanned state root, each ledger decision, exact process-identity closure, Run-directory and ledger deletion, skipped active owners, and any attention-required diagnostics. They do not convert a crashed Run into valid Evaluation evidence. P1 media manifests bind the installer profile digest, exact source identity, NTFS image digest, embedded-file verification, and read-only attachment topology; they explicitly state `prepared-not-executable` and cannot establish runtime behavior.
+
 ## Active Case Snapshot bundle
 
 An evolving local Case may be retained as:
