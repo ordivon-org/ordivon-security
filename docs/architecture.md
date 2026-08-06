@@ -149,6 +149,10 @@ The P0-admitted Provider uses QEMU/KVM from WSL because the actual Windows 11 Ho
 
 No network device is configured. QMP `query-pci` is the management-plane authority and terminates the Run if a network-class PCI device appears. The Guest report remains an Observer. P0 binds the exact compiled benign Sample digest and compilation-attestation digest into Provider execution identity; relabelling another PE is insufficient. Unknown Samples remain prohibited until a later explicit gate. See [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
 
+P0.1 separates recoverable lifecycle identity from the disposable VM directory. Each active Run atomically updates a root-owned ledger under `run-ledgers/`, binding the owner PID/start time, exact QEMU and swtpm identities, resource paths, Evaluation Spec digest, environment digest, and phase. The explicit reconciler skips a live exact owner, removes only a proven orphan, and emits attention-required diagnostics for missing or unsafe authority. See [`WINDOWS-KVM-RECOVERY-P0.1.md`](WINDOWS-KVM-RECOVERY-P0.1.md).
+
+P1 is not an extension of the benign action. Its first gate binds an exact Case and archive identity, copies the archive into NTFS, streams the embedded bytes back for verification, rechecks the source, and records a QEMU `readonly=on` removable input disk. The current 目标产品B profile authorizes preparation only and cannot enter Guest execution. See [`WINDOWS-KVM-INSTALLER-P1.md`](WINDOWS-KVM-INSTALLER-P1.md).
+
 ### Action path
 
 ```text
@@ -252,10 +256,12 @@ Evaluation integration proceeds independently:
 2. preserve external uncontrolled executions as limited historical Case material rather than Evaluation truth;
 3. retain the exact sealed Windows KVM base image and its build receipt;
 4. retain the benign-only P0 admission proving management-plane no-network topology, bounded execution, evidence export, destruction, and residual closure;
-5. add Guest and network Observers without giving them Guardian authority;
-6. require a separate explicit gate before any unknown Sample;
-7. add mature static analyzers only when an observed evidence gap justifies the adapter;
-8. connect Harness only to structured evidence summaries, never raw Sample bytes.
+5. complete P0.1 hard-failure recovery acceptance while preserving the exact benign-only admission;
+6. retain P1 large-Sample media preparation as non-executing until an exact installer path, observation protocol, and separate execution gate exist;
+7. add Guest and network Observers without giving them Guardian authority;
+8. require a separate explicit gate before any unknown Sample;
+9. add mature static analyzers only when an observed evidence gap justifies the adapter;
+10. connect Harness only to structured evidence summaries, never raw Sample bytes.
 
 ## Explicit non-goals
 

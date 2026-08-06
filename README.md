@@ -137,6 +137,26 @@ uv run ordivon-security-windows-kvm-acceptance \
 
 The first command builds a sealed Windows 11 Enterprise Evaluation base with no QEMU network device. The second compiles and executes only the Ordivon-maintained benign fixture in a disposable overlay. Neither command authorizes 目标产品B or another unknown Sample. See [`docs/WINDOWS-KVM-P0.md`](docs/WINDOWS-KVM-P0.md).
 
+## Reconcile Windows KVM state after a hard failure
+
+```bash
+uv run ordivon-security-windows-kvm-reconcile \
+  --state-root /var/lib/ordivon/security/providers/windows-kvm
+```
+
+P0.1 persists each Run lifecycle in a root-owned `run-ledgers/` directory, independent of the disposable VM directory. Reconciliation skips an exact live owner, closes only PID/start-time/command identities that still match QEMU or swtpm, removes verified orphan state, and emits attention-required diagnostics rather than guessing. It does not broaden P0 Sample admission. See [`docs/WINDOWS-KVM-RECOVERY-P0.1.md`](docs/WINDOWS-KVM-RECOVERY-P0.1.md).
+
+## Prepare a P1 installer input disk
+
+```bash
+uv run ordivon-security-windows-kvm-p1-prepare \
+  --profile research/cases/windows-kvm-p1-caseb-studio.json \
+  --source quarantine/2026-08-05_目标产品B/sample.7z \
+  --state-root /var/lib/ordivon/security/providers/windows-kvm-p1
+```
+
+This command only prepares and verifies a digest-bound NTFS input image. QEMU attachment is declared read-only and removable. The retained 目标产品B profile has `executionAuthorized: false`; it does not authorize launching the archive or an installer. See [`docs/WINDOWS-KVM-INSTALLER-P1.md`](docs/WINDOWS-KVM-INSTALLER-P1.md).
+
 ## Run the deterministic Contest
 
 Python 3.12 is the supported interpreter.
@@ -274,6 +294,8 @@ The former single-Actor experiment/evaluation framework is frozen at Git revisio
 - [`docs/STATIC-EVALUATION-P0.md`](docs/STATIC-EVALUATION-P0.md) — streaming Vault, static analyzers, native report Artifacts, quarantine hardening, and limitations;
 - [`docs/CASE-SNAPSHOT-P0.md`](docs/CASE-SNAPSHOT-P0.md) — read-only drift audit, evolving Case identity, uncontrolled-execution status, and snapshot verification;
 - [`docs/WINDOWS-KVM-P0.md`](docs/WINDOWS-KVM-P0.md) — sealed Windows image, no-network QMP authority, benign fixture acceptance, and residual closure;
+- [`docs/WINDOWS-KVM-RECOVERY-P0.1.md`](docs/WINDOWS-KVM-RECOVERY-P0.1.md) — root-owned Run ledgers and explicit orphan reconciliation after hard failures;
+- [`docs/WINDOWS-KVM-INSTALLER-P1.md`](docs/WINDOWS-KVM-INSTALLER-P1.md) — separate large-Sample installer profile and read-only NTFS input-media gate;
 - [`docs/AGENT-EXPERIMENT-P0.md`](docs/AGENT-EXPERIMENT-P0.md) — controlled Provider/Harness/Host/Runtime variants and the DeepSeek Harness baseline;
 - [`docs/research-agenda.md`](docs/research-agenda.md) — research sequence and falsifiers;
 - [`docs/research-boundary.md`](docs/research-boundary.md) — authorization and external-effect limits;
