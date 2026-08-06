@@ -1,0 +1,99 @@
+{
+  "acceptanceClaims": [
+    "the exact Windows base image completed unattended setup, emitted Guest-ready evidence, shut down automatically, passed qemu-img check, and was sealed",
+    "QMP reported no emulated network device during base construction and admitted Runs",
+    "the exact maintained benign fixture completed with exit code zero and networkRequested false",
+    "wrong Sample identity and unknown action were rejected before VM creation",
+    "Guardian timeout closed QEMU, swtpm, and all disposable Run state",
+    "Runtime cancellation produced an invalid Trial while preserving evidence and residual closure",
+    "PID plus process start-time identity prevents cleanup from signalling a reused PID",
+    "raw failed-VM diagnostics and temporary installation secrets were removed after bounded root-cause summaries were retained"
+  ],
+  "base": {
+    "baseImageDigest": "sha256:bef0ec6319a8a27a014efb1b64228d8182565ddd05ae3492839ae6899978af8b",
+    "baseVarsDigest": "sha256:290b67ad3856e0f30b1b0cc61eb29dba7f8ada2cc8e6956396bb0982f832d673",
+    "environmentImageDigest": "sha256:58d02c9d7b800b8f63ecabe451843c5d06725077f540ecffc99e24549f9412c1",
+    "manifestDigest": "sha256:27c6a678c5815dda81edf7dae93b03fb135c6eca00f7631a359329875c32c36e",
+    "networkDevicePresent": false,
+    "sourceIsoDigest": "sha256:a61adeab895ef5a4db436e0a7011c92a2ff17bb0357f58b13bbc4062e535e7b9",
+    "windowsBuild": "10.0.26200.0"
+  },
+  "closeout": {
+    "rawDiagnosticBytesRemoved": 44581950281,
+    "rawGuestStateRetained": false,
+    "remainingFixtureFiles": 0,
+    "remainingRunDirectories": 0,
+    "remainingRuntimeProcesses": 0,
+    "retainedRootCauseSummaryBytes": 20187446,
+    "sensitiveInstallationStateRetained": false
+  },
+  "evidenceReferences": {
+    "base": {
+      "byteLength": 1179,
+      "logicalName": "windows-kvm-base-c99e24549f9412c1.json",
+      "sha256": "sha256:0c980b9a0d5907eaa41ff9d6804803cc06ed2e69d3633a1f5e2b73df4f4444d0"
+    },
+    "benign": {
+      "byteLength": 715,
+      "logicalName": "windows-kvm-p0-benign-acceptance-5c6a854-run7.json",
+      "sha256": "sha256:76029d33c2716a9d84ef0e6f745a2ebf349c0b03efd2e03421347283f450e4ca"
+    },
+    "diagnosticCleanup": {
+      "byteLength": 953,
+      "logicalName": "windows-kvm-p0-diagnostic-cleanup-6a39b79.json",
+      "sha256": "sha256:63cce089d9f4e656dd43af8c54c46d4c61b377ac400ae3ffffaf2a9f1e61c162"
+    },
+    "guardianTimeout": {
+      "byteLength": 798,
+      "logicalName": "windows-kvm-p0-guardian-timeout-5c6a854-run8.json",
+      "sha256": "sha256:2ec40b97cbe02742f4dc589624002941d12d993f0143156739b04538093266ab"
+    },
+    "negativeAdmission": {
+      "byteLength": 689,
+      "logicalName": "windows-kvm-p0-negative-admission-5c6a854.json",
+      "sha256": "sha256:8f42ea8ec41dac0b8dfe7c7a82953e1063631937ebba283cc714bd7d5541d6e8"
+    },
+    "privateAdmission": {
+      "byteLength": 2374,
+      "logicalName": "windows-kvm-p0-admission-5c6a854.json",
+      "sha256": "sha256:4a4cfae545d1e7629542b246c5d74f96fb284854a3ba8a29da28f92517180571"
+    },
+    "runtimeCancellation": {
+      "byteLength": 694,
+      "logicalName": "windows-kvm-p0-runtime-cancel-clean-5c6a854-run6.json",
+      "sha256": "sha256:dc5365f90e4457dafe850942f1b6b269d0ed331ead8ec96ba0ad79b754521ced"
+    }
+  },
+  "gates": {
+    "baseImage": "passed",
+    "benignFixture": "passed",
+    "guardianTimeoutResidualClosure": "passed",
+    "runtimeCancellationResidualClosure": "passed",
+    "unknownActionRejection": "passed",
+    "wrongDigestRejection": "passed"
+  },
+  "implementationRevision": "git:5c6a8544dec65ef2482a99fb072799b00d2eca8a",
+  "kind": "ordivon.security.windows-kvm-p0-acceptance",
+  "limitations": [
+    "this admission permits only execute-benign-fixture for fixtureId ordivon-benign-v1",
+    "unknown Samples, third-party installers, and the retained 目标产品B Case are not authorized",
+    "deny-all means no emulated QEMU network device; it is not a claim against every hardware or hypervisor side channel",
+    "no-issue-observed is bounded to the exact benign Run and is not a general software-safety conclusion",
+    "hard-crash recovery after SIGKILL, Runtime process death, WSL shutdown, or host power loss remains outside P0"
+  ],
+  "providerId": "provider:windows-kvm",
+  "schemaVersion": 1,
+  "scope": {
+    "generalPurposeSandbox": false,
+    "networkMode": "deny-all",
+    "permittedActions": [
+      "execute-benign-fixture"
+    ],
+    "permittedFixtureIds": [
+      "ordivon-benign-v1"
+    ],
+    "thirdPartySampleExecution": false,
+    "unknownSampleExecution": false
+  },
+  "status": "accepted-for-exact-benign-fixture-only"
+}

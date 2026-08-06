@@ -14,8 +14,8 @@ audience:
   - evaluator
   - maintainer
   - agent
-updated: 2026-08-05
-summary: Evidence contract for active Contest, CAGE, software Evaluation, static native-report Artifacts, Case Snapshots, candidate Windows KVM Runs, and frozen Round 1 reports.
+updated: 2026-08-06
+summary: Evidence contract for active Contest, CAGE, software Evaluation, static native-report Artifacts, Case Snapshots, P0-admitted benign-only Windows KVM Runs, and frozen Round 1 reports.
 evidence_status: verified
 readiness: READY
 applies_to:
@@ -92,7 +92,9 @@ An Evaluation claim is inadmissible when Authority does not bind the exact Sampl
 
 The fixture backend never invokes Sample bytes. The static backend permits admitted analyzers to read bytes as data but never loads, installs, or invokes the Sample. A static antivirus match is an Observer result, not independent proof of runtime behavior. Imported reports must state that they were produced before the current Trial and remain bounded by their retained bytes and limitations. Artifact tampering invalidates verification.
 
-A candidate Windows KVM Run additionally binds the sealed base image, disposable overlay configuration, UEFI and TPM identity, QEMU and swtpm binaries, management-plane QMP status, and no-network PCI result. Guest and fixture results may be retained as Artifacts, but they cannot establish QEMU topology or residual closure. The Run is inadmissible when any network-class PCI device appears, the exact benign fixture contract differs, Guest result identity differs, QEMU or swtpm remains alive, or the disposable Run directory survives destruction. Until real benign acceptance is retained, no unknown Sample Run is admissible.
+A P0-admitted Windows KVM Run additionally binds the sealed base image, disposable overlay configuration, UEFI and TPM identity, QEMU and swtpm binaries, management-plane QMP status, and no-network PCI result. Guest and fixture results may be retained as Artifacts, but they cannot establish QEMU topology or residual closure. The Run is inadmissible when any network-class PCI device appears, the exact benign fixture contract differs, Guest result identity differs, QEMU or swtpm remains alive, or the disposable Run directory survives destruction. P0 admits only the exact maintained benign fixture; no unknown Sample or third-party installer is admissible.
+
+The sanitized Windows KVM P0 acceptance index is retained at [`acceptance/windows-kvm-p0-5c6a854.json`](acceptance/windows-kvm-p0-5c6a854.json). It binds the sealed environment identity, six passed gates, private receipt digests, exact admission scope, diagnostic cleanup outcome, and explicit limitations without exposing Sample bytes, temporary installation secrets, or machine-local paths.
 
 ## Active Case Snapshot bundle
 

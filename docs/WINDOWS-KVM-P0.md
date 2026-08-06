@@ -62,12 +62,7 @@ The retained receipts prove all P0 gates:
 5. an external Ordivon Runtime cancellation produced an invalid Trial, while
    still closing QEMU, swtpm, the Run directory, and the compiled fixture.
 
-The consolidated private receipt is:
-
-```text
-/var/lib/ordivon/security/providers/windows-kvm/receipts/
-  windows-kvm-p0-admission-5c6a854.json
-```
+The sanitized public acceptance index is [`../evidence/acceptance/windows-kvm-p0-5c6a854.json`](../evidence/acceptance/windows-kvm-p0-5c6a854.json). The complete private admission and diagnostic-cleanup receipts remain under the local Provider receipt root. Raw failed-VM disks, FAT configuration/result media, temporary unattend state, registry hives, UEFI/TPM state, and cancellation overlays were removed after bounded root-cause summaries were retained.
 
 This is a **limited P0 admission**, not a general-purpose malware sandbox. No
 unknown Sample, third-party installer, or retained 目标产品B Case is admitted.
