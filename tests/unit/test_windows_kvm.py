@@ -673,24 +673,91 @@ class WindowsKvmP0Tests(unittest.TestCase):
         )
         self.assertFalse(Path(f"/proc/{process.pid}").exists())
 
-    def test_destroy_removes_complete_run_directory(self) -> None:
+    def test_create_persists_recoverable_run_state(self) -> None:
+        backend = WindowsKvmEvaluationBackend(self.config)
+        spec = self._spec(backend)
+
+        def create_overlay(arguments: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+            if arguments[0] == str(self.fake_qemu_img) and "create" in arguments:
+                Path(arguments[-1]).write_bytes(b"overlay")
+            return subprocess.CompletedProcess(arguments, 0, "", "")
+
+        with (
+            patch(
+                "ordivon_security.evaluation.windows_kvm._run_checked",
+                side_effect=create_overlay,
+            ),
+            patch(
+                "ordivon_security.evaluation.windows_kvm.security_source_identity",
+                return_value={
+                    "componentId": "ordivon-security",
+                    "revision": "git:test",
+                    "revisionKind": "test",
+                    "packageVersion": "test",
+                },
+            ),
+        ):
+            instance = backend.create("evaluation-run:ledger-test", spec)
+        ledger_path = Path(str(instance.state["runStatePath"]))
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        self.assertEqual(ledger["phase"], "created")
+        self.assertEqual(ledger["runId"], "evaluation-run:ledger-test")
+        self.assertEqual(ledger["ownerPid"], os.getpid())
+        self.assertIsInstance(ledger["ownerStartTime"], int)
+        self.assertEqual(ledger["evaluationSpecDigest"], spec.digest)
+        self.assertEqual(stat.S_IMODE(ledger_path.stat().st_mode), 0o600)
+        self.assertTrue(backend.destroy(instance).clean)
+
+    def test_destroy_removes_complete_run_directory_and_root_ledger(self) -> None:
         backend = WindowsKvmEvaluationBackend(self.config)
         run_path = self.root / "state" / "runs" / "destroy-test"
         run_path.mkdir(mode=0o700)
-        (run_path / "overlay.qcow2").write_bytes(b"overlay")
+        overlay_path = run_path / "system-overlay.qcow2"
+        overlay_path.write_bytes(b"overlay")
+        ledger_path = backend.ledgers_root / "destroy-test.json"
         instance = EvaluationInstance(
             instance_id="evaluation-instance:destroy-test",
             generation="windows-kvm:test",
             state={
                 "runPath": str(run_path),
+                "runStatePath": str(ledger_path),
+                "overlayPath": str(overlay_path),
+                "varsPath": str(run_path / "OVMF_VARS.4m.fd"),
+                "runDiskPath": str(run_path / "ordivon-run.img"),
+                "qmpPath": str(run_path / "qmp.sock"),
+                "tpmSocketPath": str(run_path / "swtpm.sock"),
+                "tpmStatePath": str(run_path / "tpm-state"),
+                "ownerPid": os.getpid(),
+                "ownerStartTime": _process_start_time(os.getpid()),
+                "security": {"componentId": "ordivon-security", "revision": "test"},
+                "evaluationSpecDigest": "sha256:" + "7" * 64,
                 "qemuPid": 0,
                 "swtpmPid": 0,
+                "staged": False,
+                "qemuExited": False,
             },
         )
+        backend._persist_run_state(instance, "created")
         receipt = backend.destroy(instance)
         self.assertTrue(receipt.clean)
         self.assertFalse(run_path.exists())
+        self.assertFalse(ledger_path.exists())
+        self.assertIs(receipt.details["ledgerRemoved"], True)
         self.assertEqual(receipt.details["residualObjects"], [])
+
+    def test_destroy_without_persistent_ledger_cannot_claim_complete_closure(self) -> None:
+        backend = WindowsKvmEvaluationBackend(self.config)
+        run_path = self.root / "state" / "runs" / "legacy-destroy-test"
+        run_path.mkdir(mode=0o700)
+        instance = EvaluationInstance(
+            instance_id="evaluation-instance:legacy-destroy-test",
+            generation="windows-kvm:test",
+            state={"runPath": str(run_path), "qemuPid": 0, "swtpmPid": 0},
+        )
+        receipt = backend.destroy(instance)
+        self.assertFalse(receipt.clean)
+        self.assertFalse(run_path.exists())
+        self.assertIn("unknown-ledger", receipt.details["residualObjects"])
 
     def test_public_p0_acceptance_index_matches_implemented_scope(self) -> None:
         path = Path(__file__).parents[2] / "evidence" / "acceptance" / "windows-kvm-p0-5c6a854.json"
