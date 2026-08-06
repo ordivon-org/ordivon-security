@@ -3,9 +3,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import signal
 import subprocess
+from collections.abc import Iterator
+from contextlib import contextmanager
 from importlib.resources import files
 from pathlib import Path
+from types import FrameType
 
 from ordivon_security._canonical import JsonObject, canonical_digest
 from ordivon_security.evaluation import (
@@ -21,6 +25,29 @@ from ordivon_security.evaluation.windows_kvm import (
     WindowsKvmEvaluationBackend,
     WindowsKvmProviderConfig,
 )
+
+
+class _RuntimeCancellation(RuntimeError):
+    """Translate Runtime termination signals into controlled Evaluation cleanup."""
+
+
+@contextmanager
+def _translate_runtime_cancellation() -> Iterator[None]:
+    previous_handlers = {
+        signal_number: signal.getsignal(signal_number)
+        for signal_number in (signal.SIGTERM, signal.SIGINT)
+    }
+
+    def request_cancellation(signal_number: int, _frame: FrameType | None) -> None:
+        raise _RuntimeCancellation(f"Runtime cancellation requested by signal {signal_number}")
+
+    for signal_number in previous_handlers:
+        signal.signal(signal_number, request_cancellation)
+    try:
+        yield
+    finally:
+        for signal_number, previous_handler in previous_handlers.items():
+            signal.signal(signal_number, previous_handler)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -192,10 +219,11 @@ def main() -> None:
                 "unknownSampleExecution": False,
             },
         )
-        result = EvaluationRunner(backend, vault, evidence_root=args.evidence).run(
-            spec,
-            run_index=args.run_index,
-        )
+        with _translate_runtime_cancellation():
+            result = EvaluationRunner(backend, vault, evidence_root=args.evidence).run(
+                spec,
+                run_index=args.run_index,
+            )
         payload = result.to_dict()
         payload["fixtureCompilation"] = compilation
         print(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2))
