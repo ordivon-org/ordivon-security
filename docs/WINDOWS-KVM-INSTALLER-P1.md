@@ -192,7 +192,7 @@ The retained contract at [`../research/cases/windows-kvm-p1-davinci-case-a-execu
 
 The materializer writes the tree to an NTFS image through a private `nodev,nosuid,noexec` mount, unmounts it, remounts it read-only, and rehashes the complete payload plus the retained tree manifest. A successful result is `materialized-not-admitted`: the manifest declares QEMU read-only arguments but keeps `qemuAttachmentAuthorized`, `controllerAdmitted`, and `executionAuthorized` false.
 
-A benign two-file canary completed archive listing, Host extraction, NTFS population, read-only remount, full digest readback, unmount, and cleanup. The actual Case A archive was not materialized or executed by that canary.
+A benign two-file canary completed archive listing, Host extraction, NTFS population, read-only remount, full digest readback, unmount, and cleanup. Its sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-case-a-execution-media-canary-6c141b9.json`](../evidence/acceptance/windows-kvm-p1-case-a-execution-media-canary-6c141b9.json). The actual Case A archive was not materialized or executed by that canary.
 
 ### Network boundary
 
