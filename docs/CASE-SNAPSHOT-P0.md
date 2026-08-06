@@ -14,7 +14,7 @@ audience:
   - evaluator
   - operator
   - agent
-updated: 2026-08-05
+updated: 2026-08-06
 summary: Read-only quarantine audit and digest-bound Case snapshots for evolving local analysis material, including explicit uncontrolled-execution status and evidence limitations.
 evidence_status: verified
 readiness: EXPERIMENTAL
@@ -223,8 +223,8 @@ The next work order is:
 1. retain a read-only audit receipt for the current Case drift;
 2. normalize permissions and create one exact Case Snapshot;
 3. treat the historical Wine run as uncontrolled material only;
-4. build and accept the benign-only Windows KVM candidate before any further
-   unknown-component execution;
+4. retain the benign-only Windows KVM P0 admission as an infrastructure prerequisite,
+   without treating it as authority for unknown-component execution;
 5. require another explicit admission decision before linking this Case to a dynamic
    unknown-Sample Run;
 6. then add complete Authenticode and safe archive-expansion adapters when they
@@ -232,6 +232,6 @@ The next work order is:
 
 The host audit established that Windows Sandbox and the complete Hyper-V VM
 management stack are unavailable on the current Windows 11 Home host, while WSL
-provides functional KVM. The candidate QEMU/KVM Provider is documented in
+provides functional KVM. The P0-admitted benign-only QEMU/KVM Provider is documented in
 [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md). Its benign acceptance does not by itself
 authorize this retained Case or another unknown Sample.

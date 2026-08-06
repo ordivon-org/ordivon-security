@@ -14,7 +14,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-05
+updated: 2026-08-06
 summary: Canonical architecture for fail-closed Contest execution and authorized software Evaluation Trials with exact identity, separated authorities, residual closure, and sealed evidence.
 evidence_status: verified
 readiness: EXPERIMENTAL
@@ -135,7 +135,7 @@ The `LocalStaticEvaluationBackend` invokes admitted classical analyzers without 
 
 Observer and Guardian are separate authorities. Observer records may support a Finding but cannot alter the environment. Guardian decisions represent hard boundary enforcement and may terminate a Run without inventing a Finding. A Run is invalid when Sample verification, backend execution, or residual closure is incomplete.
 
-Current Runtime `contained_local` remains outside dynamic Sample execution because it does not provide hostile-code isolation, management-plane egress control, or disposable-machine semantics. Static Evaluation runs locally but permits only declared non-executing analyzers. The candidate Windows KVM backend is an external QEMU/KVM integration behind `EvaluationRangeBackend`; it is restricted to the Ordivon benign fixture until real acceptance succeeds. See [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md), [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md), and [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
+Current Runtime `contained_local` remains outside dynamic Sample execution because it does not provide hostile-code isolation, management-plane egress control, or disposable-machine semantics. Static Evaluation runs locally but permits only declared non-executing analyzers. The P0-admitted Windows KVM backend is an external QEMU/KVM integration behind `EvaluationRangeBackend`; its admission remains restricted to the exact Ordivon benign fixture. See [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md), [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md), and [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
 
 ## Case Snapshot P0
 
@@ -145,7 +145,7 @@ A local Wine fuzz run of one retained component occurred outside an admitted dis
 
 ## Windows KVM Provider P0
 
-The candidate Provider uses QEMU/KVM from WSL because the actual Windows 11 Home host lacks Windows Sandbox and the complete Hyper-V VM management stack while exposing a functional `/dev/kvm`. The base builder seals an exact Windows 11 Enterprise Evaluation image. Each Run creates a qcow2 overlay, UEFI variables copy, TPM state, FAT Run disk, and QMP socket, then removes the complete Run directory after execution.
+The P0-admitted Provider uses QEMU/KVM from WSL because the actual Windows 11 Home host lacks Windows Sandbox and the complete Hyper-V VM management stack while exposing a functional `/dev/kvm`. The base builder seals an exact Windows 11 Enterprise Evaluation image. Each Run creates a qcow2 overlay, UEFI variables copy, TPM state, FAT Run disk, and QMP socket, then removes the complete Run directory after execution.
 
 No network device is configured. QMP `query-pci` is the management-plane authority and terminates the Run if a network-class PCI device appears. The Guest report remains an Observer. P0 binds the exact compiled benign Sample digest and compilation-attestation digest into Provider execution identity; relabelling another PE is insufficient. Unknown Samples remain prohibited until a later explicit gate. See [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
 
@@ -228,7 +228,7 @@ Its deletion condition is not merely the existence of CAGE: it can be removed on
 | Native Agent loop, Provider turns, Tool recovery, external Harness drivers | Harness |
 | Workspace, Job, Attempt, process, artifact, physical recovery | Runtime |
 | external provider/private operator adapters when needed | World |
-| disposable Windows machine lifecycle and no-network topology | candidate QEMU/KVM Provider integrated by Security; hypervisor mechanics remain QEMU/KVM |
+| disposable Windows machine lifecycle and no-network topology | P0-admitted QEMU/KVM Provider integrated by Security; hypervisor mechanics remain QEMU/KVM |
 | Scenario, Contest, Campaign, organization, Range semantics, scoring | Security |
 | promoted cross-domain protocols | Computing |
 
@@ -250,8 +250,8 @@ Evaluation integration proceeds independently:
 
 1. retain P0 local contracts, streaming Vault, static backend, report Artifacts, quarantine audits, and Case Snapshots;
 2. preserve external uncontrolled executions as limited historical Case material rather than Evaluation truth;
-3. build and seal the exact Windows KVM base image from a clean Security revision;
-4. admit the candidate only after the maintained benign fixture proves management-plane no-network topology, bounded execution, evidence export, destruction, and residual closure;
+3. retain the exact sealed Windows KVM base image and its build receipt;
+4. retain the benign-only P0 admission proving management-plane no-network topology, bounded execution, evidence export, destruction, and residual closure;
 5. add Guest and network Observers without giving them Guardian authority;
 6. require a separate explicit gate before any unknown Sample;
 7. add mature static analyzers only when an observed evidence gap justifies the adapter;

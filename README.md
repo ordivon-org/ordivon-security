@@ -14,8 +14,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-05
-summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, controlled DeepSeek/Harness Actors, streaming SampleVault, static Evaluation, evolving Case snapshots, and a benign-only disposable Windows KVM candidate.
+updated: 2026-08-06
+summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, controlled DeepSeek/Harness Actors, streaming SampleVault, static Evaluation, evolving Case snapshots, and a P0-admitted benign-only disposable Windows KVM Provider.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -63,7 +63,7 @@ The active `0.8` core provides:
 - native report Artifacts bound into Evaluation Evidence schema revision 2;
 - read-only quarantine drift audits;
 - digest-bound Case Snapshots with explicit static, uncontrolled, or controlled execution status;
-- a QEMU/KVM disposable Windows Provider candidate restricted to the maintained benign fixture;
+- a P0-admitted QEMU/KVM disposable Windows Provider restricted to the maintained benign fixture;
 - a DeepSeek Flash `NativeHarnessActorBackend` with exact Provider, Harness, Host, Runtime, Protocol, prompt, budget, and credential-scope identity;
 - a P0-A CAGE path where Harness is consumed while Host and Runtime non-consumption remain explicit experimental facts;
 - an accepted P0-B CAGE path where Host owns the durable Task, compiled Context, committed Assignment, Run receipt, CompletionProposal, and CompletionDecision while Runtime remains explicitly unconsumed;
@@ -73,7 +73,7 @@ The active `0.8` core provides:
 
 In the CAGE adapter, one Security Red Actor controls the CAGE Red team and one Security Blue Actor controls five CAGE Blue agents. Every Red and Blue CAGE action is explicitly supplied by Ordivon to the joint step; Green agents remain CAGE-controlled environmental actors. The current action surface is intentionally narrow: each side selects either the pinned native team policy or Sleep. Parameter-level model control is a later integration.
 
-It does **not yet** provide parameterized model-built CAGE actions, arbitrary model-generated shell execution, an admitted unknown-Sample Windows execution path, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The accepted P0-B/P0-C comparison is limited to one seed, one CAGE tick, and team-plan selection; it does not establish multi-tick continuity, injected cancellation recovery, strategic superiority, or production readiness. The Windows KVM Provider is a benign-fixture-only candidate until its clean-revision base build and real acceptance Run pass. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
+It does **not yet** provide parameterized model-built CAGE actions, arbitrary model-generated shell execution, an admitted unknown-Sample Windows execution path, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The accepted P0-B/P0-C comparison is limited to one seed, one CAGE tick, and team-plan selection; it does not establish multi-tick continuity, injected cancellation recovery, strategic superiority, or production readiness. The Windows KVM Provider is admitted only for the exact maintained benign fixture; unknown Samples and third-party installers remain outside the admitted execution path. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
 
 ## Run a local Evaluation Trial dry run
 
@@ -121,7 +121,7 @@ uv run ordivon-security-case-snapshot \
 
 The audit is read-only. The snapshot binds the current directory tree, file modes, byte lengths, and complete SHA-256 identities without copying Sample bytes. It does not create Evaluation truth or retroactively control an external execution. See [`docs/CASE-SNAPSHOT-P0.md`](docs/CASE-SNAPSHOT-P0.md).
 
-## Build and accept the Windows KVM candidate
+## Build and verify Windows KVM Provider P0
 
 ```bash
 uv run ordivon-security-windows-kvm-build \
