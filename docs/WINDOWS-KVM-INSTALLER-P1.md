@@ -46,3 +46,24 @@ The retained DaVinci profile at `research/cases/windows-kvm-p1-davinci-resolve-s
 `executionAuthorized` remains false, so neither the archive nor any contained installer may be attached to a Guest or executed yet.
 
 Later execution requires a new admitted Guest observation protocol, an exact installer path and arguments, pre/post system snapshots, real residual closure, and a separate acceptance decision.
+
+## Static entry decision
+
+The retained static decision at [`../research/cases/windows-kvm-p1-davinci-static-entry.json`](../research/cases/windows-kvm-p1-davinci-static-entry.json) rejects generation of an executable profile for the current Case. It binds the archive, wrapper, outer MSI, nested GetintoWAY MSI, embedded downloader script, replacement `intl.dll`, and main `Resolve.exe` identities.
+
+The decisive evidence is the nested MSI first-install chain:
+
+- `AI_DATA_SETTER` at sequence 6401;
+- `PowerShellScriptInline` at sequence 6402;
+- download from `corehubpro.com` through BITS or `System.Net.WebClient`;
+- extraction of the downloaded ZIP;
+- highest-privilege `OneDriveStandaloneUpdate####` scheduled-task creation;
+- execution of every EXE found in the downloaded archive.
+
+The exact runtime edge from the wrapper or outer MSI to the nested MSI is not yet fully traced. That uncertainty does not weaken the rejection decision: the distributed package contains the malicious installer and the current profile remains non-executable.
+
+## Observation contract
+
+Future third-party installer execution requires the canonical profile at [`../research/profiles/windows-kvm-installer-observation-p1.json`](../research/profiles/windows-kvm-installer-observation-p1.json). It requires pre/post snapshots for files, Registry, services, drivers, scheduled tasks, BITS jobs, startup entries, installed products, users/groups, certificates, Defender, and Event Logs. It also requires a complete process tree, PowerShell script-block evidence, MSI and Task Scheduler events, QMP topology authority, host media identity, and residual closure.
+
+The observation contract is evidence infrastructure only. It does not change `executionAuthorized`, bind an installer path, attach the current media, or start Windows.

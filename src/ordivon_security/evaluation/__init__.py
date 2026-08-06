@@ -68,6 +68,10 @@ from .windows_kvm_p1 import (
     prepare_windows_kvm_installer_media,
     windows_kvm_p1_sample_disk_arguments,
 )
+from .windows_kvm_p1_contracts import (
+    WindowsKvmInstallerObservationProfile,
+    WindowsKvmInstallerStaticDecision,
+)
 from .windows_kvm_reconcile import reconcile_windows_kvm_runs
 
 __all__ = [
@@ -116,6 +120,8 @@ __all__ = [
     "WindowsKvmBaseImage",
     "WindowsKvmEvaluationBackend",
     "WindowsKvmProviderConfig",
+    "WindowsKvmInstallerObservationProfile",
+    "WindowsKvmInstallerStaticDecision",
     "WindowsKvmInstallerProfile",
     "WindowsKvmP1MediaConfig",
     "prepare_windows_kvm_installer_media",
