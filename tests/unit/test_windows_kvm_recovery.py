@@ -13,7 +13,10 @@ from ordivon_security.evaluation.windows_kvm import (
     _process_start_time,
     _replace_private_json,
 )
-from ordivon_security.evaluation.windows_kvm_reconcile import reconcile_windows_kvm_runs
+from ordivon_security.evaluation.windows_kvm_reconcile import (
+    _reconcile_benign_fixtures,
+    reconcile_windows_kvm_runs,
+)
 
 
 class WindowsKvmRecoveryTests(unittest.TestCase):
@@ -116,6 +119,34 @@ class WindowsKvmRecoveryTests(unittest.TestCase):
         self.assertTrue(run_path.exists())
         diagnostics = list((self.state / "diagnostics" / "orphan-runs").glob("unknown-*.json"))
         self.assertEqual(len(diagnostics), 1)
+
+    def test_reconciler_removes_orphan_benign_fixture(self) -> None:
+        fixture_root = self.state / "fixtures"
+        fixture_root.mkdir()
+        fixture = fixture_root / "ordivon-benign-v1-run-20.exe"
+        fixture.write_bytes(b"fixture")
+        result = reconcile_windows_kvm_runs(
+            self.state,
+            receipt_path=self.root / "fixture-receipt.json",
+        )
+        self.assertEqual(result["fixtureFilesRemoved"], 1)
+        self.assertFalse(fixture.exists())
+        self.assertFalse(fixture_root.exists())
+
+    def test_fixture_reconciler_skips_active_run_index(self) -> None:
+        fixture_root = self.state / "fixtures"
+        fixture_root.mkdir()
+        fixture = fixture_root / "ordivon-benign-v1-run-21.exe"
+        fixture.write_bytes(b"fixture")
+        results, removed, skipped = _reconcile_benign_fixtures(
+            fixture_root,
+            active_indices={21},
+            diagnostics=self.state / "diagnostics" / "orphan-runs",
+        )
+        self.assertEqual(removed, 0)
+        self.assertEqual(skipped, 1)
+        self.assertTrue(fixture.exists())
+        self.assertEqual(results[0]["decision"], "skipped-active-fixture")
 
     def test_reconciler_does_not_kill_reused_pid(self) -> None:
         process = subprocess.Popen(["/usr/bin/sleep", "30"])

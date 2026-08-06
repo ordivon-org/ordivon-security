@@ -15,6 +15,7 @@ from unittest.mock import patch
 
 from ordivon_security._canonical import JsonObject, JsonValue, canonical_digest
 from ordivon_security.cli_windows_kvm_acceptance import (
+    _remove_compiled_fixture,
     _RuntimeCancellation,
     _translate_runtime_cancellation,
 )
@@ -205,6 +206,16 @@ class WindowsKvmP0Tests(unittest.TestCase):
                 "fixtureCompilationDigest": "sha256:" + "4" * 64,
             },
         )
+
+    def test_compiled_fixture_cleanup_is_idempotent(self) -> None:
+        fixture_root = self.root / "fixtures"
+        fixture_root.mkdir()
+        fixture = fixture_root / "ordivon-benign-v1-run-99.exe"
+        fixture.write_bytes(b"fixture")
+        _remove_compiled_fixture(fixture, fixture_root)
+        _remove_compiled_fixture(fixture, fixture_root)
+        self.assertFalse(fixture.exists())
+        self.assertFalse(fixture_root.exists())
 
     def test_runtime_termination_signal_becomes_controlled_cancellation(self) -> None:
         previous = signal.getsignal(signal.SIGTERM)

@@ -34,6 +34,7 @@ The explicit `ordivon-security-windows-kvm-reconcile` command scans the private 
 - terminates QEMU and swtpm only when PID, start time, and command identity agree;
 - removes an orphan Run only after both process identities close;
 - leaves missing, unsafe, or process-identity-inconclusive Run state untouched and writes an attention-required diagnostic instead of guessing;
+- removes only exact orphan `ordivon-benign-v1-run-<index>.exe` compilation files when no matching acceptance process is active;
 - writes a private reconciliation receipt.
 
 This stage does not authorize unknown Samples or third-party installers. It remains candidate until real SIGKILL, Runtime restart, and WSL shutdown recovery gates are retained.
