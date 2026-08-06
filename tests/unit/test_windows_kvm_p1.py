@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from dataclasses import replace
 from pathlib import Path
+from unittest.mock import patch
 
 from ordivon_security.evaluation.windows_kvm_p1 import (
     _P1_INSPECT_ACTION,
@@ -77,17 +78,26 @@ class WindowsKvmP1Tests(unittest.TestCase):
         mkntfs = self._tool("mkntfs", "exit 0")
         ntfscp = self._tool("ntfscp", "exit 0")
         ntfscat = self._tool("ntfscat", f"cat '{self.source}'")
-        result = prepare_windows_kvm_installer_media(
-            self.profile,
-            self.source,
-            WindowsKvmP1MediaConfig(
-                state_root=self.root / "state",
-                mkntfs_path=mkntfs,
-                ntfscp_path=ntfscp,
-                ntfscat_path=ntfscat,
-                overhead_mib=128,
-            ),
-        )
+        with patch(
+            "ordivon_security.evaluation.windows_kvm_p1.security_source_identity",
+            return_value={
+                "componentId": "ordivon-security",
+                "revision": "git:test",
+                "revisionKind": "git-commit",
+                "packageVersion": "test",
+            },
+        ):
+            result = prepare_windows_kvm_installer_media(
+                self.profile,
+                self.source,
+                WindowsKvmP1MediaConfig(
+                    state_root=self.root / "state",
+                    mkntfs_path=mkntfs,
+                    ntfscp_path=ntfscp,
+                    ntfscat_path=ntfscat,
+                    overhead_mib=128,
+                ),
+            )
         self.assertEqual(result["status"], "prepared-not-executable")
         self.assertIs(result["executionAuthorized"], False)
         media = result["media"]
@@ -95,6 +105,17 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(media["readOnly"], True)
         self.assertIs(media["removable"], True)
         self.assertTrue(Path(str(media["path"])).is_file())
+        self.assertEqual(result["implementation"]["revision"], "git:test")
+        self.assertEqual(set(result["tools"]), {"mkntfs", "ntfscp", "ntfscat"})
+        for identity in result["tools"].values():
+            self.assertTrue(identity["digest"].startswith("sha256:"))
+            self.assertGreater(identity["byteLength"], 0)
+        self.assertEqual(
+            result["preparationIdentityDigest"],
+            __import__(
+                "ordivon_security._canonical", fromlist=["canonical_digest"]
+            ).canonical_digest(result["preparationIdentity"]),
+        )
 
     def test_prepare_media_rejects_wrong_source_and_cleans_state(self) -> None:
         wrong = self.root / "wrong.7z"
