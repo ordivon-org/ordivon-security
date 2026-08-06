@@ -62,6 +62,12 @@ from .windows_kvm_build import (
     build_windows_kvm_base,
     windows_kvm_install_arguments,
 )
+from .windows_kvm_p1 import (
+    WindowsKvmInstallerProfile,
+    WindowsKvmP1MediaConfig,
+    prepare_windows_kvm_installer_media,
+    windows_kvm_p1_sample_disk_arguments,
+)
 from .windows_kvm_reconcile import reconcile_windows_kvm_runs
 
 __all__ = [
@@ -110,8 +116,12 @@ __all__ = [
     "WindowsKvmBaseImage",
     "WindowsKvmEvaluationBackend",
     "WindowsKvmProviderConfig",
+    "WindowsKvmInstallerProfile",
+    "WindowsKvmP1MediaConfig",
+    "prepare_windows_kvm_installer_media",
     "reconcile_windows_kvm_runs",
     "build_windows_kvm_base",
+    "windows_kvm_p1_sample_disk_arguments",
     "windows_kvm_install_arguments",
     "windows_kvm_qemu_arguments",
     "write_quarantine_audit",

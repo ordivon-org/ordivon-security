@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-installer-profile",
+  "profileId": "profile:windows-kvm-p1:caseb-studio",
+  "revision": "1",
+  "caseId": "case:caseb-studio",
+  "archiveDigest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+  "archiveByteLength": 7428655207,
+  "archiveName": "目标产品B_Resolve_Studio_.7z",
+  "executionAuthorized": false,
+  "networkMode": "deny-all",
+  "allowRestart": false,
+  "maxRuntimeMs": 2700000,
+  "expectedPublisher": null,
+  "installerRelativePath": null,
+  "arguments": [],
+  "observationProfile": "windows-installer-p1"
+}
