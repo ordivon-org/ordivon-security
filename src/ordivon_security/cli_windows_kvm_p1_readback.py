@@ -162,6 +162,16 @@ def main() -> None:
     image_path = Path(str(media.get("path", "")))
     if image_path.is_symlink() or not image_path.is_file():
         raise ValueError("Windows KVM P1 media image is missing or unsafe")
+    media_root = (args.state_root / "sample-media").resolve(strict=True)
+    resolved_image_path = image_path.resolve(strict=True)
+    media_directory = resolved_image_path.parent
+    if (
+        media_directory.is_symlink()
+        or not media_directory.is_dir()
+        or media_directory.parent != media_root
+    ):
+        raise ValueError("Windows KVM P1 media path is outside the admitted media root")
+    image_path = resolved_image_path
     actual_media_digest, actual_media_length = _digest_path(image_path)
     if actual_media_digest != media.get("digest") or actual_media_length != media.get("byteLength"):
         raise ValueError("Windows KVM P1 media image differs from the sealed manifest")
@@ -192,6 +202,8 @@ def main() -> None:
     )
     original_stat = image_path.stat()
     original_mode = stat.S_IMODE(original_stat.st_mode)
+    original_directory_stat = media_directory.stat()
+    original_directory_mode = stat.S_IMODE(original_directory_stat.st_mode)
     try:
         vault = SampleVault(args.vault, max_sample_bytes=16 * 1024 * 1024)
         sample = vault.import_path(
@@ -203,6 +215,8 @@ def main() -> None:
             fixture_root.rmdir()
         compilation_digest = canonical_digest(compilation)
 
+        shutil.chown(media_directory, user="root", group="qemu")
+        media_directory.chmod(0o710)
         shutil.chown(image_path, user="root", group="qemu")
         image_path.chmod(0o440)
         config = WindowsKvmProviderConfig(
@@ -320,6 +334,12 @@ def main() -> None:
         try:
             os.chown(image_path, original_stat.st_uid, original_stat.st_gid)
             image_path.chmod(original_mode)
+            os.chown(
+                media_directory,
+                original_directory_stat.st_uid,
+                original_directory_stat.st_gid,
+            )
+            media_directory.chmod(original_directory_mode)
         except OSError:
             pass
 
