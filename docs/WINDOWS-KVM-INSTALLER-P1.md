@@ -89,6 +89,51 @@ The separate contract at [`../research/cases/windows-kvm-p1-davinci-isolated-res
 7. record that no contained EXE, MSI, DLL, script, or archive entry was executed;
 8. require complete residual closure.
 
-The new `ordivon-security-windows-kvm-p1-readback` command implements this first research Gate. It does not reverse the package rejection and does not yet admit third-party execution. Later Gates may execute the original package or a backdoor-removed derived Case only after the generic installer observer is implemented and independently admitted.
+The `ordivon-security-windows-kvm-p1-readback` command implements this first research Gate. It does not reverse the package rejection and does not yet admit third-party execution. Later Gates may execute the original package or a backdoor-removed derived Case only after the generic installer observer is implemented and independently admitted.
 
-P1 itself remains a candidate infrastructure track: the read-only media verification backend is implemented, while generic third-party installer execution and full Guest observation remain pending.
+P1 remains a candidate infrastructure track: the read-only media verification backend is implemented; the observer resource and Case authorities are implemented below; generic third-party execution and process-tree orchestration remain pending.
+
+## R0 correction: residual closure
+
+The earlier Case closeout claimed that all prepared P1 media had been removed. A later
+state-root audit found one 8 GiB `prepared-not-executable` NTFS image under the separate
+`windows-kvm-p1` root. The image and manifest were re-verified, removed, and recorded by
+[`../evidence/acceptance/windows-kvm-p1-davinci-residual-correction-r0.json`](../evidence/acceptance/windows-kvm-p1-davinci-residual-correction-r0.json).
+The original closeout remains historical evidence; it is not treated as proof of residual
+closure without this correction.
+
+## R1: deployment and evaluation are separate authorities
+
+P1 now distinguishes:
+
+- `deploymentAuthorized`: permission to deploy or use a product outside the experiment;
+- `evaluationAuthorized`: permission to execute exact components in a disposable evaluation;
+- `hostObservationAuthorized`: permission to inspect an existing host baseline read-only;
+- `hostModificationAuthorized`: permission to modify the host.
+
+The current P1 model rejects product deployment and host modification. It can authorize
+bounded evaluation in disposable Windows KVM and read-only observation of the existing
+Windows host baseline. The legacy `executionAuthorized` field remains only as an alias for
+isolated evaluation authority.
+
+## R2: observer implementation
+
+`resources/windows_kvm/p1-observer.ps1` now implements bounded pre/post collection for
+files, Registry startup state, services, drivers, scheduled tasks, BITS jobs, installed
+products, users/groups, certificates, Defender state, Event Logs, and network adapters.
+The base-image builder binds and copies this observer into future sealed images. The
+existing sealed base predates this observer and must be rebuilt before dynamic P1 runs.
+Process-tree orchestration and the third-party execution backend remain unadmitted.
+
+## R3: Case A, B, and C
+
+| Case | Surface | Current state |
+| --- | --- | --- |
+| C — installed Resolve Free 21.0.3.7 control | existing Windows host, read-only | exact executable, `intl.dll`, signature, and uninstall identity captured |
+| A — original repack | disposable Windows KVM | identity and evaluation controls defined; runner still required |
+| B — deweaponized derived payload | disposable Windows KVM | `intl.dll` and `Patches.txt` privately materialized with tree digest `sha256:4e4c5a990a0ea84d0c299577cf206573dcb67213d0864214e4b823193f4d7a13` |
+
+The transformation manifest is evidence of what was removed and retained. It does not
+prevent real use inside the disposable VM: Case B is intended to be copied into the VM's
+official Resolve installation, launched, exercised, compared with Case C, and then destroyed.
+It is not an installer and does not authorize host modification or external deployment.

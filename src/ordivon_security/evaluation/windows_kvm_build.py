@@ -421,11 +421,13 @@ def _build_windows_kvm_base_impl(
     build_path: Path,
 ) -> JsonObject:
     guest_runner_path = _resource_path("guest-runner.ps1")
+    p1_observer_path = _resource_path("p1-observer.ps1")
     base_finalize_path = _resource_path("base-finalize.ps1")
     setup_complete_path = _resource_path("SetupComplete.cmd")
     install_bootstrap_path = _resource_path("install-bootstrap.ps1")
     unattend_template_path = _resource_path("Autounattend.xml.in")
     guest_runner_digest, guest_runner_bytes = _digest_path(guest_runner_path)
+    p1_observer_digest, p1_observer_bytes = _digest_path(p1_observer_path)
     base_finalize_digest, base_finalize_bytes = _digest_path(base_finalize_path)
     setup_complete_digest, setup_complete_bytes = _digest_path(setup_complete_path)
     install_bootstrap_digest, install_bootstrap_bytes = _digest_path(install_bootstrap_path)
@@ -472,6 +474,7 @@ def _build_windows_kvm_base_impl(
         (unattend_path, "Autounattend.xml"),
         (install_bootstrap_path, "install-bootstrap.ps1"),
         (guest_runner_path, "guest-runner.ps1"),
+        (p1_observer_path, "p1-observer.ps1"),
         (base_finalize_path, "base-finalize.ps1"),
         (setup_complete_path, "SetupComplete.cmd"),
     ):
@@ -567,6 +570,7 @@ def _build_windows_kvm_base_impl(
         "baseVarsDigest": base_vars_digest,
         "firmwareCodeDigest": firmware_digest,
         "guestRunnerDigest": guest_runner_digest,
+        "p1ObserverDigest": p1_observer_digest,
         "baseFinalizeDigest": base_finalize_digest,
         "setupCompleteDigest": setup_complete_digest,
         "installBootstrapDigest": install_bootstrap_digest,
@@ -625,6 +629,7 @@ def _build_windows_kvm_base_impl(
             "baseVars": base_vars_digest,
             "firmwareCode": firmware_digest,
             "guestRunner": guest_runner_digest,
+            "p1Observer": p1_observer_digest,
             "baseFinalize": base_finalize_digest,
             "setupComplete": setup_complete_digest,
             "installBootstrap": install_bootstrap_digest,
@@ -635,6 +640,7 @@ def _build_windows_kvm_base_impl(
             "baseImage": base_image_bytes,
             "baseVars": base_vars_bytes,
             "guestRunner": guest_runner_bytes,
+            "p1Observer": p1_observer_bytes,
             "baseFinalize": base_finalize_bytes,
             "setupComplete": setup_complete_bytes,
             "installBootstrap": install_bootstrap_bytes,

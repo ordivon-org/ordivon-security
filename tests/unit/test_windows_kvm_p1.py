@@ -196,8 +196,11 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertEqual(value["permittedActions"], [_P1_PREPARE_ACTION])
         self.assertNotIn(_P1_INSPECT_ACTION, value["permittedActions"])
         self.assertIs(value["executionAuthorized"], False)
+        self.assertIs(value["deploymentAuthorized"], False)
+        self.assertIs(value["evaluationAuthorized"], False)
+        self.assertIs(value["hostModificationAuthorized"], False)
         with self.assertRaisesRegex(ValueError, "bind the installer path"):
-            replace(self.profile, execution_authorized=True)
+            replace(self.profile, evaluation_authorized=True)
 
     def test_qemu_sample_disk_is_read_only_and_removable(self) -> None:
         args = windows_kvm_p1_sample_disk_arguments(Path("/sample.img"))

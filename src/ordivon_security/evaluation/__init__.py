@@ -66,7 +66,15 @@ from .windows_kvm_p1 import (
     WindowsKvmInstallerProfile,
     WindowsKvmP1MediaConfig,
     prepare_windows_kvm_installer_media,
+    reconcile_windows_kvm_p1_non_executable_media,
     windows_kvm_p1_sample_disk_arguments,
+)
+from .windows_kvm_p1_cases import (
+    CapabilityAdmission,
+    CapabilityCase,
+    DerivedCaseManifest,
+    DerivedComponent,
+    materialize_derived_case,
 )
 from .windows_kvm_p1_contracts import (
     WindowsKvmInstallerObservationProfile,
@@ -76,6 +84,12 @@ from .windows_kvm_reconcile import reconcile_windows_kvm_runs
 
 __all__ = [
     "ArchiveInventoryAnalyzer",
+    "CapabilityAdmission",
+    "CapabilityCase",
+    "DerivedCaseManifest",
+    "DerivedComponent",
+    "materialize_derived_case",
+    "reconcile_windows_kvm_p1_non_executable_media",
     "AuthorityManifest",
     "AuthenticodeReportAnalyzer",
     "CaseExecutionStatus",

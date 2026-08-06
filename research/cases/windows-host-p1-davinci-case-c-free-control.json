@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.capability-case",
+  "caseId": "case:davinci-resolve-free-21.0.3.7:c-host-control",
+  "revision": "1",
+  "role": "control-free",
+  "admission": {
+    "deploymentAuthorized": false,
+    "evaluationAuthorized": true,
+    "hostObservationAuthorized": true,
+    "hostModificationAuthorized": false,
+    "targetSurface": "windows-host-read-only-baseline"
+  },
+  "source": {
+    "product": "DaVinci Resolve Free",
+    "version": "21.0.3.7",
+    "windowsProductVersion": "21.0.30007",
+    "resolveExe": {
+      "digest": "sha256:3a35bca1214d7463803033e2a94742a30db470c125b420f4daa89ce126f409aa",
+      "byteLength": 574885744,
+      "signatureStatus": "Valid"
+    },
+    "intlDll": {
+      "digest": "sha256:dec4671bdb1946562301c434bef589fbe52bf193b0c1aa9be47faf9661f87f2e",
+      "byteLength": 20848,
+      "signatureStatus": "Valid"
+    }
+  },
+  "observationProfile": "windows-host-resolve-free-baseline-p1",
+  "networkMode": "host-existing",
+  "status": "baseline-identity-captured",
+  "controls": {
+    "realC2": false,
+    "exportableArtifact": false,
+    "readOnly": true,
+    "hostModified": false
+  }
+}

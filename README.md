@@ -157,6 +157,8 @@ uv run ordivon-security-windows-kvm-p1-prepare \
 
 This command only prepares and verifies a digest-bound NTFS input image. QEMU attachment is declared read-only and removable. The retained DaVinci profile has `executionAuthorized: false`; it does not authorize launching the archive or an installer. See [`docs/WINDOWS-KVM-INSTALLER-P1.md`](docs/WINDOWS-KVM-INSTALLER-P1.md).
 
+P1 R0-R3 also provides manifest-verified residual reconciliation, private derived-Case materialization, a packaged Windows observer, and Case A/B/C authority records. The existing Windows host is used only as the read-only Free-version control; executable third-party Cases target disposable Windows KVM.
+
 ## Run the deterministic Contest
 
 Python 3.12 is the supported interpreter.

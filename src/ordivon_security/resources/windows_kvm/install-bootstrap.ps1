@@ -11,5 +11,6 @@ $setupRoot = 'C:\Windows\Setup\Scripts'
 New-Item -ItemType Directory -Path $programRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $setupRoot -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $sourceRoot 'guest-runner.ps1') -Destination (Join-Path $programRoot 'guest-runner.ps1') -Force
+Copy-Item -LiteralPath (Join-Path $sourceRoot 'p1-observer.ps1') -Destination (Join-Path $programRoot 'p1-observer.ps1') -Force
 Copy-Item -LiteralPath (Join-Path $sourceRoot 'base-finalize.ps1') -Destination (Join-Path $programRoot 'base-finalize.ps1') -Force
 Copy-Item -LiteralPath (Join-Path $sourceRoot 'SetupComplete.cmd') -Destination (Join-Path $setupRoot 'SetupComplete.cmd') -Force
