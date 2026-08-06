@@ -6,6 +6,7 @@
     "startWindows": false
   },
   "caseId": "case:caseb-studio",
+  "current": false,
   "embeddedSource": {
     "byteLength": 7428655207,
     "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
@@ -49,6 +50,7 @@
     "serial": "ORDIVON_P1",
     "volumeLabel": "ORDIVON_P1"
   },
+  "mediaRetained": false,
   "preparationIdentityDigest": "sha256:6fb8a85ab0fd1afb0c462fe6044eb1593c90a0894685b5530916ccb2a03b4027",
   "profileDigest": "sha256:dedee9615926ff2b65c6ae7b055502a384af26321e0c17dbe045770ea6d7c499",
   "profileId": "profile:windows-kvm-p1:caseb-studio",
@@ -59,7 +61,9 @@
     "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
     "logicalName": "目标产品B_Resolve_Studio_.7z"
   },
-  "status": "media-preparation-accepted-execution-not-authorized",
+  "status": "superseded-by-static-rejection",
+  "supersededBy": "windows-kvm-p1-caseb-case-closeout-bf272ab.json",
+  "supersessionReason": "static evidence rejected the package before Guest attachment or execution",
   "tools": {
     "mkntfs": {
       "byteLength": 71856,

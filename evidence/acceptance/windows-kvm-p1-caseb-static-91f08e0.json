@@ -1,5 +1,7 @@
 {
+  "caseCloseout": "windows-kvm-p1-caseb-case-closeout-bf272ab.json",
   "caseId": "case:caseb-studio",
+  "caseStatus": "closed-rejected",
   "decision": {
     "attachToGuest": false,
     "chainComplete": false,
