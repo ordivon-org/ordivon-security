@@ -37,6 +37,7 @@ from ordivon_security.evaluation.windows_kvm import (
     WindowsKvmEvaluationBackend,
     WindowsKvmProviderConfig,
     _pci_network_devices,
+    _process_start_time,
     _terminate_pid,
     windows_kvm_qemu_arguments,
 )
@@ -630,6 +631,24 @@ class WindowsKvmP0Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "requires two admitted processes"):
             backend._validate_spec(too_few_processes)
 
+    def test_terminate_pid_rejects_reused_process_identity(self) -> None:
+        process = subprocess.Popen(["/usr/bin/sleep", "30"])
+        try:
+            start_time = _process_start_time(process.pid)
+            self.assertIsNotNone(start_time)
+            assert start_time is not None
+            self.assertFalse(
+                _terminate_pid(
+                    process.pid,
+                    expected_fragment="sleep",
+                    expected_start_time=start_time + 1,
+                )
+            )
+            self.assertIsNone(process.poll())
+        finally:
+            process.terminate()
+            process.wait(timeout=5)
+
     def test_terminate_pid_treats_reaped_zombie_as_closed(self) -> None:
         process = subprocess.Popen(["/usr/bin/sleep", "30"])
         os.kill(process.pid, signal.SIGTERM)
@@ -642,7 +661,15 @@ class WindowsKvmP0Tests(unittest.TestCase):
             if state.rpartition(")")[2].strip().startswith("Z"):
                 break
             time.sleep(0.01)
-        self.assertTrue(_terminate_pid(process.pid, expected_fragment="sleep"))
+        start_time = _process_start_time(process.pid)
+        self.assertIsNotNone(start_time)
+        self.assertTrue(
+            _terminate_pid(
+                process.pid,
+                expected_fragment="sleep",
+                expected_start_time=start_time,
+            )
+        )
         self.assertFalse(Path(f"/proc/{process.pid}").exists())
 
     def test_destroy_removes_complete_run_directory(self) -> None:

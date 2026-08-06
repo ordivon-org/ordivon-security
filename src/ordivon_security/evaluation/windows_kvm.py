@@ -131,7 +131,7 @@ def _run_checked(
     )
 
 
-def _process_state(pid: int) -> str | None:
+def _process_identity(pid: int) -> tuple[str, int] | None:
     if pid < 1:
         return None
     try:
@@ -142,7 +142,23 @@ def _process_state(pid: int) -> str | None:
     if not separator:
         return None
     fields = suffix.strip().split()
-    return fields[0] if fields else None
+    if len(fields) <= 19:
+        return None
+    try:
+        start_time = int(fields[19])
+    except ValueError:
+        return None
+    return fields[0], start_time
+
+
+def _process_state(pid: int) -> str | None:
+    identity = _process_identity(pid)
+    return identity[0] if identity is not None else None
+
+
+def _process_start_time(pid: int) -> int | None:
+    identity = _process_identity(pid)
+    return identity[1] if identity is not None else None
 
 
 def _reap_child(pid: int) -> None:
@@ -166,27 +182,60 @@ def _is_process_alive(pid: int) -> bool:
     return True
 
 
-def _terminate_pid(pid: int, *, expected_fragment: str) -> bool:
-    if not _is_process_alive(pid):
+def _terminate_pid(
+    pid: int,
+    *,
+    expected_fragment: str,
+    expected_start_time: int | None = None,
+) -> bool:
+    identity = _process_identity(pid)
+    if identity is None:
         return True
+    state, start_time = identity
+    if expected_start_time is not None and start_time != expected_start_time:
+        return False
+    if state == "Z":
+        _reap_child(pid)
+        return True
+
     command_path = Path(f"/proc/{pid}/cmdline")
     try:
         command = command_path.read_bytes().replace(b"\0", b" ").decode("utf-8", errors="replace")
     except OSError:
         command = ""
-    if expected_fragment not in command:
+    if expected_start_time is None and expected_fragment not in command:
         return False
-    os.kill(pid, signal.SIGTERM)
+    if expected_start_time is not None and command and expected_fragment not in command:
+        return False
+
+    with suppress(ProcessLookupError):
+        os.kill(pid, signal.SIGTERM)
     for _ in range(50):
-        if not _is_process_alive(pid):
+        identity = _process_identity(pid)
+        if identity is None:
+            return True
+        state, current_start_time = identity
+        if current_start_time != start_time:
+            return False
+        if state == "Z":
+            _reap_child(pid)
             return True
         time.sleep(0.1)
-    os.kill(pid, signal.SIGKILL)
+
+    with suppress(ProcessLookupError):
+        os.kill(pid, signal.SIGKILL)
     for _ in range(50):
-        if not _is_process_alive(pid):
+        identity = _process_identity(pid)
+        if identity is None:
+            return True
+        state, current_start_time = identity
+        if current_start_time != start_time:
+            return False
+        if state == "Z":
+            _reap_child(pid)
             return True
         time.sleep(0.1)
-    return not _is_process_alive(pid)
+    return _process_identity(pid) is None
 
 
 def _set_owner(path: Path, *, user: str, group: str) -> None:
@@ -752,7 +801,11 @@ class WindowsKvmEvaluationBackend:
                 raise TimeoutError("swtpm PID file was not created")
             time.sleep(0.1)
         pid = int(pid_path.read_text(encoding="utf-8").strip())
+        start_time = _process_start_time(pid)
+        if start_time is None:
+            raise RuntimeError("swtpm process identity was not observable")
         instance.state["swtpmPid"] = pid
+        instance.state["swtpmStartTime"] = start_time
         return pid
 
     def _extract_run_file(self, run_disk_path: Path, run_path: Path, name: str) -> Path | None:
@@ -803,7 +856,13 @@ class WindowsKvmEvaluationBackend:
             qemu_stderr_path.open("xb") as stderr_handle,
         ):
             process = subprocess.Popen(arguments, stdout=stdout_handle, stderr=stderr_handle)
+            qemu_start_time = _process_start_time(process.pid)
+            if qemu_start_time is None:
+                process.kill()
+                process.wait(timeout=10)
+                raise RuntimeError("QEMU process identity was not observable")
             instance.state["qemuPid"] = process.pid
+            instance.state["qemuStartTime"] = qemu_start_time
             terminal_reason = "windows-kvm-provider-failed"
             network_devices: list[JsonObject] = []
             qmp_status: JsonValue = {}
@@ -1007,12 +1066,15 @@ class WindowsKvmEvaluationBackend:
         run_path = Path(run_path_value)
         qemu_pid = instance.state.get("qemuPid", 0)
         swtpm_pid = instance.state.get("swtpmPid", 0)
+        qemu_start_time = instance.state.get("qemuStartTime")
+        swtpm_start_time = instance.state.get("swtpmStartTime")
         qemu_closed = (
             not isinstance(qemu_pid, int)
             or qemu_pid == 0
             or _terminate_pid(
                 qemu_pid,
                 expected_fragment="qemu-system-x86_64",
+                expected_start_time=(qemu_start_time if isinstance(qemu_start_time, int) else None),
             )
         )
         swtpm_closed = (
@@ -1021,6 +1083,9 @@ class WindowsKvmEvaluationBackend:
             or _terminate_pid(
                 swtpm_pid,
                 expected_fragment="swtpm",
+                expected_start_time=(
+                    swtpm_start_time if isinstance(swtpm_start_time, int) else None
+                ),
             )
         )
         shutil.rmtree(run_path, ignore_errors=True)
