@@ -350,6 +350,20 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertEqual(configuration["fixtureRuntimeMs"], 900_000)
         self.assertEqual(configuration["admittedFixtureId"], _READONLY_MEDIA_FIXTURE_ID)
 
+    def test_read_only_media_verifier_waits_for_delayed_volume_enumeration(self) -> None:
+        source = (
+            Path(__file__).parents[2]
+            / "src"
+            / "ordivon_security"
+            / "resources"
+            / "windows_kvm"
+            / "readonly_media_fixture.c.in"
+        ).read_text(encoding="utf-8")
+        self.assertIn("attempt < 120", source)
+        self.assertIn("Sleep(1000)", source)
+        self.assertIn("volumeWaitMs", source)
+        self.assertIn("logicalDriveMask", source)
+
     def test_runtime_qemu_topology_attaches_declared_sample_media_read_only(self) -> None:
         media = self.root / "sample-media.img"
         media.write_bytes(b"media")
