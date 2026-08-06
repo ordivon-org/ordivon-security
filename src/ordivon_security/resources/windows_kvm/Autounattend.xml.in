@@ -39,6 +39,12 @@
       <RunSynchronous>
         <RunSynchronousCommand wcm:action="add">
           <Order>1</Order>
+          <Description>Complete Windows child setup state</Description>
+          <Path>reg.exe add HKLM\SYSTEM\Setup\Status\ChildCompletion /v setup.exe /t REG_DWORD /d 3 /f</Path>
+          <WillReboot>Never</WillReboot>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>2</Order>
           <Description>Install Ordivon base scripts</Description>
           <Path>powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "$v=Get-Volume -FileSystemLabel 'ORDIVONCFG' -ErrorAction SilentlyContinue | Select-Object -First 1; if ($null -eq $v -or $null -eq $v.DriveLetter) { exit 20 }; &amp; (Join-Path ($v.DriveLetter + ':\') 'install-bootstrap.ps1')"</Path>
           <WillReboot>Never</WillReboot>
