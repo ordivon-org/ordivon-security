@@ -32,6 +32,7 @@ from ordivon_security.evaluation import (
     SampleIdentity,
 )
 from ordivon_security.evaluation.windows_kvm import (
+    _RUN_ACTION,
     _RUN_LABEL,
     WindowsKvmBaseImage,
     WindowsKvmEvaluationBackend,
@@ -690,6 +691,21 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertTrue(receipt.clean)
         self.assertFalse(run_path.exists())
         self.assertEqual(receipt.details["residualObjects"], [])
+
+    def test_public_p0_acceptance_index_matches_implemented_scope(self) -> None:
+        path = Path(__file__).parents[2] / "evidence" / "acceptance" / "windows-kvm-p0-5c6a854.json"
+        index = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(index["kind"], "ordivon.security.windows-kvm-p0-acceptance")
+        self.assertEqual(index["status"], "accepted-for-exact-benign-fixture-only")
+        self.assertEqual(index["providerId"], WindowsKvmEvaluationBackend.provider_id)
+        self.assertEqual(index["scope"]["permittedActions"], [_RUN_ACTION])
+        self.assertEqual(index["scope"]["permittedFixtureIds"], ["ordivon-benign-v1"])
+        self.assertIs(index["scope"]["unknownSampleExecution"], False)
+        self.assertIs(index["scope"]["thirdPartySampleExecution"], False)
+        self.assertIs(index["scope"]["generalPurposeSandbox"], False)
+        self.assertTrue(all(value == "passed" for value in index["gates"].values()))
+        self.assertIs(index["closeout"]["rawGuestStateRetained"], False)
+        self.assertIs(index["closeout"]["sensitiveInstallationStateRetained"], False)
 
     def test_packaged_resources_are_present(self) -> None:
         resource_root = (
