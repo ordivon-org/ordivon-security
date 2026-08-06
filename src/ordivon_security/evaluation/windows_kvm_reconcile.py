@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import shutil
 import time
+from collections.abc import Iterable
+from contextlib import suppress
 from pathlib import Path
 from typing import cast
 
@@ -51,6 +53,102 @@ def _validated_run_path(runs_root: Path, ledger_path: Path, ledger: JsonObject) 
         if not path.is_absolute() or not path.is_relative_to(run_path):
             return None
     return run_path
+
+
+def _active_benign_run_indices(proc_root: Path = Path("/proc")) -> set[int]:
+    active: set[int] = set()
+    for entry in proc_root.iterdir():
+        if not entry.name.isdigit():
+            continue
+        try:
+            raw_arguments = entry.joinpath("cmdline").read_bytes().split(b"\0")
+        except (FileNotFoundError, PermissionError, ProcessLookupError, OSError):
+            continue
+        arguments = [item.decode("utf-8", errors="replace") for item in raw_arguments if item]
+        if "ordivon_security.cli_windows_kvm_acceptance" not in arguments:
+            continue
+        for index, value in enumerate(arguments[:-1]):
+            if value != "--run-index":
+                continue
+            with suppress(ValueError):
+                active.add(int(arguments[index + 1]))
+    return active
+
+
+def _reconcile_benign_fixtures(
+    fixture_root: Path,
+    *,
+    active_indices: Iterable[int],
+    diagnostics: Path,
+) -> tuple[list[JsonObject], int, int]:
+    active = set(active_indices)
+    results: list[JsonObject] = []
+    removed = 0
+    skipped = 0
+    if not fixture_root.exists():
+        return results, removed, skipped
+    for path in sorted(fixture_root.glob("ordivon-benign-v1-run-*.exe")):
+        suffix = path.name.removeprefix("ordivon-benign-v1-run-").removesuffix(".exe")
+        try:
+            run_index = int(suffix)
+        except ValueError:
+            diagnostic = _write_diagnostic(
+                diagnostics,
+                "fixture",
+                {
+                    "schemaVersion": 1,
+                    "kind": "ordivon.security.windows-kvm-reconciliation-diagnostic",
+                    "decision": "attention-required",
+                    "reason": "invalid-benign-fixture-name",
+                    "path": str(path),
+                },
+            )
+            results.append(
+                {
+                    "fixture": path.name,
+                    "decision": "attention-required",
+                    "reason": "invalid-benign-fixture-name",
+                    "diagnosticPath": str(diagnostic),
+                }
+            )
+            continue
+        if path.is_symlink() or not path.is_file():
+            diagnostic = _write_diagnostic(
+                diagnostics,
+                f"fixture-run-{run_index}",
+                {
+                    "schemaVersion": 1,
+                    "kind": "ordivon.security.windows-kvm-reconciliation-diagnostic",
+                    "decision": "attention-required",
+                    "reason": "unsafe-benign-fixture-path",
+                    "path": str(path),
+                },
+            )
+            results.append(
+                {
+                    "fixtureRunIndex": run_index,
+                    "decision": "attention-required",
+                    "reason": "unsafe-benign-fixture-path",
+                    "diagnosticPath": str(diagnostic),
+                }
+            )
+            continue
+        if run_index in active:
+            skipped += 1
+            results.append({"fixtureRunIndex": run_index, "decision": "skipped-active-fixture"})
+            continue
+        path.unlink()
+        removed += 1
+        results.append(
+            {
+                "fixtureRunIndex": run_index,
+                "decision": "fixture-reconciled",
+                "fixtureRemoved": True,
+            }
+        )
+    if fixture_root.exists() and not any(fixture_root.iterdir()):
+        fixture_root.rmdir()
+    return results, removed, skipped
 
 
 def _write_diagnostic(diagnostics: Path, token: str, payload: JsonObject) -> Path:
@@ -226,6 +324,12 @@ def reconcile_windows_kvm_runs(
                 "diagnosticPath": str(diagnostic),
             }
         )
+    fixture_results, fixtures_removed, fixtures_skipped = _reconcile_benign_fixtures(
+        state_root / "fixtures",
+        active_indices=_active_benign_run_indices(),
+        diagnostics=diagnostics,
+    )
+    results.extend(fixture_results)
     attention = sum(item.get("decision") == "attention-required" for item in results)
     payload: JsonObject = {
         "schemaVersion": 1,
@@ -236,6 +340,8 @@ def reconcile_windows_kvm_runs(
         "reconciled": sum(item.get("decision") == "reconciled" for item in results),
         "skippedActive": sum(item.get("decision") == "skipped-active" for item in results),
         "attentionRequired": attention,
+        "fixtureFilesRemoved": fixtures_removed,
+        "fixtureFilesSkippedActive": fixtures_skipped,
         "status": "passed" if attention == 0 else "attention-required",
     }
     if receipt_path is None:

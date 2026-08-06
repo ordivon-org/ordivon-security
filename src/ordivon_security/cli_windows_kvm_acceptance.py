@@ -67,6 +67,12 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _remove_compiled_fixture(fixture_path: Path, fixture_root: Path) -> None:
+    fixture_path.unlink(missing_ok=True)
+    if fixture_root.exists() and not any(fixture_root.iterdir()):
+        fixture_root.rmdir()
+
+
 def _compile_fixture(output_path: Path) -> JsonObject:
     source_resource = files("ordivon_security").joinpath(
         "resources", "windows_kvm", "benign_fixture.c"
@@ -150,6 +156,7 @@ def main() -> None:
             fixture_path,
             media_type="application/vnd.microsoft.portable-executable",
         )
+        _remove_compiled_fixture(fixture_path, fixture_root)
         compilation_digest = canonical_digest(compilation)
         config = WindowsKvmProviderConfig(
             state_root=args.state_root,
@@ -234,9 +241,7 @@ def main() -> None:
         ):
             raise SystemExit(2)
     finally:
-        fixture_path.unlink(missing_ok=True)
-        if fixture_root.exists() and not any(fixture_root.iterdir()):
-            fixture_root.rmdir()
+        _remove_compiled_fixture(fixture_path, fixture_root)
 
 
 if __name__ == "__main__":
