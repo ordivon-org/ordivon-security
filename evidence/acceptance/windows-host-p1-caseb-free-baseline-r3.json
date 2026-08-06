@@ -1,34 +1,62 @@
 {
-  "schemaVersion": 1,
-  "kind": "ordivon.security.windows-host-caseb-free-baseline-acceptance",
-  "status": "identity-captured-read-only",
-  "caseId": "case:目标产品B-caseb-free-:c-host-control",
-  "caseDigest": "sha256:390198f8a4499d71640dc98881f47e42e3eafb7b3db80858831b211e880e058e",
-  "capturedFacts": {
-    "product": "目标产品B Resolve Free",
-    "version": "",
-    "windowsProductVersion": "21.0.30007",
-    "resolveExe": {
-      "digest": "sha256:3a35bca1214d7463803033e2a94742a30db470c125b420f4daa89ce126f409aa",
-      "byteLength": 574885744,
-      "signatureStatus": "Valid"
-    },
-    "intlDll": {
-      "digest": "sha256:dec4671bdb1946562301c434bef589fbe52bf193b0c1aa9be47faf9661f87f2e",
-      "byteLength": 20848,
-      "signatureStatus": "Valid"
-    }
-  },
   "authority": {
     "deploymentAuthorized": false,
     "evaluationAuthorized": true,
-    "hostObservationAuthorized": true,
     "hostModificationAuthorized": false,
+    "hostObservationAuthorized": true,
     "targetSurface": "windows-host-read-only-baseline"
   },
+  "caseDigest": "sha256:c9ae0a7f2b10851e73cf6e6c213a08c526aa769aa0ef2670e138d49cbc57fd24",
+  "caseId": "case:目标产品B-caseb-free-:c-host-control",
+  "edition": {
+    "behaviorallyVerified": false,
+    "claim": "free-user-declared",
+    "limitation": "The gate binds the installed Free control identity; feature-level behavior remains a later comparison gate."
+  },
+  "gate": {
+    "collectorReadOnly": true,
+    "hostUnmodified": true,
+    "intlIdentityStable": true,
+    "intlSignatureValid": true,
+    "resolveIdentityStable": true,
+    "resolveSignatureValid": true
+  },
+  "host": {
+    "hostModified": false,
+    "osVersion": "10.0.26200.0",
+    "resolveRunningDuringCapture": false
+  },
+  "kind": "ordivon.security.windows-host-caseb-free-baseline-acceptance",
   "limitations": [
-    "identity capture does not yet include UI feature assertions or export workload results",
-    "the host installation was not modified",
-    "Case A and Case B remain disposable-VM candidates"
-  ]
+    "Free edition is user-declared and not inferred from paid-feature UI behavior.",
+    "The identity baseline does not yet include export workload or feature assertions.",
+    "The host installation was not modified."
+  ],
+  "privateEvidence": {
+    "byteLength": 3067,
+    "digest": "sha256:ee6e348eca0fff6176be68d0dac85f804881593e80490872b08a5a120ea25c32",
+    "logicalName": "目标产品B-free-case-c-r3.json",
+    "receiptDigest": "sha256:a0b7bac280a81144e4c08ad6e1b400a0b6e8c20fb5a7812d921bb7e113e1c4f3"
+  },
+  "product": {
+    "displayName": "目标产品B Resolve",
+    "displayVersion": "21.0.30007",
+    "intlDll": {
+      "byteLength": 20848,
+      "digest": "sha256:dec4671bdb1946562301c434bef589fbe52bf193b0c1aa9be47faf9661f87f2e",
+      "signatureStatus": "Valid",
+      "signerSubject": "CN=厂商B Design Pty Ltd, O=厂商B Design Pty Ltd, L=South Melbourne, S=Victoria, C=AU"
+    },
+    "publisher": "厂商B Design",
+    "resolveExe": {
+      "byteLength": 574885744,
+      "digest": "sha256:3a35bca1214d7463803033e2a94742a30db470c125b420f4daa89ce126f409aa",
+      "fileVersion": "",
+      "productVersion": "",
+      "signatureStatus": "Valid",
+      "signerSubject": "CN=厂商B Design Pty Ltd, O=厂商B Design Pty Ltd, L=South Melbourne, S=Victoria, C=AU"
+    }
+  },
+  "schemaVersion": 1,
+  "status": "accepted-read-only-baseline"
 }

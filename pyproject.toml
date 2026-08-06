@@ -41,6 +41,7 @@ ordivon-security-windows-kvm-p1-prepare = "ordivon_security.cli_windows_kvm_p1_p
 ordivon-security-windows-kvm-p1-readback = "ordivon_security.cli_windows_kvm_p1_readback:main"
 ordivon-security-windows-kvm-p1-reconcile = "ordivon_security.cli_windows_kvm_p1_reconcile:main"
 ordivon-security-windows-kvm-p1-materialize-case = "ordivon_security.cli_windows_kvm_p1_materialize_case:main"
+ordivon-security-windows-host-p1-baseline = "ordivon_security.cli_windows_host_p1_baseline:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -72,7 +72,7 @@ The observation contract is evidence infrastructure only. It does not change `ex
 
 The current 目标产品B package is closed as **rejected**, not promoted to an execution Trial. Independent table-level verification reproduced the wrapper identity, the original and replacement `intl.dll` entries, the nested GetintoWAY MSI, first-install sequences 6401 and 6402, the external downloader, BITS/WebClient transports, highest-privilege scheduled-task creation, and recursive execution of downloaded EXE files.
 
-The final sanitized Case index is [`../evidence/acceptance/windows-kvm-p1-caseb-case-closeout-bf272ab.json`](../evidence/acceptance/windows-kvm-p1-caseb-case-closeout-bf272ab.json). The prepared 8 GiB NTFS image was deleted after its manifest, content identity, preparation provenance, media acceptance, static rejection, and removal receipt were retained. No QEMU, Windows Guest, archive, MSI, DLL, or installer execution was used for this decision.
+The final sanitized Case index is [`../evidence/acceptance/windows-kvm-p1-caseb-case-closeout-bf272ab.json`](../evidence/acceptance/windows-kvm-p1-caseb-case-closeout-bf272ab.json). That closeout originally claimed complete media removal, but a later state-root audit found one manifest-bound non-executable 8 GiB image still present. The corrected residual authority is [`../evidence/acceptance/windows-kvm-p1-caseb-residual-correction-r0.json`](../evidence/acceptance/windows-kvm-p1-caseb-residual-correction-r0.json). No installer or contained component was executed to reach the original static decision.
 
 This closes the **ordinary installation admission** for the current 目标产品B package. It does not erase the package or prohibit a separately authorized isolated research Trial. Product admission and research admission are different authorities.
 
@@ -129,11 +129,10 @@ Process-tree orchestration and the third-party execution backend remain unadmitt
 
 | Case | Surface | Current state |
 | --- | --- | --- |
-| C — installed Resolve Free  control | existing Windows host, read-only | exact executable, `intl.dll`, signature, and uninstall identity captured |
-| A — original repack | disposable Windows KVM | identity and evaluation controls defined; runner still required |
-| B — deweaponized derived payload | disposable Windows KVM | `intl.dll` and `Patches.txt` privately materialized with tree digest `sha256:4e4c5a990a0ea84d0c299577cf206573dcb67213d0864214e4b823193f4d7a13` |
+| C — installed Resolve Free  control | existing main Windows host, read-only | signed executable and official `intl.dll` identities captured before and after without change |
+| A — original repack | disposable Windows KVM | mandatory environment transformation manifest binds read-only media, deny-all egress, local record-only FakeNet, secondary-EXE blocking, and overlay destruction; runner still required |
+| B — deweaponized derived payload | main Windows controlled-evaluation surface | exact `intl.dll` and `Patches.txt` privately rematerialized; pre/post observer and explicit host-write Gate required before any installed file changes |
 
-The transformation manifest is evidence of what was removed and retained. It does not
-prevent real use inside the disposable VM: Case B is intended to be copied into the VM's
-official Resolve installation, launched, exercised, compared with Case C, and then destroyed.
-It is not an installer and does not authorize host modification or external deployment.
+Case A's transformation manifest changes the environment while preserving the original Sample bytes. Case B's payload manifest records what was removed and retained, but the materializer refuses `/mnt/*` destinations and cannot deploy to Windows. R3 therefore establishes the comparison topology and evidence inputs without changing the main Windows installation. Case C is labeled Free from the user's declaration; feature-level behavior remains a later comparison Gate.
+
+The host baseline can be reproduced with `ordivon-security-windows-host-p1-baseline`. Its public acceptance index binds the private receipt digest and verifies that `Resolve.exe` and the signed official `intl.dll` were stable before and after collection.

@@ -1,0 +1,23 @@
+{
+  "exportableArtifact": false,
+  "hostDeployment": false,
+  "kind": "ordivon.security.environment-transformation-manifest",
+  "manifestId": "transform:caseb-studio:case-a-environment",
+  "materializationStatus": "environment-bound",
+  "retainedSample": {
+    "byteLength": 7428655207,
+    "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e"
+  },
+  "revision": "1",
+  "sampleBytesChanged": false,
+  "schemaVersion": 1,
+  "sourceCaseDigest": "sha256:5ac181597d6fdae86befb6d0a9692ee56b5f6ff2abb05b5d10fc26f9a3f1d2a4",
+  "sourceCaseId": "case:caseb-studio",
+  "transformations": [
+    "attach-source-read-only",
+    "deny-external-network-at-hypervisor",
+    "provide-local-record-only-fake-network-boundary",
+    "block-unknown-secondary-executable-launch",
+    "use-disposable-overlay-and-destroy-after-run"
+  ]
+}

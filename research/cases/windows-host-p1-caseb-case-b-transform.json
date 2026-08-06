@@ -1,0 +1,51 @@
+{
+  "exportableArtifact": false,
+  "hostDeployment": false,
+  "kind": "ordivon.security.deweaponized-derived-case",
+  "manifestId": "transform:caseb-studio:case-b",
+  "materializationStatus": "materialized",
+  "removedComponents": [
+    {
+      "digest": "sha256:ee98ffe8a4b681caa0958704816cba7426c46842298e042e4a8ce34ad2a1d40c",
+      "role": "distribution-wrapper"
+    },
+    {
+      "digest": "sha256:44ae022b71782a8a4693abbc182f8fce59ef15200defd4088d7196595f64f6cf",
+      "role": "outer-msi"
+    },
+    {
+      "digest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+      "role": "nested-malicious-msi"
+    },
+    {
+      "digest": "sha256:fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397",
+      "role": "downloader-script"
+    }
+  ],
+  "resultingTreeDigest": "sha256:4e4c5a990a0ea84d0c299577cf206573dcb67213d0864214e4b823193f4d7a13",
+  "retainedComponents": [
+    {
+      "byteLength": 152576,
+      "digest": "sha256:737ba26966f648a4383ab28faae13a02a20b91f2d779a5e1ad24b4a4589e5f34",
+      "logicalPath": "目标产品B Resolve/intl.dll",
+      "role": "patch-loader"
+    },
+    {
+      "byteLength": 4081,
+      "digest": "sha256:32f25947ef6f60529622a2a1a7ed6340b17ca92ba2d11e9cbaefb5a0436c2216",
+      "logicalPath": "目标产品B Resolve/Patches.txt",
+      "role": "patch-rules"
+    }
+  ],
+  "revision": "2",
+  "schemaVersion": 1,
+  "sourceCaseDigest": "sha256:1d5203ed28ab8f21562d3f5c6828199a7e1902fc3e336d20e83338944ecbb504",
+  "sourceCaseId": "case:caseb-studio:a-original-repack",
+  "transformations": [
+    "exclude-distribution-wrapper",
+    "exclude-outer-and-nested-installer-chain",
+    "exclude-downloader-custom-action",
+    "exclude-real-c2-reference",
+    "retain-only-evaluation-components"
+  ]
+}
