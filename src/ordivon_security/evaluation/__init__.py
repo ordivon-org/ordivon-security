@@ -62,6 +62,7 @@ from .windows_kvm_build import (
     build_windows_kvm_base,
     windows_kvm_install_arguments,
 )
+from .windows_kvm_reconcile import reconcile_windows_kvm_runs
 
 __all__ = [
     "ArchiveInventoryAnalyzer",
@@ -109,6 +110,7 @@ __all__ = [
     "WindowsKvmBaseImage",
     "WindowsKvmEvaluationBackend",
     "WindowsKvmProviderConfig",
+    "reconcile_windows_kvm_runs",
     "build_windows_kvm_base",
     "windows_kvm_install_arguments",
     "windows_kvm_qemu_arguments",

@@ -20,6 +20,7 @@ from ordivon_security._canonical import (
     canonical_digest,
     validate_json,
 )
+from ordivon_security.identity import security_source_identity
 
 from .backend import (
     EvaluationArtifact,
@@ -56,14 +57,37 @@ def _load_object(path: Path, label: str) -> JsonObject:
     return value
 
 
+def _fsync_directory(path: Path) -> None:
+    descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _replace_private_json(path: Path, value: JsonObject) -> None:
+    validate_json(value)
+    if path.is_symlink():
+        raise ValueError(f"Private JSON path must not be a symlink: {path}")
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.{time.monotonic_ns()}.tmp")
+    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(canonical_bytes(value) + b"\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        path.chmod(0o600)
+        _fsync_directory(path.parent)
+    except BaseException:
+        temporary.unlink(missing_ok=True)
+        raise
+
+
 def _write_private_json(path: Path, value: JsonObject) -> None:
     if path.exists() or path.is_symlink():
         raise FileExistsError(f"Private JSON path already exists: {path}")
-    with path.open("xb") as handle:
-        handle.write(canonical_bytes(value) + b"\n")
-        handle.flush()
-        os.fsync(handle.fileno())
-    path.chmod(0o600)
+    _replace_private_json(path, value)
 
 
 def _host_cpu_identity() -> JsonObject:
@@ -560,6 +584,55 @@ class WindowsKvmEvaluationBackend:
         self.runs_root.mkdir(parents=True, exist_ok=True)
         self.runs_root.chmod(0o710)
         _set_owner(self.runs_root, user="root", group=config.run_group)
+        self.ledgers_root = config.state_root / "run-ledgers"
+        self.ledgers_root.mkdir(parents=True, exist_ok=True)
+        self.ledgers_root.chmod(0o700)
+        _set_owner(self.ledgers_root, user="root", group="root")
+
+    def _persist_run_state(self, instance: EvaluationInstance, phase: str) -> None:
+        state_path_value = instance.state.get("runStatePath")
+        if not isinstance(state_path_value, str) or not state_path_value:
+            return
+        state_path = Path(state_path_value)
+        run_path_value = instance.state.get("runPath")
+        if not isinstance(run_path_value, str):
+            raise ValueError("Windows KVM Run path is missing from the state ledger")
+        run_path = Path(run_path_value)
+        expected_name = run_path.name + ".json"
+        if state_path.parent != self.ledgers_root or state_path.name != expected_name:
+            raise ValueError("Windows KVM Run state path differs from the root-owned ledger path")
+        instance.state["phase"] = phase
+        ledger: JsonObject = {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.windows-kvm-run-state",
+            "providerId": self.provider_id,
+            "instanceId": instance.instance_id,
+            "generation": instance.generation,
+            "runId": instance.instance_id.replace("evaluation-instance:", "evaluation-run:"),
+            "phase": phase,
+            "updatedAtNs": time.time_ns(),
+            "security": cast(JsonObject, instance.state["security"]),
+            "baseEnvironmentImageDigest": self.base.environment_image_digest,
+            "evaluationSpecDigest": instance.state["evaluationSpecDigest"],
+            "ownerPid": instance.state["ownerPid"],
+            "ownerStartTime": instance.state["ownerStartTime"],
+            "runPath": instance.state["runPath"],
+            "overlayPath": instance.state["overlayPath"],
+            "varsPath": instance.state["varsPath"],
+            "runDiskPath": instance.state["runDiskPath"],
+            "qmpPath": instance.state["qmpPath"],
+            "tpmSocketPath": instance.state["tpmSocketPath"],
+            "tpmStatePath": instance.state["tpmStatePath"],
+            "qemuPid": instance.state.get("qemuPid", 0),
+            "qemuStartTime": instance.state.get("qemuStartTime"),
+            "swtpmPid": instance.state.get("swtpmPid", 0),
+            "swtpmStartTime": instance.state.get("swtpmStartTime"),
+            "staged": instance.state.get("staged", False),
+            "qemuExited": instance.state.get("qemuExited", False),
+            "qemuExitCode": instance.state.get("qemuExitCode"),
+            "networkDevicePresent": instance.state.get("networkDevicePresent"),
+        }
+        _replace_private_json(state_path, ledger)
 
     @property
     def execution_identity(self) -> JsonObject:
@@ -680,8 +753,13 @@ class WindowsKvmEvaluationBackend:
         for path in (overlay_path, vars_path):
             path.chmod(0o600)
             _set_owner(path, user=self.config.run_user, group=self.config.run_group)
+        owner_start_time = _process_start_time(os.getpid())
+        if owner_start_time is None:
+            shutil.rmtree(run_path, ignore_errors=True)
+            raise RuntimeError("Windows KVM owner process identity was not observable")
         state: JsonObject = {
             "runPath": str(run_path),
+            "runStatePath": str(self.ledgers_root / f"{token}.json"),
             "overlayPath": str(overlay_path),
             "varsPath": str(vars_path),
             "runDiskPath": str(run_disk_path),
@@ -690,15 +768,21 @@ class WindowsKvmEvaluationBackend:
             "tpmStatePath": str(tpm_state_path),
             "qemuPid": 0,
             "swtpmPid": 0,
+            "ownerPid": os.getpid(),
+            "ownerStartTime": owner_start_time,
+            "security": security_source_identity(),
+            "evaluationSpecDigest": spec.digest,
             "staged": False,
             "qemuExited": False,
             "fixtureRuntimeMs": min(120_000, spec.guardian_policy.max_runtime_ms),
         }
-        return EvaluationInstance(
+        instance = EvaluationInstance(
             instance_id=f"evaluation-instance:{token}",
             generation=f"windows-kvm:{self.base.environment_image_digest[-16:]}",
             state=state,
         )
+        self._persist_run_state(instance, "created")
+        return instance
 
     def stage(
         self,
@@ -753,6 +837,7 @@ class WindowsKvmEvaluationBackend:
         _set_owner(run_disk_path, user=self.config.run_user, group=self.config.run_group)
         instance.state["sampleDigest"] = sample.sha256
         instance.state["staged"] = True
+        self._persist_run_state(instance, "staged")
         staged_digest, staged_length = _digest_path(run_disk_path)
         return {
             "instanceId": instance.instance_id,
@@ -806,6 +891,7 @@ class WindowsKvmEvaluationBackend:
             raise RuntimeError("swtpm process identity was not observable")
         instance.state["swtpmPid"] = pid
         instance.state["swtpmStartTime"] = start_time
+        self._persist_run_state(instance, "swtpm-started")
         return pid
 
     def _extract_run_file(self, run_disk_path: Path, run_path: Path, name: str) -> Path | None:
@@ -863,6 +949,7 @@ class WindowsKvmEvaluationBackend:
                 raise RuntimeError("QEMU process identity was not observable")
             instance.state["qemuPid"] = process.pid
             instance.state["qemuStartTime"] = qemu_start_time
+            self._persist_run_state(instance, "executing")
             terminal_reason = "windows-kvm-provider-failed"
             network_devices: list[JsonObject] = []
             qmp_status: JsonValue = {}
@@ -932,6 +1019,7 @@ class WindowsKvmEvaluationBackend:
                     process.wait(timeout=10)
                 instance.state["qemuExited"] = True
                 instance.state["qemuExitCode"] = process.returncode
+                self._persist_run_state(instance, "executed")
 
         qmp_topology_path = run_path / "qmp-topology.json"
         _write_private_json(
@@ -1064,6 +1152,8 @@ class WindowsKvmEvaluationBackend:
                 details={"reason": "run-path-missing", "residualObjects": ["unknown-run-path"]},
             )
         run_path = Path(run_path_value)
+        if run_path.exists():
+            self._persist_run_state(instance, "closing")
         qemu_pid = instance.state.get("qemuPid", 0)
         swtpm_pid = instance.state.get("swtpmPid", 0)
         qemu_start_time = instance.state.get("qemuStartTime")
@@ -1088,9 +1178,21 @@ class WindowsKvmEvaluationBackend:
                 ),
             )
         )
-        shutil.rmtree(run_path, ignore_errors=True)
+        ledger_path_value = instance.state.get("runStatePath")
+        ledger_path = Path(ledger_path_value) if isinstance(ledger_path_value, str) else None
+        if qemu_closed and swtpm_closed:
+            if run_path.exists():
+                instance.state["qemuClosed"] = True
+                instance.state["swtpmClosed"] = True
+                self._persist_run_state(instance, "closed")
+            shutil.rmtree(run_path, ignore_errors=True)
         run_removed = not run_path.exists()
-        clean = qemu_closed and swtpm_closed and run_removed
+        ledger_removed = False
+        if qemu_closed and swtpm_closed and run_removed and ledger_path is not None:
+            ledger_path.unlink(missing_ok=True)
+            _fsync_directory(self.ledgers_root)
+            ledger_removed = not ledger_path.exists()
+        clean = qemu_closed and swtpm_closed and run_removed and ledger_removed
         residual_objects: list[JsonValue] = []
         if not qemu_closed:
             residual_objects.append(f"process:qemu:{qemu_pid}")
@@ -1098,6 +1200,10 @@ class WindowsKvmEvaluationBackend:
             residual_objects.append(f"process:swtpm:{swtpm_pid}")
         if not run_removed:
             residual_objects.append(str(run_path))
+        if not ledger_removed:
+            residual_objects.append(
+                str(ledger_path) if ledger_path is not None else "unknown-ledger"
+            )
         return ResidualClosureReceipt(
             clean=clean,
             details={
@@ -1106,6 +1212,7 @@ class WindowsKvmEvaluationBackend:
                 "qemuClosed": qemu_closed,
                 "swtpmClosed": swtpm_closed,
                 "runDirectoryRemoved": run_removed,
+                "ledgerRemoved": ledger_removed,
                 "networkDevicePresent": False,
                 "residualObjects": residual_objects,
             },

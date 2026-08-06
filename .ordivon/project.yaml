@@ -23,6 +23,7 @@ managed_paths:
   - docs/STATIC-EVALUATION-P0.md
   - docs/CASE-SNAPSHOT-P0.md
   - docs/WINDOWS-KVM-P0.md
+  - docs/WINDOWS-KVM-RECOVERY-P0.1.md
   - docs/AGENT-EXPERIMENT-P0.md
   - docs/research-agenda.md
   - docs/research-boundary.md
