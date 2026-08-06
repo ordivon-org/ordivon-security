@@ -24,6 +24,7 @@ from ordivon_security.evaluation import (
     SampleIdentity,
 )
 from ordivon_security.evaluation.windows_kvm import (
+    _RUN_LABEL,
     WindowsKvmBaseImage,
     WindowsKvmEvaluationBackend,
     WindowsKvmProviderConfig,
@@ -255,6 +256,18 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertNotIn("virtio-net", joined)
         self.assertIn("setpriv --reuid root --regid root --init-groups --", joined)
         self.assertIn("VGA", arguments)
+        self.assertIn(
+            f"usb-storage,drive=rundisk,bus=xhci.0,removable=on,serial={_RUN_LABEL}",
+            arguments,
+        )
+        self.assertNotIn("usb-storage,drive=rundisk,bus=xhci.0,removable=off", joined)
+        identity = WindowsKvmEvaluationBackend(self.config).execution_identity
+        configuration = identity["configuration"]
+        assert isinstance(configuration, dict)
+        self.assertEqual(configuration["runDisk"], "usb-fat-writable-removable")
+        self.assertEqual(configuration["runDiskLabel"], _RUN_LABEL)
+        self.assertIs(configuration["runDiskReadOnly"], False)
+        self.assertIs(configuration["runDiskRemovable"], True)
 
     def test_install_qemu_topology_has_no_network_path(self) -> None:
         source_iso = self.root / "source.iso"
@@ -312,8 +325,6 @@ class WindowsKvmP0Tests(unittest.TestCase):
         )
 
     def test_fat_labels_are_valid_and_finalize_uses_build_label(self) -> None:
-        from ordivon_security.evaluation.windows_kvm import _RUN_LABEL
-
         self.assertLessEqual(len(_BUILD_LABEL), 11)
         self.assertLessEqual(len(_CONFIG_LABEL), 11)
         self.assertLessEqual(len(_RUN_LABEL), 11)
