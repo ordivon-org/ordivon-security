@@ -51,11 +51,14 @@
   ],
   "implementation": {
     "guestObserverResource": "resources/windows_kvm/p1-observer.ps1",
-    "baseImageIntegration": "implemented-rebuild-required",
+    "baseImageIntegration": "implemented-and-sealed",
     "executionBackend": "not-yet-admitted",
     "prePostCapture": "implemented-resource",
     "processTreeCapture": "requires-p1-runner",
     "qmpTopology": "existing-provider-authority",
-    "residualClosure": "existing-provider-plus-p1-reconcile"
+    "residualClosure": "existing-provider-plus-p1-reconcile",
+    "baseImageAcceptance": "windows-kvm-p1-observer-base-1367c76.json",
+    "observerDigest": "sha256:efeb283d513bfa9f59b4869b1b3385dad881013d64cfe65d3344c864879753d0",
+    "environmentImageDigest": "sha256:37ebebb36b0e05a9c3f1cd02e84f086d8c8c245553b4bf175539ce279f1e4cad"
   }
 }
