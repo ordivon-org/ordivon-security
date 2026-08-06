@@ -6,6 +6,7 @@ import secrets
 import shutil
 import subprocess
 import time
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from importlib.resources import files
 from pathlib import Path
@@ -31,6 +32,8 @@ from .windows_kvm import (
 
 _BUILD_LABEL = "ORDIVONBLD"
 _CONFIG_LABEL = "ORDIVONCFG"
+_UNATTEND_NAMESPACE = {"u": "urn:schemas-microsoft-com:unattend"}
+_MAX_DEPLOYMENT_COMMAND_TEXT_CHARS = 259
 
 
 @dataclass(frozen=True, slots=True)
@@ -120,6 +123,41 @@ def _prepare_provider_layout(config: WindowsKvmBaseBuildConfig) -> dict[str, Pat
     config.source_iso_path.chmod(0o640)
     _set_owner(config.source_iso_path, user="root", group=config.run_group)
     return paths
+
+
+def _validate_unattend(unattend: str) -> None:
+    try:
+        root = ET.fromstring(unattend)
+    except ET.ParseError as error:
+        raise ValueError("Windows KVM unattend template is not valid XML") from error
+
+    for settings in root.findall("u:settings", _UNATTEND_NAMESPACE):
+        pass_name = settings.get("pass", "unknown")
+        for component in settings.findall("u:component", _UNATTEND_NAMESPACE):
+            if component.get("name") != "Microsoft-Windows-Deployment":
+                continue
+            commands = component.findall(
+                ".//u:RunSynchronousCommand",
+                _UNATTEND_NAMESPACE,
+            )
+            for command in commands:
+                order = command.findtext("u:Order", namespaces=_UNATTEND_NAMESPACE) or "unknown"
+                for setting_name in ("Path", "Description"):
+                    value = command.findtext(
+                        f"u:{setting_name}",
+                        namespaces=_UNATTEND_NAMESPACE,
+                    )
+                    if not value:
+                        raise ValueError(
+                            "Windows KVM unattend deployment command "
+                            f"{setting_name} is empty in pass {pass_name}, order {order}"
+                        )
+                    if len(value) > _MAX_DEPLOYMENT_COMMAND_TEXT_CHARS:
+                        raise ValueError(
+                            "Windows KVM unattend deployment command "
+                            f"{setting_name} exceeds {_MAX_DEPLOYMENT_COMMAND_TEXT_CHARS} "
+                            f"characters in pass {pass_name}, order {order}: {len(value)}"
+                        )
 
 
 def _write_private(path: Path, content: bytes) -> None:
@@ -408,6 +446,7 @@ def _build_windows_kvm_base_impl(
     boot_screen_path = build_path / "boot-screen.ppm"
     password = secrets.token_urlsafe(32)
     unattend = unattend_template_path.read_text(encoding="utf-8").replace("@@PASSWORD@@", password)
+    _validate_unattend(unattend)
     unattend_path = build_path / "Autounattend.xml"
     _write_private(unattend_path, unattend.encode("utf-8"))
     password = ""
