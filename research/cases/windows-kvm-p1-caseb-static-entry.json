@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-installer-static-decision",
+  "decisionId": "decision:windows-kvm-p1:caseb-studio-static-entry",
+  "revision": "1",
+  "caseId": "case:caseb-studio",
+  "outcome": "reject-execution-profile",
+  "executionAuthorized": false,
+  "chainComplete": false,
+  "identities": {
+    "archive": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+    "wrapper": "sha256:ee98ffe8a4b681caa0958704816cba7426c46842298e042e4a8ce34ad2a1d40c",
+    "outerMsi": "sha256:44ae022b71782a8a4693abbc182f8fce59ef15200defd4088d7196595f64f6cf",
+    "nestedMsi": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+    "downloaderScript": "sha256:fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397",
+    "crackDll": "sha256:737ba26966f648a4383ab28faae13a02a20b91f2d779a5e1ad24b4a4589e5f34",
+    "mainExecutable": "sha256:77fd83a5a7cd5a9e50797b41e1d76addf9b372efff7d1a95fc7af77249cf7539"
+  },
+  "components": [
+    {
+      "role": "distribution-wrapper",
+      "logicalPath": "目标产品B Resolve Studio.exe",
+      "byteLength": 4585876,
+      "publisherClaim": "GetintoWAY",
+      "signatureStatus": "unsigned",
+      "facts": [
+        "Advanced Installer wrapper",
+        "SetupFile is 目标产品B Resolve\\目标产品B.msi",
+        "command line is /qr",
+        "distribution includes 目标产品B Resolve\\目标产品B Resolve.7z"
+      ]
+    },
+    {
+      "role": "outer-msi",
+      "logicalPath": "目标产品B Resolve/目标产品B.msi",
+      "byteLength": 2872387,
+      "publisherClaim": "厂商B Design",
+      "facts": [
+        "ProductVersion 21.0.30007",
+        "WiX metadata",
+        "references ResExt01.cab through ResExt17.cab",
+        "contains both the original 20848-byte intl.dll entry and added replacement intl.dll plus Patches.txt entries"
+      ]
+    },
+    {
+      "role": "nested-msi-container",
+      "logicalPath": "目标产品B Resolve/目标产品B Resolve.7z",
+      "byteLength": 1164591,
+      "sha256": "sha256:3542239301dddc1ce5dbc951e799c5700956be2d29398f697e65c23eb0344647",
+      "facts": [
+        "contains exactly 目标产品B Resolve.msi",
+        "embedded MSI expands to 4998144 bytes"
+      ]
+    },
+    {
+      "role": "malicious-nested-msi",
+      "logicalPath": "目标产品B Resolve/nested/目标产品B Resolve.msi",
+      "byteLength": 4998144,
+      "publisherClaim": "GetintoWAY",
+      "signatureStatus": "unsigned",
+      "facts": [
+        "Advanced Installer 23.8",
+        "AI_DATA_SETTER is sequenced at 6401",
+        "PowerShellScriptInline is sequenced at 6402",
+        "condition is NOT Installed AND NOT OLDPRODUCTS",
+        "downloads an attacker-controlled ZIP",
+        "registers highest-privilege OneDriveStandaloneUpdate#### scheduled tasks",
+        "starts every EXE found in the downloaded ZIP"
+      ]
+    },
+    {
+      "role": "crack-dll",
+      "logicalPath": "目标产品B Resolve/厂商B Design/目标产品B Resolve/intl.dll",
+      "byteLength": 152576,
+      "signatureStatus": "unsigned",
+      "facts": [
+        "replaces a signed 20848-byte original intl.dll",
+        "local RVA memory patch engine",
+        "reads Patches.txt",
+        "no network capability established by prior static analysis"
+      ]
+    }
+  ],
+  "maliciousBehavior": {
+    "trigger": "first install",
+    "downloadUrl": "https://corehubpro.com/d/windows",
+    "transports": ["bitsadmin", "System.Net.WebClient"],
+    "stagingPath": "%TEMP%\\目标产品B Resolve\\packagecache_x64_data.zip",
+    "persistence": "OneDriveStandaloneUpdate#### scheduled task as BUILTIN Administrators with highest run level",
+    "payloadExecution": "all EXE files recursively found in the downloaded archive"
+  },
+  "reasons": [
+    "the archive contains an unsigned GetintoWAY MSI with a first-install PowerShell downloader CustomAction",
+    "the downloader creates privileged scheduled-task persistence and executes attacker-controlled secondary binaries",
+    "the package replaces a signed 厂商B intl.dll with an unsigned crack and memory-patching engine",
+    "static evidence is sufficient to reject generating an executable installer profile"
+  ],
+  "unresolvedQuestions": [
+    "the exact runtime invocation edge from the wrapper or outer MSI to the nested malicious MSI has not been fully traced",
+    "no Guest execution is needed to decide that the current package must not be admitted for installation"
+  ],
+  "profileDecision": {
+    "installerRelativePath": null,
+    "arguments": [],
+    "expectedPublisher": null,
+    "observationProfile": "windows-installer-p1",
+    "attachToGuest": false,
+    "startWindows": false,
+    "executeInstaller": false
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-installer-observation-profile",
+  "profileId": "observation-profile:windows-installer-p1",
+  "revision": "1",
+  "snapshotDomains": [
+    "files",
+    "registry",
+    "services",
+    "drivers",
+    "scheduled-tasks",
+    "bits-jobs",
+    "startup-entries",
+    "installed-products",
+    "users-groups",
+    "certificates",
+    "defender",
+    "event-logs"
+  ],
+  "eventChannels": [
+    "process-tree",
+    "powershell-script-block",
+    "service-control-manager",
+    "task-scheduler",
+    "windows-installer",
+    "defender",
+    "qmp-topology",
+    "host-media-identity",
+    "residual-closure"
+  ],
+  "networkMode": "deny-all",
+  "captureMemory": "never",
+  "invariants": {
+    "processTree": true,
+    "qmpNoNetworkAuthority": true,
+    "prePostDiff": true,
+    "residualClosure": true
+  },
+  "authority": {
+    "qmpTopology": "host-management-plane",
+    "systemChanges": "guest-pre-post-snapshots",
+    "processAndScriptEvents": "guest-observer",
+    "mediaIdentity": "host-preparation-manifest",
+    "residualClosure": "host-provider"
+  },
+  "terminalOutcomes": [
+    "no-prohibited-behavior-observed",
+    "suspicious-inconclusive",
+    "prohibited-behavior-observed",
+    "invalid-trial"
+  ]
+}

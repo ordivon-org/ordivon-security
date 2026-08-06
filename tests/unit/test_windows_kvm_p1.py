@@ -15,6 +15,10 @@ from ordivon_security.evaluation.windows_kvm_p1 import (
     prepare_windows_kvm_installer_media,
     windows_kvm_p1_sample_disk_arguments,
 )
+from ordivon_security.evaluation.windows_kvm_p1_contracts import (
+    WindowsKvmInstallerObservationProfile,
+    WindowsKvmInstallerStaticDecision,
+)
 
 
 def _digest(path: Path) -> str:
@@ -73,6 +77,53 @@ class WindowsKvmP1Tests(unittest.TestCase):
         old_index = __import__("json").loads(old_path.read_text(encoding="utf-8"))
         self.assertEqual(old_index["status"], "superseded-pre-provenance")
         self.assertEqual(old_index["supersededBy"], path.name)
+
+    def test_目标产品B_static_decision_rejects_execution_profile(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "research"
+            / "cases"
+            / "windows-kvm-p1-caseb-static-entry.json"
+        )
+        value = __import__("json").loads(path.read_text(encoding="utf-8"))
+        decision = WindowsKvmInstallerStaticDecision.from_dict(value)
+        self.assertEqual(decision.outcome, "reject-execution-profile")
+        self.assertIs(decision.execution_authorized, False)
+        self.assertIs(decision.chain_complete, False)
+        self.assertEqual(
+            decision.identities["nestedMsi"],
+            "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+        )
+        self.assertEqual(
+            decision.identities["downloaderScript"],
+            "sha256:fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397",
+        )
+        self.assertGreater(len(decision.reasons), 2)
+        profile_decision = value["profileDecision"]
+        self.assertIsNone(profile_decision["installerRelativePath"])
+        self.assertIs(profile_decision["attachToGuest"], False)
+        self.assertIs(profile_decision["executeInstaller"], False)
+
+    def test_installer_observation_profile_requires_complete_authority(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "research"
+            / "profiles"
+            / "windows-kvm-installer-observation-p1.json"
+        )
+        value = __import__("json").loads(path.read_text(encoding="utf-8"))
+        profile = WindowsKvmInstallerObservationProfile.from_dict(value)
+        self.assertEqual(profile.network_mode, "deny-all")
+        self.assertIn("scheduled-tasks", profile.snapshot_domains)
+        self.assertIn("bits-jobs", profile.snapshot_domains)
+        self.assertIn("powershell-script-block", profile.event_channels)
+        self.assertIn("qmp-topology", profile.event_channels)
+        self.assertIs(profile.invariants["qmpNoNetworkAuthority"], True)
+        self.assertIs(profile.invariants["residualClosure"], True)
+        incomplete = dict(value)
+        incomplete["snapshotDomains"] = ["files"]
+        with self.assertRaisesRegex(ValueError, "snapshot domains are incomplete"):
+            WindowsKvmInstallerObservationProfile.from_dict(incomplete)
 
     def test_profile_does_not_authorize_execution_by_default(self) -> None:
         value = self.profile.to_dict()
