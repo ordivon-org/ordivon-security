@@ -33,6 +33,7 @@ from ordivon_security.evaluation import (
     SampleIdentity,
 )
 from ordivon_security.evaluation.windows_kvm import (
+    _READONLY_MEDIA_FIXTURE_ID,
     _RUN_ACTION,
     _RUN_LABEL,
     WindowsKvmBaseImage,
@@ -299,6 +300,77 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertEqual(configuration["runDiskLabel"], _RUN_LABEL)
         self.assertIs(configuration["runDiskReadOnly"], False)
         self.assertIs(configuration["runDiskRemovable"], True)
+
+    def test_read_only_sample_media_config_requires_complete_identity(self) -> None:
+        media = self.root / "sample-media.img"
+        media.write_bytes(b"media")
+        with self.assertRaisesRegex(ValueError, "identity is incomplete"):
+            replace(self.config, read_only_sample_media_path=media)
+
+    def test_read_only_sample_media_binding_is_exact(self) -> None:
+        media = self.root / "sample-media.img"
+        media.write_bytes(b"media")
+        media_digest = _digest(media)
+        config = replace(
+            self.config,
+            admitted_fixture_id=_READONLY_MEDIA_FIXTURE_ID,
+            read_only_sample_media_path=media,
+            read_only_sample_media_digest=media_digest,
+            read_only_sample_media_serial="ORDIVON_P1",
+            fixture_runtime_ms=900_000,
+        )
+        backend = WindowsKvmEvaluationBackend(config)
+        spec = self._spec(backend)
+        binding: JsonObject = {
+            "digest": media_digest,
+            "serial": "ORDIVON_P1",
+            "readOnly": True,
+            "sampleExecutionAuthorized": False,
+        }
+        bound = replace(
+            spec,
+            metadata={
+                "fixtureId": _READONLY_MEDIA_FIXTURE_ID,
+                "fixtureCompilationDigest": self.config.fixture_attestation_digest,
+                "readOnlySampleMedia": binding,
+            },
+        )
+        backend._validate_spec(bound)
+        mismatched = replace(
+            bound,
+            metadata={
+                **bound.metadata,
+                "readOnlySampleMedia": {**binding, "sampleExecutionAuthorized": True},
+            },
+        )
+        with self.assertRaisesRegex(ValueError, "media binding differs"):
+            backend._validate_spec(mismatched)
+        configuration = backend.execution_identity["configuration"]
+        assert isinstance(configuration, dict)
+        self.assertEqual(configuration["fixtureRuntimeMs"], 900_000)
+        self.assertEqual(configuration["admittedFixtureId"], _READONLY_MEDIA_FIXTURE_ID)
+
+    def test_runtime_qemu_topology_attaches_declared_sample_media_read_only(self) -> None:
+        media = self.root / "sample-media.img"
+        media.write_bytes(b"media")
+        arguments = windows_kvm_qemu_arguments(
+            config=self.config,
+            overlay_path=self.root / "overlay.qcow2",
+            vars_path=self.root / "vars-copy.fd",
+            run_disk_path=self.root / "run.img",
+            qmp_path=self.root / "qmp.sock",
+            tpm_socket_path=self.root / "swtpm.sock",
+            name="ordivon-test",
+            read_only_sample_media_path=media,
+            read_only_sample_media_serial="ORDIVON_P1",
+        )
+        joined = " ".join(arguments)
+        self.assertIn(f"file={media},if=none,format=raw,readonly=on", joined)
+        self.assertIn(
+            "usb-storage,drive=sampledisk,bus=xhci.0,removable=on,serial=ORDIVON_P1",
+            joined,
+        )
+        self.assertNotIn("readonly=off", joined)
 
     def test_install_qemu_topology_has_no_network_path(self) -> None:
         source_iso = self.root / "source.iso"
@@ -794,6 +866,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "SetupComplete.cmd",
             "base-finalize.ps1",
             "benign_fixture.c",
+            "readonly_media_fixture.c.in",
             "guest-runner.ps1",
             "install-bootstrap.ps1",
         }

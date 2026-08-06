@@ -74,4 +74,21 @@ The current DaVinci package is closed as **rejected**, not promoted to an execut
 
 The final sanitized Case index is [`../evidence/acceptance/windows-kvm-p1-davinci-case-closeout-bf272ab.json`](../evidence/acceptance/windows-kvm-p1-davinci-case-closeout-bf272ab.json). The prepared 8 GiB NTFS image was deleted after its manifest, content identity, preparation provenance, media acceptance, static rejection, and removal receipt were retained. No QEMU, Windows Guest, archive, MSI, DLL, or installer execution was used for this decision.
 
-This closes the **current DaVinci Case only**. P1 itself remains a candidate infrastructure track: the observation profile is defined, but the generic Guest observer and third-party installer execution backend are not implemented or admitted.
+This closes the **ordinary installation admission** for the current DaVinci package. It does not erase the package or prohibit a separately authorized isolated research Trial. Product admission and research admission are different authorities.
+
+## Isolated research admission
+
+The separate contract at [`../research/cases/windows-kvm-p1-davinci-isolated-research-trial.json`](../research/cases/windows-kvm-p1-davinci-isolated-research-trial.json) retains the static product rejection while admitting staged research. Its first action is `verify-read-only-sample-media`:
+
+1. rebuild the exact provenance-bound NTFS media;
+2. attach it to a disposable Windows Guest with QEMU `readonly=on` and `removable=on`;
+3. execute only the locally compiled `ordivon-readonly-media-verifier-v1`;
+4. stream and SHA-256 the exact 7,428,655,207-byte archive from Windows;
+5. require a failed write probe with Windows write-protect or access-denied semantics;
+6. require QMP authority showing no network-class device;
+7. record that no contained EXE, MSI, DLL, script, or archive entry was executed;
+8. require complete residual closure.
+
+The new `ordivon-security-windows-kvm-p1-readback` command implements this first research Gate. It does not reverse the package rejection and does not yet admit third-party execution. Later Gates may execute the original package or a backdoor-removed derived Case only after the generic installer observer is implemented and independently admitted.
+
+P1 itself remains a candidate infrastructure track: the read-only media verification backend is implemented, while generic third-party installer execution and full Guest observation remain pending.
