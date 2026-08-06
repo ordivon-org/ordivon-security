@@ -1,23 +1,33 @@
 {
-  "schemaVersion": 1,
-  "kind": "ordivon.security.windows-kvm-p1-residual-closure-correction-index",
-  "status": "corrected-and-removed",
-  "caseId": "case:davinci-resolve-studio-21.0.3.7",
-  "corrects": "windows-kvm-p1-davinci-case-closeout-bf272ab.json",
-  "finding": "an 8 GiB prepared non-executable NTFS image remained in the separate P1 state root",
-  "removedMedia": {
-    "digest": "sha256:0ac2df1b60b18554937ea163017303666d367c981fbf4b8a6fe6d57116388794",
-    "byteLength": 8589934592,
-    "allocatedBytes": 7472373760
-  },
-  "retainedReceipt": {
-    "logicalName": "windows-kvm-p1-residual-correction-4bcd9ef1cc2c0d2e.json",
-    "private": true
-  },
   "authority": {
     "evaluationAuthorized": false,
     "hostModificationAuthorized": false,
     "removed": true
   },
-  "rootCause": "the earlier closeout inspected the primary Windows KVM state root but not the separate windows-kvm-p1 state root"
+  "caseId": "case:davinci-resolve-studio-21.0.3.7",
+  "corrects": "windows-kvm-p1-davinci-case-closeout-bf272ab.json",
+  "finding": "an 8 GiB prepared non-executable NTFS image remained in the retired windows-kvm-p1 state root",
+  "kind": "ordivon.security.windows-kvm-p1-residual-closure-correction-index",
+  "limitations": [
+    "The correction receipt was produced by a concurrent local task before a later reconciliation invocation observed an empty legacy sample-media root.",
+    "The original closeout remains historical and is not rewritten as if its residual claim had been correct."
+  ],
+  "removedManifest": {
+    "byteLength": 3339,
+    "digest": "sha256:696f3911326bbf45634d24d68cc4071b56db7a7ee28f29268e38a201c0e66584"
+  },
+  "removedMedia": {
+    "allocatedBytes": 7472373760,
+    "byteLength": 8589934592,
+    "digest": "sha256:0ac2df1b60b18554937ea163017303666d367c981fbf4b8a6fe6d57116388794"
+  },
+  "retainedReceipt": {
+    "byteLength": 558,
+    "digest": "sha256:8f3fe706375d817ed85cdba10fb17ac3445844d1b47e9b7d5672d1aa99849b26",
+    "logicalName": "windows-kvm-p1-residual-correction-4bcd9ef1cc2c0d2e.json",
+    "private": true
+  },
+  "rootCause": "the earlier closeout inspected the primary Windows KVM state root but not the separate windows-kvm-p1 state root",
+  "schemaVersion": 1,
+  "status": "corrected-and-removed"
 }

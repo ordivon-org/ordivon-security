@@ -51,6 +51,7 @@ from .static import (
     StaticAnalyzerResult,
 )
 from .vault import SampleVault
+from .windows_host_p1 import collect_windows_host_resolve_baseline
 from .windows_kvm import (
     WindowsKvmBaseImage,
     WindowsKvmEvaluationBackend,
@@ -74,6 +75,7 @@ from .windows_kvm_p1_cases import (
     CapabilityCase,
     DerivedCaseManifest,
     DerivedComponent,
+    EnvironmentTransformationManifest,
     materialize_derived_case,
 )
 from .windows_kvm_p1_contracts import (
@@ -87,7 +89,9 @@ __all__ = [
     "CapabilityAdmission",
     "CapabilityCase",
     "DerivedCaseManifest",
+    "EnvironmentTransformationManifest",
     "DerivedComponent",
+    "collect_windows_host_resolve_baseline",
     "materialize_derived_case",
     "reconcile_windows_kvm_p1_non_executable_media",
     "AuthorityManifest",

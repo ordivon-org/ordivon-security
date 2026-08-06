@@ -11,6 +11,7 @@ from .windows_kvm import _digest_path, _replace_private_json
 
 _VM_SURFACE = "disposable-windows-kvm"
 _HOST_BASELINE_SURFACE = "windows-host-read-only-baseline"
+_HOST_EVALUATION_SURFACE = "windows-host-controlled-evaluation"
 
 
 def _digest(value: str, label: str) -> str:
@@ -38,18 +39,25 @@ class CapabilityAdmission:
     target_surface: str
 
     def __post_init__(self) -> None:
-        if self.target_surface not in {_VM_SURFACE, _HOST_BASELINE_SURFACE}:
+        if self.target_surface not in {
+            _VM_SURFACE,
+            _HOST_BASELINE_SURFACE,
+            _HOST_EVALUATION_SURFACE,
+        }:
             raise ValueError("Capability Case target surface is unsupported")
         if self.deployment_authorized:
             raise ValueError("P1 capability Cases cannot authorize product deployment")
-        if self.host_modification_authorized:
-            raise ValueError("P1 capability Cases cannot authorize host modification")
         if not self.evaluation_authorized:
             raise ValueError("Capability Case must authorize bounded evaluation")
-        if self.target_surface == _HOST_BASELINE_SURFACE and not self.host_observation_authorized:
-            raise ValueError("Host baseline Case requires read-only host observation authority")
-        if self.target_surface == _VM_SURFACE and self.host_observation_authorized:
-            raise ValueError("Disposable VM Case must not claim host observation authority")
+        if self.target_surface == _VM_SURFACE:
+            if self.host_observation_authorized or self.host_modification_authorized:
+                raise ValueError("Disposable VM Case cannot claim host authority")
+        elif not self.host_observation_authorized:
+            raise ValueError("Host Case requires host observation authority")
+        if self.target_surface == _HOST_BASELINE_SURFACE and self.host_modification_authorized:
+            raise ValueError("Host baseline Case must remain read-only")
+        if self.host_modification_authorized and self.target_surface != _HOST_EVALUATION_SURFACE:
+            raise ValueError("Host modification requires the controlled evaluation surface")
 
     @classmethod
     def from_dict(cls, value: JsonObject) -> CapabilityAdmission:
@@ -103,6 +111,94 @@ class DerivedComponent:
             "byteLength": self.byte_length,
             "role": self.role,
         }
+
+
+@dataclass(frozen=True, slots=True)
+class EnvironmentTransformationManifest:
+    manifest_id: str
+    revision: str
+    source_case_id: str
+    source_case_digest: str
+    transformations: tuple[str, ...]
+    retained_sample_digest: str
+    retained_sample_byte_length: int
+    sample_bytes_changed: bool
+    materialization_status: str
+    exportable_artifact: bool
+    host_deployment: bool
+
+    def __post_init__(self) -> None:
+        if not self.manifest_id.startswith("transform:") or not self.revision:
+            raise ValueError("Environment transformation identity is invalid")
+        if not self.source_case_id.startswith("case:"):
+            raise ValueError("Environment transformation source identity is invalid")
+        _digest(self.source_case_digest, "source Case")
+        _digest(self.retained_sample_digest, "retained Sample")
+        if self.retained_sample_byte_length < 1:
+            raise ValueError("Retained Sample byte length is invalid")
+        if not self.transformations or any(not item for item in self.transformations):
+            raise ValueError("Environment transformations are missing")
+        if self.sample_bytes_changed:
+            raise ValueError("Case A environment transformation cannot change Sample bytes")
+        if self.materialization_status != "environment-bound":
+            raise ValueError("Case A transformation must remain environment-bound")
+        if self.exportable_artifact or self.host_deployment:
+            raise ValueError("Case A transformation cannot create a deployable artifact")
+
+    @classmethod
+    def from_dict(cls, value: JsonObject) -> EnvironmentTransformationManifest:
+        if (
+            value.get("schemaVersion") != 1
+            or value.get("kind") != "ordivon.security.environment-transformation-manifest"
+        ):
+            raise ValueError("Environment transformation schema is unsupported")
+        transformations = value.get("transformations")
+        retained = value.get("retainedSample")
+        if not isinstance(transformations, list) or not all(
+            isinstance(item, str) for item in transformations
+        ):
+            raise ValueError("Environment transformations are invalid")
+        if not isinstance(retained, dict):
+            raise ValueError("Environment transformation retained Sample is missing")
+        byte_length = retained.get("byteLength")
+        if not isinstance(byte_length, int) or isinstance(byte_length, bool):
+            raise ValueError("Environment transformation byte length is invalid")
+        return cls(
+            manifest_id=str(value.get("manifestId", "")),
+            revision=str(value.get("revision", "")),
+            source_case_id=str(value.get("sourceCaseId", "")),
+            source_case_digest=str(value.get("sourceCaseDigest", "")),
+            transformations=tuple(cast(list[str], transformations)),
+            retained_sample_digest=str(retained.get("digest", "")),
+            retained_sample_byte_length=byte_length,
+            sample_bytes_changed=value.get("sampleBytesChanged") is True,
+            materialization_status=str(value.get("materializationStatus", "")),
+            exportable_artifact=value.get("exportableArtifact") is True,
+            host_deployment=value.get("hostDeployment") is True,
+        )
+
+    def to_dict(self) -> JsonObject:
+        return {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.environment-transformation-manifest",
+            "manifestId": self.manifest_id,
+            "revision": self.revision,
+            "sourceCaseId": self.source_case_id,
+            "sourceCaseDigest": self.source_case_digest,
+            "transformations": list(self.transformations),
+            "retainedSample": {
+                "digest": self.retained_sample_digest,
+                "byteLength": self.retained_sample_byte_length,
+            },
+            "sampleBytesChanged": self.sample_bytes_changed,
+            "materializationStatus": self.materialization_status,
+            "exportableArtifact": self.exportable_artifact,
+            "hostDeployment": self.host_deployment,
+        }
+
+    @property
+    def digest(self) -> str:
+        return canonical_digest(self.to_dict())
 
 
 @dataclass(frozen=True, slots=True)
@@ -204,6 +300,8 @@ class CapabilityCase:
     role: str
     admission: CapabilityAdmission
     source: JsonObject
+    transformation_manifest: str | None
+    transformation_manifest_digest: str | None
     observation_profile: str
     network_mode: str
     status: str
@@ -216,12 +314,29 @@ class CapabilityCase:
             raise ValueError("Capability Case role is unsupported")
         if not self.observation_profile or self.network_mode not in {"deny-all", "host-existing"}:
             raise ValueError("Capability Case observation or network mode is invalid")
-        if self.role == "control-free" and self.admission.target_surface != _HOST_BASELINE_SURFACE:
-            raise ValueError("Free control Case must use the read-only host baseline surface")
-        if self.role != "control-free" and self.admission.target_surface != _VM_SURFACE:
-            raise ValueError("Executable capability Cases require disposable Windows KVM")
+        expected_surface = {
+            "control-free": _HOST_BASELINE_SURFACE,
+            "original-repack": _VM_SURFACE,
+            "deweaponized-derived": _HOST_EVALUATION_SURFACE,
+        }[self.role]
+        if self.admission.target_surface != expected_surface:
+            raise ValueError("Capability Case role does not match target surface")
+        if self.role in {"original-repack", "deweaponized-derived"}:
+            if not self.transformation_manifest or not self.transformation_manifest_digest:
+                raise ValueError("Executable capability Case requires a transformation manifest")
+            _digest(self.transformation_manifest_digest, "transformation manifest")
+        elif (
+            self.transformation_manifest is not None
+            or self.transformation_manifest_digest is not None
+        ):
+            raise ValueError("Free control Case cannot claim a transformation manifest")
         if self.controls.get("realC2") is True or self.controls.get("exportableArtifact") is True:
             raise ValueError("Capability Case control surface is unsafe")
+        if (
+            self.role == "deweaponized-derived"
+            and self.controls.get("automaticHostMutation") is not False
+        ):
+            raise ValueError("Host Case B must keep automatic mutation disabled")
 
     @classmethod
     def from_dict(cls, value: JsonObject) -> CapabilityCase:
@@ -245,6 +360,16 @@ class CapabilityCase:
             role=str(value.get("role", "")),
             admission=CapabilityAdmission.from_dict(admission),
             source=source,
+            transformation_manifest=(
+                str(value["transformationManifest"])
+                if value.get("transformationManifest") is not None
+                else None
+            ),
+            transformation_manifest_digest=(
+                str(value["transformationManifestDigest"])
+                if value.get("transformationManifestDigest") is not None
+                else None
+            ),
             observation_profile=str(value.get("observationProfile", "")),
             network_mode=str(value.get("networkMode", "")),
             status=str(value.get("status", "")),
@@ -260,6 +385,8 @@ class CapabilityCase:
             "role": self.role,
             "admission": self.admission.to_dict(),
             "source": self.source,
+            "transformationManifest": self.transformation_manifest,
+            "transformationManifestDigest": self.transformation_manifest_digest,
             "observationProfile": self.observation_profile,
             "networkMode": self.network_mode,
             "status": self.status,
@@ -276,6 +403,8 @@ def materialize_derived_case(
 ) -> JsonObject:
     if manifest.materialization_status != "planned":
         raise ValueError("Only a planned derived Case may be materialized")
+    if str(output_root.resolve(strict=False)).startswith("/mnt/"):
+        raise ValueError("Derived Case materialization cannot target a mounted Windows volume")
     if output_root.exists():
         raise FileExistsError(f"Derived Case output already exists: {output_root}")
     payload_root = output_root / "payload"

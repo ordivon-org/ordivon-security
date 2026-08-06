@@ -1,38 +1,48 @@
 {
-  "schemaVersion": 1,
-  "kind": "ordivon.security.capability-case",
-  "caseId": "case:davinci-resolve-free-21.0.3.7:c-host-control",
-  "revision": "1",
-  "role": "control-free",
   "admission": {
     "deploymentAuthorized": false,
     "evaluationAuthorized": true,
-    "hostObservationAuthorized": true,
     "hostModificationAuthorized": false,
+    "hostObservationAuthorized": true,
     "targetSurface": "windows-host-read-only-baseline"
   },
+  "caseId": "case:davinci-resolve-free-21.0.3.7:c-host-control",
+  "controls": {
+    "exportableArtifact": false,
+    "hostModified": false,
+    "readOnly": true,
+    "realC2": false
+  },
+  "evidence": {
+    "privateReceipt": "davinci-free-case-c-r3.json",
+    "privateReceiptDigest": "sha256:ee6e348eca0fff6176be68d0dac85f804881593e80490872b08a5a120ea25c32",
+    "privateSemanticReceiptDigest": "sha256:a0b7bac280a81144e4c08ad6e1b400a0b6e8c20fb5a7812d921bb7e113e1c4f3",
+    "publicIndex": "windows-host-p1-davinci-free-baseline-r3.json",
+    "publicIndexDigest": "sha256:09e8535688af27bdc237d49091f92886022d74529b412936d8ea0b21aead3129"
+  },
+  "kind": "ordivon.security.capability-case",
+  "networkMode": "host-existing",
+  "observationProfile": "windows-host-resolve-capability-p1",
+  "revision": "2",
+  "role": "control-free",
+  "schemaVersion": 1,
   "source": {
-    "product": "DaVinci Resolve Free",
-    "version": "21.0.3.7",
-    "windowsProductVersion": "21.0.30007",
-    "resolveExe": {
-      "digest": "sha256:3a35bca1214d7463803033e2a94742a30db470c125b420f4daa89ce126f409aa",
-      "byteLength": 574885744,
+    "editionClaim": "free-user-declared",
+    "intlDll": {
+      "byteLength": 20848,
+      "digest": "sha256:dec4671bdb1946562301c434bef589fbe52bf193b0c1aa9be47faf9661f87f2e",
       "signatureStatus": "Valid"
     },
-    "intlDll": {
-      "digest": "sha256:dec4671bdb1946562301c434bef589fbe52bf193b0c1aa9be47faf9661f87f2e",
-      "byteLength": 20848,
+    "product": "DaVinci Resolve Free",
+    "resolveExe": {
+      "byteLength": 574885744,
+      "digest": "sha256:3a35bca1214d7463803033e2a94742a30db470c125b420f4daa89ce126f409aa",
       "signatureStatus": "Valid"
-    }
+    },
+    "version": "21.0.3.7",
+    "windowsProductVersion": "21.0.30007"
   },
-  "observationProfile": "windows-host-resolve-free-baseline-p1",
-  "networkMode": "host-existing",
-  "status": "baseline-identity-captured",
-  "controls": {
-    "realC2": false,
-    "exportableArtifact": false,
-    "readOnly": true,
-    "hostModified": false
-  }
+  "status": "baseline-captured-read-only",
+  "transformationManifest": null,
+  "transformationManifestDigest": null
 }

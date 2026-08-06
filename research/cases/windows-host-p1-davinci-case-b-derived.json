@@ -1,0 +1,40 @@
+{
+  "admission": {
+    "deploymentAuthorized": false,
+    "evaluationAuthorized": true,
+    "hostModificationAuthorized": false,
+    "hostObservationAuthorized": true,
+    "targetSurface": "windows-host-controlled-evaluation"
+  },
+  "caseId": "case:davinci-resolve-studio-21.0.3.7:b-deweaponized-derived",
+  "controls": {
+    "automaticHostMutation": false,
+    "componentNetworkCapabilityEstablished": false,
+    "exportableArtifact": false,
+    "operatorPresenceRequired": true,
+    "prePostSnapshotRequired": true,
+    "realC2": false,
+    "restoreOfficialFilesRequired": true
+  },
+  "kind": "ordivon.security.capability-case",
+  "networkMode": "host-existing",
+  "observationProfile": "windows-host-resolve-capability-p1",
+  "revision": "2",
+  "role": "deweaponized-derived",
+  "schemaVersion": 1,
+  "source": {
+    "comparisonControlCase": "case:davinci-resolve-free-21.0.3.7:c-host-control",
+    "materializationStatus": "materialized",
+    "privateMaterializationReceipt": {
+      "byteLength": 2420,
+      "digest": "sha256:6bc0b2e19484d8350238f3226fc7a42982a99ea052eb285967d2b43e854ad8c2",
+      "logicalName": "manifest.json"
+    },
+    "resultingTreeDigest": "sha256:4e4c5a990a0ea84d0c299577cf206573dcb67213d0864214e4b823193f4d7a13",
+    "transformationManifest": "windows-host-p1-davinci-case-b-transform.json",
+    "transformationManifestDigest": "sha256:e18b123c903699308ae1ea5b66ed2accae62b93be88b44a9665aef9e345561cd"
+  },
+  "status": "materialized-host-write-gate-pending",
+  "transformationManifest": "windows-host-p1-davinci-case-b-transform.json",
+  "transformationManifestDigest": "sha256:e18b123c903699308ae1ea5b66ed2accae62b93be88b44a9665aef9e345561cd"
+}

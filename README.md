@@ -152,12 +152,21 @@ P0.1 persists each Run lifecycle in a root-owned `run-ledgers/` directory, indep
 uv run ordivon-security-windows-kvm-p1-prepare \
   --profile research/cases/windows-kvm-p1-davinci-resolve-studio-21.0.3.7.json \
   --source quarantine/2026-08-05_davinci/sample.7z \
-  --state-root /var/lib/ordivon/security/providers/windows-kvm-p1
+  --state-root /var/lib/ordivon/security/providers/windows-kvm
 ```
 
 This command only prepares and verifies a digest-bound NTFS input image. QEMU attachment is declared read-only and removable. The retained DaVinci profile has `executionAuthorized: false`; it does not authorize launching the archive or an installer. See [`docs/WINDOWS-KVM-INSTALLER-P1.md`](docs/WINDOWS-KVM-INSTALLER-P1.md).
 
-P1 R0-R3 also provides manifest-verified residual reconciliation, private derived-Case materialization, a packaged Windows observer, and Case A/B/C authority records. The existing Windows host is used only as the read-only Free-version control; executable third-party Cases target disposable Windows KVM.
+P1 R0-R3 also provides manifest-verified residual reconciliation, private derived-Case materialization, a packaged Windows observer, and Case A/B/C authority records. Case A targets disposable Windows KVM and requires an environment transformation manifest. Case B and Case C target the main Windows installation: C is the read-only Free control, while B remains behind an explicit host-write Gate with automatic mutation disabled.
+
+Capture or refresh the Free control with:
+
+```bash
+uv run ordivon-security-windows-host-p1-baseline \
+  --receipt /var/lib/ordivon/security/providers/windows-host/receipts/davinci-free-case-c-r3.json
+```
+
+The command hashes the official `Resolve.exe` and signed `intl.dll` before and after collection and fails if either identity changes. It does not infer paid-feature state from the UI and does not modify the host.
 
 ## Run the deterministic Contest
 

@@ -1,0 +1,49 @@
+{
+  "eventChannels": [
+    "process-tree",
+    "powershell",
+    "service-control-manager",
+    "task-scheduler",
+    "windows-installer",
+    "defender",
+    "host-file-identity",
+    "residual-closure"
+  ],
+  "invariants": {
+    "automaticHostMutation": false,
+    "evidencePathOnlyObserverWrites": true,
+    "prePostDiffRequiredForCaseB": true,
+    "productDeploymentAuthorized": false,
+    "restoreOfficialFilesRequiredForCaseB": true
+  },
+  "kind": "ordivon.security.windows-host-capability-observation-profile",
+  "limits": {
+    "maxEventEntriesPerChannel": 2000,
+    "maxFileEntries": 20000
+  },
+  "modes": {
+    "control-free": "single-read-only-baseline",
+    "deweaponized-derived": "pre-post-with-explicit-host-write-gate"
+  },
+  "profileId": "observation-profile:windows-host-resolve-capability-p1",
+  "revision": "1",
+  "schemaVersion": 1,
+  "snapshotDomains": [
+    "files",
+    "registry",
+    "services",
+    "drivers",
+    "scheduled-tasks",
+    "bits-jobs",
+    "startup-entries",
+    "installed-products",
+    "users-groups",
+    "certificates",
+    "defender",
+    "event-logs"
+  ],
+  "surfaces": [
+    "windows-host-read-only-baseline",
+    "windows-host-controlled-evaluation"
+  ]
+}

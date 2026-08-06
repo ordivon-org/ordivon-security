@@ -14,9 +14,9 @@ foreach ($path in $paths) {
         path = $path
         byteLength = [int64]$item.Length
         sha256 = 'sha256:' + (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
-        fileVersion = $item.VersionInfo.FileVersion
-        productVersion = $item.VersionInfo.ProductVersion
-        companyName = $item.VersionInfo.CompanyName
+        fileVersion = [string]$item.VersionInfo.FileVersion
+        productVersion = [string]$item.VersionInfo.ProductVersion
+        companyName = [string]$item.VersionInfo.CompanyName
         signatureStatus = [string]$signature.Status
         signerSubject = if ($null -ne $signature.SignerCertificate) {
             [string]$signature.SignerCertificate.Subject
@@ -38,11 +38,14 @@ foreach ($root in @(
                 displayVersion = [string]$_.DisplayVersion
                 publisher = [string]$_.Publisher
                 installLocation = [string]$_.InstallLocation
-                uninstallString = [string]$_.UninstallString
                 registryPath = [string]$_.PSPath
             }
         }
 }
+
+$services = @(Get-CimInstance Win32_Service -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -match 'Blackmagic|DaVinci' -or $_.DisplayName -match 'Blackmagic|DaVinci' } |
+    Select-Object Name, DisplayName, State, StartMode, PathName, StartName)
 
 $result = [ordered]@{
     schemaVersion = 1
@@ -50,8 +53,11 @@ $result = [ordered]@{
     capturedAtUtc = [DateTime]::UtcNow.ToString('o')
     computerName = $env:COMPUTERNAME
     osVersion = [Environment]::OSVersion.Version.ToString()
+    editionClaim = 'free-user-declared'
+    editionLimitation = 'The collector binds installed identities but does not infer paid-feature state from UI behavior.'
     files = $files
     uninstallEntries = $uninstall
+    relatedServices = $services
     runningProcesses = @(Get-Process -Name Resolve -ErrorAction SilentlyContinue | ForEach-Object {
         [ordered]@{ id = [int]$_.Id; path = [string]$_.Path }
     })
