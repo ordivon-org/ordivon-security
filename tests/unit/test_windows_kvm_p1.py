@@ -50,7 +50,7 @@ class WindowsKvmP1Tests(unittest.TestCase):
             Path(__file__).parents[2]
             / "evidence"
             / "acceptance"
-            / "windows-kvm-p1-davinci-media-bcac3cc.json"
+            / "windows-kvm-p1-davinci-media-136a8a7.json"
         )
         index = __import__("json").loads(path.read_text(encoding="utf-8"))
         self.assertEqual(index["status"], "media-preparation-accepted-execution-not-authorized")
@@ -58,6 +58,21 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(index["authorization"]["attachToGuest"], False)
         self.assertIs(index["authorization"]["executeArchiveOrInstaller"], False)
         self.assertEqual(index["gate"]["embeddedReadbackIdentity"], "passed")
+        self.assertEqual(index["gate"]["toolIdentity"], "passed")
+        self.assertEqual(index["gate"]["preparationIdentity"], "passed")
+        self.assertEqual(
+            index["implementationRevision"],
+            "git:136a8a71af63b6f37d31cc6b785441ac5cd9a8bc",
+        )
+        old_path = (
+            Path(__file__).parents[2]
+            / "evidence"
+            / "acceptance"
+            / "windows-kvm-p1-davinci-media-bcac3cc.json"
+        )
+        old_index = __import__("json").loads(old_path.read_text(encoding="utf-8"))
+        self.assertEqual(old_index["status"], "superseded-pre-provenance")
+        self.assertEqual(old_index["supersededBy"], path.name)
 
     def test_profile_does_not_authorize_execution_by_default(self) -> None:
         value = self.profile.to_dict()
