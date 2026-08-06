@@ -1,0 +1,45 @@
+---
+schema_version: 1
+id: security.windows-kvm-installer-p1
+title: Windows KVM Installer Evaluation P1
+type: specification
+profile: engineering
+lifecycle: active
+source_role: canonical
+visibility: public
+owners:
+  - ordivon-security
+audience:
+  - maintainer
+  - evaluator
+  - researcher
+  - agent
+updated: 2026-08-06
+summary: Separate large-Sample Windows installer profile using exact Case identity and a QEMU-read-only NTFS input disk.
+evidence_status: candidate
+readiness: CANDIDATE
+applies_to:
+  - ordivon-security-evaluation
+related:
+  - security.windows-kvm-p0
+  - security.windows-kvm-recovery-p0.1
+  - security.case-snapshot-p0
+  - security.authority
+---
+# Windows KVM Installer Evaluation P1
+
+P1 is a separate profile. It does not widen `execute-benign-fixture` and cannot reuse the P0 Authority.
+
+The first implemented gate is media preparation only:
+
+1. bind an exact Case, archive SHA-256, byte length, logical name, deny-all network mode, no-restart policy, and observation profile;
+2. create an NTFS image sized from the exact source length;
+3. copy the archive into the image;
+4. stream the embedded file back through `ntfscat` and verify its SHA-256 and length;
+5. verify the source did not change during preparation;
+6. seal a private manifest with the media digest and QEMU attachment arguments;
+7. require `readonly=on`, `removable=on`, and serial `ORDIVON_P1`.
+
+The retained DaVinci profile at `research/cases/windows-kvm-p1-davinci-resolve-studio-21.0.3.7.json` authorizes only `prepare-authorized-windows-installer-media`. `executionAuthorized` is false, so neither the archive nor any contained installer may be executed yet.
+
+Later execution requires a new admitted Guest observation protocol, an exact installer path and arguments, pre/post system snapshots, real residual closure, and a separate acceptance decision.

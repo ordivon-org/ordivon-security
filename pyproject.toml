@@ -37,6 +37,7 @@ ordivon-security-case-snapshot = "ordivon_security.cli_case_snapshot:main"
 ordivon-security-windows-kvm-build = "ordivon_security.cli_windows_kvm_build:main"
 ordivon-security-windows-kvm-acceptance = "ordivon_security.cli_windows_kvm_acceptance:main"
 ordivon-security-windows-kvm-reconcile = "ordivon_security.cli_windows_kvm_reconcile:main"
+ordivon-security-windows-kvm-p1-prepare = "ordivon_security.cli_windows_kvm_p1_prepare:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

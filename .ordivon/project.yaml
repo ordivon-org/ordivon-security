@@ -24,6 +24,7 @@ managed_paths:
   - docs/CASE-SNAPSHOT-P0.md
   - docs/WINDOWS-KVM-P0.md
   - docs/WINDOWS-KVM-RECOVERY-P0.1.md
+  - docs/WINDOWS-KVM-INSTALLER-P1.md
   - docs/AGENT-EXPERIMENT-P0.md
   - docs/research-agenda.md
   - docs/research-boundary.md
