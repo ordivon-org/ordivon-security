@@ -35,6 +35,7 @@ from .models import EvaluationSpec, SampleIdentity
 _CHUNK_BYTES = 4 * 1024 * 1024
 _RUN_ACTION = "execute-benign-fixture"
 _RUN_LABEL = "ORDIVON_RUN"
+_READONLY_MEDIA_FIXTURE_ID = "ordivon-readonly-media-verifier-v1"
 _NETWORK_PCI_CLASS_MIN = 0x0200
 _NETWORK_PCI_CLASS_MAX = 0x02FF
 
@@ -369,6 +370,11 @@ class WindowsKvmProviderConfig:
     run_group: str = "qemu"
     admitted_sample_digest: str = ""
     fixture_attestation_digest: str = ""
+    admitted_fixture_id: str = "ordivon-benign-v1"
+    read_only_sample_media_path: Path | None = None
+    read_only_sample_media_digest: str | None = None
+    read_only_sample_media_serial: str | None = None
+    fixture_runtime_ms: int = 120_000
     memory_mib: int = 5120
     vcpu_count: int = 4
     qmp_ready_timeout_seconds: int = 60
@@ -387,9 +393,38 @@ class WindowsKvmProviderConfig:
             except ValueError as error:
                 raise ValueError(f"Windows KVM {label} digest is invalid") from error
         if (
+            not self.admitted_fixture_id
+            or self.admitted_fixture_id != self.admitted_fixture_id.strip()
+        ):
+            raise ValueError("Windows KVM admitted fixture identity is invalid")
+        media_values = (
+            self.read_only_sample_media_path,
+            self.read_only_sample_media_digest,
+            self.read_only_sample_media_serial,
+        )
+        if any(value is not None for value in media_values) and not all(
+            value is not None for value in media_values
+        ):
+            raise ValueError("Windows KVM read-only Sample media identity is incomplete")
+        if self.read_only_sample_media_path is not None:
+            media_path = self.read_only_sample_media_path
+            media_digest = cast(str, self.read_only_sample_media_digest)
+            media_serial = cast(str, self.read_only_sample_media_serial)
+            if media_path.is_symlink() or not media_path.is_file():
+                raise ValueError("Windows KVM read-only Sample media is missing or unsafe")
+            if len(media_digest) != 71 or not media_digest.startswith("sha256:"):
+                raise ValueError("Windows KVM read-only Sample media digest is invalid")
+            try:
+                bytes.fromhex(media_digest.removeprefix("sha256:"))
+            except ValueError as error:
+                raise ValueError("Windows KVM read-only Sample media digest is invalid") from error
+            if not media_serial or media_serial != media_serial.strip() or "," in media_serial:
+                raise ValueError("Windows KVM read-only Sample media serial is invalid")
+        if (
             min(
                 self.memory_mib,
                 self.vcpu_count,
+                self.fixture_runtime_ms,
                 self.qmp_ready_timeout_seconds,
                 self.shutdown_grace_seconds,
                 self.run_disk_mib,
@@ -508,8 +543,10 @@ def windows_kvm_qemu_arguments(
     qmp_path: Path,
     tpm_socket_path: Path,
     name: str,
+    read_only_sample_media_path: Path | None = None,
+    read_only_sample_media_serial: str | None = None,
 ) -> list[str]:
-    return [
+    arguments = [
         str(config.setpriv_path),
         "--reuid",
         config.run_user,
@@ -569,6 +606,24 @@ def windows_kvm_qemu_arguments(
         "-nic",
         "none",
     ]
+    if read_only_sample_media_path is not None:
+        if read_only_sample_media_serial is None:
+            raise ValueError("Windows KVM read-only Sample media serial is missing")
+        arguments.extend(
+            [
+                "-drive",
+                (
+                    f"file={read_only_sample_media_path},if=none,format=raw,readonly=on,"
+                    "cache=none,aio=threads,id=sampledisk"
+                ),
+                "-device",
+                (
+                    "usb-storage,drive=sampledisk,bus=xhci.0,removable=on,"
+                    f"serial={read_only_sample_media_serial}"
+                ),
+            ]
+        )
+    return arguments
 
 
 class WindowsKvmEvaluationBackend:
@@ -661,6 +716,19 @@ class WindowsKvmEvaluationBackend:
             "privilegeDrop": "setpriv",
             "admittedSampleDigest": self.config.admitted_sample_digest,
             "fixtureAttestationDigest": self.config.fixture_attestation_digest,
+            "admittedFixtureId": self.config.admitted_fixture_id,
+            "fixtureRuntimeMs": self.config.fixture_runtime_ms,
+            "readOnlySampleMedia": (
+                {
+                    "path": str(self.config.read_only_sample_media_path),
+                    "digest": self.config.read_only_sample_media_digest,
+                    "serial": self.config.read_only_sample_media_serial,
+                    "readOnly": True,
+                    "removable": True,
+                }
+                if self.config.read_only_sample_media_path is not None
+                else None
+            ),
         }
         return {
             "kind": "ordivon.security.evaluation-backend",
@@ -710,8 +778,21 @@ class WindowsKvmEvaluationBackend:
             raise ValueError("Windows KVM benign gate requires a PE executable Sample")
         if spec.sample.sha256 != self.config.admitted_sample_digest:
             raise ValueError("Windows KVM Sample differs from the admitted benign fixture bytes")
-        if spec.metadata.get("fixtureId") != "ordivon-benign-v1":
-            raise ValueError("Windows KVM P0 requires the exact benign fixture identity")
+        if spec.metadata.get("fixtureId") != self.config.admitted_fixture_id:
+            if self.config.admitted_fixture_id == "ordivon-benign-v1":
+                raise ValueError("Windows KVM P0 requires the exact benign fixture identity")
+            raise ValueError("Windows KVM requires the exact admitted fixture identity")
+        if self.config.read_only_sample_media_path is not None:
+            expected_media = spec.metadata.get("readOnlySampleMedia")
+            if not isinstance(expected_media, dict):
+                raise ValueError("Windows KVM read-only Sample media binding is missing")
+            if (
+                expected_media.get("digest") != self.config.read_only_sample_media_digest
+                or expected_media.get("serial") != self.config.read_only_sample_media_serial
+                or expected_media.get("readOnly") is not True
+                or expected_media.get("sampleExecutionAuthorized") is not False
+            ):
+                raise ValueError("Windows KVM read-only Sample media binding differs")
         if spec.metadata.get("fixtureCompilationDigest") != self.config.fixture_attestation_digest:
             raise ValueError("Windows KVM fixture attestation differs from Provider identity")
         if spec.environment.image_digest != self.base.environment_image_digest:
@@ -774,7 +855,11 @@ class WindowsKvmEvaluationBackend:
             "evaluationSpecDigest": spec.digest,
             "staged": False,
             "qemuExited": False,
-            "fixtureRuntimeMs": min(120_000, spec.guardian_policy.max_runtime_ms),
+            "fixtureRuntimeMs": min(
+                self.config.fixture_runtime_ms,
+                spec.guardian_policy.max_runtime_ms,
+            ),
+            "readOnlySampleMedia": spec.metadata.get("readOnlySampleMedia"),
         }
         instance = EvaluationInstance(
             instance_id=f"evaluation-instance:{token}",
@@ -806,7 +891,8 @@ class WindowsKvmEvaluationBackend:
             "sampleByteLength": sample.byte_length,
             "action": _RUN_ACTION,
             "maxRuntimeMs": instance.state["fixtureRuntimeMs"],
-            "fixtureId": "ordivon-benign-v1",
+            "fixtureId": self.config.admitted_fixture_id,
+            "readOnlySampleMedia": instance.state.get("readOnlySampleMedia"),
         }
         manifest_path = run_path / "ordivon-run.json"
         _write_private_json(manifest_path, manifest)
@@ -934,6 +1020,8 @@ class WindowsKvmEvaluationBackend:
             qmp_path=qmp_path,
             tpm_socket_path=tpm_socket_path,
             name=instance.instance_id.replace("evaluation-instance:", "ordivon-"),
+            read_only_sample_media_path=self.config.read_only_sample_media_path,
+            read_only_sample_media_serial=self.config.read_only_sample_media_serial,
         )
         started_at = time.monotonic_ns()
         guardian_records: list[GuardianRecord] = []
@@ -1058,11 +1146,21 @@ class WindowsKvmEvaluationBackend:
             and result.get("sampleDigest") == spec.sample.sha256
             and result.get("action") == _RUN_ACTION
             and fixture_result is not None
-            and fixture_result.get("fixtureId") == "ordivon-benign-v1"
+            and fixture_result.get("fixtureId") == self.config.admitted_fixture_id
             and fixture_result.get("completed") is True
             and fixture_result.get("networkRequested") is False
         ):
-            terminal_reason = "benign-fixture-completed"
+            if self.config.admitted_fixture_id == _READONLY_MEDIA_FIXTURE_ID:
+                if (
+                    fixture_result.get("archiveIdentityMatch") is True
+                    and fixture_result.get("writeBlocked") is True
+                    and fixture_result.get("sampleExecuted") is False
+                ):
+                    terminal_reason = "readonly-sample-media-verification-completed"
+                else:
+                    terminal_reason = "windows-kvm-guest-result-invalid"
+            else:
+                terminal_reason = "benign-fixture-completed"
         else:
             terminal_reason = "windows-kvm-guest-result-invalid"
 
@@ -1105,15 +1203,27 @@ class WindowsKvmEvaluationBackend:
             observer_records.append(
                 ObserverRecord(
                     channel="windows-guest-runner",
-                    event_type="benign.fixture-execution",
+                    event_type=(
+                        "media.readonly-verification"
+                        if self.config.admitted_fixture_id == _READONLY_MEDIA_FIXTURE_ID
+                        else "benign.fixture-execution"
+                    ),
                     payload=result,
                 )
             )
         if fixture_result is not None:
             observer_records.append(
                 ObserverRecord(
-                    channel="benign-fixture",
-                    event_type="benign.fixture-result",
+                    channel=(
+                        "readonly-media-verifier"
+                        if self.config.admitted_fixture_id == _READONLY_MEDIA_FIXTURE_ID
+                        else "benign-fixture"
+                    ),
+                    event_type=(
+                        "media.readonly-verification-result"
+                        if self.config.admitted_fixture_id == _READONLY_MEDIA_FIXTURE_ID
+                        else "benign.fixture-result"
+                    ),
                     payload=fixture_result,
                 )
             )
@@ -1126,8 +1236,13 @@ class WindowsKvmEvaluationBackend:
                 "environmentImageDigest": self.base.environment_image_digest,
                 "sampleExecutionAttempted": True,
                 "sampleExecuted": fixture_result is not None,
+                "attachedThirdPartySampleExecutionAttempted": False,
+                "attachedThirdPartySampleExecuted": False,
                 "sampleDigest": spec.sample.sha256,
+                "fixtureId": self.config.admitted_fixture_id,
                 "action": _RUN_ACTION,
+                "readOnlySampleMediaAttached": self.config.read_only_sample_media_path is not None,
+                "readOnlySampleMediaDigest": self.config.read_only_sample_media_digest,
                 "networkDevicePresent": bool(network_devices),
                 "qmpStatus": qmp_status,
                 "qemuExitCode": instance.state.get("qemuExitCode"),

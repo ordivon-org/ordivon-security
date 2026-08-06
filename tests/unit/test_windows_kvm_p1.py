@@ -167,6 +167,30 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(index["decision"]["attachToGuest"], False)
         self.assertIs(index["decision"]["executeInstaller"], False)
 
+    def test_目标产品B_research_admission_does_not_reverse_product_rejection(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "research"
+            / "cases"
+            / "windows-kvm-p1-caseb-isolated-research-trial.json"
+        )
+        value = __import__("json").loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            value["kind"],
+            "ordivon.security.windows-kvm-isolated-research-admission",
+        )
+        self.assertEqual(value["productAdmission"]["status"], "rejected")
+        self.assertIs(value["productAdmission"]["installOnHost"], False)
+        self.assertEqual(value["researchAdmission"]["status"], "admitted-in-stages")
+        self.assertEqual(
+            value["researchAdmission"]["currentAction"],
+            "verify-read-only-sample-media",
+        )
+        self.assertIs(value["researchAdmission"]["executeOrdivonVerifier"], True)
+        self.assertIs(value["researchAdmission"]["executeThirdPartyCode"], False)
+        self.assertIs(value["researchAdmission"]["sampleMediaReadOnly"], True)
+        self.assertEqual(value["researchAdmission"]["networkMode"], "deny-all")
+
     def test_profile_does_not_authorize_execution_by_default(self) -> None:
         value = self.profile.to_dict()
         self.assertEqual(value["permittedActions"], [_P1_PREPARE_ACTION])

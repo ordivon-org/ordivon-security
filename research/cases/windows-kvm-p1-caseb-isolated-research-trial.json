@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-isolated-research-admission",
+  "admissionId": "admission:windows-kvm-p1:caseb-studio-isolated-research",
+  "revision": "1",
+  "caseId": "case:caseb-studio",
+  "sourceDecision": "decision:windows-kvm-p1:caseb-studio-static-entry",
+  "productAdmission": {
+    "status": "rejected",
+    "installOnHost": false,
+    "distributeAsSoftware": false,
+    "useAsDailySoftware": false
+  },
+  "researchAdmission": {
+    "status": "admitted-in-stages",
+    "currentAction": "verify-read-only-sample-media",
+    "executeOrdivonVerifier": true,
+    "executeThirdPartyCode": false,
+    "attachSampleMedia": true,
+    "sampleMediaReadOnly": true,
+    "networkMode": "deny-all",
+    "disposableOverlay": true,
+    "residualClosureRequired": true
+  },
+  "currentGate": {
+    "fixtureId": "ordivon-readonly-media-verifier-v1",
+    "expectedArchiveDigest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+    "expectedArchiveByteLength": 7428655207,
+    "requiredFacts": [
+      "Windows Guest reads the exact archive bytes from ORDIVON_P1",
+      "Windows Guest cannot create a write probe on the Sample media",
+      "QMP reports no network-class device",
+      "no contained EXE, MSI, DLL, script, or archive entry is executed",
+      "all disposable VM state is closed"
+    ]
+  },
+  "laterGates": [
+    {
+      "action": "observe-original-package",
+      "status": "pending-observer-backend",
+      "networkMode": "deny-all-or-simulated-only"
+    },
+    {
+      "action": "evaluate-backdoor-removed-crack-capability",
+      "status": "pending-derived-case-and-observer-backend",
+      "networkMode": "deny-all"
+    },
+    {
+      "action": "compare-official-baseline",
+      "status": "pending-official-baseline"
+    }
+  ],
+  "principle": "Rejection for ordinary installation does not prohibit controlled execution as an isolated research Trial. Research admission does not convert the package into an approved product."
+}

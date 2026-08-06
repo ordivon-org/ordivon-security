@@ -1,0 +1,151 @@
+#include <windows.h>
+#include <bcrypt.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <wchar.h>
+
+#ifndef EXPECTED_ARCHIVE_NAME
+#error EXPECTED_ARCHIVE_NAME is required
+#endif
+#ifndef EXPECTED_ARCHIVE_SHA256
+#error EXPECTED_ARCHIVE_SHA256 is required
+#endif
+#ifndef EXPECTED_ARCHIVE_LENGTH
+#error EXPECTED_ARCHIVE_LENGTH is required
+#endif
+
+static int write_result(const wchar_t *path, int completed, int identity_match,
+                        int write_blocked, DWORD write_error,
+                        const char *actual_digest,
+                        unsigned long long actual_length,
+                        const char *error_message) {
+    FILE *handle = _wfopen(path, L"wb");
+    if (handle == NULL) return 90;
+    fprintf(handle,
+        "{\"schemaVersion\":1,\"fixtureId\":\"ordivon-readonly-media-verifier-v1\","
+        "\"completed\":%s,\"networkRequested\":false,\"sampleExecuted\":false,"
+        "\"volumeLabel\":\"ORDIVON_P1\",\"archiveName\":\"%s\","
+        "\"archiveDigest\":\"sha256:%s\",\"archiveByteLength\":%llu,"
+        "\"archiveIdentityMatch\":%s,\"writeBlocked\":%s,\"writeProbeError\":%lu,"
+        "\"error\":\"%s\"}\n",
+        completed ? "true" : "false", EXPECTED_ARCHIVE_NAME,
+        actual_digest, actual_length, identity_match ? "true" : "false",
+        write_blocked ? "true" : "false", (unsigned long)write_error,
+        error_message == NULL ? "" : error_message);
+    fclose(handle);
+    return 0;
+}
+
+static int hash_file(const wchar_t *path, char output[65],
+                     unsigned long long *length_out) {
+    HANDLE file = CreateFileW(path, GENERIC_READ,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
+        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    if (file == INVALID_HANDLE_VALUE) return 30;
+
+    BCRYPT_ALG_HANDLE algorithm = NULL;
+    BCRYPT_HASH_HANDLE hash = NULL;
+    DWORD object_length = 0, hash_length = 0, copied = 0;
+    unsigned char *object = NULL, *buffer = NULL;
+    unsigned char digest[32];
+    LARGE_INTEGER size;
+    int status = 0;
+
+    if (!GetFileSizeEx(file, &size) || size.QuadPart < 0) { status = 31; goto cleanup; }
+    *length_out = (unsigned long long)size.QuadPart;
+    if (BCryptOpenAlgorithmProvider(&algorithm, BCRYPT_SHA256_ALGORITHM, NULL, 0) < 0) { status = 32; goto cleanup; }
+    if (BCryptGetProperty(algorithm, BCRYPT_OBJECT_LENGTH, (PUCHAR)&object_length,
+                          sizeof(object_length), &copied, 0) < 0) { status = 33; goto cleanup; }
+    if (BCryptGetProperty(algorithm, BCRYPT_HASH_LENGTH, (PUCHAR)&hash_length,
+                          sizeof(hash_length), &copied, 0) < 0 || hash_length != 32) { status = 34; goto cleanup; }
+    object = (unsigned char *)HeapAlloc(GetProcessHeap(), 0, object_length);
+    buffer = (unsigned char *)HeapAlloc(GetProcessHeap(), 0, 4 * 1024 * 1024);
+    if (object == NULL || buffer == NULL) { status = 35; goto cleanup; }
+    if (BCryptCreateHash(algorithm, &hash, object, object_length, NULL, 0, 0) < 0) { status = 36; goto cleanup; }
+
+    for (;;) {
+        DWORD read_bytes = 0;
+        if (!ReadFile(file, buffer, 4 * 1024 * 1024, &read_bytes, NULL)) { status = 37; goto cleanup; }
+        if (read_bytes == 0) break;
+        if (BCryptHashData(hash, buffer, read_bytes, 0) < 0) { status = 38; goto cleanup; }
+    }
+    if (BCryptFinishHash(hash, digest, sizeof(digest), 0) < 0) { status = 39; goto cleanup; }
+    for (int index = 0; index < 32; index++) sprintf(output + index * 2, "%02x", digest[index]);
+    output[64] = '\0';
+
+cleanup:
+    if (hash != NULL) BCryptDestroyHash(hash);
+    if (algorithm != NULL) BCryptCloseAlgorithmProvider(algorithm, 0);
+    if (buffer != NULL) HeapFree(GetProcessHeap(), 0, buffer);
+    if (object != NULL) HeapFree(GetProcessHeap(), 0, object);
+    CloseHandle(file);
+    return status;
+}
+
+int wmain(int argc, wchar_t **argv) {
+    if (argc != 3 || wcscmp(argv[1], L"--result") != 0) return 20;
+    const wchar_t *result_path = argv[2];
+    wchar_t archive_path[MAX_PATH], probe_path[MAX_PATH], label[MAX_PATH];
+    wchar_t archive_name[MAX_PATH];
+    int found = 0;
+    if (MultiByteToWideChar(
+            CP_UTF8,
+            MB_ERR_INVALID_CHARS,
+            EXPECTED_ARCHIVE_NAME,
+            -1,
+            archive_name,
+            MAX_PATH
+        ) == 0) {
+        write_result(result_path, 0, 0, 0, GetLastError(), "", 0,
+                     "archive name conversion failed");
+        return 22;
+    }
+
+    for (wchar_t drive = L'A'; drive <= L'Z'; drive++) {
+        wchar_t root[] = L"A:\\";
+        root[0] = drive;
+        label[0] = L'\0';
+        if (!GetVolumeInformationW(root, label, MAX_PATH, NULL, NULL, NULL, NULL, 0)) continue;
+        if (wcscmp(label, L"ORDIVON_P1") == 0) {
+            _snwprintf(archive_path, MAX_PATH, L"%ls%ls", root, archive_name);
+            _snwprintf(probe_path, MAX_PATH, L"%ls.ordivon-write-probe", root);
+            found = 1;
+            break;
+        }
+    }
+    if (!found) {
+        write_result(result_path, 0, 0, 0, 0, "", 0, "sample volume missing");
+        return 21;
+    }
+
+    DWORD write_error = 0;
+    int write_blocked = 0;
+    HANDLE probe = CreateFileW(probe_path, GENERIC_WRITE, 0, NULL, CREATE_NEW,
+                               FILE_ATTRIBUTE_NORMAL, NULL);
+    if (probe == INVALID_HANDLE_VALUE) {
+        write_error = GetLastError();
+        write_blocked = (
+            write_error == ERROR_WRITE_PROTECT ||
+            write_error == ERROR_ACCESS_DENIED
+        );
+    } else {
+        CloseHandle(probe);
+        DeleteFileW(probe_path);
+    }
+
+    char actual_digest[65] = "";
+    unsigned long long actual_length = 0;
+    int hash_status = hash_file(archive_path, actual_digest, &actual_length);
+    if (hash_status != 0) {
+        write_result(result_path, 0, 0, write_blocked, write_error,
+                     actual_digest, actual_length, "archive hash failed");
+        return hash_status;
+    }
+    int identity_match = (_stricmp(actual_digest, EXPECTED_ARCHIVE_SHA256) == 0 &&
+                          actual_length == (unsigned long long)EXPECTED_ARCHIVE_LENGTH);
+    int completed = identity_match && write_blocked;
+    write_result(result_path, completed, identity_match, write_blocked,
+                 write_error, actual_digest, actual_length,
+                 completed ? "" : "media verification failed");
+    return completed ? 0 : 40;
+}
