@@ -39,4 +39,6 @@ The explicit `ordivon-security-windows-kvm-reconcile` command scans the private 
 
 The owner-process SIGKILL gate passed from revision `bcac3cc`: the Run was killed after the root-owned ledger reached `executing`, and reconciliation closed QEMU, swtpm, the Run directory, the ledger, and Fixture state with zero residuals. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p01-bcac3cc.json`](../evidence/acceptance/windows-kvm-p01-bcac3cc.json).
 
-This stage does not authorize unknown Samples or third-party installers. It remains **candidate** because Runtime service restart and WSL shutdown recovery gates are still pending.
+The Runtime service restart gate also passed from revision `7b027f0`: the root ledger was captured in `executing`, the Runtime control plane restarted three seconds later, and the active attempt completed the benign Fixture thirty seconds after the restart with QMP network-device count zero and full residual closure.
+
+This stage does not authorize unknown Samples or third-party installers. It remains **candidate** because WSL shutdown recovery is still pending.

@@ -77,8 +77,13 @@ class WindowsKvmRecoveryTests(unittest.TestCase):
         index = json.loads(path.read_text(encoding="utf-8"))
         self.assertEqual(index["status"], "partial-acceptance")
         self.assertEqual(index["gates"]["sigkillRecovery"], "passed")
-        self.assertEqual(index["gates"]["runtimeRestartRecovery"], "pending")
+        self.assertEqual(index["gates"]["runtimeRestartRecovery"], "passed")
         self.assertEqual(index["gates"]["wslShutdownRecovery"], "pending")
+        self.assertEqual(
+            index["runtimeRestartGate"]["attemptContinuity"],
+            "active-attempt-completed-across-runtime-control-plane-restart",
+        )
+        self.assertIs(index["runtimeRestartGate"]["residualClosed"], True)
         self.assertIs(index["scope"]["crashRecoveryFullyAdmitted"], False)
         self.assertIs(index["scope"]["thirdPartyInstallerExecution"], False)
 
