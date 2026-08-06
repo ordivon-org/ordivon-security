@@ -157,6 +157,19 @@ uv run ordivon-security-windows-kvm-p1-prepare \
 
 This command only prepares and verifies a digest-bound NTFS input image. QEMU attachment is declared read-only and removable. The retained 目标产品B profile has `executionAuthorized: false`; it does not authorize launching the archive or an installer. See [`docs/WINDOWS-KVM-INSTALLER-P1.md`](docs/WINDOWS-KVM-INSTALLER-P1.md).
 
+R4-A can separately materialize a complete Host-extracted execution tree into another read-only NTFS candidate:
+
+```bash
+uv run ordivon-security-windows-kvm-p1-materialize-execution-media \
+  --contract research/cases/windows-kvm-p1-caseb-case-a-execution.json \
+  --case-manifest research/cases/windows-kvm-p1-caseb-case-a-original-repack.json \
+  --transform-manifest research/cases/windows-kvm-p1-caseb-case-a-transform.json \
+  --source /path/to/exact-authorized-archive.7z \
+  --state-root /var/lib/ordivon/security/providers/windows-kvm
+```
+
+This command lists and validates archive paths before extraction, rejects links and special files, creates a complete digest-bound tree, and verifies it through a read-only NTFS remount. Its output remains `materialized-not-admitted`; it does not attach QEMU, start Windows, admit a Controller, or execute the installer.
+
 P1 R0-R3 also provides manifest-verified residual reconciliation, private derived-Case materialization, a packaged Windows observer, and Case A/B/C authority records. Case A targets disposable Windows KVM and requires an environment transformation manifest. Case B and Case C target the main Windows installation: C is the read-only Free control, while B remains behind an explicit host-write Gate with automatic mutation disabled.
 
 Capture or refresh the Free control with:
@@ -168,7 +181,7 @@ uv run ordivon-security-windows-host-p1-baseline \
 
 The command hashes the official `Resolve.exe` and signed `intl.dll` before and after collection and fails if either identity changes. It does not infer paid-feature state from the UI and does not modify the host.
 
-The observer is also present in a separately sealed no-network Windows base accepted by `evidence/acceptance/windows-kvm-p1-observer-base-1367c76.json`. R4 selects one Provider-owned controller/orchestrator Runner architecture; its implementation and Case A execution remain later Gates, and any Case B host write remains blocked.
+The observer is also present in a separately sealed no-network Windows base accepted by `evidence/acceptance/windows-kvm-p1-observer-base-1367c76.json`. R4 selects one Provider-owned controller/orchestrator Runner architecture. R4-A now implements the execution contract and read-only execution-media materializer; the Controller, Case A execution, and any Case B host write remain later Gates.
 
 ## Run the deterministic Contest
 

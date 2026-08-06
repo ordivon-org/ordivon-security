@@ -82,6 +82,14 @@ from .windows_kvm_p1_contracts import (
     WindowsKvmInstallerObservationProfile,
     WindowsKvmInstallerStaticDecision,
 )
+from .windows_kvm_p1_execution_media import (
+    WindowsKvmP1ExecutionContract,
+    WindowsKvmP1ExecutionMediaConfig,
+    WindowsKvmP1ExecutionTree,
+    WindowsKvmP1ExecutionTreeEntry,
+    materialize_windows_kvm_p1_execution_media,
+    windows_kvm_p1_execution_media_arguments,
+)
 from .windows_kvm_reconcile import reconcile_windows_kvm_runs
 
 __all__ = [
@@ -142,6 +150,12 @@ __all__ = [
     "WindowsKvmInstallerStaticDecision",
     "WindowsKvmInstallerProfile",
     "WindowsKvmP1MediaConfig",
+    "WindowsKvmP1ExecutionContract",
+    "WindowsKvmP1ExecutionMediaConfig",
+    "WindowsKvmP1ExecutionTree",
+    "WindowsKvmP1ExecutionTreeEntry",
+    "materialize_windows_kvm_p1_execution_media",
+    "windows_kvm_p1_execution_media_arguments",
     "prepare_windows_kvm_installer_media",
     "reconcile_windows_kvm_runs",
     "build_windows_kvm_base",
