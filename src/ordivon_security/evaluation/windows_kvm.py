@@ -8,6 +8,7 @@ import signal
 import socket
 import subprocess
 import time
+from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
@@ -130,8 +131,31 @@ def _run_checked(
     )
 
 
+def _process_state(pid: int) -> str | None:
+    if pid < 1:
+        return None
+    try:
+        raw = Path(f"/proc/{pid}/stat").read_text(encoding="utf-8")
+    except OSError:
+        return None
+    _, separator, suffix = raw.rpartition(")")
+    if not separator:
+        return None
+    fields = suffix.strip().split()
+    return fields[0] if fields else None
+
+
+def _reap_child(pid: int) -> None:
+    with suppress(ChildProcessError):
+        os.waitpid(pid, os.WNOHANG)
+
+
 def _is_process_alive(pid: int) -> bool:
     if pid < 1:
+        return False
+    state = _process_state(pid)
+    if state == "Z":
+        _reap_child(pid)
         return False
     try:
         os.kill(pid, 0)
