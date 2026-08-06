@@ -15,7 +15,7 @@ audience:
   - agent
 updated: 2026-08-06
 summary: Crash-recoverable Windows KVM Run ledger and explicit orphan reconciliation beyond the controlled-cancellation P0 gate.
-evidence_status: candidate
+evidence_status: partial
 readiness: CANDIDATE
 applies_to:
   - ordivon-security-evaluation
@@ -37,4 +37,6 @@ The explicit `ordivon-security-windows-kvm-reconcile` command scans the private 
 - removes only exact orphan `ordivon-benign-v1-run-<index>.exe` compilation files when no matching acceptance process is active;
 - writes a private reconciliation receipt.
 
-This stage does not authorize unknown Samples or third-party installers. It remains candidate until real SIGKILL, Runtime restart, and WSL shutdown recovery gates are retained.
+The owner-process SIGKILL gate passed from revision `bcac3cc`: the Run was killed after the root-owned ledger reached `executing`, and reconciliation closed QEMU, swtpm, the Run directory, the ledger, and Fixture state with zero residuals. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p01-bcac3cc.json`](../evidence/acceptance/windows-kvm-p01-bcac3cc.json).
+
+This stage does not authorize unknown Samples or third-party installers. It remains **candidate** because Runtime service restart and WSL shutdown recovery gates are still pending.

@@ -70,6 +70,18 @@ class WindowsKvmRecoveryTests(unittest.TestCase):
             "networkDevicePresent": False,
         }
 
+    def test_public_p01_index_preserves_partial_scope(self) -> None:
+        path = (
+            Path(__file__).parents[2] / "evidence" / "acceptance" / "windows-kvm-p01-bcac3cc.json"
+        )
+        index = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(index["status"], "partial-acceptance")
+        self.assertEqual(index["gates"]["sigkillRecovery"], "passed")
+        self.assertEqual(index["gates"]["runtimeRestartRecovery"], "pending")
+        self.assertEqual(index["gates"]["wslShutdownRecovery"], "pending")
+        self.assertIs(index["scope"]["crashRecoveryFullyAdmitted"], False)
+        self.assertIs(index["scope"]["thirdPartyInstallerExecution"], False)
+
     def test_private_json_replace_is_atomic_and_private(self) -> None:
         path = self.root / "state.json"
         _replace_private_json(path, {"value": 1})

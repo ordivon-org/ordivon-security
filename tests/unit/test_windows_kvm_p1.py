@@ -44,6 +44,20 @@ class WindowsKvmP1Tests(unittest.TestCase):
         path.chmod(0o755)
         return path
 
+    def test_public_目标产品B_media_index_does_not_authorize_execution(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "evidence"
+            / "acceptance"
+            / "windows-kvm-p1-caseb-media-bcac3cc.json"
+        )
+        index = __import__("json").loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(index["status"], "media-preparation-accepted-execution-not-authorized")
+        self.assertIs(index["authorization"]["prepareAuthorizedMedia"], True)
+        self.assertIs(index["authorization"]["attachToGuest"], False)
+        self.assertIs(index["authorization"]["executeArchiveOrInstaller"], False)
+        self.assertEqual(index["gate"]["embeddedReadbackIdentity"], "passed")
+
     def test_profile_does_not_authorize_execution_by_default(self) -> None:
         value = self.profile.to_dict()
         self.assertEqual(value["permittedActions"], [_P1_PREPARE_ACTION])
