@@ -125,6 +125,22 @@ class WindowsKvmP1Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "snapshot domains are incomplete"):
             WindowsKvmInstallerObservationProfile.from_dict(incomplete)
 
+    def test_public_static_gate_is_a_rejection_not_execution_admission(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "evidence"
+            / "acceptance"
+            / "windows-kvm-p1-davinci-static-91f08e0.json"
+        )
+        index = __import__("json").loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(index["status"], "accepted-rejection-decision")
+        self.assertEqual(index["decision"]["outcome"], "reject-execution-profile")
+        self.assertIs(index["decision"]["chainComplete"], False)
+        self.assertIs(index["decision"]["executionAuthorized"], False)
+        self.assertIsNone(index["decision"]["installerRelativePath"])
+        self.assertIs(index["decision"]["attachToGuest"], False)
+        self.assertIs(index["decision"]["executeInstaller"], False)
+
     def test_profile_does_not_authorize_execution_by_default(self) -> None:
         value = self.profile.to_dict()
         self.assertEqual(value["permittedActions"], [_P1_PREPARE_ACTION])
