@@ -1,0 +1,48 @@
+{
+  "evidenceReferences": {
+    "firstFailedSigkillAttempt": {
+      "byteLength": 603,
+      "logicalName": "windows-kvm-p01-sigkill-run20-fixture-residual-d73c8a2.json",
+      "sha256": "sha256:e15d3ad1953291497d9c3ed01f36b55d03e7dbd7dd784ab6bacb2bb91f20884f"
+    },
+    "sigkillAcceptance": {
+      "byteLength": 665,
+      "logicalName": "windows-kvm-p01-sigkill-acceptance-bcac3cc-run21.json",
+      "sha256": "sha256:bdcb6ca17a427354ea2478a66fe338a6bec127e0d225a4930c08407961636b53"
+    }
+  },
+  "gates": {
+    "runtimeRestartRecovery": "pending",
+    "sigkillRecovery": "passed",
+    "wslShutdownRecovery": "pending"
+  },
+  "implementationRevision": "git:bcac3cc6072120bc4eeb70bbad75a184d11e6d0a",
+  "kind": "ordivon.security.windows-kvm-p01-acceptance",
+  "limitations": [
+    "only the owner-process SIGKILL gate is retained",
+    "Runtime service restart and WSL shutdown recovery remain unverified",
+    "the first SIGKILL attempt exposed an orphan compiled Fixture and is retained as failure evidence"
+  ],
+  "passedGate": {
+    "attentionRequired": 0,
+    "failureMode": "SIGKILL-owner-after-executing-ledger",
+    "finalState": {
+      "fixtureFiles": [],
+      "qemuPids": [],
+      "runDirectories": [],
+      "runLedgers": [],
+      "swtpmPids": []
+    },
+    "ledgerPhaseBefore": "executing",
+    "reconciledRuns": 1
+  },
+  "providerId": "provider:windows-kvm",
+  "schemaVersion": 1,
+  "scope": {
+    "crashRecoveryFullyAdmitted": false,
+    "davinciCaseExecution": false,
+    "thirdPartyInstallerExecution": false,
+    "unknownSampleExecution": false
+  },
+  "status": "partial-acceptance"
+}

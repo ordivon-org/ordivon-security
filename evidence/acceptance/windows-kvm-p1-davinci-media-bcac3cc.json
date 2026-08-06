@@ -1,0 +1,55 @@
+{
+  "authorization": {
+    "attachToGuest": false,
+    "executeArchiveOrInstaller": false,
+    "prepareAuthorizedMedia": true,
+    "startWindows": false
+  },
+  "caseId": "case:davinci-resolve-studio-21.0.3.7",
+  "embeddedSource": {
+    "byteLength": 7428655207,
+    "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+    "guestPath": "/DaVinci_Resolve_Studio_21.0.3.7.7z"
+  },
+  "evidenceReferences": {
+    "privateMediaAcceptance": {
+      "byteLength": 1221,
+      "logicalName": "windows-kvm-p1-davinci-media-acceptance-bcac3cc.json",
+      "sha256": "sha256:53d1d5a84e5038c1f0096c877f08ed37f74ab7191b9f66b82de4298b1898c837"
+    }
+  },
+  "gate": {
+    "embeddedReadbackIdentity": "passed",
+    "noExecution": "passed",
+    "ntfsVolumeIdentity": "passed",
+    "qemuReadOnlyTopology": "passed",
+    "sourceIdentity": "passed"
+  },
+  "implementationRevision": "git:bcac3cc6072120bc4eeb70bbad75a184d11e6d0a",
+  "kind": "ordivon.security.windows-kvm-p1-media-acceptance",
+  "limitations": [
+    "the prepared NTFS image has not been attached to QEMU",
+    "the archive and contained installers have not been executed",
+    "no installer path, publisher, arguments, or Guest observer protocol is admitted"
+  ],
+  "media": {
+    "allocatedBytes": 7472373760,
+    "byteLength": 8589934592,
+    "digest": "sha256:ced748c37bd4b7712a0b2aa85ac645c111b441aa83ba55c91205dff3fd8a14d4",
+    "filesystem": "ntfs",
+    "readOnly": true,
+    "removable": true,
+    "serial": "ORDIVON_P1",
+    "volumeLabel": "ORDIVON_P1"
+  },
+  "profileDigest": "sha256:dedee9615926ff2b65c6ae7b055502a384af26321e0c17dbe045770ea6d7c499",
+  "profileId": "profile:windows-kvm-p1:davinci-resolve-studio-21.0.3.7",
+  "providerId": "provider:windows-kvm",
+  "schemaVersion": 1,
+  "source": {
+    "byteLength": 7428655207,
+    "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+    "logicalName": "DaVinci_Resolve_Studio_21.0.3.7.7z"
+  },
+  "status": "media-preparation-accepted-execution-not-authorized"
+}

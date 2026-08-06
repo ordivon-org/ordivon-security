@@ -16,7 +16,7 @@ audience:
   - agent
 updated: 2026-08-06
 summary: Separate large-Sample Windows installer profile using exact Case identity and a QEMU-read-only NTFS input disk.
-evidence_status: candidate
+evidence_status: partial
 readiness: CANDIDATE
 applies_to:
   - ordivon-security-evaluation
@@ -40,6 +40,8 @@ The first implemented gate is media preparation only:
 6. seal a private manifest with the media digest and QEMU attachment arguments;
 7. require `readonly=on`, `removable=on`, and serial `ORDIVON_P1`.
 
-The retained DaVinci profile at `research/cases/windows-kvm-p1-davinci-resolve-studio-21.0.3.7.json` authorizes only `prepare-authorized-windows-installer-media`. `executionAuthorized` is false, so neither the archive nor any contained installer may be executed yet.
+The retained DaVinci profile at `research/cases/windows-kvm-p1-davinci-resolve-studio-21.0.3.7.json` authorizes only `prepare-authorized-windows-installer-media`. The real media gate passed from revision `bcac3cc`: the exact 7,428,655,207-byte archive was embedded in an 8 GiB NTFS image, streamed back with the same SHA-256, and bound to a QEMU-read-only topology. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-davinci-media-bcac3cc.json`](../evidence/acceptance/windows-kvm-p1-davinci-media-bcac3cc.json).
+
+`executionAuthorized` remains false, so neither the archive nor any contained installer may be attached to a Guest or executed yet.
 
 Later execution requires a new admitted Guest observation protocol, an exact installer path and arguments, pre/post system snapshots, real residual closure, and a separate acceptance decision.
