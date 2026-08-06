@@ -98,6 +98,8 @@ The sanitized Windows KVM P0 acceptance index is retained at [`acceptance/window
 
 P0.1 reconciliation receipts bind the scanned state root, each ledger decision, exact process-identity closure, Run-directory and ledger deletion, skipped active owners, and any attention-required diagnostics. They do not convert a crashed Run into valid Evaluation evidence. P1 media manifests bind the installer profile digest, exact source identity, NTFS image digest, embedded-file verification, and read-only attachment topology; they explicitly state `prepared-not-executable` and cannot establish runtime behavior.
 
+The sanitized R4-A materializer-canary index is retained at [`acceptance/windows-kvm-p1-case-a-execution-media-canary-6c141b9.json`](acceptance/windows-kvm-p1-case-a-execution-media-canary-6c141b9.json). It binds a committed implementation revision, a private receipt digest, pre-extraction archive validation, a complete tree digest, `noexec` NTFS population, read-only remount verification, source immutability, and residual closure. The canary used only maintained benign data: it does not admit QEMU attachment, a Controller, Case A execution, or Case B.
+
 ## Active Case Snapshot bundle
 
 An evolving local Case may be retained as:

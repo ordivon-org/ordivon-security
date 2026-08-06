@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-execution-media-canary-acceptance",
+  "status": "accepted-benign-materializer-canary",
+  "implementationRevision": "git:6c141b9284c624e6e01ef77927828a669d134768",
+  "privateReceipt": {
+    "digest": "sha256:8615857564bf270d1360ce8aa6a05a5530c401a0c0dad10efe146851ccb180e4",
+    "byteLength": 2783
+  },
+  "scope": {
+    "thirdPartySample": false,
+    "actualCaseAMaterialized": false,
+    "installerExecuted": false,
+    "qemuStarted": false,
+    "controllerAdmitted": false,
+    "executionAuthorized": false
+  },
+  "canary": {
+    "archiveDigest": "sha256:ec5e4be8d5499abcffc8df4572a5983c0f78647e6a51f3252f8bb2e67c8b557a",
+    "archiveByteLength": 233,
+    "fileCount": 2,
+    "directoryCount": 1,
+    "totalFileBytes": 37,
+    "treeDigest": "sha256:071573f7e0ae6e423c9301d19a32fe3b4e9eeab37dae98d1bafbf4648d13915f"
+  },
+  "materializedMedia": {
+    "status": "materialized-not-admitted",
+    "digest": "sha256:5ff35cf8ff6d4a24e95c4a9fe1c82065e586334f853da44d29c805f88f1fe70c",
+    "byteLength": 1073741824,
+    "readOnly": true,
+    "retained": false
+  },
+  "gates": {
+    "archiveInventoryValidatedBeforeExtraction": true,
+    "hostTreeDigestBound": true,
+    "ntfsNoExecPopulation": true,
+    "readOnlyRemountVerified": true,
+    "sourceUnchanged": true,
+    "qemuAttachmentClosed": true,
+    "controllerAdmissionClosed": true,
+    "executionAdmissionClosed": true,
+    "residualClosure": true
+  },
+  "toolDigests": {
+    "sevenZip": "sha256:f802383f13b8331aabaf779def00a356c8d2b8148255170b75b03028f4d23ad4",
+    "mkntfs": "sha256:6a526751d278efe3d717f6857595e9513948495bbf07b3509fcf8869928c9ed7",
+    "ntfs3g": "sha256:a48885bf326644a61957fe4e6798aef75da76456ae0e3282f70a7dc0928fa20b",
+    "umount": "sha256:19029304089dacb436d6913ab1f4aa311fe595ac39df45e971564243e35f4074",
+    "mountpoint": "sha256:24f9724be6be1da8bc234f82cb2f63d6318294aaaf6c9cb376a71e02f31c503b",
+    "sync": "sha256:23cee5af26b339541403a8caa02de5f28a3dd6955be5f66a23e47243b7abffbc"
+  },
+  "residual": {
+    "stateRootRemoved": true,
+    "mountResidualCount": 0
+  },
+  "limitations": [
+    "the canary used only Ordivon-maintained benign data and did not materialize the actual Case A archive",
+    "the canary did not attach the generated image to QEMU or start Windows",
+    "the canary does not admit the native Controller, Guest orchestrator, or third-party installer execution",
+    "Case B remains blocked"
+  ]
+}

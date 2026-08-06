@@ -157,6 +157,26 @@ class WindowsKvmP1ExecutionMediaTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.temporary.cleanup()
 
+    def test_public_materializer_canary_keeps_all_execution_gates_closed(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "evidence/acceptance/windows-kvm-p1-case-a-execution-media-canary-6c141b9.json"
+        )
+        value = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(value["status"], "accepted-benign-materializer-canary")
+        self.assertEqual(
+            value["implementationRevision"],
+            "git:6c141b9284c624e6e01ef77927828a669d134768",
+        )
+        self.assertIs(value["scope"]["thirdPartySample"], False)
+        self.assertIs(value["scope"]["actualCaseAMaterialized"], False)
+        self.assertIs(value["scope"]["qemuStarted"], False)
+        self.assertIs(value["scope"]["controllerAdmitted"], False)
+        self.assertIs(value["scope"]["executionAuthorized"], False)
+        self.assertTrue(all(value["gates"].values()))
+        self.assertIs(value["materializedMedia"]["retained"], False)
+        self.assertEqual(value["residual"]["mountResidualCount"], 0)
+
     def test_retained_case_a_contract_keeps_execution_closed(self) -> None:
         repo = Path(__file__).parents[2]
         case_value = json.loads(
