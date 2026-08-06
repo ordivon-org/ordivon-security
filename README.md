@@ -168,7 +168,7 @@ uv run ordivon-security-windows-host-p1-baseline \
 
 The command hashes the official `Resolve.exe` and signed `intl.dll` before and after collection and fails if either identity changes. It does not infer paid-feature state from the UI and does not modify the host.
 
-The observer is also present in a separately sealed no-network Windows base accepted by `evidence/acceptance/windows-kvm-p1-observer-base-1367c76.json`; Case A execution and any Case B host write remain later Gates.
+The observer is also present in a separately sealed no-network Windows base accepted by `evidence/acceptance/windows-kvm-p1-observer-base-1367c76.json`. R4 selects one Provider-owned controller/orchestrator Runner architecture; its implementation and Case A execution remain later Gates, and any Case B host write remains blocked.
 
 ## Run the deterministic Contest
 
