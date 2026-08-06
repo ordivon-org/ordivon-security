@@ -5,7 +5,9 @@ import json
 import os
 import signal
 import stat
+import subprocess
 import tempfile
+import time
 import unittest
 from dataclasses import replace
 from pathlib import Path
@@ -35,6 +37,7 @@ from ordivon_security.evaluation.windows_kvm import (
     WindowsKvmEvaluationBackend,
     WindowsKvmProviderConfig,
     _pci_network_devices,
+    _terminate_pid,
     windows_kvm_qemu_arguments,
 )
 from ordivon_security.evaluation.windows_kvm_build import (
@@ -626,6 +629,21 @@ class WindowsKvmP0Tests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "requires two admitted processes"):
             backend._validate_spec(too_few_processes)
+
+    def test_terminate_pid_treats_reaped_zombie_as_closed(self) -> None:
+        process = subprocess.Popen(["/usr/bin/sleep", "30"])
+        os.kill(process.pid, signal.SIGTERM)
+        deadline = time.monotonic() + 5
+        while time.monotonic() < deadline:
+            try:
+                state = Path(f"/proc/{process.pid}/stat").read_text(encoding="utf-8")
+            except FileNotFoundError:
+                break
+            if state.rpartition(")")[2].strip().startswith("Z"):
+                break
+            time.sleep(0.01)
+        self.assertTrue(_terminate_pid(process.pid, expected_fragment="sleep"))
+        self.assertFalse(Path(f"/proc/{process.pid}").exists())
 
     def test_destroy_removes_complete_run_directory(self) -> None:
         backend = WindowsKvmEvaluationBackend(self.config)
