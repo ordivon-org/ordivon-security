@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-observer-base-acceptance",
+  "status": "accepted-observer-enabled-base",
+  "providerId": "provider:windows-kvm",
+  "implementationRevision": "git:1367c7603d062d96a264029566474dfeacdccc1d",
+  "environmentImageDigest": "sha256:37ebebb36b0e05a9c3f1cd02e84f086d8c8c245553b4bf175539ce279f1e4cad",
+  "baseImage": {
+    "digest": "sha256:adc81b60a93a6c7e008a6384c69b9bfeb354c08e76db788b0b9e1c2022e9ea57",
+    "byteLength": 14157152256,
+    "sealedReadOnly": true
+  },
+  "baseVariables": {
+    "digest": "sha256:6603a9a7e70b7bb2b4bfb3dd6541317fc3c5fde38cc28e9080470ed4f230eb2a",
+    "byteLength": 540672,
+    "sealedReadOnly": true
+  },
+  "observer": {
+    "digest": "sha256:efeb283d513bfa9f59b4869b1b3385dad881013d64cfe65d3344c864879753d0",
+    "byteLength": 5527,
+    "guestPath": "C:\\ProgramData\\Ordivon\\p1-observer.ps1",
+    "guestReadyReceipt": true
+  },
+  "guest": {
+    "computerName": "ORDIVON-BASE",
+    "windowsBuild": "10.0.26200.0",
+    "status": "ready",
+    "networkRequired": false
+  },
+  "network": {
+    "devicePresent": false,
+    "deviceCount": 0,
+    "qmpAuthority": true
+  },
+  "build": {
+    "completedAtMs": 1786017661378,
+    "startedAtMs": 1786016681985
+  },
+  "verification": {
+    "qemuImageCheck": "passed",
+    "guestObserverPathWritten": "passed",
+    "noResidualQemuOrSwtpm": "passed",
+    "manifestDigest": "sha256:0a44fa90bf3ea64f0cf4c968892b95125360b434a73c52582ea0cef2d56decd7"
+  },
+  "limitations": [
+    "the observer-enabled base has not yet executed Case A or Case B",
+    "process-tree orchestration and third-party execution remain pending",
+    "the existing host is authorized only for read-only Case C observation"
+  ]
+}

@@ -121,8 +121,13 @@ isolated evaluation authority.
 `resources/windows_kvm/p1-observer.ps1` now implements bounded pre/post collection for
 files, Registry startup state, services, drivers, scheduled tasks, BITS jobs, installed
 products, users/groups, certificates, Defender state, Event Logs, and network adapters.
-The base-image builder binds and copies this observer into future sealed images. The
-existing sealed base predates this observer and must be rebuilt before dynamic P1 runs.
+The base-image builder binds and copies this observer into sealed images. An
+observer-enabled Windows 11 Enterprise Evaluation base was built and accepted from
+revision `1367c76`; the Guest ready receipt names
+`C:\ProgramData\Ordivon\p1-observer.ps1`, the observer digest is
+`sha256:efeb283d513bfa9f59b4869b1b3385dad881013d64cfe65d3344c864879753d0`,
+and QMP recorded zero network devices. The sanitized acceptance index is
+[`../evidence/acceptance/windows-kvm-p1-observer-base-1367c76.json`](../evidence/acceptance/windows-kvm-p1-observer-base-1367c76.json).
 Process-tree orchestration and the third-party execution backend remain unadmitted.
 
 ## R3: Case A, B, and C
