@@ -37,8 +37,9 @@ The first implemented gate is media preparation only:
 3. copy the archive into the image;
 4. stream the embedded file back through `ntfscat` and verify its SHA-256 and length;
 5. verify the source did not change during preparation;
-6. seal a private manifest with the media digest and QEMU attachment arguments;
-7. require `readonly=on`, `removable=on`, and serial `ORDIVON_P1`.
+6. bind the exact Security source identity and SHA-256 identities of `mkntfs`, `ntfscp`, and `ntfscat`;
+7. seal a private manifest with the preparation identity digest, media digest, and QEMU attachment arguments;
+8. require `readonly=on`, `removable=on`, and serial `ORDIVON_P1`.
 
 The retained DaVinci profile at `research/cases/windows-kvm-p1-davinci-resolve-studio-21.0.3.7.json` authorizes only `prepare-authorized-windows-installer-media`. The real media gate passed from revision `bcac3cc`: the exact 7,428,655,207-byte archive was embedded in an 8 GiB NTFS image, streamed back with the same SHA-256, and bound to a QEMU-read-only topology. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-davinci-media-bcac3cc.json`](../evidence/acceptance/windows-kvm-p1-davinci-media-bcac3cc.json).
 

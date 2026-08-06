@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue, canonical_digest
+from ordivon_security.identity import security_source_identity
 
 from .windows_kvm import _digest_path, _replace_private_json, _run_checked
 
@@ -22,6 +23,15 @@ def _integer(value: JsonValue | None, label: str) -> int:
     if not isinstance(value, int) or isinstance(value, bool):
         raise ValueError(f"{label} must be an integer")
     return value
+
+
+def _tool_identity(path: Path) -> JsonObject:
+    digest, byte_length = _digest_path(path)
+    return {
+        "path": str(path),
+        "digest": digest,
+        "byteLength": byte_length,
+    }
 
 
 def _digest_stream(arguments: list[str]) -> tuple[str, int]:
@@ -189,6 +199,26 @@ def prepare_windows_kvm_installer_media(
     source_digest, source_length = _digest_path(source_path)
     if source_digest != profile.archive_digest or source_length != profile.archive_byte_length:
         raise ValueError("Windows KVM P1 source differs from the authorized archive identity")
+    security_identity = security_source_identity()
+    tool_identities: JsonObject = {
+        "mkntfs": _tool_identity(config.mkntfs_path),
+        "ntfscp": _tool_identity(config.ntfscp_path),
+        "ntfscat": _tool_identity(config.ntfscat_path),
+    }
+    preparation_identity: JsonObject = {
+        "schemaVersion": 1,
+        "kind": "ordivon.security.windows-kvm-p1-media-preparation-identity",
+        "implementation": security_identity,
+        "profileDigest": profile.digest,
+        "tools": tool_identities,
+        "filesystem": "ntfs",
+        "volumeLabel": _P1_LABEL,
+        "attachment": {
+            "readOnly": True,
+            "removable": True,
+            "serial": _P1_SERIAL,
+        },
+    }
     media_root = config.state_root / "sample-media" / source_digest[-16:]
     if media_root.exists():
         raise FileExistsError(f"Windows KVM P1 media already exists: {media_root}")
@@ -226,6 +256,10 @@ def prepare_windows_kvm_installer_media(
             "status": "prepared-not-executable",
             "profile": profile.to_dict(),
             "profileDigest": profile.digest,
+            "implementation": security_identity,
+            "tools": tool_identities,
+            "preparationIdentity": preparation_identity,
+            "preparationIdentityDigest": canonical_digest(preparation_identity),
             "source": {
                 "digest": source_digest,
                 "byteLength": source_length,
