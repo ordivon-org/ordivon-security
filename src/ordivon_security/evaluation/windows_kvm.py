@@ -1043,6 +1043,7 @@ class WindowsKvmEvaluationBackend:
             qmp_status: JsonValue = {}
             qmp_pci: JsonValue = []
             timed_out = False
+            provider_error: Exception | None = None
             try:
                 with _QmpClient(
                     qmp_path, timeout_seconds=self.config.qmp_ready_timeout_seconds
@@ -1101,6 +1102,15 @@ class WindowsKvmEvaluationBackend:
                                 process.wait(timeout=10)
                 else:
                     process.wait(timeout=30)
+            except Exception as error:
+                provider_error = error
+                guardian_records.append(
+                    GuardianRecord(
+                        decision="terminate",
+                        reason="provider-management-plane-failure",
+                        payload={"errorType": type(error).__name__},
+                    )
+                )
             finally:
                 if process.poll() is None:
                     process.kill()
@@ -1119,6 +1129,10 @@ class WindowsKvmEvaluationBackend:
                 "pci": qmp_pci,
                 "networkDevices": cast(list[JsonValue], network_devices),
                 "networkDevicePresent": bool(network_devices),
+                "providerErrorType": (
+                    type(provider_error).__name__ if provider_error is not None else None
+                ),
+                "providerErrorMessage": str(provider_error) if provider_error is not None else None,
             },
         )
         extracted: dict[str, Path] = {}
@@ -1133,7 +1147,9 @@ class WindowsKvmEvaluationBackend:
         if "fixture-result.json" in extracted:
             fixture_result = _load_object(extracted["fixture-result.json"], "Benign fixture result")
 
-        if timed_out:
+        if provider_error is not None:
+            terminal_reason = "windows-kvm-provider-failed:" + type(provider_error).__name__
+        elif timed_out:
             terminal_reason = "guardian-runtime-bound-exceeded"
         elif network_devices:
             terminal_reason = "guardian-network-device-present"
@@ -1199,6 +1215,18 @@ class WindowsKvmEvaluationBackend:
                 )
         duration_ms = max(0, (time.monotonic_ns() - started_at) // 1_000_000)
         observer_records: list[ObserverRecord] = []
+        if provider_error is not None:
+            observer_records.append(
+                ObserverRecord(
+                    channel="windows-kvm-provider",
+                    event_type="provider.management-plane-failure",
+                    payload={
+                        "errorType": type(provider_error).__name__,
+                        "errorMessage": str(provider_error),
+                        "qemuExitCode": instance.state.get("qemuExitCode"),
+                    },
+                )
+            )
         if result is not None:
             observer_records.append(
                 ObserverRecord(
@@ -1248,6 +1276,9 @@ class WindowsKvmEvaluationBackend:
                 "qemuExitCode": instance.state.get("qemuExitCode"),
                 "guestResultPresent": result is not None,
                 "fixtureResultPresent": fixture_result is not None,
+                "providerErrorType": (
+                    type(provider_error).__name__ if provider_error is not None else None
+                ),
             },
             raw_metrics={
                 "windows_kvm.duration_ms": duration_ms,
@@ -1255,6 +1286,7 @@ class WindowsKvmEvaluationBackend:
                 "windows_kvm.qemu_exit_code": instance.state.get("qemuExitCode", -1),
                 "windows_kvm.guest_result_present": result is not None,
                 "windows_kvm.fixture_result_present": fixture_result is not None,
+                "windows_kvm.provider_error": provider_error is not None,
             },
             artifacts=tuple(artifacts),
         )
