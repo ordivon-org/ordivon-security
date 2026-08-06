@@ -10,6 +10,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 from ordivon_security._canonical import JsonObject, JsonValue, canonical_digest
+from ordivon_security.cli_windows_kvm_acceptance import (
+    build_parser as build_acceptance_parser,
+)
+from ordivon_security.cli_windows_kvm_build import build_parser as build_base_parser
 from ordivon_security.evaluation import (
     AuthorityManifest,
     EnvironmentIdentity,
@@ -188,6 +192,33 @@ class WindowsKvmP0Tests(unittest.TestCase):
                 "fixtureId": "ordivon-benign-v1",
                 "fixtureCompilationDigest": "sha256:" + "4" * 64,
             },
+        )
+
+    def test_cli_defaults_use_validated_local_resource_baseline(self) -> None:
+        build_args = build_base_parser().parse_args(
+            ["--source-iso", "source.iso", "--state-root", "state"]
+        )
+        acceptance_args = build_acceptance_parser().parse_args(
+            [
+                "--base-manifest",
+                "base.manifest.json",
+                "--state-root",
+                "state",
+                "--vault",
+                "vault",
+                "--evidence",
+                "evidence",
+            ]
+        )
+        self.assertEqual(build_args.memory_mib, 5120)
+        self.assertEqual(acceptance_args.memory_mib, 5120)
+        self.assertEqual(
+            WindowsKvmBaseBuildConfig.__dataclass_fields__["memory_mib"].default,
+            5120,
+        )
+        self.assertEqual(
+            WindowsKvmProviderConfig.__dataclass_fields__["memory_mib"].default,
+            5120,
         )
 
     def test_boot_media_progress_parser_is_device_scoped(self) -> None:

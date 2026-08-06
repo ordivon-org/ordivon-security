@@ -50,7 +50,7 @@ class WindowsKvmBaseBuildConfig:
     firmware_vars_template_path: Path = Path("/usr/share/edk2/x64/OVMF_VARS.4m.fd")
     run_user: str = "qemu"
     run_group: str = "qemu"
-    memory_mib: int = 6144
+    memory_mib: int = 5120
     vcpu_count: int = 4
     disk_size_gib: int = 80
     installation_timeout_seconds: int = 7200

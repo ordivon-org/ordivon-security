@@ -33,11 +33,16 @@ related:
 ## Status
 
 The Provider implementation and its local KVM topology have passed unit, type,
-package, and management-plane topology checks. It remains a **candidate** until
-both of these real gates succeed from a clean Security revision:
+package, and management-plane topology checks. The exact base-image gate passed
+from clean revision `52da5ca`: Windows build `10.0.26200.0` emitted Guest-ready
+evidence, QMP reported zero network devices, and the sealed image passed
+`qemu-img check`. The Provider remains a **candidate** until the second real gate
+succeeds:
 
-1. build and seal one exact Windows base image;
-2. complete one disposable Run using only the Ordivon-maintained benign fixture.
+1. **passed** — build and seal one exact Windows base image using the validated
+   local baseline of 5120 MiB RAM, 4 vCPUs, and an 80 GiB sparse system disk;
+2. **pending** — complete one disposable Run using only the Ordivon-maintained
+   benign fixture, including residual closure.
 
 No unknown Sample is admitted by P0. The retained DaVinci Case and every other
 third-party executable remain outside this Provider until a later explicit gate.

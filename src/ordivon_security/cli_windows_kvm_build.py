@@ -16,7 +16,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--source-iso", type=Path, required=True)
     parser.add_argument("--state-root", type=Path, required=True)
-    parser.add_argument("--memory-mib", type=int, default=6144)
+    parser.add_argument("--memory-mib", type=int, default=5120)
     parser.add_argument("--vcpus", type=int, default=4)
     parser.add_argument("--disk-size-gib", type=int, default=80)
     parser.add_argument("--timeout-seconds", type=int, default=7200)
