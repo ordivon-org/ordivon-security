@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import signal
 import stat
 import tempfile
 import unittest
@@ -10,6 +12,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 from ordivon_security._canonical import JsonObject, JsonValue, canonical_digest
+from ordivon_security.cli_windows_kvm_acceptance import (
+    _RuntimeCancellation,
+    _translate_runtime_cancellation,
+)
 from ordivon_security.cli_windows_kvm_acceptance import (
     build_parser as build_acceptance_parser,
 )
@@ -194,6 +200,15 @@ class WindowsKvmP0Tests(unittest.TestCase):
                 "fixtureCompilationDigest": "sha256:" + "4" * 64,
             },
         )
+
+    def test_runtime_termination_signal_becomes_controlled_cancellation(self) -> None:
+        previous = signal.getsignal(signal.SIGTERM)
+        with (
+            self.assertRaisesRegex(_RuntimeCancellation, "signal"),
+            _translate_runtime_cancellation(),
+        ):
+            os.kill(os.getpid(), signal.SIGTERM)
+        self.assertIs(signal.getsignal(signal.SIGTERM), previous)
 
     def test_cli_defaults_use_validated_local_resource_baseline(self) -> None:
         build_args = build_base_parser().parse_args(
