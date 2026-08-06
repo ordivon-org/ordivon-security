@@ -141,3 +141,56 @@ Process-tree orchestration and the third-party execution backend remain unadmitt
 Case A's transformation manifest changes the environment while preserving the original Sample bytes. Case B's payload manifest records what was removed and retained, but the materializer refuses `/mnt/*` destinations and cannot deploy to Windows. R3 therefore establishes the comparison topology and evidence inputs without changing the main Windows installation. Case C is labeled Free from the user's declaration; feature-level behavior remains a later comparison Gate.
 
 The host baseline can be reproduced with `ordivon-security-windows-host-p1-baseline`. Its public acceptance index binds the private receipt digest and verifies that `Resolve.exe` and the signed official `intl.dll` were stable before and after collection.
+
+
+## R4 architecture decision: one controller/orchestrator Runner
+
+**Status: selected; implementation and execution remain pending.**
+
+P1 will use one Runner architecture:
+
+```text
+WindowsKvmEvaluationBackend
+  → exact Case/run binding
+  → thin sealed Guest Runner dispatcher
+  → generic sealed native controller
+  → declarative PowerShell orchestrator
+  → Observer artifacts and writable result media
+```
+
+The earlier inline Guest Runner prototype and the Case-specific native-launcher prototype are rejected as implementation directions. Their uncommitted states are retained only in the private prototype backup under `/root/backups/ordivon-security-case-a-prototypes-20260806/`; neither prototype defines current behavior.
+
+### Responsibility split
+
+- The host Provider owns Case admission, media identity, disposable overlay and UEFI-variable creation, QMP topology, the outer runtime bound, forced VM termination, Artifact extraction, and residual closure.
+- `guest-runner.ps1` remains a small dispatcher. It validates the action class and transfers control; it does not inline installer extraction, network recording, process polling, or Case-specific policy.
+- One reproducibly built native controller is sealed into a later P1 base. It validates the exact run binding, places the directly launched process tree in a Windows Job Object, owns controller timeout and cancellation, and emits a bounded controller result. It is generic P1 infrastructure rather than a 目标产品B-specific launcher.
+- A declarative PowerShell orchestrator owns pre/post Observer invocation, bounded event collection, overlay-local name redirection, a record-only loopback connection sink, installer invocation, and result assembly. It is evidence collection and orchestration, not management-plane authority.
+- Process polling may enrich evidence but cannot be a Guardian. Blocking of known secondary staging roots requires an admitted Windows execution-control policy plus a pre-run canary; a WMI/CIM polling loop alone cannot satisfy the transformation manifest.
+
+### Media topology
+
+Case A execution will use four distinct state surfaces:
+
+1. the exact original archive on `ORDIVON_P1`, attached read-only for provenance;
+2. a host-materialized extracted execution view on a separate read-only NTFS medium, bound by a complete tree manifest and extraction-tool identity;
+3. a writable `ORDIVON_RUN` medium used only for the run manifest and returned evidence;
+4. a disposable qcow2 overlay and per-run UEFI variables, both destroyed after closure.
+
+The host-prepared extracted view removes Guest 7-Zip from the trusted execution path. It does not change the original archive bytes, but it is an additional environment transformation and therefore requires a new transformation-manifest revision before admission.
+
+### Network boundary
+
+QEMU continues to expose no network-class device. Known destinations may be redirected inside the disposable Guest to a loopback-only, record-only TCP sink so connection attempts can be counted. The sink does not proxy traffic, decrypt TLS, emulate the remote service, or return executable content. QMP remains authoritative for absence of external network capability.
+
+### Admission sequence
+
+Implementation proceeds through separate gates:
+
+1. contracts and read-only execution-media materialization;
+2. native-controller and execution-control canary tests using maintained fixtures only;
+3. a newly sealed P1 controller base and independent acceptance;
+4. one bounded Case A dynamic Trial;
+5. repeated-run and injected-failure residual closure.
+
+No Case A installer execution is authorized by this decision alone. Case B remains blocked until Case A has accepted dynamic evidence and residual closure.
