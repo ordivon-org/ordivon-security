@@ -60,7 +60,7 @@ The decisive evidence is the nested MSI first-install chain:
 - highest-privilege `OneDriveStandaloneUpdate####` scheduled-task creation;
 - execution of every EXE found in the downloaded archive.
 
-The exact runtime edge from the wrapper or outer MSI to the nested MSI is not yet fully traced. That uncertainty does not weaken the rejection decision: the distributed package contains the malicious installer and the current profile remains non-executable.
+The exact runtime edge from the wrapper or outer MSI to the nested MSI is not yet fully traced. That uncertainty does not weaken the rejection decision: the distributed package contains the malicious installer and the current profile remains non-executable. The independent static gate passed from revision `91f08e0`; its sanitized index is [`../evidence/acceptance/windows-kvm-p1-caseb-static-91f08e0.json`](../evidence/acceptance/windows-kvm-p1-caseb-static-91f08e0.json).
 
 ## Observation contract
 
