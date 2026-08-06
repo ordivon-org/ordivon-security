@@ -263,7 +263,7 @@ class WindowsKvmProviderConfig:
     qemu_path: Path = Path("/usr/bin/qemu-system-x86_64")
     qemu_img_path: Path = Path("/usr/bin/qemu-img")
     swtpm_path: Path = Path("/usr/bin/swtpm")
-    runuser_path: Path = Path("/usr/bin/runuser")
+    setpriv_path: Path = Path("/usr/bin/setpriv")
     mkfs_fat_path: Path = Path("/usr/bin/mkfs.fat")
     mcopy_path: Path = Path("/usr/bin/mcopy")
     mdir_path: Path = Path("/usr/bin/mdir")
@@ -304,7 +304,7 @@ class WindowsKvmProviderConfig:
             self.qemu_path,
             self.qemu_img_path,
             self.swtpm_path,
-            self.runuser_path,
+            self.setpriv_path,
             self.mkfs_fat_path,
             self.mcopy_path,
             self.mdir_path,
@@ -413,9 +413,12 @@ def windows_kvm_qemu_arguments(
     name: str,
 ) -> list[str]:
     return [
-        str(config.runuser_path),
-        "-u",
+        str(config.setpriv_path),
+        "--reuid",
         config.run_user,
+        "--regid",
+        config.run_group,
+        "--init-groups",
         "--",
         str(config.qemu_path),
         "-name",
@@ -505,6 +508,8 @@ class WindowsKvmEvaluationBackend:
             "runDisk": "usb-fat",
             "tpm": "disposable-swtpm-2.0",
             "runUser": self.config.run_user,
+            "runGroup": self.config.run_group,
+            "privilegeDrop": "setpriv",
             "admittedSampleDigest": self.config.admitted_sample_digest,
             "fixtureAttestationDigest": self.config.fixture_attestation_digest,
         }
@@ -691,9 +696,12 @@ class WindowsKvmEvaluationBackend:
         log_path = run_path / "swtpm.log"
         _run_checked(
             [
-                str(self.config.runuser_path),
-                "-u",
+                str(self.config.setpriv_path),
+                "--reuid",
                 self.config.run_user,
+                "--regid",
+                self.config.run_group,
+                "--init-groups",
                 "--",
                 str(self.config.swtpm_path),
                 "socket",
