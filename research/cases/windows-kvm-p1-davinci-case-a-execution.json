@@ -1,0 +1,46 @@
+{
+  "authorization": {
+    "controllerAdmitted": false,
+    "executionAuthorized": false,
+    "exportableArtifact": false,
+    "hostModificationAuthorized": false,
+    "materializationAuthorized": true
+  },
+  "caseId": "case:davinci-resolve-studio-21.0.3.7:a-original-repack",
+  "caseManifestDigest": "sha256:ca0061ea6689c1d2489804132c7a2a82947712c5a911419119ed1e1ea260cf46",
+  "contractId": "contract:davinci-resolve-studio-21.0.3.7:case-a-execution-media",
+  "controls": {
+    "destroyOverlayAfterRun": true,
+    "disposableOverlay": true,
+    "executionMediaReadOnly": true,
+    "knownDestinationBoundary": "loopback-record-only",
+    "networkMode": "deny-all-at-hypervisor",
+    "sourceReadOnly": true,
+    "unknownSecondaryExecution": "block-by-admitted-policy"
+  },
+  "installer": {
+    "arguments": [],
+    "byteLength": 4585876,
+    "digest": "sha256:ee98ffe8a4b681caa0958704816cba7426c46842298e042e4a8ce34ad2a1d40c",
+    "relativePath": "DaVinci Resolve Studio.exe"
+  },
+  "kind": "ordivon.security.windows-kvm-p1-execution-contract",
+  "observationProfile": "windows-installer-p1",
+  "requiredTransformations": [
+    "attach-source-read-only",
+    "host-materialize-read-only-execution-tree",
+    "deny-external-network-at-hypervisor",
+    "provide-local-record-only-fake-network-boundary",
+    "block-unknown-secondary-executable-launch",
+    "use-disposable-overlay-and-destroy-after-run"
+  ],
+  "revision": "1",
+  "schemaVersion": 1,
+  "sourceArchive": {
+    "byteLength": 7428655207,
+    "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+    "name": "DaVinci_Resolve_Studio_21.0.3.7.7z"
+  },
+  "transformationManifestDigest": "sha256:2db1fc9b91589f0aceef66de7bb35855d72027dc3d42af1edb55f1ebd13f4e7c",
+  "transformationManifestId": "transform:davinci-resolve-studio-21.0.3.7:case-a-environment"
+}

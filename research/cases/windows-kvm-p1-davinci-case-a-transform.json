@@ -8,13 +8,14 @@
     "byteLength": 7428655207,
     "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e"
   },
-  "revision": "1",
+  "revision": "2",
   "sampleBytesChanged": false,
   "schemaVersion": 1,
   "sourceCaseDigest": "sha256:5ac181597d6fdae86befb6d0a9692ee56b5f6ff2abb05b5d10fc26f9a3f1d2a4",
   "sourceCaseId": "case:davinci-resolve-studio-21.0.3.7",
   "transformations": [
     "attach-source-read-only",
+    "host-materialize-read-only-execution-tree",
     "deny-external-network-at-hypervisor",
     "provide-local-record-only-fake-network-boundary",
     "block-unknown-secondary-executable-launch",

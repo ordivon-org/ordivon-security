@@ -145,7 +145,7 @@ The host baseline can be reproduced with `ordivon-security-windows-host-p1-basel
 
 ## R4 architecture decision: one controller/orchestrator Runner
 
-**Status: selected; implementation and execution remain pending.**
+**Status: selected; execution contract and read-only media materializer implemented; Controller and execution remain pending.**
 
 P1 will use one Runner architecture:
 
@@ -177,7 +177,22 @@ Case A execution will use four distinct state surfaces:
 3. a writable `ORDIVON_RUN` medium used only for the run manifest and returned evidence;
 4. a disposable qcow2 overlay and per-run UEFI variables, both destroyed after closure.
 
-The host-prepared extracted view removes Guest 7-Zip from the trusted execution path. It does not change the original archive bytes, but it is an additional environment transformation and therefore requires a new transformation-manifest revision before admission.
+The host-prepared extracted view removes Guest 7-Zip from the trusted execution path. It does not change the original archive bytes. Transformation manifest revision 2 records `host-materialize-read-only-execution-tree` as an explicit additional environment transformation.
+
+### R4-A contracts and materializer
+
+The retained contract at [`../research/cases/windows-kvm-p1-davinci-case-a-execution.json`](../research/cases/windows-kvm-p1-davinci-case-a-execution.json) binds the exact Case manifest, transformation manifest, original archive, wrapper path, wrapper SHA-256 and byte length, observation profile, and required controls. It authorizes only Host-side materialization. It explicitly retains:
+
+- `controllerAdmitted: false`;
+- `executionAuthorized: false`;
+- `hostModificationAuthorized: false`;
+- `exportableArtifact: false`.
+
+`ordivon-security-windows-kvm-p1-materialize-execution-media` implements the materialization gate. Before extraction it validates the 7-Zip technical inventory, rejects unsafe Windows paths, case-insensitive collisions, symbolic links, reparse entries, and declared hard links. After extraction it uses `lstat` to reject links, special files, and multiply linked files; strips Host execute permissions; computes a complete sorted tree manifest; and verifies the exact admitted wrapper identity.
+
+The materializer writes the tree to an NTFS image through a private `nodev,nosuid,noexec` mount, unmounts it, remounts it read-only, and rehashes the complete payload plus the retained tree manifest. A successful result is `materialized-not-admitted`: the manifest declares QEMU read-only arguments but keeps `qemuAttachmentAuthorized`, `controllerAdmitted`, and `executionAuthorized` false.
+
+A benign two-file canary completed archive listing, Host extraction, NTFS population, read-only remount, full digest readback, unmount, and cleanup. The actual Case A archive was not materialized or executed by that canary.
 
 ### Network boundary
 

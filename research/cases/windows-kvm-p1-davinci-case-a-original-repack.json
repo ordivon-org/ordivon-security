@@ -9,16 +9,18 @@
   "caseId": "case:davinci-resolve-studio-21.0.3.7:a-original-repack",
   "controls": {
     "destroyOverlayAfterRun": true,
+    "executionMedia": "host-materialized-read-only-tree",
     "exportableArtifact": false,
     "fakeNetworkService": "local-record-only",
     "realC2": false,
     "sampleBytesChanged": false,
     "unknownSecondaryExecution": "block"
   },
+  "executionContract": "windows-kvm-p1-davinci-case-a-execution.json",
   "kind": "ordivon.security.capability-case",
   "networkMode": "deny-all",
   "observationProfile": "windows-installer-p1",
-  "revision": "2",
+  "revision": "3",
   "role": "original-repack",
   "schemaVersion": 1,
   "source": {
@@ -27,7 +29,7 @@
     "archiveName": "DaVinci_Resolve_Studio_21.0.3.7.7z",
     "staticDecision": "windows-kvm-p1-davinci-static-entry.json"
   },
-  "status": "environment-bound-observer-runner-required",
+  "status": "execution-media-contract-ready-runner-required",
   "transformationManifest": "windows-kvm-p1-davinci-case-a-transform.json",
-  "transformationManifestDigest": "sha256:c21e491bee048fcaf58b41d9addf13fd316e1eddf6b58b0dd2de62c85d2fa4b5"
+  "transformationManifestDigest": "sha256:2db1fc9b91589f0aceef66de7bb35855d72027dc3d42af1edb55f1ebd13f4e7c"
 }
