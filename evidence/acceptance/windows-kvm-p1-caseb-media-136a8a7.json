@@ -6,27 +6,33 @@
     "startWindows": false
   },
   "caseId": "case:caseb-studio",
-  "current": false,
   "embeddedSource": {
     "byteLength": 7428655207,
     "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
     "guestPath": "/目标产品B_Resolve_Studio_.7z"
   },
   "evidenceReferences": {
+    "preProvenanceMediaSupersession": {
+      "byteLength": 1002,
+      "logicalName": "windows-kvm-p1-caseb-media-superseded-136a8a7.json",
+      "sha256": "sha256:0c7b8d4607660a90701b1e20088f16274dce7d306ab5d971751f66d213ff9e9e"
+    },
     "privateMediaAcceptance": {
-      "byteLength": 1221,
-      "logicalName": "windows-kvm-p1-caseb-media-acceptance-bcac3cc.json",
-      "sha256": "sha256:53d1d5a84e5038c1f0096c877f08ed37f74ab7191b9f66b82de4298b1898c837"
+      "byteLength": 1749,
+      "logicalName": "windows-kvm-p1-caseb-media-acceptance-136a8a7.json",
+      "sha256": "sha256:d22b60159e5df018021d5b573fc7d240350b767ce01d4d61f3c9e9f2571918c3"
     }
   },
   "gate": {
     "embeddedReadbackIdentity": "passed",
     "noExecution": "passed",
     "ntfsVolumeIdentity": "passed",
+    "preparationIdentity": "passed",
     "qemuReadOnlyTopology": "passed",
-    "sourceIdentity": "passed"
+    "sourceIdentity": "passed",
+    "toolIdentity": "passed"
   },
-  "implementationRevision": "git:bcac3cc6072120bc4eeb70bbad75a184d11e6d0a",
+  "implementationRevision": "git:136a8a71af63b6f37d31cc6b785441ac5cd9a8bc",
   "kind": "ordivon.security.windows-kvm-p1-media-acceptance",
   "limitations": [
     "the prepared NTFS image has not been attached to QEMU",
@@ -36,13 +42,14 @@
   "media": {
     "allocatedBytes": 7472373760,
     "byteLength": 8589934592,
-    "digest": "sha256:ced748c37bd4b7712a0b2aa85ac645c111b441aa83ba55c91205dff3fd8a14d4",
+    "digest": "sha256:45cde41942c7536ef13ce5acce9317bf0260c5b2bba852c1bb4e5d8816aa351a",
     "filesystem": "ntfs",
     "readOnly": true,
     "removable": true,
     "serial": "ORDIVON_P1",
     "volumeLabel": "ORDIVON_P1"
   },
+  "preparationIdentityDigest": "sha256:6fb8a85ab0fd1afb0c462fe6044eb1593c90a0894685b5530916ccb2a03b4027",
   "profileDigest": "sha256:dedee9615926ff2b65c6ae7b055502a384af26321e0c17dbe045770ea6d7c499",
   "profileId": "profile:windows-kvm-p1:caseb-studio",
   "providerId": "provider:windows-kvm",
@@ -52,7 +59,19 @@
     "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
     "logicalName": "目标产品B_Resolve_Studio_.7z"
   },
-  "status": "superseded-pre-provenance",
-  "supersededBy": "windows-kvm-p1-caseb-media-136a8a7.json",
-  "supersessionReason": "the accepted media predates implementation and NTFS tool provenance binding"
+  "status": "media-preparation-accepted-execution-not-authorized",
+  "tools": {
+    "mkntfs": {
+      "byteLength": 71856,
+      "digest": "sha256:6a526751d278efe3d717f6857595e9513948495bbf07b3509fcf8869928c9ed7"
+    },
+    "ntfscat": {
+      "byteLength": 26792,
+      "digest": "sha256:4e57e315ec2c2a1bbedcdde2d3adc53f099ee388990e457a0fcec4975796ae38"
+    },
+    "ntfscp": {
+      "byteLength": 30888,
+      "digest": "sha256:a381e85a6b6b1437c217b14d4f8001cd2cf3ed927ee1d1bba92632e7aa92643d"
+    }
+  }
 }

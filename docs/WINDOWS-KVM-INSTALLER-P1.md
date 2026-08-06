@@ -41,7 +41,7 @@ The first implemented gate is media preparation only:
 7. seal a private manifest with the preparation identity digest, media digest, and QEMU attachment arguments;
 8. require `readonly=on`, `removable=on`, and serial `ORDIVON_P1`.
 
-The retained 目标产品B profile at `research/cases/windows-kvm-p1-caseb-studio.json` authorizes only `prepare-authorized-windows-installer-media`. The real media gate passed from revision `bcac3cc`: the exact 7,428,655,207-byte archive was embedded in an 8 GiB NTFS image, streamed back with the same SHA-256, and bound to a QEMU-read-only topology. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-caseb-media-bcac3cc.json`](../evidence/acceptance/windows-kvm-p1-caseb-media-bcac3cc.json).
+The retained 目标产品B profile at `research/cases/windows-kvm-p1-caseb-studio.json` authorizes only `prepare-authorized-windows-installer-media`. The current media gate passed from revision `136a8a7`: the exact 7,428,655,207-byte archive was embedded in an 8 GiB NTFS image, streamed back with the same SHA-256, bound to a QEMU-read-only topology, and tied to the Security revision plus SHA-256 identities for `mkntfs`, `ntfscp`, and `ntfscat`. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-caseb-media-136a8a7.json`](../evidence/acceptance/windows-kvm-p1-caseb-media-136a8a7.json). The earlier `bcac3cc` media is retained only as a superseded pre-provenance record.
 
 `executionAuthorized` remains false, so neither the archive nor any contained installer may be attached to a Guest or executed yet.
 
