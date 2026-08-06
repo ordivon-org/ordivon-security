@@ -32,6 +32,7 @@ from ordivon_security.evaluation.windows_kvm_build import (
     WindowsKvmBaseBuildConfig,
     _block_read_bytes,
     _create_fat_image,
+    _validate_unattend,
     build_windows_kvm_base,
     windows_kvm_install_arguments,
 )
@@ -316,13 +317,70 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertIn(_CONFIG_LABEL, bootstrap)
         self.assertNotIn(_BUILD_LABEL, unattend)
         self.assertIn("BypassSecureBootCheck", unattend)
-        self.assertIn("ChildCompletion", unattend)
-        self.assertIn("/v setup.exe /t REG_DWORD /d 3 /f", unattend)
-        self.assertLess(unattend.index("ChildCompletion"), unattend.index("install-bootstrap.ps1"))
+        self.assertNotIn("ChildCompletion", unattend)
+        self.assertNotIn("/v setup.exe /t REG_DWORD /d 3 /f", unattend)
+        self.assertNotIn("Select-Object -First 1", unattend)
+        self.assertNotIn("-ErrorAction SilentlyContinue", unattend)
         self.assertNotIn("BypassTPMCheck", unattend)
         self.assertNotIn("BypassCPUCheck", unattend)
         self.assertNotIn("BypassRAMCheck", unattend)
         self.assertIn("SetupComplete.cmd", bootstrap)
+
+        import xml.etree.ElementTree as ET
+
+        root = ET.fromstring(unattend.replace("@@PASSWORD@@", "test-password"))
+        namespace = {"u": "urn:schemas-microsoft-com:unattend"}
+        commands = root.findall(
+            ".//u:settings[@pass='specialize']//u:RunSynchronousCommand",
+            namespace,
+        )
+        self.assertEqual(len(commands), 1)
+        command_path = commands[0].findtext("u:Path", namespaces=namespace)
+        self.assertIsNotNone(command_path)
+        assert command_path is not None
+        self.assertLessEqual(len(command_path), 259)
+        self.assertEqual(commands[0].findtext("u:Order", namespaces=namespace), "1")
+        self.assertIn("Get-Volume -FileSystemLabel ORDIVONCFG", command_path)
+        self.assertIn("install-bootstrap.ps1", command_path)
+
+    def test_unattend_validation_rejects_oversized_deployment_path(self) -> None:
+        oversized = "x" * 260
+        unattend = """<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+  <settings pass="specialize">
+    <component name="Microsoft-Windows-Deployment">
+      <RunSynchronous>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>1</Order><Description>test</Description><Path>{oversized}</Path>
+        </RunSynchronousCommand>
+      </RunSynchronous>
+    </component>
+  </settings>
+</unattend>""".replace("{oversized}", oversized)
+        with self.assertRaisesRegex(ValueError, r"Path exceeds 259 characters.*260"):
+            _validate_unattend(unattend)
+
+    def test_unattend_validation_does_not_echo_command_content(self) -> None:
+        secret = "secret-command-material-" + "x" * 260
+        unattend = """<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+  <settings pass="specialize">
+    <component name="Microsoft-Windows-Deployment">
+      <RunSynchronous>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>7</Order><Description>test</Description><Path>{secret}</Path>
+        </RunSynchronousCommand>
+      </RunSynchronous>
+    </component>
+  </settings>
+</unattend>""".replace("{secret}", secret)
+        try:
+            _validate_unattend(unattend)
+        except ValueError as error:
+            self.assertNotIn("secret-command-material", str(error))
+            self.assertIn("order 7", str(error))
+        else:
+            self.fail("oversized unattend path was accepted")
 
     def test_fat_image_is_private_before_formatter_runs(self) -> None:
         source_iso = self.root / "private-source.iso"
