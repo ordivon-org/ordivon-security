@@ -88,7 +88,7 @@ WindowsKvmMachineProvider
   → sealed base identity + disposable overlay / UEFI / TPM
   → root-owned machine lifecycle ledger
   → QMP status and PCI topology truth
-  → process-identity-aware terminate / destroy / reconcile
+  → process-identity-aware terminate / destroy + reusable recovery primitives
   → no Sample or fixture admission of its own
 
 AdversarialWindowsRange (S3)
@@ -115,10 +115,18 @@ WindowsIsolatedFabricRange (S5)
 WindowsTopologyChurnRange (S6)
   → keep the same Windows QEMU Guest alive
   → Guest reaches lightweight peer A
-  → management removes A; Host truth observes only the Guest TAP
-  → management adds lightweight peer B; Host truth updates current topology
+  → backend-local controller removes A; Host truth converges to only the Guest TAP
+  → controller adds lightweight peer B; Host truth updates current topology
+  → inspect reads current topology rather than initiating the replacement
   → Guest reaches B; tcpdump observes both flows
   → ordered historical truth + correct current truth + complete residual closure
+
+S5/S6 Range reconciliation (S6-R)
+  → durable Range ledger binds current namespace + peer/sensor process identities
+  → exact owner loss does not erase current peer-B resource authority
+  → Range reconciler closes peer/tcpdump/QEMU/swtpm by PID + start time + command identity
+  → delete only deterministic Range namespaces, run directory, ledger, and maintained canary
+  → separate policy consumer from the Evaluation reconciler
 
 EvaluationSpec
   1. validate Sample, Authority, Environment, Guardian, Observation plan, and actions
@@ -173,7 +181,7 @@ Active Ranges:
 - `MicroContestRange` — local deterministic semantic contract fixture;
 - `Cage4RangeBackend` — pinned CAGE Challenge 4 Enterprise simulation.
 
-Active fidelity now spans deterministic Contest simulation, the accepted S3 single-node disposable Windows/KVM Range, S4 Host-only post-run NTFS world truth, the accepted S5 isolated fabric with heterogeneous materialization, and S6 live topology churn while the same Windows Guest remains alive. S6 shows that backend-owned asynchronous world evolution fits the existing persistent `RangeSession` contract: ordered world-truth events preserve the transition while `inspect()` must still expose correct current truth. This remains an evidence-bounded composition rule, not a generic node, topology, mutation, or fidelity framework.
+Active fidelity now spans deterministic Contest simulation, the accepted S3 single-node disposable Windows/KVM Range, S4 Host-only post-run NTFS world truth, the accepted S5 isolated fabric with heterogeneous materialization, and S6 live topology churn while the same Windows Guest remains alive. S6-R strengthens that path: topology progression is backend-owned rather than triggered by `inspect()`, changing Range resources are durably identified, and an exact S5/S6 policy consumer can reconcile the S6 world after owner loss. This remains an evidence-bounded composition rule, not a generic node, topology, mutation, fidelity, or recovery framework.
 
 ## Evaluation Trial P0
 
@@ -201,7 +209,7 @@ The P0-admitted Provider uses QEMU/KVM from WSL because the actual Windows 11 Ho
 
 No network device is configured. QMP `query-pci` is the management-plane authority and terminates the Run if a network-class PCI device appears. The Guest report remains an Observer. P0 binds the exact compiled benign Sample digest and compilation-attestation digest into Provider execution identity; relabelling another PE is insufficient. Unknown Samples remain prohibited until a later explicit gate. See [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
 
-P0.1 separates recoverable lifecycle identity from the disposable VM directory. Each active Run atomically updates a root-owned ledger under `run-ledgers/`, binding the owner PID/start time, exact QEMU and swtpm identities, resource paths, Evaluation Spec digest, environment digest, and phase. The explicit reconciler skips a live exact owner, removes only a proven orphan, and emits attention-required diagnostics for missing or unsafe authority. See [`WINDOWS-KVM-RECOVERY-P0.1.md`](WINDOWS-KVM-RECOVERY-P0.1.md).
+P0.1 separates recoverable Evaluation lifecycle identity from the disposable VM directory. Each active Evaluation Run atomically updates a root-owned ledger under `run-ledgers/`, binding the owner PID/start time, exact QEMU and swtpm identities, resource paths, Evaluation Spec digest, environment digest, and phase. Its explicit Evaluation reconciler skips a live exact owner, removes only a proven orphan, and emits attention-required diagnostics for missing or unsafe authority. S6-R later reuses the Provider-level process/ledger primitives through a separate exact Range reconciler rather than broadening this Evaluation policy. See [`WINDOWS-KVM-RECOVERY-P0.1.md`](WINDOWS-KVM-RECOVERY-P0.1.md) and [`PERSISTENT-RANGE-RECOVERY-S6R.md`](PERSISTENT-RANGE-RECOVERY-S6R.md).
 
 P1 is not an extension of the benign action. Its first gate binds an exact Case and archive identity, copies the archive into NTFS, streams the embedded bytes back for verification, rechecks the source, and records a QEMU `readonly=on` removable input disk. The current DaVinci profile authorizes preparation only and cannot enter Guest execution. See [`WINDOWS-KVM-INSTALLER-P1.md`](WINDOWS-KVM-INSTALLER-P1.md).
 
@@ -298,7 +306,7 @@ Security may request a Harness or Runtime change but must not copy their state m
 4. retain the accepted P0-C Runtime-executed baseline and its fail-closed diagnostic predecessors;
 5. expand from team-plan control to typed parameterized CAGE Action Proposals while preserving the P0-C authority boundary;
 6. add Campaign and organization state only when multi-Actor experiments consume it;
-7. retain the accepted S6 live-churn Range and extend the fabric only when a new node/materialization, Actor-requested effect, or richer telemetry is demanded; evaluate containerlab or Zeek then rather than making them prerequisites;
+7. retain the accepted S6 live-churn Range plus S6-R read/effect and owner-loss recovery strengthening; extend the fabric only when a new node/materialization, Actor-requested effect, or richer telemetry is demanded; evaluate containerlab or Zeek then rather than making them prerequisites;
 8. add CALDERA as a TTP execution adapter, not as Campaign authority;
 9. connect Codex and Hermes as delegated Harness baselines in planner-only, Tool-proxy, and black-box modes.
 

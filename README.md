@@ -65,11 +65,12 @@ The active `0.8` core provides:
 - native report Artifacts bound into Evaluation Evidence schema revision 2;
 - read-only quarantine drift audits;
 - digest-bound Case Snapshots with explicit static, uncontrolled, or controlled execution status;
-- an S2 `WindowsKvmMachineProvider` substrate for sealed base identity, disposable overlay/UEFI/TPM state, root-owned lifecycle ledgers, external QMP topology truth, recovery, and residual closure without Sample admission;
+- an S2 `WindowsKvmMachineProvider` substrate for sealed base identity, disposable overlay/UEFI/TPM state, root-owned lifecycle ledgers, external QMP topology truth, recovery primitives, and residual closure without Sample admission;
 - an accepted S3 single-node `AdversarialWindowsRange` where the maintained Guest claim reports loss of Guest-local control/observation, persistence across reboot, and synthetic telemetry deletion while external no-NIC containment, QMP reset truth, machine lifecycle, and zero-residual closure remain authoritative;
 - an accepted S4 out-of-band `world-truth` path that reads selected stopped-Guest NTFS state through read-only qemu-nbd/ntfscat, independently verifying maintained persistence/deletion facts without upgrading the Guest claim to truth;
 - an accepted S5 `WindowsIsolatedFabricRange` where one full Windows KVM Guest and one lightweight Linux netns peer share an isolated no-uplink L2 fabric while QMP management, Host topology truth, external packet sensing, Guest claims, and complete machine/fabric closure remain separate authorities;
 - an accepted S6 `WindowsTopologyChurnRange` where the same live Windows Guest reaches peer A, management replaces A with lightweight peer B, Host truth preserves the exact A-present/A-removed/B-present sequence and current B topology, external sensing sees both flows, and closure remains complete;
+- an accepted S6-R strengthening where topology progression no longer depends on `inspect()`, changing Range resources are durably bound, and an exact S5/S6 Range reconciler closes live peer/sensor/QEMU/swtpm state plus namespaces and files after owner SIGKILL;
 - a P0 Windows Evaluation adapter that remains restricted to the exact maintained benign fixture;
 - a DeepSeek Flash `NativeHarnessActorBackend` with exact Provider, Harness, Host, Runtime, Protocol, prompt, budget, and credential-scope identity;
 - a P0-A CAGE path where Harness is consumed while Host and Runtime non-consumption remain explicit experimental facts;
@@ -151,7 +152,16 @@ uv run ordivon-security-windows-kvm-reconcile \
   --state-root /var/lib/ordivon/security/providers/windows-kvm
 ```
 
-P0.1 persists each Run lifecycle in a root-owned `run-ledgers/` directory, independent of the disposable VM directory. Reconciliation skips an exact live owner, closes only PID/start-time/command identities that still match QEMU or swtpm, removes verified orphan state, and emits attention-required diagnostics rather than guessing. It does not broaden P0 Sample admission. See [`docs/WINDOWS-KVM-RECOVERY-P0.1.md`](docs/WINDOWS-KVM-RECOVERY-P0.1.md).
+P0.1 persists each Evaluation Run lifecycle in a root-owned `run-ledgers/` directory, independent of the disposable VM directory. Its Evaluation reconciler skips an exact live owner, closes only PID/start-time/command identities that still match QEMU or swtpm, removes verified orphan state, and emits attention-required diagnostics rather than guessing. It does not broaden P0 Sample admission. See [`docs/WINDOWS-KVM-RECOVERY-P0.1.md`](docs/WINDOWS-KVM-RECOVERY-P0.1.md).
+
+S5/S6 fabric Ranges use a separate policy consumer over the same machine/process/ledger primitives:
+
+```bash
+uv run ordivon-security-windows-kvm-range-reconcile \
+  --state-root /var/lib/ordivon/security/ranges/<exact-s5-or-s6-state-root>
+```
+
+That reconciler admits only the exact S5/S6 Range identities and deterministic namespace/resource set; it does not reinterpret Evaluation ledgers. S6-R physically verifies owner SIGKILL recovery with QEMU, swtpm, peer B, and tcpdump all still live before reconciliation. See [`docs/PERSISTENT-RANGE-RECOVERY-S6R.md`](docs/PERSISTENT-RANGE-RECOVERY-S6R.md).
 
 ## Prepare a P1 installer input disk
 
@@ -333,7 +343,8 @@ The former single-Actor experiment/evaluation framework is frozen at Git revisio
 - [`docs/STATIC-EVALUATION-P0.md`](docs/STATIC-EVALUATION-P0.md) — streaming Vault, static analyzers, native report Artifacts, quarantine hardening, and limitations;
 - [`docs/CASE-SNAPSHOT-P0.md`](docs/CASE-SNAPSHOT-P0.md) — read-only drift audit, evolving Case identity, uncontrolled-execution status, and snapshot verification;
 - [`docs/WINDOWS-KVM-P0.md`](docs/WINDOWS-KVM-P0.md) — sealed Windows image, no-network QMP authority, benign fixture acceptance, and residual closure;
-- [`docs/WINDOWS-KVM-RECOVERY-P0.1.md`](docs/WINDOWS-KVM-RECOVERY-P0.1.md) — root-owned Run ledgers and explicit orphan reconciliation after hard failures;
+- [`docs/WINDOWS-KVM-RECOVERY-P0.1.md`](docs/WINDOWS-KVM-RECOVERY-P0.1.md) — root-owned Evaluation Run ledgers and explicit Evaluation orphan reconciliation after hard failures;
+- [`docs/PERSISTENT-RANGE-RECOVERY-S6R.md`](docs/PERSISTENT-RANGE-RECOVERY-S6R.md) — read/effect separation, durable S5/S6 Range resources, and accepted owner-loss reconciliation for the S6 physical topology;
 - [`docs/WINDOWS-KVM-INSTALLER-P1.md`](docs/WINDOWS-KVM-INSTALLER-P1.md) — separate large-Sample installer profile and read-only NTFS input-media gate;
 - [`docs/AGENT-EXPERIMENT-P0.md`](docs/AGENT-EXPERIMENT-P0.md) — controlled Provider/Harness/Host/Runtime variants and the DeepSeek Harness baseline;
 - [`docs/research-agenda.md`](docs/research-agenda.md) — research sequence and falsifiers;
