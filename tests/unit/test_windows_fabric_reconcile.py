@@ -54,7 +54,6 @@ class WindowsFabricRangeReconcileTests(unittest.TestCase):
             "runPath": str(run_path),
             "overlayPath": str(run_path / "system-overlay.qcow2"),
             "varsPath": str(run_path / "OVMF_VARS.4m.fd"),
-            "runDiskPath": str(run_path / "ordivon-run.img"),
             "qmpPath": str(run_path / "qmp.sock"),
             "tpmSocketPath": str(run_path / "swtpm.sock"),
             "tpmStatePath": str(run_path / "tpm-state"),
