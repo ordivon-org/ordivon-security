@@ -20,6 +20,7 @@ from ordivon_security.providers.windows_kvm import (
 
 from .model import RangeSessionSpec
 from .protocol import BackendCheckpoint, PendingRangeEvent, RangeSessionInstance
+from .windows_out_of_band import WindowsOfflineNtfsInspector
 
 _RANGE_ID = "range:windows-sacrificial-s3"
 _RUN_LABEL = "ORDIVON_RUN"
@@ -78,6 +79,8 @@ class _SacrificialRun:
     reset_observed: bool = False
     exit_recorded: bool = False
     guest_claim_recorded: bool = False
+    disk_truth_recorded: bool = False
+    disk_truth: JsonObject | None = None
     watcher: threading.Thread | None = None
 
 
@@ -416,6 +419,113 @@ class AdversarialWindowsRange:
         self._extract_guest_claim(run)
         return exit_code
 
+    def capture_offline_disk_truth(
+        self,
+        instance: RangeSessionInstance,
+        inspector: WindowsOfflineNtfsInspector,
+    ) -> JsonObject:
+        run = self._run(instance)
+        exit_code = self._record_exit_if_needed(run)
+        if exit_code is None:
+            raise RuntimeError("S4 offline disk truth requires the Guest machine to be stopped")
+        if run.disk_truth_recorded:
+            if run.disk_truth is None:
+                raise RuntimeError("S4 disk truth state is inconsistent")
+            return run.disk_truth
+
+        persisted_exe = "/ProgramData/Ordivon/S3/s3-canary.exe"
+        scheduled_task = "/Windows/System32/Tasks/OrdivonS3CanaryPersistence"
+        persistence_marker = "/ProgramData/Ordivon/S3/persistence-fired.marker"
+        deletion_marker = "/ProgramData/Ordivon/S3/synthetic-log-deleted.marker"
+        synthetic_log = "/ProgramData/Ordivon/S3/synthetic-guest.log"
+        paths = (
+            persisted_exe,
+            scheduled_task,
+            persistence_marker,
+            deletion_marker,
+            synthetic_log,
+        )
+        text_checks = {
+            "scheduledTaskCommandIsPersistedCanary": (
+                scheduled_task,
+                "C:\\ProgramData\\Ordivon\\S3\\s3-canary.exe",
+            ),
+            "scheduledTaskArgumentsPersisted": (scheduled_task, "--persisted"),
+        }
+        baseline = inspector.inspect(
+            self.machine_provider.base.base_image_path,
+            file_paths=paths,
+            text_checks=text_checks,
+        )
+        overlay_path = Path(cast(str, run.state["overlayPath"]))
+        post_run = inspector.inspect(
+            overlay_path,
+            file_paths=paths,
+            text_checks=text_checks,
+        )
+
+        def files_by_path(observation: JsonObject) -> dict[str, JsonObject]:
+            values = observation.get("files")
+            if not isinstance(values, list):
+                raise ValueError("S4 offline NTFS observation omitted file records")
+            result: dict[str, JsonObject] = {}
+            for value in values:
+                if not isinstance(value, dict):
+                    raise ValueError("S4 offline NTFS file record is invalid")
+                path = value.get("path")
+                if not isinstance(path, str):
+                    raise ValueError("S4 offline NTFS file record omitted path")
+                result[path] = cast(JsonObject, value)
+            return result
+
+        baseline_files = files_by_path(baseline)
+        post_files = files_by_path(post_run)
+        baseline_absent = all(baseline_files[path].get("present") is False for path in paths)
+        persisted_canary = post_files[persisted_exe]
+        persistence = post_files[persistence_marker]
+        deletion = post_files[deletion_marker]
+        text_results = post_run.get("textChecks")
+        if not isinstance(text_results, dict):
+            raise ValueError("S4 offline NTFS observation omitted text checks")
+        facts: JsonObject = {
+            "baselineSyntheticStateAbsent": baseline_absent,
+            "persistedCanaryPresent": persisted_canary.get("present") is True,
+            "persistedCanaryDigestMatches": persisted_canary.get("digest")
+            == self.config.canary_digest,
+            "scheduledTaskPresent": post_files[scheduled_task].get("present") is True,
+            "scheduledTaskTargetsPersistedCanary": (
+                text_results.get("scheduledTaskCommandIsPersistedCanary") is True
+                and text_results.get("scheduledTaskArgumentsPersisted") is True
+            ),
+            "persistenceMarkerPresent": persistence.get("present") is True,
+            "persistenceMarkerDigestMatches": persistence.get("digest")
+            == "sha256:ec6372af8577f375d4fa5cfffe9e4f513244c9e9df4985cfb7e24350836963a3",
+            "deletionMarkerPresent": deletion.get("present") is True,
+            "deletionMarkerDigestMatches": deletion.get("digest")
+            == "sha256:d2b5be46eadffc18fdbc4f849d4ded8e69c99379b23923b907d06acf9e173e8e",
+            "syntheticGuestLogAbsent": post_files[synthetic_log].get("present") is False,
+            "resetObservedByQmp": run.reset_observed,
+        }
+        truth: JsonObject = {
+            "kind": "ordivon.security.s4-offline-disk-truth",
+            "authority": "host-offline-read-only-ntfs",
+            "baseline": baseline,
+            "postRun": post_run,
+            "facts": facts,
+        }
+        validate_json(truth)
+        run.disk_truth = truth
+        run.disk_truth_recorded = True
+        self._emit(
+            run,
+            logical_time=4,
+            plane="world-truth",
+            source_id="observer:host-offline-ntfs",
+            event_type="world.disk-state-observed",
+            payload=truth,
+        )
+        return truth
+
     def inspect(self, instance: RangeSessionInstance) -> JsonObject:
         run = self._run(instance)
         exit_code = self._record_exit_if_needed(run)
@@ -429,6 +539,7 @@ class AdversarialWindowsRange:
             "networkDevicePresent": run.state.get("networkDevicePresent", False),
             "guestAuthority": "untrusted-disposable",
             "guestCanaryClaim": run.state.get("guestCanaryClaim"),
+            "offlineDiskTruth": run.disk_truth,
         }
         validate_json(result)
         return result

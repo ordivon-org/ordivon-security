@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 
 from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
 
-_RANGE_EVENT_PLANES = {"contested", "management"}
+_RANGE_EVENT_PLANES = {"contested", "management", "world-truth"}
 _ACTOR_PRESENCE_STATES = {"unknown", "active", "unreachable", "stopped", "compromised"}
 _EXTERNAL_BOUNDARIES = {"denied"}
 
