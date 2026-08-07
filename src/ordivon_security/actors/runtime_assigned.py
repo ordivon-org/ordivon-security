@@ -101,6 +101,10 @@ def _read_artifact(
         chunks.append(content)
         offset = next_offset
         if eof is True:
+            if offset != retained:
+                raise RuntimeMcpError(
+                    "Runtime Artifact read byte count differs from its descriptor"
+                )
             break
         if offset >= retained:
             raise RuntimeMcpError("Runtime Artifact read stopped without EOF")
