@@ -53,7 +53,7 @@ RangeSessionSpec
 RangeSession
   → RangeSessionBackend lifecycle
   → asynchronous backend/world events
-  → management + contested + world-truth RangeEvent stream
+  → management + contested + sensor + world-truth RangeEvent stream
   → checkpoint / terminate / destroy
 
 SynchronousContestProfile
@@ -104,6 +104,13 @@ S4 out-of-band disk truth
   → read selected NTFS objects from the Host and bind exact presence / digest / absence facts
   → emit those observations on the Range world-truth plane
   → detach NBD before normal provider residual closure
+
+WindowsIsolatedFabricRange (S5)
+  → one Windows KVM Guest + one lightweight Linux peer
+  → QEMU TAP and peer veth inside an isolated network-namespace bridge
+  → no fabric L3 address, no fabric route, no peer default route, no uplink
+  → QMP management + netlink world-truth + tcpdump sensor + Guest contested claim
+  → machine, ledger, Run directory, and network-namespace residual closure
 
 EvaluationSpec
   1. validate Sample, Authority, Environment, Guardian, Observation plan, and actions
@@ -158,7 +165,7 @@ Active Ranges:
 - `MicroContestRange` — local deterministic semantic contract fixture;
 - `Cage4RangeBackend` — pinned CAGE Challenge 4 Enterprise simulation.
 
-Active fidelity now spans deterministic Contest simulation, the accepted S3 single-node disposable Windows/KVM Range, and S4 Host-only post-run NTFS world truth. Post-S4 probes also establish that an isolated Linux network-namespace fabric can carry real peer traffic with no external route and can host QEMU while management retains Unix QMP control. That probe is feasibility evidence, not yet an admitted Range. S5 therefore begins with one full Windows Guest plus one lightweight peer rather than assuming every Range node requires a full VM; each experiment must use the minimum materialization fidelity that preserves the variable being studied.
+Active fidelity now spans deterministic Contest simulation, the accepted S3 single-node disposable Windows/KVM Range, S4 Host-only post-run NTFS world truth, and the accepted S5 isolated fabric with one full Windows Guest plus one lightweight Linux peer. S5 establishes that Range entities need not share one materialization fidelity: the decisive Windows endpoint can remain a full VM while a peer uses a real lightweight kernel network stack. This is an evidence-bounded composition rule, not a generic node or fidelity framework.
 
 ## Evaluation Trial P0
 
@@ -269,7 +276,7 @@ Its deletion condition is not merely the existence of CAGE: it can be removed on
 | Native Agent loop, Provider turns, Tool recovery, external Harness drivers | Harness |
 | Workspace, Job, Attempt, process, artifact, physical recovery | Runtime |
 | external provider/private operator adapters when needed | World |
-| disposable Windows machine lifecycle and no-network topology | P0-admitted QEMU/KVM Provider integrated by Security; hypervisor mechanics remain QEMU/KVM |
+| disposable Windows machine lifecycle and QMP topology | `WindowsKvmMachineProvider` integrated by Security; network admission remains caller/Range policy; hypervisor mechanics remain QEMU/KVM |
 | Scenario, Contest, Campaign, organization, Range semantics, scoring | Security |
 | promoted cross-domain protocols | Computing |
 
@@ -283,7 +290,7 @@ Security may request a Harness or Runtime change but must not copy their state m
 4. retain the accepted P0-C Runtime-executed baseline and its fail-closed diagnostic predecessors;
 5. expand from team-plan control to typed parameterized CAGE Action Proposals while preserving the P0-C authority boundary;
 6. add Campaign and organization state only when multi-Actor experiments consume it;
-7. introduce containerlab, an independent management plane, and Zeek telemetry;
+7. extend the accepted S5 fabric only when another node/materialization or richer telemetry is demanded; evaluate containerlab or Zeek then rather than making them prerequisites;
 8. add CALDERA as a TTP execution adapter, not as Campaign authority;
 9. connect Codex and Hermes as delegated Harness baselines in planner-only, Tool-proxy, and black-box modes.
 

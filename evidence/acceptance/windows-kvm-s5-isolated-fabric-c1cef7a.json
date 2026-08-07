@@ -1,0 +1,198 @@
+{
+  "acceptanceClaims": [
+    "one disposable Windows KVM Guest joined an isolated Linux network-namespace L2 fabric with exactly one lightweight peer",
+    "the fabric bridge had no L3 address, no fabric route, exactly the declared TAP and peer-veth ports, and the peer had no default route",
+    "QMP independently observed exactly one Guest network device and the Host retained QEMU lifecycle authority outside the contested fabric",
+    "the maintained Guest canary bound its static Range address to the exact QEMU MAC and established a real TCP connection to the maintained peer",
+    "the Host tcpdump sensor independently observed the challenge TCP handshake, 16-byte peer banner, and connection close without being promoted to world truth",
+    "QEMU, swtpm, the disposable run directory, root-owned ledger, fabric namespace, and peer namespace all closed with zero declared residuals"
+  ],
+  "authoritySplit": {
+    "contested": [
+      "Guest Runner diagnostic",
+      "Guest fabric-connectivity claim"
+    ],
+    "management": [
+      "QMP network-device count",
+      "QEMU process lifecycle",
+      "root-owned machine ledger",
+      "machine and fabric residual closure"
+    ],
+    "sensor": [
+      "Host tcpdump packet capture"
+    ],
+    "worldTruth": [
+      "Host Linux netlink/bridge fabric topology",
+      "fabric L3-address absence",
+      "fabric-route absence",
+      "declared active port set and TAP carrier"
+    ]
+  },
+  "externalAcceptance": {
+    "challengeTrafficObserved": true,
+    "externalRouteAbsent": true,
+    "fabricHasNoL3Address": true,
+    "fabricPortSetClosed": true,
+    "fabricTopologyRecorded": true,
+    "guestReachedMaintainedPeer": true,
+    "qmpNetworkDeviceConfirmed": true,
+    "residualClosureClean": true,
+    "sensorRecorded": true,
+    "singleNetworkDevicePresent": true
+  },
+  "falsifiers": [
+    {
+      "failure": "tool admission initially rejected the symlinked /usr/bin/python3 invocation path",
+      "logicalName": "s5-first.json",
+      "privateReceiptByteLength": 1489,
+      "privateReceiptSha256": "sha256:84fa827557bc4d4549a3f1be0017290614118674d8aab603c3301f892b366ff2",
+      "status": "failed"
+    },
+    {
+      "failure": "tool admission initially rejected the symlinked /usr/bin/mcopy invocation path",
+      "logicalName": "s5-second.json",
+      "privateReceiptByteLength": 1487,
+      "privateReceiptSha256": "sha256:38454c7b1295c6ee688b7f1dafda5360e1a493a55c0d024041f8cb19012a7cf6",
+      "status": "failed"
+    },
+    {
+      "failure": "resolving the mcopy invocation path to the mtools multicall target changed argv[0] semantics and broke media staging; invocation identity and resolved binary identity were separated",
+      "logicalName": "s5-third.json",
+      "privateReceiptByteLength": 1732,
+      "privateReceiptSha256": "sha256:735f257bee6f8e8f1c74203135744605a8f5004730fad5f153435b772133c820",
+      "status": "failed"
+    },
+    {
+      "failure": "Guest static IPv4 configuration targeted an insufficiently identified adapter; Winsock returned WSAENETUNREACH 10051 and the Host sensor observed zero challenge packets",
+      "logicalName": "s5-sixth.json",
+      "privateReceiptByteLength": 20884,
+      "privateReceiptSha256": "sha256:fa54ec4d684ebdbb26f438406e08b257aac9a6118f64d19d9fd05457ee70f1b0",
+      "status": "failed"
+    },
+    {
+      "failure": "an exact-commit diagnostic run used a shortened 180-second outer bound and terminated before Guest Runner produced evidence; the canonical 360-second acceptance bound was retained",
+      "logicalName": "s5-isolated-fabric-c1cef7a.json",
+      "privateReceiptByteLength": 18197,
+      "privateReceiptSha256": "sha256:03d1090c2035fd1a934b0e3ab7c4052357fbfb886291f0ec24c42a452b800c0e",
+      "status": "failed"
+    }
+  ],
+  "guestChallengeClaim": {
+    "authority": "guest-claim-not-world-truth",
+    "canaryDigest": "sha256:de129eed43fcdefb342b47ed2116eff3dc5d8c4541aed4aeec4078f6072a10b8",
+    "fixtureResultDigest": "sha256:22c68cc647558034a3c90051cf873583edad053f8b88f54dbd577fe34c09ed85",
+    "guestNicMac": "52-54-00-53-35-01",
+    "peerAddress": "10.253.60.3",
+    "peerBannerMatched": true,
+    "peerConnected": true,
+    "peerPort": 48080,
+    "rangeRoutePresent": true
+  },
+  "implementationRevision": "git:c1cef7a79ad0f501083940c8742db02a7ddb0bb1",
+  "kind": "ordivon.security.windows-kvm-s5-isolated-fabric-acceptance",
+  "limitations": [
+    "S5 has one full Windows Guest and one lightweight Linux peer; it does not establish several independent full-OS compromise domains",
+    "the fabric is one unrouted L2 segment with no DHCP, DNS, NAT, routing, multi-zone policy, or external egress",
+    "tcpdump is an external sensor observation and is not claimed to be complete or lossless world truth",
+    "the Guest claim verifies only the maintained Range-local connectivity canary and is not authority for Host topology or closure",
+    "S5 does not implement generic node, topology, fidelity, promotion, or materialization frameworks",
+    "S5 does not admit unknown Samples, third-party malware, Internet egress, or external targets"
+  ],
+  "materialization": {
+    "fabric": "linux-network-namespace-bridge-tap-veth",
+    "guest": "windows-kvm",
+    "peer": "linux-network-namespace-process"
+  },
+  "network": {
+    "bridgeL3Addresses": 0,
+    "declaredPortCount": 2,
+    "fabricRoutes": 0,
+    "guestAddress": "10.253.60.2/24",
+    "peerAddress": "10.253.60.3/24",
+    "peerDefaultRoute": false,
+    "peerPort": 48080,
+    "tapCarrierObserved": true,
+    "uplink": "absent"
+  },
+  "physicalReceipt": {
+    "byteLength": 25478,
+    "logicalName": "s5-isolated-fabric-c1cef7a-360.json",
+    "sha256": "sha256:0a19a43aa126813fddae48eaf8a1a2960c40ffd35b4be53e5e479a8fe5c78d21"
+  },
+  "rangeEventPlanes": {
+    "guestClaim": "contested",
+    "guestDiagnostic": "contested",
+    "packetCapture": "sensor",
+    "qmpLifecycle": "management",
+    "topologyObservation": "world-truth"
+  },
+  "rangeId": "range:windows-isolated-fabric-s5",
+  "schemaVersion": 1,
+  "securitySource": {
+    "componentId": "ordivon-security",
+    "packageVersion": "0.8.0",
+    "revision": "git:c1cef7a79ad0f501083940c8742db02a7ddb0bb1",
+    "revisionKind": "git-commit"
+  },
+  "sensorObservation": {
+    "authority": "external-packet-sensor-not-world-truth",
+    "matchedChallengeTraffic": true,
+    "packetLineCount": 8,
+    "pcapDigest": "sha256:537bdede5d059ad0fb1a2bbfcd37e76e2d166648d60a86a5fdef3890ee216f80",
+    "observedExchange": [
+      "SYN",
+      "SYN-ACK",
+      "ACK",
+      "16-byte peer banner",
+      "connection close"
+    ]
+  },
+  "status": "accepted",
+  "tools": {
+    "bridge": {
+      "digest": "sha256:ecb3c3ffe005d5c1706447484364892e5af4e6677251ca2bcb224dccc8665375",
+      "invocationPath": "/usr/bin/bridge",
+      "resolvedPath": "/usr/bin/bridge"
+    },
+    "ip": {
+      "digest": "sha256:c18bc2ced72446a747427779dffeae79d959d545658821fd9c950eec36826e65",
+      "invocationPath": "/usr/bin/ip",
+      "resolvedPath": "/usr/bin/ip"
+    },
+    "mcopy": {
+      "digest": "sha256:8a30e259d53fde3e9cb53ae35c134976978bde3ad2ce0d9f2cf57b1dd52c1e87",
+      "invocationPath": "/usr/bin/mcopy",
+      "resolvedPath": "/usr/bin/mtools"
+    },
+    "mkfsFat": {
+      "digest": "sha256:4b84d55baed18ecbb47c8ebdb03e2671d5b5690df92237992a8ed18d16ece5c8",
+      "invocationPath": "/usr/bin/mkfs.fat",
+      "resolvedPath": "/usr/bin/mkfs.fat"
+    },
+    "python": {
+      "digest": "sha256:2700be1aabe3687bd597f21b0eac3b9bbdf7417e93035255a9286c67935b59bd",
+      "invocationPath": "/usr/bin/python3",
+      "resolvedPath": "/usr/bin/python3.14"
+    },
+    "sysctl": {
+      "digest": "sha256:ee38cba52979c50f1494e31f1a385b89ce5a1d1c6305df294ea21b3533c280a4",
+      "invocationPath": "/usr/bin/sysctl",
+      "resolvedPath": "/usr/bin/sysctl"
+    },
+    "tcpdump": {
+      "digest": "sha256:6070c59b7fe43e16b43078e00aecf7cc53c54fa82bcce71fd3bed7fc573b5de",
+      "invocationPath": "/usr/bin/tcpdump",
+      "resolvedPath": "/usr/bin/tcpdump"
+    }
+  },
+  "worldTruth": {
+    "authority": "host-linux-netlink",
+    "facts": {
+      "bridgeL3Addresses": 0,
+      "declaredPortsPresent": true,
+      "externalRouteAbsent": true,
+      "fabricRoutesEmpty": true,
+      "tapCarrierObserved": true
+    }
+  }
+}

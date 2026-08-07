@@ -68,6 +68,7 @@ The active `0.8` core provides:
 - an S2 `WindowsKvmMachineProvider` substrate for sealed base identity, disposable overlay/UEFI/TPM state, root-owned lifecycle ledgers, external QMP topology truth, recovery, and residual closure without Sample admission;
 - an accepted S3 single-node `AdversarialWindowsRange` where the maintained Guest claim reports loss of Guest-local control/observation, persistence across reboot, and synthetic telemetry deletion while external no-NIC containment, QMP reset truth, machine lifecycle, and zero-residual closure remain authoritative;
 - an accepted S4 out-of-band `world-truth` path that reads selected stopped-Guest NTFS state through read-only qemu-nbd/ntfscat, independently verifying maintained persistence/deletion facts without upgrading the Guest claim to truth;
+- an accepted S5 `WindowsIsolatedFabricRange` where one full Windows KVM Guest and one lightweight Linux netns peer share an isolated no-uplink L2 fabric while QMP management, Host topology truth, external packet sensing, Guest claims, and complete machine/fabric closure remain separate authorities;
 - a P0 Windows Evaluation adapter that remains restricted to the exact maintained benign fixture;
 - a DeepSeek Flash `NativeHarnessActorBackend` with exact Provider, Harness, Host, Runtime, Protocol, prompt, budget, and credential-scope identity;
 - a P0-A CAGE path where Harness is consumed while Host and Runtime non-consumption remain explicit experimental facts;
