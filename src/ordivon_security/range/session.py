@@ -51,20 +51,32 @@ class RangeSession:
         backend_identity = self.backend.execution_identity
         validate_json(backend_identity)
         instance = self.backend.create(self.spec)
-        if instance.session_id != self.spec.session_id:
-            raise ValueError("Range backend instance session identity differs")
-        self._append_event(
-            logical_time=0,
-            plane="management",
-            source_id="security:range-session",
-            event_type="range.session-started",
-            payload={
-                "instanceId": instance.instance_id,
-                "rangeId": self.spec.range_id,
-                "specDigest": self.spec.digest,
-                "backendIdentity": backend_identity,
-            },
-        )
+        try:
+            if instance.session_id != self.spec.session_id:
+                raise ValueError("Range backend instance session identity differs")
+            start_event = self._build_event(
+                sequence=len(self._events),
+                logical_time=0,
+                plane="management",
+                source_id="security:range-session",
+                event_type="range.session-started",
+                payload={
+                    "instanceId": instance.instance_id,
+                    "rangeId": self.spec.range_id,
+                    "specDigest": self.spec.digest,
+                    "backendIdentity": backend_identity,
+                },
+            )
+        except Exception as error:
+            try:
+                cleanup_receipt = self.backend.destroy(instance)
+                validate_json(cleanup_receipt)
+            except Exception as cleanup_error:
+                raise RuntimeError(
+                    "Range backend post-create validation failed and cleanup also failed"
+                ) from cleanup_error
+            raise error
+        self._events.append(start_event)
         self._instance = instance
         self._state = "running"
         return instance
