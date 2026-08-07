@@ -14,7 +14,7 @@ audience:
   - evaluator
   - maintainer
   - agent
-updated: 2026-08-06
+updated: 2026-08-07
 summary: Evidence contract for active Contest, CAGE, software Evaluation, static native-report Artifacts, Case Snapshots, P0-admitted benign-only Windows KVM Runs, and frozen Round 1 reports.
 evidence_status: verified
 readiness: READY
@@ -97,6 +97,8 @@ A P0-admitted Windows KVM Run additionally binds the sealed base image, disposab
 The sanitized Windows KVM P0 acceptance index is retained at [`acceptance/windows-kvm-p0-5c6a854.json`](acceptance/windows-kvm-p0-5c6a854.json). It binds the sealed environment identity, six passed gates, private receipt digests, exact admission scope, diagnostic cleanup outcome, and explicit limitations without exposing Sample bytes, temporary installation secrets, or machine-local paths.
 
 The S3 sacrificial-node acceptance index is retained at [`acceptance/windows-kvm-s3-sacrificial-node-fc5740a.json`](acceptance/windows-kvm-s3-sacrificial-node-fc5740a.json). It binds the committed Range implementation, the first failed QMP-reset falsifier, the final private physical-receipt digest, external no-NIC/reset/lifecycle/closure gates, and the explicit rule that the canary result is a contested Guest claim used only to establish trial completeness.
+
+The S4 out-of-band truth acceptance index is retained at [`acceptance/windows-kvm-s4-out-of-band-truth-0f9d35a.json`](acceptance/windows-kvm-s4-out-of-band-truth-0f9d35a.json). It binds the first failed representation falsifier, the accepted physical-receipt digest, exact Security source identity, read-only qemu-nbd/NTFS tool identities, selected post-run file presence/digests/absence, and the separation between contested Guest claims and `world-truth` observations. It does not claim live introspection, process attribution, complete filesystem truth, or network truth.
 
 P0.1 reconciliation receipts bind the scanned state root, each ledger decision, exact process-identity closure, Run-directory and ledger deletion, skipped active owners, and any attention-required diagnostics. They do not convert a crashed Run into valid Evaluation evidence. P1 media manifests bind the installer profile digest, exact source identity, NTFS image digest, embedded-file verification, and read-only attachment topology; they explicitly state `prepared-not-executable` and cannot establish runtime behavior.
 

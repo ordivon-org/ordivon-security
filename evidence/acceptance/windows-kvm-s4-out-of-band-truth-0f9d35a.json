@@ -1,0 +1,118 @@
+{
+  "acceptanceClaims": [
+    "the sealed base image did not contain the S3 synthetic persistence or log-deletion objects",
+    "after a Guest-originated QMP reset and final machine exit, a Host read-only NBD/NTFS path independently observed the exact persisted canary bytes",
+    "the Host independently observed the S3 scheduled task and verified its persisted-canary command and --persisted argument",
+    "the Host independently observed exact persistence/deletion marker bytes and the absence of the synthetic Guest log",
+    "the disk-state observation was emitted on a world-truth Range plane while the Guest canary result remained contested",
+    "QEMU, swtpm, the disposable run directory, the root-owned ledger, and the temporary NBD attachment were all closed after observation"
+  ],
+  "diskTruth": {
+    "authority": "host-offline-read-only-ntfs",
+    "facts": {
+      "baselineSyntheticStateAbsent": true,
+      "deletionMarkerDigestMatches": true,
+      "deletionMarkerPresent": true,
+      "persistedCanaryDigestMatches": true,
+      "persistedCanaryPresent": true,
+      "persistenceMarkerDigestMatches": true,
+      "persistenceMarkerPresent": true,
+      "resetObservedByQmp": true,
+      "scheduledTaskPresent": true,
+      "scheduledTaskTargetsPersistedCanary": true,
+      "syntheticGuestLogAbsent": true
+    },
+    "postRunFiles": [
+      {
+        "byteLength": 23040,
+        "digest": "sha256:4dbb44c26ebe32568cd9d649b72bcfcbbeb561237d23bc9266868c5cacac6f2e",
+        "logicalPath": "/ProgramData/Ordivon/S3/s3-canary.exe",
+        "present": true
+      },
+      {
+        "byteLength": 3306,
+        "digest": "sha256:505757263c8285036ed815f58c852b6fee276bcaa49716dc3ea2cc97f06737d4",
+        "logicalPath": "/Windows/System32/Tasks/OrdivonS3CanaryPersistence",
+        "present": true
+      },
+      {
+        "byteLength": 18,
+        "digest": "sha256:ec6372af8577f375d4fa5cfffe9e4f513244c9e9df4985cfb7e24350836963a3",
+        "logicalPath": "/ProgramData/Ordivon/S3/persistence-fired.marker",
+        "present": true
+      },
+      {
+        "byteLength": 22,
+        "digest": "sha256:d2b5be46eadffc18fdbc4f849d4ded8e69c99379b23923b907d06acf9e173e8e",
+        "logicalPath": "/ProgramData/Ordivon/S3/synthetic-log-deleted.marker",
+        "present": true
+      },
+      {
+        "logicalPath": "/ProgramData/Ordivon/S3/synthetic-guest.log",
+        "present": false
+      }
+    ],
+    "textChecks": {
+      "scheduledTaskArgumentsPersisted": true,
+      "scheduledTaskCommandIsPersistedCanary": true
+    }
+  },
+  "externalAcceptance": {
+    "containmentConfirmed": true,
+    "networkDeviceAbsent": true,
+    "qemuExited": true,
+    "resetObservedByQmp": true,
+    "residualClosureClean": true,
+    "worldTruthEventRecorded": true
+  },
+  "firstPhysicalFalsifier": {
+    "byteLength": 29364,
+    "failure": "scheduled task existed, but the first external text check incorrectly expected executable and arguments to be one continuous Task XML string",
+    "logicalName": "s4-out-of-band-first.json",
+    "sha256": "sha256:9b4b9f0b536eeccac7261d49130acb19c61365f5a362b30e1b705f6e5286da10",
+    "status": "failed"
+  },
+  "guestChallengeClaim": {
+    "authority": "guest-claim-not-world-truth",
+    "claimPasses": true,
+    "role": "challenge-completeness-only"
+  },
+  "implementationRevision": "git:0f9d35a6c3f25be812a85f8b8434dc94e7391358",
+  "inspector": {
+    "filesystem": "ntfs-3g-userspace-read",
+    "implementationRevision": "1",
+    "tools": {
+      "ntfscat": "sha256:4e57e315ec2c2a1bbedcdde2d3adc53f099ee388990e457a0fcec4975796ae38",
+      "ntfsls": "sha256:6dc3a505da46a5a91c2ae9c2a369ff7fb3b10f72124d2b04460f54d67778aad1",
+      "partx": "sha256:923998713089c0eff4c9805c8c118fbea82d2ec6bf354301e9711519baa30adf",
+      "qemuNbd": "sha256:8d08f1f94639313227f489e395c7a7d5af6c1f845436a236e47fd1caee4d706e"
+    },
+    "transport": "qemu-nbd-read-only"
+  },
+  "kind": "ordivon.security.windows-kvm-s4-out-of-band-truth-acceptance",
+  "limitations": [
+    "the accepted truth is post-run and filesystem-scoped; S4 does not provide live memory or complete filesystem introspection",
+    "presence and content observations do not by themselves attribute a change to a particular Guest process",
+    "network truth is intentionally deferred until a real multi-node contested fabric exists",
+    "the reader is Windows NTFS-specific and is not yet a generic disk-forensics framework",
+    "S4 does not admit unknown Samples, third-party malware, Internet egress, or external targets"
+  ],
+  "physicalReceipt": {
+    "byteLength": 29921,
+    "logicalName": "s4-out-of-band-0f9d35a.json",
+    "sha256": "sha256:20f4fe3c32327230f49ce16929d139ee61f1cef187424a25309c46dea6bd8c08"
+  },
+  "rangeEventPlanes": {
+    "guestClaim": "contested",
+    "offlineDiskObservation": "world-truth"
+  },
+  "rangeId": "range:windows-sacrificial-s3",
+  "schemaVersion": 1,
+  "securitySource": {
+    "componentId": "ordivon-security",
+    "packageVersion": "0.8.0",
+    "revision": "git:0f9d35a6c3f25be812a85f8b8434dc94e7391358",
+    "revisionKind": "git-commit"
+  },
+  "status": "accepted"
+}
