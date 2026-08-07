@@ -15,6 +15,7 @@ from .session import RangeSession
 from .synchronous import SynchronousContestProfile
 from .windows_fabric import WindowsFabricRangeConfig, WindowsIsolatedFabricRange
 from .windows_sacrificial import AdversarialWindowsRange, SacrificialWindowsRangeConfig
+from .windows_topology_churn import WindowsTopologyChurnRange
 
 __all__ = [
     "ActorPresence",
@@ -32,4 +33,5 @@ __all__ = [
     "SynchronousContestProfile",
     "WindowsFabricRangeConfig",
     "WindowsIsolatedFabricRange",
+    "WindowsTopologyChurnRange",
 ]

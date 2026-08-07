@@ -117,6 +117,17 @@ class WindowsIsolatedFabricRange:
     """S5 first slice: one Windows VM plus one lightweight peer on an isolated L2 fabric."""
 
     range_id = _RANGE_ID
+    stage_label = "S5"
+    namespace_prefix = "s5"
+    fixture_id = _CANARY_ID
+    semantic_action = "connect-maintained-range-peer-v1"
+    guest_address = _GUEST_ADDRESS
+    peer_address = _PEER_ADDRESS
+    prefix_length = _PREFIX_LENGTH
+    peer_port = _PEER_PORT
+    peer_banner = "ORDIVON-S5-PEER"
+    guest_runner_source_id = "guest:s5-runner"
+    guest_canary_source_id = "guest:s5-fabric-canary"
 
     def __init__(self, config: WindowsFabricRangeConfig) -> None:
         self.config = config
@@ -147,7 +158,7 @@ class WindowsIsolatedFabricRange:
             "securitySource": security_source_identity(),
             "machineProvider": self.machine_provider.execution_identity,
             "canary": {
-                "canaryId": _CANARY_ID,
+                "canaryId": self.fixture_id,
                 "digest": self.config.canary_digest,
                 "byteLength": self.config.canary_path.stat().st_size,
             },
@@ -157,10 +168,10 @@ class WindowsIsolatedFabricRange:
                 "fabric": "linux-network-namespace-bridge-tap-veth",
             },
             "network": {
-                "guestAddress": _GUEST_ADDRESS,
-                "peerAddress": _PEER_ADDRESS,
-                "prefixLength": _PREFIX_LENGTH,
-                "peerPort": _PEER_PORT,
+                "guestAddress": self.guest_address,
+                "peerAddress": self.peer_address,
+                "prefixLength": self.prefix_length,
+                "peerPort": self.peer_port,
                 "uplink": "absent",
                 "fabricL3": "disabled-ipv4-and-ipv6",
             },
@@ -216,9 +227,9 @@ class WindowsIsolatedFabricRange:
             "sampleByteLength": self.config.canary_path.stat().st_size,
             "action": "execute-benign-fixture",
             "maxRuntimeMs": self.config.max_runtime_seconds * 1000,
-            "fixtureId": _CANARY_ID,
+            "fixtureId": self.fixture_id,
             "fabricRange": True,
-            "semanticAction": "connect-maintained-range-peer-v1",
+            "semanticAction": self.semantic_action,
         }
         manifest_path = run_path / "ordivon-run.json"
         manifest_path.write_text(
@@ -248,8 +259,8 @@ class WindowsIsolatedFabricRange:
         self, state: JsonObject, token: str
     ) -> tuple[subprocess.Popen[bytes], subprocess.Popen[bytes]]:
         suffix = token[:8]
-        fabric_ns = f"s5f{suffix}"
-        peer_ns = f"s5p{suffix}"
+        fabric_ns = f"{self.namespace_prefix}f{suffix}"
+        peer_ns = f"{self.namespace_prefix}p{suffix}"
         bridge_name = f"b{suffix}"
         tap_name = f"t{suffix}"
         peer_veth = f"p{suffix}"
@@ -369,7 +380,7 @@ class WindowsIsolatedFabricRange:
                     peer_ns,
                     "addr",
                     "add",
-                    f"{_PEER_ADDRESS}/{_PREFIX_LENGTH}",
+                    f"{self.peer_address}/{self.prefix_length}",
                     "dev",
                     peer_veth,
                 ]
@@ -453,7 +464,7 @@ class WindowsIsolatedFabricRange:
                     str(pcap_path),
                     "tcp",
                     "port",
-                    str(_PEER_PORT),
+                    str(self.peer_port),
                 ],
                 stdout=capture_stdout,
                 stderr=capture_stderr,
@@ -465,9 +476,10 @@ class WindowsIsolatedFabricRange:
             peer_stderr = (run_path / "peer.stderr.log").open("xb")
             script = (
                 "import socket; "
-                f"s=socket.socket(); s.settimeout(300); s.bind(('{_PEER_ADDRESS}',{_PEER_PORT})); "
+                f"s=socket.socket(); s.settimeout(300); "
+                f"s.bind(('{self.peer_address}',{self.peer_port})); "
                 "s.listen(1); c,a=s.accept(); "
-                "c.sendall(b'ORDIVON-S5-PEER\\n'); c.close(); s.close()"
+                f"c.sendall({(self.peer_banner + chr(10)).encode()!r}); c.close(); s.close()"
             )
             peer = subprocess.Popen(
                 [
@@ -528,14 +540,17 @@ class WindowsIsolatedFabricRange:
 
     def create(self, spec: RangeSessionSpec) -> RangeSessionInstance:
         if spec.range_id != self.range_id:
-            raise ValueError("S5 Range specification targets another Range")
+            raise ValueError(f"{self.stage_label} Range specification targets another Range")
         token = hashlib.sha256(spec.session_id.encode("utf-8")).hexdigest()[:8]
         instance = RangeSessionInstance(
-            instance_id=f"range-instance:s5-{token}", session_id=spec.session_id
+            instance_id=f"range-instance:{self.namespace_prefix}-{token}",
+            session_id=spec.session_id,
         )
         generation = f"windows-kvm:{self.machine_provider.base.environment_image_digest[-16:]}"
         state = self.machine_provider.create_state(
-            token=f"s5-{token}", instance_id=instance.instance_id, generation=generation
+            token=f"{self.namespace_prefix}-{token}",
+            instance_id=instance.instance_id,
+            generation=generation,
         )
         state["rangeSpecDigest"] = spec.digest
         peer: subprocess.Popen[bytes] | None = None
@@ -669,7 +684,9 @@ class WindowsIsolatedFabricRange:
         try:
             return self._runs[instance.instance_id]
         except KeyError as error:
-            raise KeyError(f"unknown S5 Range instance: {instance.instance_id}") from error
+            raise KeyError(
+                f"unknown {self.stage_label} Range instance: {instance.instance_id}"
+            ) from error
 
     def _extract_guest_claim(self, run: _FabricRun) -> JsonObject | None:
         if run.guest_claim_recorded:
@@ -728,7 +745,7 @@ class WindowsIsolatedFabricRange:
             run,
             logical_time=2,
             plane="contested",
-            source_id="guest:s5-runner",
+            source_id=self.guest_runner_source_id,
             event_type="guest.runner-diagnostic-observed",
             payload=diagnostic,
         )
@@ -741,7 +758,7 @@ class WindowsIsolatedFabricRange:
             run,
             logical_time=2,
             plane="contested",
-            source_id="guest:s5-fabric-canary",
+            source_id=self.guest_canary_source_id,
             event_type="guest.fabric-connectivity-claim",
             payload={"authority": "guest-claim-not-world-truth", "claim": claim},
         )
@@ -765,7 +782,7 @@ class WindowsIsolatedFabricRange:
                 for line in output.splitlines()
                 if line.strip() and not line.startswith("reading from file ")
             ]
-        matched = any(_GUEST_ADDRESS in line and _PEER_ADDRESS in line for line in lines)
+        matched = any(self.guest_address in line and self.peer_address in line for line in lines)
         observation: JsonObject = {
             "authority": "external-packet-sensor-not-world-truth",
             "pcapDigest": pcap_digest,
