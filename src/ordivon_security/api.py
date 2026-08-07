@@ -73,6 +73,11 @@ from .evidence import (
     verify_evidence_bundle,
     verify_operational_evidence,
 )
+from .providers import (
+    WindowsKvmMachineClosure,
+    WindowsKvmMachineConfig,
+    WindowsKvmMachineProvider,
+)
 from .range import (
     ActorPresence,
     BackendCheckpoint,
@@ -168,6 +173,9 @@ __all__ = [
     "WindowsKvmBaseBuildConfig",
     "WindowsKvmBaseImage",
     "WindowsKvmEvaluationBackend",
+    "WindowsKvmMachineClosure",
+    "WindowsKvmMachineConfig",
+    "WindowsKvmMachineProvider",
     "WindowsKvmProviderConfig",
     "audit_quarantine_tree",
     "build_windows_kvm_base",

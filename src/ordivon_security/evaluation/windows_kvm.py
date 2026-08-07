@@ -1,26 +1,37 @@
 from __future__ import annotations
 
-import hashlib
-import json
 import os
-import shutil
-import signal
-import socket
 import subprocess
 import time
 from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
-from ordivon_security._canonical import (
-    JsonObject,
-    JsonValue,
-    canonical_bytes,
-    canonical_digest,
-    validate_json,
+from ordivon_security._canonical import JsonObject, JsonValue, canonical_digest
+from ordivon_security.providers.windows_kvm import (
+    WindowsKvmBaseImage as WindowsKvmBaseImage,
 )
-from ordivon_security.identity import security_source_identity
+from ordivon_security.providers.windows_kvm import (
+    WindowsKvmMachineConfig,
+    WindowsKvmMachineProvider,
+    _digest_path,
+    _host_cpu_identity,
+    _load_object,
+    _replace_private_json,
+    _set_owner,
+    _version_line,
+)
+from ordivon_security.providers.windows_kvm import (
+    _pci_network_devices as _pci_network_devices,
+)
+from ordivon_security.providers.windows_kvm import (
+    _process_start_time as _process_start_time,
+)
+from ordivon_security.providers.windows_kvm import _QmpClient as _QmpClient
+from ordivon_security.providers.windows_kvm import (
+    _terminate_pid as _terminate_pid,
+)
 
 from .backend import (
     EvaluationArtifact,
@@ -32,111 +43,15 @@ from .backend import (
 )
 from .models import EvaluationSpec, SampleIdentity
 
-_CHUNK_BYTES = 4 * 1024 * 1024
 _RUN_ACTION = "execute-benign-fixture"
 _RUN_LABEL = "ORDIVON_RUN"
 _READONLY_MEDIA_FIXTURE_ID = "ordivon-readonly-media-verifier-v1"
-_NETWORK_PCI_CLASS_MIN = 0x0200
-_NETWORK_PCI_CLASS_MAX = 0x02FF
-
-
-def _digest_path(path: Path) -> tuple[str, int]:
-    digest = hashlib.sha256()
-    byte_length = 0
-    with path.open("rb") as handle:
-        while chunk := handle.read(_CHUNK_BYTES):
-            digest.update(chunk)
-            byte_length += len(chunk)
-    return "sha256:" + digest.hexdigest(), byte_length
-
-
-def _load_object(path: Path, label: str) -> JsonObject:
-    value = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(value, dict):
-        raise ValueError(f"{label} must be an object")
-    validate_json(value)
-    return value
-
-
-def _fsync_directory(path: Path) -> None:
-    descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
-    try:
-        os.fsync(descriptor)
-    finally:
-        os.close(descriptor)
-
-
-def _replace_private_json(path: Path, value: JsonObject) -> None:
-    validate_json(value)
-    if path.is_symlink():
-        raise ValueError(f"Private JSON path must not be a symlink: {path}")
-    temporary = path.with_name(f".{path.name}.{os.getpid()}.{time.monotonic_ns()}.tmp")
-    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-    try:
-        with os.fdopen(descriptor, "wb") as handle:
-            handle.write(canonical_bytes(value) + b"\n")
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temporary, path)
-        path.chmod(0o600)
-        _fsync_directory(path.parent)
-    except BaseException:
-        temporary.unlink(missing_ok=True)
-        raise
 
 
 def _write_private_json(path: Path, value: JsonObject) -> None:
     if path.exists() or path.is_symlink():
         raise FileExistsError(f"Private JSON path already exists: {path}")
     _replace_private_json(path, value)
-
-
-def _host_cpu_identity() -> JsonObject:
-    fields: dict[str, str] = {}
-    for line in Path("/proc/cpuinfo").read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            break
-        if ":" not in line:
-            continue
-        key, value = (part.strip() for part in line.split(":", 1))
-        if key in {
-            "vendor_id",
-            "cpu family",
-            "model",
-            "model name",
-            "stepping",
-            "microcode",
-            "flags",
-        }:
-            fields[key] = value
-    if "model name" not in fields or "flags" not in fields:
-        raise ValueError("Host CPU identity is incomplete")
-    identity: JsonObject = {
-        "vendorId": fields.get("vendor_id"),
-        "family": fields.get("cpu family"),
-        "model": fields.get("model"),
-        "modelName": fields["model name"],
-        "stepping": fields.get("stepping"),
-        "microcode": fields.get("microcode"),
-        "flags": cast(list[JsonValue], sorted(set(fields["flags"].split()))),
-    }
-    validate_json(identity)
-    return identity
-
-
-def _version_line(executable: Path, *args: str) -> str:
-    completed = subprocess.run(
-        [str(executable), *args],
-        check=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        timeout=30,
-    )
-    line = completed.stdout.splitlines()[0].strip()
-    if not line:
-        raise ValueError(f"Tool returned no version identity: {executable}")
-    return line
 
 
 def _run_checked(
@@ -156,117 +71,6 @@ def _run_checked(
     )
 
 
-def _process_identity(pid: int) -> tuple[str, int] | None:
-    if pid < 1:
-        return None
-    try:
-        raw = Path(f"/proc/{pid}/stat").read_text(encoding="utf-8")
-    except OSError:
-        return None
-    _, separator, suffix = raw.rpartition(")")
-    if not separator:
-        return None
-    fields = suffix.strip().split()
-    if len(fields) <= 19:
-        return None
-    try:
-        start_time = int(fields[19])
-    except ValueError:
-        return None
-    return fields[0], start_time
-
-
-def _process_state(pid: int) -> str | None:
-    identity = _process_identity(pid)
-    return identity[0] if identity is not None else None
-
-
-def _process_start_time(pid: int) -> int | None:
-    identity = _process_identity(pid)
-    return identity[1] if identity is not None else None
-
-
-def _reap_child(pid: int) -> None:
-    with suppress(ChildProcessError):
-        os.waitpid(pid, os.WNOHANG)
-
-
-def _is_process_alive(pid: int) -> bool:
-    if pid < 1:
-        return False
-    state = _process_state(pid)
-    if state == "Z":
-        _reap_child(pid)
-        return False
-    try:
-        os.kill(pid, 0)
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    return True
-
-
-def _terminate_pid(
-    pid: int,
-    *,
-    expected_fragment: str,
-    expected_start_time: int | None = None,
-) -> bool:
-    identity = _process_identity(pid)
-    if identity is None:
-        return True
-    state, start_time = identity
-    if expected_start_time is not None and start_time != expected_start_time:
-        return False
-    if state == "Z":
-        _reap_child(pid)
-        return True
-
-    command_path = Path(f"/proc/{pid}/cmdline")
-    try:
-        command = command_path.read_bytes().replace(b"\0", b" ").decode("utf-8", errors="replace")
-    except OSError:
-        command = ""
-    if expected_start_time is None and expected_fragment not in command:
-        return False
-    if expected_start_time is not None and command and expected_fragment not in command:
-        return False
-
-    with suppress(ProcessLookupError):
-        os.kill(pid, signal.SIGTERM)
-    for _ in range(50):
-        identity = _process_identity(pid)
-        if identity is None:
-            return True
-        state, current_start_time = identity
-        if current_start_time != start_time:
-            return False
-        if state == "Z":
-            _reap_child(pid)
-            return True
-        time.sleep(0.1)
-
-    with suppress(ProcessLookupError):
-        os.kill(pid, signal.SIGKILL)
-    for _ in range(50):
-        identity = _process_identity(pid)
-        if identity is None:
-            return True
-        state, current_start_time = identity
-        if current_start_time != start_time:
-            return False
-        if state == "Z":
-            _reap_child(pid)
-            return True
-        time.sleep(0.1)
-    return _process_identity(pid) is None
-
-
-def _set_owner(path: Path, *, user: str, group: str) -> None:
-    shutil.chown(path, user=user, group=group)
-
-
 def _artifact(path: Path, *, artifact_id: str, kind: str, media_type: str) -> EvaluationArtifact:
     digest, byte_length = _digest_path(path)
     return EvaluationArtifact(
@@ -278,80 +82,6 @@ def _artifact(path: Path, *, artifact_id: str, kind: str, media_type: str) -> Ev
         logical_name=path.name,
         source_path=path,
     )
-
-
-@dataclass(frozen=True, slots=True)
-class WindowsKvmBaseImage:
-    manifest_path: Path
-    base_image_path: Path
-    base_vars_path: Path
-    environment_image_digest: str
-    source_iso_digest: str
-    base_image_digest: str
-    base_vars_digest: str
-    firmware_code_digest: str
-    guest_runner_digest: str
-    windows_build: str
-
-    @classmethod
-    def load(cls, manifest_path: Path) -> WindowsKvmBaseImage:
-        manifest = _load_object(manifest_path, "Windows KVM base manifest")
-        if (
-            manifest.get("schemaVersion") != 1
-            or manifest.get("kind") != "ordivon.security.windows-kvm-base-image"
-        ):
-            raise ValueError("Windows KVM base manifest schema is unsupported")
-        paths = manifest.get("paths")
-        digests = manifest.get("digests")
-        guest = manifest.get("guest")
-        if (
-            not isinstance(paths, dict)
-            or not isinstance(digests, dict)
-            or not isinstance(guest, dict)
-        ):
-            raise ValueError("Windows KVM base manifest sections are missing")
-        image_value = paths.get("baseImage")
-        vars_value = paths.get("baseVars")
-        required_digests = (
-            "environmentImage",
-            "sourceIso",
-            "baseImage",
-            "baseVars",
-            "firmwareCode",
-            "guestRunner",
-        )
-        if not isinstance(image_value, str) or not isinstance(vars_value, str):
-            raise ValueError("Windows KVM base paths are invalid")
-        for key in required_digests:
-            value = digests.get(key)
-            if not isinstance(value, str) or not value.startswith("sha256:"):
-                raise ValueError(f"Windows KVM base digest is invalid: {key}")
-        windows_build = guest.get("windowsBuild")
-        if not isinstance(windows_build, str) or not windows_build:
-            raise ValueError("Windows KVM guest build identity is missing")
-        image_path = Path(image_value)
-        vars_path = Path(vars_value)
-        for path in (manifest_path, image_path, vars_path):
-            if path.is_symlink() or not path.is_file():
-                raise ValueError(f"Windows KVM base file is missing or unsafe: {path}")
-        actual_image_digest, _ = _digest_path(image_path)
-        actual_vars_digest, _ = _digest_path(vars_path)
-        if actual_image_digest != digests["baseImage"]:
-            raise ValueError("Windows KVM base image digest differs")
-        if actual_vars_digest != digests["baseVars"]:
-            raise ValueError("Windows KVM base UEFI variables digest differs")
-        return cls(
-            manifest_path=manifest_path,
-            base_image_path=image_path,
-            base_vars_path=vars_path,
-            environment_image_digest=cast(str, digests["environmentImage"]),
-            source_iso_digest=cast(str, digests["sourceIso"]),
-            base_image_digest=digests["baseImage"],
-            base_vars_digest=digests["baseVars"],
-            firmware_code_digest=cast(str, digests["firmwareCode"]),
-            guest_runner_digest=cast(str, digests["guestRunner"]),
-            windows_build=windows_build,
-        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -447,91 +177,22 @@ class WindowsKvmProviderConfig:
             if path.is_symlink() or not path.is_file():
                 raise ValueError(f"Windows KVM provider identity file is missing or unsafe: {path}")
 
-
-class _QmpClient:
-    def __init__(self, path: Path, *, timeout_seconds: int) -> None:
-        self.path = path
-        self.timeout_seconds = timeout_seconds
-        self._socket: socket.socket | None = None
-        self._reader: Any = None
-        self._writer: Any = None
-
-    def __enter__(self) -> _QmpClient:
-        deadline = time.monotonic() + self.timeout_seconds
-        while True:
-            connection: socket.socket | None = None
-            try:
-                connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                connection.settimeout(5)
-                connection.connect(str(self.path))
-                self._socket = connection
-                self._reader = connection.makefile("r", encoding="utf-8", newline="\n")
-                self._writer = connection.makefile("w", encoding="utf-8", newline="\n")
-                greeting = self._read_message()
-                if "QMP" not in greeting:
-                    raise ValueError("QMP greeting is missing")
-                self.execute("qmp_capabilities")
-                return self
-            except (FileNotFoundError, ConnectionRefusedError, TimeoutError, OSError) as error:
-                if connection is not None:
-                    connection.close()
-                self._socket = None
-                self._reader = None
-                self._writer = None
-                if time.monotonic() >= deadline:
-                    raise TimeoutError(f"QMP socket did not become ready: {self.path}") from error
-                time.sleep(0.25)
-
-    def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
-        if self._reader is not None:
-            self._reader.close()
-        if self._writer is not None:
-            self._writer.close()
-        if self._socket is not None:
-            self._socket.close()
-
-    def _read_message(self) -> JsonObject:
-        line = self._reader.readline()
-        if not line:
-            raise ConnectionError("QMP connection closed")
-        value = json.loads(line)
-        if not isinstance(value, dict):
-            raise ValueError("QMP message must be an object")
-        return cast(JsonObject, value)
-
-    def execute(self, command: str, arguments: JsonObject | None = None) -> JsonValue:
-        request: JsonObject = {"execute": command}
-        if arguments is not None:
-            request["arguments"] = arguments
-        self._writer.write(json.dumps(request, separators=(",", ":")) + "\n")
-        self._writer.flush()
-        while True:
-            message = self._read_message()
-            if "event" in message:
-                continue
-            if "error" in message:
-                raise RuntimeError(f"QMP command failed: {message['error']}")
-            if "return" in message:
-                return message["return"]
-
-
-def _pci_network_devices(value: JsonValue) -> list[JsonObject]:
-    found: list[JsonObject] = []
-    if isinstance(value, list):
-        for item in value:
-            found.extend(_pci_network_devices(item))
-    elif isinstance(value, dict):
-        class_info = value.get("class_info")
-        if isinstance(class_info, dict):
-            class_value = class_info.get("class")
-            if (
-                isinstance(class_value, int)
-                and _NETWORK_PCI_CLASS_MIN <= class_value <= _NETWORK_PCI_CLASS_MAX
-            ):
-                found.append(value)
-        for item in value.values():
-            found.extend(_pci_network_devices(item))
-    return found
+    def machine_config(self) -> WindowsKvmMachineConfig:
+        return WindowsKvmMachineConfig(
+            state_root=self.state_root,
+            base_manifest_path=self.base_manifest_path,
+            qemu_path=self.qemu_path,
+            qemu_img_path=self.qemu_img_path,
+            swtpm_path=self.swtpm_path,
+            setpriv_path=self.setpriv_path,
+            firmware_code_path=self.firmware_code_path,
+            run_user=self.run_user,
+            run_group=self.run_group,
+            memory_mib=self.memory_mib,
+            vcpu_count=self.vcpu_count,
+            qmp_ready_timeout_seconds=self.qmp_ready_timeout_seconds,
+            shutdown_grace_seconds=self.shutdown_grace_seconds,
+        )
 
 
 def windows_kvm_qemu_arguments(
@@ -634,60 +295,30 @@ class WindowsKvmEvaluationBackend:
 
     def __init__(self, config: WindowsKvmProviderConfig) -> None:
         self.config = config
-        self.base = WindowsKvmBaseImage.load(config.base_manifest_path)
-        self.runs_root = config.state_root / "runs"
-        self.runs_root.mkdir(parents=True, exist_ok=True)
-        self.runs_root.chmod(0o710)
-        _set_owner(self.runs_root, user="root", group=config.run_group)
-        self.ledgers_root = config.state_root / "run-ledgers"
-        self.ledgers_root.mkdir(parents=True, exist_ok=True)
-        self.ledgers_root.chmod(0o700)
-        _set_owner(self.ledgers_root, user="root", group="root")
+        self.machine_provider = WindowsKvmMachineProvider(config.machine_config())
+        self.base = self.machine_provider.base
+        self.runs_root = self.machine_provider.runs_root
+        self.ledgers_root = self.machine_provider.ledgers_root
+
+    def _ledger_extra(self, instance: EvaluationInstance) -> JsonObject:
+        extra: JsonObject = {
+            "runId": instance.instance_id.replace("evaluation-instance:", "evaluation-run:"),
+        }
+        for key in ("evaluationSpecDigest", "runDiskPath"):
+            if key in instance.state:
+                extra[key] = instance.state[key]
+        if "staged" in instance.state:
+            extra["staged"] = instance.state["staged"]
+        return extra
 
     def _persist_run_state(self, instance: EvaluationInstance, phase: str) -> None:
-        state_path_value = instance.state.get("runStatePath")
-        if not isinstance(state_path_value, str) or not state_path_value:
-            return
-        state_path = Path(state_path_value)
-        run_path_value = instance.state.get("runPath")
-        if not isinstance(run_path_value, str):
-            raise ValueError("Windows KVM Run path is missing from the state ledger")
-        run_path = Path(run_path_value)
-        expected_name = run_path.name + ".json"
-        if state_path.parent != self.ledgers_root or state_path.name != expected_name:
-            raise ValueError("Windows KVM Run state path differs from the root-owned ledger path")
-        instance.state["phase"] = phase
-        ledger: JsonObject = {
-            "schemaVersion": 1,
-            "kind": "ordivon.security.windows-kvm-run-state",
-            "providerId": self.provider_id,
-            "instanceId": instance.instance_id,
-            "generation": instance.generation,
-            "runId": instance.instance_id.replace("evaluation-instance:", "evaluation-run:"),
-            "phase": phase,
-            "updatedAtNs": time.time_ns(),
-            "security": cast(JsonObject, instance.state["security"]),
-            "baseEnvironmentImageDigest": self.base.environment_image_digest,
-            "evaluationSpecDigest": instance.state["evaluationSpecDigest"],
-            "ownerPid": instance.state["ownerPid"],
-            "ownerStartTime": instance.state["ownerStartTime"],
-            "runPath": instance.state["runPath"],
-            "overlayPath": instance.state["overlayPath"],
-            "varsPath": instance.state["varsPath"],
-            "runDiskPath": instance.state["runDiskPath"],
-            "qmpPath": instance.state["qmpPath"],
-            "tpmSocketPath": instance.state["tpmSocketPath"],
-            "tpmStatePath": instance.state["tpmStatePath"],
-            "qemuPid": instance.state.get("qemuPid", 0),
-            "qemuStartTime": instance.state.get("qemuStartTime"),
-            "swtpmPid": instance.state.get("swtpmPid", 0),
-            "swtpmStartTime": instance.state.get("swtpmStartTime"),
-            "staged": instance.state.get("staged", False),
-            "qemuExited": instance.state.get("qemuExited", False),
-            "qemuExitCode": instance.state.get("qemuExitCode"),
-            "networkDevicePresent": instance.state.get("networkDevicePresent"),
-        }
-        _replace_private_json(state_path, ledger)
+        self.machine_provider.persist_state(
+            instance_id=instance.instance_id,
+            generation=instance.generation,
+            state=instance.state,
+            phase=phase,
+            extra=self._ledger_extra(instance),
+        )
 
     @property
     def execution_identity(self) -> JsonObject:
@@ -803,67 +434,29 @@ class WindowsKvmEvaluationBackend:
     def create(self, run_id: str, spec: EvaluationSpec) -> EvaluationInstance:
         self._validate_spec(spec)
         token = run_id.removeprefix("evaluation-run:")
-        run_path = self.runs_root / token
-        if run_path.exists():
-            raise FileExistsError(f"Windows KVM Run already exists: {run_path}")
-        run_path.mkdir(mode=0o700)
-        _set_owner(run_path, user=self.config.run_user, group=self.config.run_group)
-        overlay_path = run_path / "system-overlay.qcow2"
-        vars_path = run_path / "OVMF_VARS.4m.fd"
-        run_disk_path = run_path / "ordivon-run.img"
-        qmp_path = run_path / "qmp.sock"
-        tpm_socket_path = run_path / "swtpm.sock"
-        tpm_state_path = run_path / "tpm-state"
-        tpm_state_path.mkdir(mode=0o700)
-        _set_owner(tpm_state_path, user=self.config.run_user, group=self.config.run_group)
-        _run_checked(
-            [
-                str(self.config.qemu_img_path),
-                "create",
-                "-q",
-                "-f",
-                "qcow2",
-                "-F",
-                "qcow2",
-                "-b",
-                str(self.base.base_image_path),
-                str(overlay_path),
-            ]
+        instance_id = f"evaluation-instance:{token}"
+        generation = f"windows-kvm:{self.base.environment_image_digest[-16:]}"
+        state = self.machine_provider.create_state(
+            token=token,
+            instance_id=instance_id,
+            generation=generation,
         )
-        shutil.copyfile(self.base.base_vars_path, vars_path)
-        for path in (overlay_path, vars_path):
-            path.chmod(0o600)
-            _set_owner(path, user=self.config.run_user, group=self.config.run_group)
-        owner_start_time = _process_start_time(os.getpid())
-        if owner_start_time is None:
-            shutil.rmtree(run_path, ignore_errors=True)
-            raise RuntimeError("Windows KVM owner process identity was not observable")
-        state: JsonObject = {
-            "runPath": str(run_path),
-            "runStatePath": str(self.ledgers_root / f"{token}.json"),
-            "overlayPath": str(overlay_path),
-            "varsPath": str(vars_path),
-            "runDiskPath": str(run_disk_path),
-            "qmpPath": str(qmp_path),
-            "tpmSocketPath": str(tpm_socket_path),
-            "tpmStatePath": str(tpm_state_path),
-            "qemuPid": 0,
-            "swtpmPid": 0,
-            "ownerPid": os.getpid(),
-            "ownerStartTime": owner_start_time,
-            "security": security_source_identity(),
-            "evaluationSpecDigest": spec.digest,
-            "staged": False,
-            "qemuExited": False,
-            "fixtureRuntimeMs": min(
-                self.config.fixture_runtime_ms,
-                spec.guardian_policy.max_runtime_ms,
-            ),
-            "readOnlySampleMedia": spec.metadata.get("readOnlySampleMedia"),
-        }
+        run_path = Path(cast(str, state["runPath"]))
+        state.update(
+            {
+                "runDiskPath": str(run_path / "ordivon-run.img"),
+                "evaluationSpecDigest": spec.digest,
+                "staged": False,
+                "fixtureRuntimeMs": min(
+                    self.config.fixture_runtime_ms,
+                    spec.guardian_policy.max_runtime_ms,
+                ),
+                "readOnlySampleMedia": spec.metadata.get("readOnlySampleMedia"),
+            }
+        )
         instance = EvaluationInstance(
-            instance_id=f"evaluation-instance:{token}",
-            generation=f"windows-kvm:{self.base.environment_image_digest[-16:]}",
+            instance_id=instance_id,
+            generation=generation,
             state=state,
         )
         self._persist_run_state(instance, "created")
@@ -936,49 +529,12 @@ class WindowsKvmEvaluationBackend:
         }
 
     def _start_swtpm(self, instance: EvaluationInstance) -> int:
-        run_path = Path(cast(str, instance.state["runPath"]))
-        tpm_state_path = Path(cast(str, instance.state["tpmStatePath"]))
-        tpm_socket_path = Path(cast(str, instance.state["tpmSocketPath"]))
-        pid_path = run_path / "swtpm.pid"
-        log_path = run_path / "swtpm.log"
-        _run_checked(
-            [
-                str(self.config.setpriv_path),
-                "--reuid",
-                self.config.run_user,
-                "--regid",
-                self.config.run_group,
-                "--init-groups",
-                "--",
-                str(self.config.swtpm_path),
-                "socket",
-                "--tpm2",
-                "--tpmstate",
-                f"dir={tpm_state_path}",
-                "--ctrl",
-                f"type=unixio,path={tpm_socket_path}",
-                "--flags",
-                "not-need-init",
-                "--daemon",
-                "--pid",
-                f"file={pid_path}",
-                "--log",
-                f"file={log_path},level=5",
-            ]
+        return self.machine_provider.start_swtpm(
+            instance_id=instance.instance_id,
+            generation=instance.generation,
+            state=instance.state,
+            ledger_extra=self._ledger_extra(instance),
         )
-        deadline = time.monotonic() + 10
-        while not pid_path.exists():
-            if time.monotonic() >= deadline:
-                raise TimeoutError("swtpm PID file was not created")
-            time.sleep(0.1)
-        pid = int(pid_path.read_text(encoding="utf-8").strip())
-        start_time = _process_start_time(pid)
-        if start_time is None:
-            raise RuntimeError("swtpm process identity was not observable")
-        instance.state["swtpmPid"] = pid
-        instance.state["swtpmStartTime"] = start_time
-        self._persist_run_state(instance, "swtpm-started")
-        return pid
 
     def _extract_run_file(self, run_disk_path: Path, run_path: Path, name: str) -> Path | None:
         destination = run_path / f"extracted-{name}"
@@ -1025,100 +581,98 @@ class WindowsKvmEvaluationBackend:
         )
         started_at = time.monotonic_ns()
         guardian_records: list[GuardianRecord] = []
-        with (
-            qemu_stdout_path.open("xb") as stdout_handle,
-            qemu_stderr_path.open("xb") as stderr_handle,
-        ):
-            process = subprocess.Popen(arguments, stdout=stdout_handle, stderr=stderr_handle)
-            qemu_start_time = _process_start_time(process.pid)
-            if qemu_start_time is None:
-                process.kill()
-                process.wait(timeout=10)
-                raise RuntimeError("QEMU process identity was not observable")
-            instance.state["qemuPid"] = process.pid
-            instance.state["qemuStartTime"] = qemu_start_time
-            self._persist_run_state(instance, "executing")
-            terminal_reason = "windows-kvm-provider-failed"
-            network_devices: list[JsonObject] = []
-            qmp_status: JsonValue = {}
-            qmp_pci: JsonValue = []
-            timed_out = False
-            provider_error: Exception | None = None
-            try:
-                with _QmpClient(
-                    qmp_path, timeout_seconds=self.config.qmp_ready_timeout_seconds
-                ) as qmp:
-                    qmp_status = qmp.execute("query-status")
-                    qmp_pci = qmp.execute("query-pci")
-                    network_devices = _pci_network_devices(qmp_pci)
-                    instance.state["networkDevicePresent"] = bool(network_devices)
-                    if network_devices:
-                        guardian_records.append(
-                            GuardianRecord(
-                                decision="terminate",
-                                reason="network-device-present",
-                                payload={"deviceCount": len(network_devices)},
-                            )
-                        )
-                        qmp.execute("quit")
-                    else:
-                        guardian_records.append(
-                            GuardianRecord(
-                                decision="allow",
-                                reason="management-plane-confirmed-no-network-device",
-                                payload={"deviceCount": 0},
-                            )
-                        )
-                if not network_devices:
-                    timeout_seconds = spec.guardian_policy.max_runtime_ms / 1000
-                    try:
-                        process.wait(timeout=timeout_seconds)
-                    except subprocess.TimeoutExpired:
-                        timed_out = True
-                        guardian_records.append(
-                            GuardianRecord(
-                                decision="terminate",
-                                reason="runtime-bound-exceeded",
-                                payload={"maxRuntimeMs": spec.guardian_policy.max_runtime_ms},
-                            )
-                        )
-                        try:
-                            with _QmpClient(qmp_path, timeout_seconds=5) as qmp:
-                                qmp.execute("system_powerdown")
-                        except Exception:
-                            pass
-                        try:
-                            process.wait(timeout=self.config.shutdown_grace_seconds)
-                        except subprocess.TimeoutExpired:
-                            try:
-                                with _QmpClient(qmp_path, timeout_seconds=5) as qmp:
-                                    qmp.execute("quit")
-                            except Exception:
-                                process.terminate()
-                            try:
-                                process.wait(timeout=10)
-                            except subprocess.TimeoutExpired:
-                                process.kill()
-                                process.wait(timeout=10)
-                else:
-                    process.wait(timeout=30)
-            except Exception as error:
-                provider_error = error
+        process = self.machine_provider.start_qemu(
+            instance_id=instance.instance_id,
+            generation=instance.generation,
+            state=instance.state,
+            arguments=arguments,
+            stdout_path=qemu_stdout_path,
+            stderr_path=qemu_stderr_path,
+            ledger_extra=self._ledger_extra(instance),
+        )
+        terminal_reason = "windows-kvm-provider-failed"
+        network_devices: list[JsonObject] = []
+        qmp_status: JsonValue = {}
+        qmp_pci: JsonValue = []
+        timed_out = False
+        provider_error: Exception | None = None
+        try:
+            topology = self.machine_provider.inspect_qmp(instance.state)
+            qmp_status = topology["status"]
+            qmp_pci = topology["pci"]
+            network_devices = cast(list[JsonObject], topology["networkDevices"])
+            if network_devices:
                 guardian_records.append(
                     GuardianRecord(
                         decision="terminate",
-                        reason="provider-management-plane-failure",
-                        payload={"errorType": type(error).__name__},
+                        reason="network-device-present",
+                        payload={"deviceCount": len(network_devices)},
                     )
                 )
-            finally:
-                if process.poll() is None:
-                    process.kill()
-                    process.wait(timeout=10)
-                instance.state["qemuExited"] = True
-                instance.state["qemuExitCode"] = process.returncode
-                self._persist_run_state(instance, "executed")
-
+                self.machine_provider.qmp_execute(instance.state, "quit")
+            else:
+                guardian_records.append(
+                    GuardianRecord(
+                        decision="allow",
+                        reason="management-plane-confirmed-no-network-device",
+                        payload={"deviceCount": 0},
+                    )
+                )
+            if not network_devices:
+                timeout_seconds = spec.guardian_policy.max_runtime_ms / 1000
+                try:
+                    process.wait(timeout=timeout_seconds)
+                except subprocess.TimeoutExpired:
+                    timed_out = True
+                    guardian_records.append(
+                        GuardianRecord(
+                            decision="terminate",
+                            reason="runtime-bound-exceeded",
+                            payload={"maxRuntimeMs": spec.guardian_policy.max_runtime_ms},
+                        )
+                    )
+                    with suppress(Exception):
+                        self.machine_provider.qmp_execute(
+                            instance.state,
+                            "system_powerdown",
+                        )
+                    try:
+                        process.wait(timeout=self.config.shutdown_grace_seconds)
+                    except subprocess.TimeoutExpired:
+                        try:
+                            self.machine_provider.qmp_execute(instance.state, "quit")
+                        except Exception:
+                            process.terminate()
+                        try:
+                            process.wait(timeout=10)
+                        except subprocess.TimeoutExpired:
+                            process.kill()
+                            process.wait(timeout=10)
+            else:
+                process.wait(timeout=30)
+        except Exception as error:
+            provider_error = error
+            guardian_records.append(
+                GuardianRecord(
+                    decision="terminate",
+                    reason="provider-management-plane-failure",
+                    payload={"errorType": type(error).__name__},
+                )
+            )
+        finally:
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=10)
+            exit_code = process.returncode
+            if not isinstance(exit_code, int):
+                raise RuntimeError("QEMU exit code was not observable")
+            self.machine_provider.record_qemu_exit(
+                instance_id=instance.instance_id,
+                generation=instance.generation,
+                state=instance.state,
+                exit_code=exit_code,
+                ledger_extra=self._ledger_extra(instance),
+            )
         qmp_topology_path = run_path / "qmp-topology.json"
         _write_private_json(
             qmp_topology_path,
@@ -1292,75 +846,10 @@ class WindowsKvmEvaluationBackend:
         )
 
     def destroy(self, instance: EvaluationInstance) -> ResidualClosureReceipt:
-        run_path_value = instance.state.get("runPath")
-        if not isinstance(run_path_value, str) or not run_path_value:
-            return ResidualClosureReceipt(
-                clean=False,
-                details={"reason": "run-path-missing", "residualObjects": ["unknown-run-path"]},
-            )
-        run_path = Path(run_path_value)
-        if run_path.exists():
-            self._persist_run_state(instance, "closing")
-        qemu_pid = instance.state.get("qemuPid", 0)
-        swtpm_pid = instance.state.get("swtpmPid", 0)
-        qemu_start_time = instance.state.get("qemuStartTime")
-        swtpm_start_time = instance.state.get("swtpmStartTime")
-        qemu_closed = (
-            not isinstance(qemu_pid, int)
-            or qemu_pid == 0
-            or _terminate_pid(
-                qemu_pid,
-                expected_fragment="qemu-system-x86_64",
-                expected_start_time=(qemu_start_time if isinstance(qemu_start_time, int) else None),
-            )
+        closure = self.machine_provider.destroy_state(
+            instance_id=instance.instance_id,
+            generation=instance.generation,
+            state=instance.state,
+            ledger_extra=self._ledger_extra(instance),
         )
-        swtpm_closed = (
-            not isinstance(swtpm_pid, int)
-            or swtpm_pid == 0
-            or _terminate_pid(
-                swtpm_pid,
-                expected_fragment="swtpm",
-                expected_start_time=(
-                    swtpm_start_time if isinstance(swtpm_start_time, int) else None
-                ),
-            )
-        )
-        ledger_path_value = instance.state.get("runStatePath")
-        ledger_path = Path(ledger_path_value) if isinstance(ledger_path_value, str) else None
-        if qemu_closed and swtpm_closed:
-            if run_path.exists():
-                instance.state["qemuClosed"] = True
-                instance.state["swtpmClosed"] = True
-                self._persist_run_state(instance, "closed")
-            shutil.rmtree(run_path, ignore_errors=True)
-        run_removed = not run_path.exists()
-        ledger_removed = False
-        if qemu_closed and swtpm_closed and run_removed and ledger_path is not None:
-            ledger_path.unlink(missing_ok=True)
-            _fsync_directory(self.ledgers_root)
-            ledger_removed = not ledger_path.exists()
-        clean = qemu_closed and swtpm_closed and run_removed and ledger_removed
-        residual_objects: list[JsonValue] = []
-        if not qemu_closed:
-            residual_objects.append(f"process:qemu:{qemu_pid}")
-        if not swtpm_closed:
-            residual_objects.append(f"process:swtpm:{swtpm_pid}")
-        if not run_removed:
-            residual_objects.append(str(run_path))
-        if not ledger_removed:
-            residual_objects.append(
-                str(ledger_path) if ledger_path is not None else "unknown-ledger"
-            )
-        return ResidualClosureReceipt(
-            clean=clean,
-            details={
-                "instanceId": instance.instance_id,
-                "generation": instance.generation,
-                "qemuClosed": qemu_closed,
-                "swtpmClosed": swtpm_closed,
-                "runDirectoryRemoved": run_removed,
-                "ledgerRemoved": ledger_removed,
-                "networkDevicePresent": False,
-                "residualObjects": residual_objects,
-            },
-        )
+        return ResidualClosureReceipt(clean=closure.clean, details=closure.details)

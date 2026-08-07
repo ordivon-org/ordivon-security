@@ -783,11 +783,11 @@ class WindowsKvmP0Tests(unittest.TestCase):
 
         with (
             patch(
-                "ordivon_security.evaluation.windows_kvm._run_checked",
+                "ordivon_security.providers.windows_kvm._run_checked",
                 side_effect=create_overlay,
             ),
             patch(
-                "ordivon_security.evaluation.windows_kvm.security_source_identity",
+                "ordivon_security.providers.windows_kvm.security_source_identity",
                 return_value={
                     "componentId": "ordivon-security",
                     "revision": "git:test",

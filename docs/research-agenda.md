@@ -63,7 +63,7 @@ Falsifier: direct stateless model calls perform equivalently and no continuity o
 
 The accepted R0-R2 work proved deterministic Contest semantics, CAGE transfer, real model Actors, and controlled Host/Runtime composition. The next infrastructure dependency is no longer a richer CAGE action menu. S0 therefore introduces a parallel `RangeSession` core that removes mandatory ticks, one-proposal-per-Actor scheduling, and action-menu authority while leaving accepted Contest semantics unchanged.
 
-S0 is only a contract/lifecycle foundation. S1 confirms that the accepted synchronous Contest core composes naturally as a bounded profile through RangeSession management events and sealed evidence references; forcing `ContestRunner` to implement `RangeSessionBackend` is unnecessary. The next physical falsifier is whether an externally controlled disposable Range can continue to produce management truth after a Guest becomes untrusted or unavailable.
+S0 is only a contract/lifecycle foundation. S1 confirms that the accepted synchronous Contest core composes naturally as a bounded profile through RangeSession management events and sealed evidence references; forcing `ContestRunner` to implement `RangeSessionBackend` is unnecessary. S2 separates reusable Windows KVM machine authority from Evaluation Sample admission: disposable overlay/UEFI/TPM state, root-owned ledger, QMP topology truth, process identity, recovery, and residual closure now exist below the Evaluation adapter. The next physical falsifier is a sacrificial Range where the Guest becomes untrusted or unavailable while external containment and management truth remain intact.
 
 ## R3 — Opponent models and deception
 

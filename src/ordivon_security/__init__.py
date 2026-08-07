@@ -11,6 +11,8 @@ from .api import (
     RangeSession,
     RangeSessionSpec,
     ScenarioManifest,
+    WindowsKvmMachineConfig,
+    WindowsKvmMachineProvider,
 )
 
 __all__ = [
@@ -24,5 +26,7 @@ __all__ = [
     "RangeSession",
     "RangeSessionSpec",
     "ScenarioManifest",
+    "WindowsKvmMachineConfig",
+    "WindowsKvmMachineProvider",
 ]
 __version__ = "0.8.0"
