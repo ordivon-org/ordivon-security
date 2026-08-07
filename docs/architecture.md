@@ -91,6 +91,13 @@ WindowsKvmMachineProvider
   → process-identity-aware terminate / destroy / reconcile
   → no Sample or fixture admission of its own
 
+AdversarialWindowsRange (S3)
+  → one disposable sacrificial Windows Guest
+  → no emulated network device; QMP owns topology truth
+  → maintained canary may kill Guest-side observer/bootstrap assumptions and reboot
+  → QMP/process/ledger/provider closure remain management authority
+  → Guest canary result is contested trial-completeness evidence, not world truth
+
 EvaluationSpec
   1. validate Sample, Authority, Environment, Guardian, Observation plan, and actions
   2. verify Sample bytes from the local content-addressed Vault
