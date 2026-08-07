@@ -271,6 +271,81 @@ class WindowsKvmMachineProviderTests(unittest.TestCase):
             ).clean
         )
 
+    def test_qemu_spawn_can_bind_an_existing_network_namespace(self) -> None:
+        provider = WindowsKvmMachineProvider(self.config)
+
+        def create_overlay(arguments: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+            if arguments[0] == str(self.qemu_img) and "create" in arguments:
+                Path(arguments[-1]).write_bytes(b"overlay")
+            return subprocess.CompletedProcess(arguments, 0, "", "")
+
+        with patch(
+            "ordivon_security.providers.windows_kvm._run_checked",
+            side_effect=create_overlay,
+        ):
+            state = provider.create_state(
+                token="netns-node-01",
+                instance_id="range-machine:netns-node-01",
+                generation="windows-kvm:test",
+            )
+
+        class FakeProcess:
+            pid = 4343
+
+            def kill(self) -> None:
+                return None
+
+            def wait(self, timeout: float | None = None) -> int:
+                del timeout
+                return 0
+
+        ip_path = self._tool(self.root, "ip", "ip test")
+        arguments = [
+            str(self.setpriv),
+            "--reuid",
+            "root",
+            "--regid",
+            "root",
+            "--init-groups",
+            "--",
+            str(self.qemu),
+            "-name",
+            "provider-netns-spawn",
+        ]
+        run_path = Path(str(state["runPath"]))
+        with (
+            patch(
+                "ordivon_security.providers.windows_kvm.subprocess.run",
+                return_value=subprocess.CompletedProcess([], 0, "s5fabric (id: 1)\n", ""),
+            ),
+            patch(
+                "ordivon_security.providers.windows_kvm.subprocess.Popen",
+                return_value=FakeProcess(),
+            ) as popen,
+            patch(
+                "ordivon_security.providers.windows_kvm._process_start_time",
+                return_value=888,
+            ),
+        ):
+            provider.start_qemu(
+                instance_id="range-machine:netns-node-01",
+                generation="windows-kvm:test",
+                state=state,
+                arguments=arguments,
+                stdout_path=run_path / "qemu.stdout.log",
+                stderr_path=run_path / "qemu.stderr.log",
+                ledger_extra={"rangeSessionId": "range-session:test"},
+                network_namespace="s5fabric",
+                ip_path=ip_path,
+            )
+        self.assertEqual(
+            popen.call_args.args[0],
+            [str(ip_path), "netns", "exec", "s5fabric", *arguments],
+        )
+        self.assertEqual(state["networkNamespace"], "s5fabric")
+        ledger = json.loads(Path(str(state["runStatePath"])).read_text(encoding="utf-8"))
+        self.assertEqual(ledger["networkNamespace"], "s5fabric")
+
     def test_qemu_spawn_rejects_command_outside_provider_identity(self) -> None:
         provider = WindowsKvmMachineProvider(self.config)
         with self.assertRaisesRegex(ValueError, "execution identity"):

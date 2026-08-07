@@ -218,6 +218,21 @@ class RangeSessionS0Tests(unittest.TestCase):
         self.assertEqual(event.plane, "world-truth")
         self.assertEqual(session.events[0].plane, "management")
 
+    def test_sensor_plane_is_observation_not_world_truth(self) -> None:
+        backend = _MemoryRangeBackend()
+        session = RangeSession(backend, _spec("actor:red"))
+        session.start()
+        backend.emit(
+            logical_time=3,
+            plane="sensor",
+            source_id="sensor:external-packet-capture",
+            event_type="sensor.packet-observed",
+            payload={"packetCount": 1},
+        )
+        event = session.poll_backend()[0]
+        self.assertEqual(event.plane, "sensor")
+        self.assertNotEqual(event.plane, "world-truth")
+
     def test_checkpoint_is_backend_owned_but_session_identified(self) -> None:
         session = RangeSession(_MemoryRangeBackend(), _spec("actor:red"))
         session.start()

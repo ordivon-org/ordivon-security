@@ -555,7 +555,7 @@ class WindowsKvmMachineProvider:
         return {
             "kind": "ordivon.security.windows-kvm-machine-provider",
             "providerId": self.provider_id,
-            "implementationRevision": "1",
+            "implementationRevision": "2",
             "configurationDigest": canonical_digest(configuration),
             "configuration": configuration,
             "environmentImageDigest": self.base.environment_image_digest,
@@ -683,6 +683,7 @@ class WindowsKvmMachineProvider:
             "qemuExited": state.get("qemuExited", False),
             "qemuExitCode": state.get("qemuExitCode"),
             "networkDevicePresent": state.get("networkDevicePresent"),
+            "networkNamespace": state.get("networkNamespace"),
         }
         if extra is not None:
             for key, value in extra.items():
@@ -759,6 +760,8 @@ class WindowsKvmMachineProvider:
         stdout_path: Path,
         stderr_path: Path,
         ledger_extra: JsonObject | None = None,
+        network_namespace: str | None = None,
+        ip_path: Path = Path("/usr/bin/ip"),
     ) -> subprocess.Popen[bytes]:
         expected_prefix = [
             str(self.config.setpriv_path),
@@ -772,6 +775,40 @@ class WindowsKvmMachineProvider:
         ]
         if arguments[: len(expected_prefix)] != expected_prefix:
             raise ValueError("Windows KVM QEMU command does not match Provider execution identity")
+        launch_arguments = arguments
+        if network_namespace is not None:
+            if (
+                not network_namespace
+                or network_namespace != network_namespace.strip()
+                or len(network_namespace) > 63
+                or any(
+                    character
+                    not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.-"
+                    for character in network_namespace
+                )
+            ):
+                raise ValueError("Windows KVM network namespace identity is invalid")
+            if ip_path.is_symlink() or not ip_path.is_file() or not ip_path.resolve().is_file():
+                raise ValueError("Windows KVM iproute2 tool is missing or unsafe")
+            listed = subprocess.run(
+                [str(ip_path), "netns", "list"],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                timeout=10,
+            ).stdout.splitlines()
+            names = {line.split()[0] for line in listed if line.strip()}
+            if network_namespace not in names:
+                raise ValueError("Windows KVM network namespace does not exist")
+            state["networkNamespace"] = network_namespace
+            launch_arguments = [
+                str(ip_path),
+                "netns",
+                "exec",
+                network_namespace,
+                *arguments,
+            ]
         run_path = Path(cast(str, state["runPath"]))
         for path in (stdout_path, stderr_path):
             if path.parent != run_path or path.exists() or path.is_symlink():
@@ -780,7 +817,7 @@ class WindowsKvmMachineProvider:
             stdout_path.open("xb") as stdout_handle,
             stderr_path.open("xb") as stderr_handle,
         ):
-            process = subprocess.Popen(arguments, stdout=stdout_handle, stderr=stderr_handle)
+            process = subprocess.Popen(launch_arguments, stdout=stdout_handle, stderr=stderr_handle)
         start_time = _process_start_time(process.pid)
         if start_time is None:
             process.kill()

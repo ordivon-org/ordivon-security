@@ -38,6 +38,7 @@ ordivon-security-windows-kvm-build = "ordivon_security.cli_windows_kvm_build:mai
 ordivon-security-windows-kvm-acceptance = "ordivon_security.cli_windows_kvm_acceptance:main"
 ordivon-security-windows-kvm-s3-acceptance = "ordivon_security.cli_windows_kvm_s3_acceptance:main"
 ordivon-security-windows-kvm-s4-acceptance = "ordivon_security.cli_windows_kvm_s4_acceptance:main"
+ordivon-security-windows-kvm-s5-acceptance = "ordivon_security.cli_windows_kvm_s5_acceptance:main"
 ordivon-security-windows-kvm-reconcile = "ordivon_security.cli_windows_kvm_reconcile:main"
 ordivon-security-windows-kvm-p1-prepare = "ordivon_security.cli_windows_kvm_p1_prepare:main"
 ordivon-security-windows-kvm-p1-readback = "ordivon_security.cli_windows_kvm_p1_readback:main"
