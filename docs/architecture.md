@@ -158,7 +158,7 @@ Active Ranges:
 - `MicroContestRange` — local deterministic semantic contract fixture;
 - `Cage4RangeBackend` — pinned CAGE Challenge 4 Enterprise simulation.
 
-Active fidelity now spans deterministic Contest simulation and the accepted S3 single-node disposable Windows/KVM Range. Multi-node isolated topology remains unimplemented; its design should be driven by the external-truth gaps observed in S3 rather than by the former fixed E1/E2 ladder.
+Active fidelity now spans deterministic Contest simulation, the accepted S3 single-node disposable Windows/KVM Range, and S4 Host-only post-run NTFS world truth. Post-S4 probes also establish that an isolated Linux network-namespace fabric can carry real peer traffic with no external route and can host QEMU while management retains Unix QMP control. That probe is feasibility evidence, not yet an admitted Range. S5 therefore begins with one full Windows Guest plus one lightweight peer rather than assuming every Range node requires a full VM; each experiment must use the minimum materialization fidelity that preserves the variable being studied.
 
 ## Evaluation Trial P0
 

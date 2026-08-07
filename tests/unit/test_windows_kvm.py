@@ -882,6 +882,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "SetupComplete.cmd",
             "base-finalize.ps1",
             "benign_fixture.c",
+            "fabric_canary.c",
             "readonly_media_fixture.c.in",
             "sacrificial_canary.c",
             "guest-runner.ps1",

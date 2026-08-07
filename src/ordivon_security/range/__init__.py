@@ -13,6 +13,7 @@ from .protocol import (
 )
 from .session import RangeSession
 from .synchronous import SynchronousContestProfile
+from .windows_fabric import WindowsFabricRangeConfig, WindowsIsolatedFabricRange
 from .windows_sacrificial import AdversarialWindowsRange, SacrificialWindowsRangeConfig
 
 __all__ = [
@@ -29,4 +30,6 @@ __all__ = [
     "RangeSessionSpec",
     "SacrificialWindowsRangeConfig",
     "SynchronousContestProfile",
+    "WindowsFabricRangeConfig",
+    "WindowsIsolatedFabricRange",
 ]
