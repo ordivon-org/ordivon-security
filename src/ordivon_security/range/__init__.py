@@ -13,9 +13,11 @@ from .protocol import (
 )
 from .session import RangeSession
 from .synchronous import SynchronousContestProfile
+from .windows_sacrificial import AdversarialWindowsRange, SacrificialWindowsRangeConfig
 
 __all__ = [
     "ActorPresence",
+    "AdversarialWindowsRange",
     "BackendCheckpoint",
     "PendingRangeEvent",
     "RangeAuthority",
@@ -25,5 +27,6 @@ __all__ = [
     "RangeSessionBackend",
     "RangeSessionInstance",
     "RangeSessionSpec",
+    "SacrificialWindowsRangeConfig",
     "SynchronousContestProfile",
 ]

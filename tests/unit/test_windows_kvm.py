@@ -883,15 +883,17 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "base-finalize.ps1",
             "benign_fixture.c",
             "readonly_media_fixture.c.in",
+            "sacrificial_canary.c",
             "guest-runner.ps1",
             "install-bootstrap.ps1",
             "p1-observer.ps1",
             "windows-host-caseb-baseline.ps1",
         }
         self.assertEqual({path.name for path in resource_root.iterdir()}, expected)
-        fixture_source = (resource_root / "benign_fixture.c").read_text(encoding="utf-8").lower()
-        for token in ("ws2_32", "wininet", "winhttp", "urlmon", "socket(", "connect("):
-            self.assertNotIn(token, fixture_source)
+        for source_name in ("benign_fixture.c", "sacrificial_canary.c"):
+            source = (resource_root / source_name).read_text(encoding="utf-8").lower()
+            for token in ("ws2_32", "wininet", "winhttp", "urlmon", "socket(", "connect("):
+                self.assertNotIn(token, source)
 
 
 if __name__ == "__main__":
