@@ -59,6 +59,12 @@ The accepted P0-A experiment selects CAGE team plans through Harness while Host 
 
 Falsifier: direct stateless model calls perform equivalently and no continuity or effect-reconciliation distinction appears.
 
+## Immediate infrastructure pivot — persistent Range Session
+
+The accepted R0-R2 work proved deterministic Contest semantics, CAGE transfer, real model Actors, and controlled Host/Runtime composition. The next infrastructure dependency is no longer a richer CAGE action menu. S0 therefore introduces a parallel `RangeSession` core that removes mandatory ticks, one-proposal-per-Actor scheduling, and action-menu authority while leaving accepted Contest semantics unchanged.
+
+S0 is only a contract/lifecycle foundation. The next physical falsifier is whether an externally controlled disposable Range can continue to produce management truth after a Guest becomes untrusted or unavailable.
+
 ## R3 — Opponent models and deception
 
 Test explicit hypotheses about opponent objectives, capabilities, policy changes, decoys, false flags, sensor manipulation, and second-order beliefs.

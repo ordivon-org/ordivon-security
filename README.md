@@ -43,6 +43,7 @@ Its central executable object is a **Contest**: multiple goal-bearing actors rec
 
 The active `0.8` core provides:
 
+- an experimental S0 `RangeSession` core for persistent contested worlds without mandatory ticks or action menus;
 - a multi-Actor `ScenarioManifest`;
 - actor-specific observations separated from hidden world truth;
 - simultaneous Action Proposals followed by explicit admission and deterministic resolution;
@@ -273,6 +274,12 @@ The deterministic bundle and non-deterministic operational bundle verify indepen
 ## Active architecture
 
 ```text
+RangeSessionSpec
+  → RangeSession
+  → RangeSessionBackend lifecycle + asynchronous world events
+  → management / contested RangeEvent stream
+  → checkpoint / terminate / destroy
+
 ScenarioManifest
   → ContestRunner
   → ActorBackend[]

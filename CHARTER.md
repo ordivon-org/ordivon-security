@@ -33,9 +33,11 @@ related:
 
 Ordivon Security builds the experimental conditions required to study autonomous intelligent opposition and authorized execution subjects. It must make Red, Blue, neutral, service, observer, and evaluator actors first-class participants in contested worlds, while also preserving exact identity, authority, evidence, and control for software Evaluation. Static analysis remains one evidence source; it does not replace active opposition or dynamic effect verification.
 
-## Central executable object
+## Executable objects
 
-The first stable object is the **Contest**:
+The first stable controlled profile is the **Contest**. The emerging persistent execution spine is `RangeSession`: it represents a contested world that can continue changing without a global tick barrier or one Action Proposal per Actor. The Contest remains the reproducible synchronous profile for controlled comparisons.
+
+A **Contest**:
 
 - multiple actors have conflicting or partially aligned objectives;
 - each actor receives only its admitted observation;

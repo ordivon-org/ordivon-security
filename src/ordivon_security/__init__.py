@@ -6,6 +6,10 @@ from .api import (
     EvaluationResult,
     EvaluationRunner,
     EvaluationSpec,
+    RangeAuthority,
+    RangeEvent,
+    RangeSession,
+    RangeSessionSpec,
     ScenarioManifest,
 )
 
@@ -15,6 +19,10 @@ __all__ = [
     "EvaluationResult",
     "EvaluationRunner",
     "EvaluationSpec",
+    "RangeAuthority",
+    "RangeEvent",
+    "RangeSession",
+    "RangeSessionSpec",
     "ScenarioManifest",
 ]
 __version__ = "0.8.0"

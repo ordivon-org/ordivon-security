@@ -42,7 +42,20 @@ It composes rather than replaces Host, Harness, Runtime, external ranges, model 
 
 ## Active `0.8` flows
 
+Range Session S0 is a new parallel core for persistent contested worlds. It does not replace or reinterpret accepted Contest Trials.
+
 ```text
+RangeSessionSpec
+  ├─ Actor identities
+  ├─ zone/capability Range authorities
+  └─ Range binding
+        ↓
+RangeSession
+  → RangeSessionBackend lifecycle
+  → asynchronous backend/world events
+  → management + contested RangeEvent stream
+  → checkpoint / terminate / destroy
+
 ScenarioManifest
   ├─ Range binding and exact revision
   ├─ ordered Actor bindings
