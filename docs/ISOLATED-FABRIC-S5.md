@@ -172,4 +172,4 @@ S5 does not provide:
 
 S5 should stop here. The fabric boundary itself has survived its first real Windows consumer.
 
-The next experiment should add complexity only where a new research question requires it. A natural falsifier is to introduce another independently materialized lightweight peer/service or a topology change during one live Range and ask whether current backend-local identities and external truth remain sufficient. If repeated consumers expose the same node/fabric mechanism, only then should Security consider extracting a reusable topology or materialization abstraction. A second full VM should be introduced only when the hypothesis actually depends on an independent OS/kernel/failure domain.
+The next experiment was narrowed to one live topology change rather than another full VM. S6 kept the same Windows Guest alive, removed peer A, introduced peer B, and required external truth to preserve the intermediate and final topology. That pressure was sufficient to expose stale-current-state and fast-success process assumptions without justifying a generic topology or materialization framework. See [`TOPOLOGY-CHURN-S6.md`](TOPOLOGY-CHURN-S6.md).

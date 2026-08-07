@@ -1,0 +1,137 @@
+{
+  "acceptanceClaims": [
+    "one disposable Windows KVM Guest remained in the same QEMU lifecycle while lightweight peer A was removed and lightweight peer B was introduced",
+    "Host Linux netlink/bridge observations independently retained the exact peer-a-present, peer-a-removed, and peer-b-present topology sequence",
+    "the final current fabric truth points to peer B rather than retaining the stale initial peer-A snapshot",
+    "the maintained Guest canary completed distinct TCP interactions with peer A and peer B without requesting external network access",
+    "the Host tcpdump sensor independently observed both maintained TCP exchanges without being promoted to world truth",
+    "QEMU, swtpm, the disposable Run directory, root-owned ledger, fabric namespace, and surviving replacement-peer namespace all closed without declared residuals"
+  ],
+  "authoritySplit": {
+    "contested": [
+      "Guest Runner diagnostic",
+      "Guest topology-churn canary claim"
+    ],
+    "management": [
+      "peer replacement start/completion intent",
+      "QMP machine lifecycle",
+      "machine and fabric residual closure"
+    ],
+    "sensor": [
+      "Host tcpdump observation of peer-A and peer-B traffic"
+    ],
+    "worldTruth": [
+      "Host Linux netlink/bridge peer-A-present snapshot",
+      "Host Linux netlink/bridge peer-A-removed intermediate snapshot",
+      "Host Linux netlink/bridge peer-B-present snapshot and current fabric truth"
+    ]
+  },
+  "externalAcceptance": {
+    "bothChallengeFlowsObserved": true,
+    "currentTopologyIsPeerB": true,
+    "guestObservedBothPeers": true,
+    "peerARemovalObserved": true,
+    "peerBAdditionObserved": true,
+    "replacementCompleted": true,
+    "replacementStarted": true,
+    "residualClosureClean": true,
+    "singleNetworkDevicePresent": true,
+    "topologyChurnCompleted": true,
+    "topologyHistoryRetained": true
+  },
+  "falsifiers": [
+    {
+      "failure": "the first replacement-peer readiness check classified any process that had already exited after 250 ms as startup failure; in a live world an already-running Guest can consume the one-shot peer fast enough for exit 0 to represent successful service completion",
+      "logicalName": "s6-first.json",
+      "privateReceiptByteLength": 16089,
+      "privateReceiptSha256": "sha256:efab7e3407242b1b57eec501ef87181f14076e9d8fd038319a073f3d8e1641d9",
+      "status": "failed"
+    },
+    {
+      "failure": "a physical run completed both flows and emitted topology history, but inherited current fabricTruth remained the initial peer-A snapshot; S6 then required current truth and historical truth to remain consistent",
+      "logicalName": "s6-second.json",
+      "privateReceiptByteLength": 36793,
+      "privateReceiptSha256": "sha256:23a7978bfadfac3960774929d0978d528d3b7b5d3b2a873c3b47479fba907c55",
+      "status": "accepted-with-representation-gap"
+    },
+    {
+      "failure": "the corrected dirty-tree candidate retained the exact three topology phases and final peer-B current truth before the implementation was committed for exact-revision acceptance",
+      "logicalName": "s6-third.json",
+      "privateReceiptByteLength": 37849,
+      "privateReceiptSha256": "sha256:0736f83f275fd8ba6a5786ecbace3b6b4668c9bf59afce6ece7cb53ab970e4e2",
+      "status": "accepted-candidate"
+    }
+  ],
+  "guestChallengeClaim": {
+    "authority": "guest-claim-not-world-truth",
+    "canaryDigest": "sha256:817bac89c2e1229bc9db53b172676411b46c767e36d6d70daccb576a7c660f61",
+    "fixtureResultDigest": "sha256:9f82b3b3660f5fb7e189ec7fef9a329261c040d1f30216f96e62664541cb517e",
+    "guestNicMac": "52-54-00-53-35-01",
+    "peerAAddress": "10.253.70.3",
+    "peerAConnected": true,
+    "peerBAddress": "10.253.70.4",
+    "peerBConnected": true,
+    "rangeRoutePresent": true
+  },
+  "implementationRevision": "git:03a93e36b53455477a3cd2b47006c53621317caf",
+  "kind": "ordivon.security.windows-kvm-s6-topology-churn-acceptance",
+  "limitations": [
+    "the topology change is management-driven rather than requested by an evaluated Actor",
+    "S6 uses one full Windows Guest and sequential maintained lightweight peers rather than several full-OS failure domains",
+    "the accepted topology is one unrouted L2 segment with no DHCP, DNS, NAT, routing, zones, or external egress",
+    "tcpdump remains a fallible external sensor and is not claimed to be complete world truth",
+    "S6 does not introduce a generic RangeNode, topology graph, materialization registry, world-mutation API, or action gateway",
+    "S6 does not admit unknown Samples, third-party malware, Internet egress, or external targets"
+  ],
+  "physicalReceipt": {
+    "byteLength": 37772,
+    "logicalName": "s6-topology-churn-03a93e3.json",
+    "sha256": "sha256:9f240c2c03d55304e303c8581ad72b439fb8c0805df6b4fa5cf99dfae20cd1af"
+  },
+  "rangeEventPlanes": {
+    "guestClaim": "contested",
+    "guestDiagnostic": "contested",
+    "packetCapture": "sensor",
+    "replacementControl": "management",
+    "topologySnapshots": "world-truth"
+  },
+  "rangeId": "range:windows-topology-churn-s6",
+  "schemaVersion": 1,
+  "securitySource": {
+    "componentId": "ordivon-security",
+    "packageVersion": "0.8.0",
+    "revision": "git:03a93e36b53455477a3cd2b47006c53621317caf",
+    "revisionKind": "git-commit"
+  },
+  "sensorObservation": {
+    "authority": "external-packet-sensor-not-world-truth",
+    "matchedChallengeTraffic": true,
+    "packetLineCount": 16,
+    "pcapDigest": "sha256:5acce90f10f5923628a25e8588a40b5374334236543e0972c45e3e32d0b1a9b6",
+    "peerATrafficObserved": true,
+    "peerBTrafficObserved": true
+  },
+  "status": "accepted",
+  "topologyTruth": {
+    "authority": "host-linux-netlink-bridge",
+    "current": {
+      "currentPeerAddress": "10.253.70.4",
+      "externalRouteAbsent": true,
+      "phase": "peer-b-present"
+    },
+    "history": [
+      {
+        "currentPeerAddress": "10.253.70.3",
+        "phase": "peer-a-present"
+      },
+      {
+        "currentPeerAddress": null,
+        "phase": "peer-a-removed"
+      },
+      {
+        "currentPeerAddress": "10.253.70.4",
+        "phase": "peer-b-present"
+      }
+    ]
+  }
+}

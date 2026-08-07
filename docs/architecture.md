@@ -112,6 +112,14 @@ WindowsIsolatedFabricRange (S5)
   → QMP management + netlink world-truth + tcpdump sensor + Guest contested claim
   → machine, ledger, Run directory, and network-namespace residual closure
 
+WindowsTopologyChurnRange (S6)
+  → keep the same Windows QEMU Guest alive
+  → Guest reaches lightweight peer A
+  → management removes A; Host truth observes only the Guest TAP
+  → management adds lightweight peer B; Host truth updates current topology
+  → Guest reaches B; tcpdump observes both flows
+  → ordered historical truth + correct current truth + complete residual closure
+
 EvaluationSpec
   1. validate Sample, Authority, Environment, Guardian, Observation plan, and actions
   2. verify Sample bytes from the local content-addressed Vault
@@ -165,7 +173,7 @@ Active Ranges:
 - `MicroContestRange` — local deterministic semantic contract fixture;
 - `Cage4RangeBackend` — pinned CAGE Challenge 4 Enterprise simulation.
 
-Active fidelity now spans deterministic Contest simulation, the accepted S3 single-node disposable Windows/KVM Range, S4 Host-only post-run NTFS world truth, and the accepted S5 isolated fabric with one full Windows Guest plus one lightweight Linux peer. S5 establishes that Range entities need not share one materialization fidelity: the decisive Windows endpoint can remain a full VM while a peer uses a real lightweight kernel network stack. This is an evidence-bounded composition rule, not a generic node or fidelity framework.
+Active fidelity now spans deterministic Contest simulation, the accepted S3 single-node disposable Windows/KVM Range, S4 Host-only post-run NTFS world truth, the accepted S5 isolated fabric with heterogeneous materialization, and S6 live topology churn while the same Windows Guest remains alive. S6 shows that backend-owned asynchronous world evolution fits the existing persistent `RangeSession` contract: ordered world-truth events preserve the transition while `inspect()` must still expose correct current truth. This remains an evidence-bounded composition rule, not a generic node, topology, mutation, or fidelity framework.
 
 ## Evaluation Trial P0
 
@@ -290,7 +298,7 @@ Security may request a Harness or Runtime change but must not copy their state m
 4. retain the accepted P0-C Runtime-executed baseline and its fail-closed diagnostic predecessors;
 5. expand from team-plan control to typed parameterized CAGE Action Proposals while preserving the P0-C authority boundary;
 6. add Campaign and organization state only when multi-Actor experiments consume it;
-7. extend the accepted S5 fabric only when another node/materialization or richer telemetry is demanded; evaluate containerlab or Zeek then rather than making them prerequisites;
+7. retain the accepted S6 live-churn Range and extend the fabric only when a new node/materialization, Actor-requested effect, or richer telemetry is demanded; evaluate containerlab or Zeek then rather than making them prerequisites;
 8. add CALDERA as a TTP execution adapter, not as Campaign authority;
 9. connect Codex and Hermes as delegated Harness baselines in planner-only, Tool-proxy, and black-box modes.
 
