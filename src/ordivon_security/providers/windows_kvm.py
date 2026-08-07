@@ -404,6 +404,98 @@ class _QmpClient:
             if "return" in message:
                 return message["return"]
 
+    def wait_for_event(self, event_name: str, *, timeout_seconds: int) -> JsonObject:
+        if not event_name or event_name != event_name.strip():
+            raise ValueError("QMP event name must be non-empty and trimmed")
+        if timeout_seconds < 1:
+            raise ValueError("QMP event timeout must be positive")
+        deadline = time.monotonic() + timeout_seconds
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError(f"QMP event did not arrive: {event_name}")
+            if self._socket is not None:
+                # Buffered socket.makefile() readers can become unusable after a read timeout.
+                # Use the remaining deadline as one blocking read instead of polling timeouts.
+                self._socket.settimeout(remaining)
+            try:
+                message = self._read_message()
+            except TimeoutError as error:
+                raise TimeoutError(f"QMP event did not arrive: {event_name}") from error
+            if message.get("event") == event_name:
+                return message
+
+
+def windows_kvm_machine_base_arguments(
+    *,
+    config: WindowsKvmMachineConfig,
+    state: JsonObject,
+    name: str,
+) -> list[str]:
+    if not name or name != name.strip():
+        raise ValueError("Windows KVM machine name must be non-empty and trimmed")
+    required_paths = ("overlayPath", "varsPath", "qmpPath", "tpmSocketPath")
+    values: dict[str, Path] = {}
+    for key in required_paths:
+        value = state.get(key)
+        if not isinstance(value, str) or not value:
+            raise ValueError(f"Windows KVM machine state is missing {key}")
+        values[key] = Path(value)
+    return [
+        str(config.setpriv_path),
+        "--reuid",
+        config.run_user,
+        "--regid",
+        config.run_group,
+        "--init-groups",
+        "--",
+        str(config.qemu_path),
+        "-name",
+        name,
+        "-machine",
+        "q35,accel=kvm,smm=off",
+        "-cpu",
+        "host",
+        "-smp",
+        str(config.vcpu_count),
+        "-m",
+        str(config.memory_mib),
+        "-nodefaults",
+        "-no-user-config",
+        "-display",
+        "none",
+        "-serial",
+        "none",
+        "-monitor",
+        "none",
+        "-qmp",
+        f"unix:{values['qmpPath']},server=on,wait=off",
+        "-drive",
+        f"if=pflash,format=raw,readonly=on,file={config.firmware_code_path}",
+        "-drive",
+        f"if=pflash,format=raw,file={values['varsPath']}",
+        "-chardev",
+        f"socket,id=chrtpm,path={values['tpmSocketPath']}",
+        "-tpmdev",
+        "emulator,id=tpm0,chardev=chrtpm",
+        "-device",
+        "tpm-crb,tpmdev=tpm0",
+        "-drive",
+        (f"file={values['overlayPath']},if=none,format=qcow2,cache=none,aio=threads,id=osdisk"),
+        "-device",
+        "ide-hd,drive=osdisk,bus=ide.0",
+        "-device",
+        "VGA",
+        "-device",
+        "qemu-xhci,id=xhci",
+        "-device",
+        "virtio-rng-pci",
+        "-rtc",
+        "base=utc,clock=host",
+        "-boot",
+        "order=c,menu=off",
+    ]
+
 
 def _pci_network_devices(value: JsonValue) -> list[JsonObject]:
     found: list[JsonObject] = []
@@ -750,6 +842,20 @@ class WindowsKvmMachineProvider:
         qmp_path = Path(cast(str, state["qmpPath"]))
         with _QmpClient(qmp_path, timeout_seconds=timeout_seconds) as qmp:
             return qmp.execute(command)
+
+    def wait_for_qmp_event(
+        self,
+        state: JsonObject,
+        event_name: str,
+        *,
+        timeout_seconds: int,
+    ) -> JsonObject:
+        qmp_path = Path(cast(str, state["qmpPath"]))
+        with _QmpClient(
+            qmp_path,
+            timeout_seconds=self.config.qmp_ready_timeout_seconds,
+        ) as qmp:
+            return qmp.wait_for_event(event_name, timeout_seconds=timeout_seconds)
 
     def destroy_state(
         self,

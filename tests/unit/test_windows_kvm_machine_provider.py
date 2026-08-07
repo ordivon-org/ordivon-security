@@ -284,5 +284,31 @@ class WindowsKvmMachineProviderTests(unittest.TestCase):
             )
 
 
+class QmpEventWaitTests(unittest.TestCase):
+    def test_event_wait_uses_one_deadline_read_and_does_not_retry_timed_out_reader(self) -> None:
+        from ordivon_security.providers.windows_kvm import _QmpClient
+
+        class FakeSocket:
+            def __init__(self) -> None:
+                self.timeouts: list[float] = []
+
+            def settimeout(self, value: float) -> None:
+                self.timeouts.append(value)
+
+        client = _QmpClient(Path("/tmp/unused-qmp.sock"), timeout_seconds=5)
+        socket = FakeSocket()
+        client._socket = socket  # type: ignore[assignment]
+        with (
+            patch.object(
+                client, "_read_message", side_effect=TimeoutError("simulated timeout")
+            ) as read,
+            self.assertRaisesRegex(TimeoutError, "QMP event did not arrive: RESET"),
+        ):
+            client.wait_for_event("RESET", timeout_seconds=30)
+        self.assertEqual(read.call_count, 1)
+        self.assertEqual(len(socket.timeouts), 1)
+        self.assertGreater(socket.timeouts[0], 29)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -80,6 +80,7 @@ from .providers import (
 )
 from .range import (
     ActorPresence,
+    AdversarialWindowsRange,
     BackendCheckpoint,
     PendingRangeEvent,
     RangeAuthority,
@@ -89,6 +90,7 @@ from .range import (
     RangeSessionBackend,
     RangeSessionInstance,
     RangeSessionSpec,
+    SacrificialWindowsRangeConfig,
 )
 from .ranges import (
     CAGE4_NATIVE_PLAN,
@@ -110,6 +112,7 @@ __all__ = [
     "ActorBinding",
     "ActorObservation",
     "ActorPresence",
+    "AdversarialWindowsRange",
     "ActorProposalFailure",
     "ActorProposalFailureCode",
     "AgentLayerBinding",
@@ -164,6 +167,7 @@ __all__ = [
     "RangeSessionBackend",
     "RangeSessionInstance",
     "RangeSessionSpec",
+    "SacrificialWindowsRangeConfig",
     "SampleIdentity",
     "SampleVault",
     "ScenarioManifest",

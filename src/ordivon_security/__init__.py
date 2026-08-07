@@ -1,6 +1,7 @@
 """Ordivon Security public package."""
 
 from .api import (
+    AdversarialWindowsRange,
     ContestResult,
     ContestRunner,
     EvaluationResult,
@@ -10,12 +11,14 @@ from .api import (
     RangeEvent,
     RangeSession,
     RangeSessionSpec,
+    SacrificialWindowsRangeConfig,
     ScenarioManifest,
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
 )
 
 __all__ = [
+    "AdversarialWindowsRange",
     "ContestResult",
     "ContestRunner",
     "EvaluationResult",
@@ -25,6 +28,7 @@ __all__ = [
     "RangeEvent",
     "RangeSession",
     "RangeSessionSpec",
+    "SacrificialWindowsRangeConfig",
     "ScenarioManifest",
     "WindowsKvmMachineConfig",
     "WindowsKvmMachineProvider",
