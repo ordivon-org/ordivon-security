@@ -151,11 +151,7 @@ Active Ranges:
 - `MicroContestRange` — local deterministic semantic contract fixture;
 - `Cage4RangeBackend` — pinned CAGE Challenge 4 Enterprise simulation.
 
-Planned fidelity levels:
-
-- S0: deterministic local and CAGE/CybORG simulations;
-- E1: containerlab/Docker isolated emulation;
-- E2: Proxmox/KVM VM range when required.
+Active fidelity now spans deterministic Contest simulation and the accepted S3 single-node disposable Windows/KVM Range. Multi-node isolated topology remains unimplemented; its design should be driven by the external-truth gaps observed in S3 rather than by the former fixed E1/E2 ladder.
 
 ## Evaluation Trial P0
 

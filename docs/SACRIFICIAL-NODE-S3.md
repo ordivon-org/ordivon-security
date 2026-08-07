@@ -89,7 +89,7 @@ The first physical run was correctly rejected even though the Guest claimed the 
 
 The correction changed QMP event waiting to one deadline-bounded blocking read. This fixed the external truth channel rather than making the Guest cooperate more. A unit regression prevents retrying a timed-out buffered QMP reader.
 
-The next two physical runs observed `RESET` through QMP and passed all external gates. The final accepted run binds implementation revision `3a28e3e2685ae62d2a44f5172abcb7b8af2d3c9c` and is indexed by [`../evidence/acceptance/windows-kvm-s3-sacrificial-node-3a28e3e.json`](../evidence/acceptance/windows-kvm-s3-sacrificial-node-3a28e3e.json).
+Subsequent physical runs observed `RESET` through QMP and passed all external gates. The final acceptance was rerun from a clean worktree and binds implementation revision `fc5740aa83df8d4ec2aae657e4f72810b982f6de` directly in Range execution identity. It is indexed by [`../evidence/acceptance/windows-kvm-s3-sacrificial-node-fc5740a.json`](../evidence/acceptance/windows-kvm-s3-sacrificial-node-fc5740a.json).
 
 ## What S3 proves
 
