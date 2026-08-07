@@ -42,7 +42,10 @@ class _FakeMachineProvider:
 
     def __init__(self, config: WindowsKvmMachineConfig, *, network_present: bool = False) -> None:
         self.config = config
-        self.base = SimpleNamespace(environment_image_digest="sha256:" + "a" * 64)
+        self.base = SimpleNamespace(
+            environment_image_digest="sha256:" + "a" * 64,
+            base_image_path=config.state_root / "base.qcow2",
+        )
         self.network_present = network_present
         self.process = _FakeProcess()
         self.destroy_called = False
@@ -276,6 +279,102 @@ class SacrificialWindowsRangeTests(unittest.TestCase):
         self.assertIsInstance(security_source, dict)
         self.assertEqual(security_source["componentId"], "ordivon-security")
         self.assertIn("revision", security_source)
+
+    def test_s4_offline_disk_truth_is_emitted_separately_from_guest_claim(self) -> None:
+        provider = _FakeMachineProvider(self.machine)
+        backend = self._build_backend(provider)
+        with (
+            patch(
+                "ordivon_security.range.windows_sacrificial._run_checked",
+                side_effect=self._fake_media_command,
+            ),
+            patch("ordivon_security.range.windows_sacrificial._set_owner"),
+        ):
+            instance = backend.create(self.spec)
+        run = backend._run(instance)
+        assert run.watcher is not None
+        run.watcher.join(timeout=1)
+        provider.process.returncode = 0
+        run.guest_claim_recorded = True
+
+        persisted_exe = "/ProgramData/Ordivon/S3/s3-canary.exe"
+        scheduled_task = "/Windows/System32/Tasks/OrdivonS3CanaryPersistence"
+        persistence_marker = "/ProgramData/Ordivon/S3/persistence-fired.marker"
+        deletion_marker = "/ProgramData/Ordivon/S3/synthetic-log-deleted.marker"
+        synthetic_log = "/ProgramData/Ordivon/S3/synthetic-guest.log"
+        outer = self
+
+        class FakeInspector:
+            def __init__(self) -> None:
+                self.calls = 0
+
+            def inspect(self, image_path, *, file_paths, text_checks):
+                del image_path, file_paths, text_checks
+                self.calls += 1
+                if self.calls == 1:
+                    return {
+                        "files": [
+                            {"path": persisted_exe, "present": False},
+                            {"path": scheduled_task, "present": False},
+                            {"path": persistence_marker, "present": False},
+                            {"path": deletion_marker, "present": False},
+                            {"path": synthetic_log, "present": False},
+                        ],
+                        "textChecks": {
+                            "scheduledTaskCommandIsPersistedCanary": False,
+                            "scheduledTaskArgumentsPersisted": False,
+                        },
+                    }
+                return {
+                    "files": [
+                        {"path": persisted_exe, "present": True, "digest": outer.canary_digest},
+                        {"path": scheduled_task, "present": True},
+                        {
+                            "path": persistence_marker,
+                            "present": True,
+                            "digest": (
+                                "sha256:ec6372af8577f375d4fa5cfffe9e4f513244c9e9df4985cfb7e24350836963a3"
+                            ),
+                        },
+                        {
+                            "path": deletion_marker,
+                            "present": True,
+                            "digest": (
+                                "sha256:d2b5be46eadffc18fdbc4f849d4ded8e69c99379b23923b907d06acf9e173e8e"
+                            ),
+                        },
+                        {"path": synthetic_log, "present": False},
+                    ],
+                    "textChecks": {
+                        "scheduledTaskCommandIsPersistedCanary": True,
+                        "scheduledTaskArgumentsPersisted": True,
+                    },
+                }
+
+        truth = backend.capture_offline_disk_truth(instance, FakeInspector())  # type: ignore[arg-type]
+        self.assertTrue(all(truth["facts"].values()))
+        events = backend.events(instance, after_cursor=-1)
+        truth_event = next(
+            event for event in events if event.event_type == "world.disk-state-observed"
+        )
+        self.assertEqual(truth_event.plane, "world-truth")
+        self.assertEqual(truth_event.payload["authority"], "host-offline-read-only-ntfs")
+        backend.destroy(instance)
+
+    def test_s4_offline_disk_truth_rejects_live_machine(self) -> None:
+        provider = _FakeMachineProvider(self.machine)
+        backend = self._build_backend(provider)
+        with (
+            patch(
+                "ordivon_security.range.windows_sacrificial._run_checked",
+                side_effect=self._fake_media_command,
+            ),
+            patch("ordivon_security.range.windows_sacrificial._set_owner"),
+        ):
+            instance = backend.create(self.spec)
+        with self.assertRaisesRegex(RuntimeError, "machine to be stopped"):
+            backend.capture_offline_disk_truth(instance, SimpleNamespace())  # type: ignore[arg-type]
+        backend.destroy(instance)
 
     def test_checkpoint_is_deliberately_absent_in_s3(self) -> None:
         provider = _FakeMachineProvider(self.machine)

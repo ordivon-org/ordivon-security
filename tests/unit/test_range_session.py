@@ -203,6 +203,21 @@ class RangeSessionS0Tests(unittest.TestCase):
         self.assertEqual(management.plane, "management")
         self.assertEqual(contested.plane, "contested")
 
+    def test_world_truth_plane_is_distinct_from_management_and_contested(self) -> None:
+        backend = _MemoryRangeBackend()
+        session = RangeSession(backend, _spec("actor:red"))
+        session.start()
+        backend.emit(
+            logical_time=2,
+            plane="world-truth",
+            source_id="observer:external",
+            event_type="world.state-observed",
+            payload={"changed": True},
+        )
+        event = session.poll_backend()[0]
+        self.assertEqual(event.plane, "world-truth")
+        self.assertEqual(session.events[0].plane, "management")
+
     def test_checkpoint_is_backend_owned_but_session_identified(self) -> None:
         session = RangeSession(_MemoryRangeBackend(), _spec("actor:red"))
         session.start()
