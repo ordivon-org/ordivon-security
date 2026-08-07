@@ -268,6 +268,15 @@ class SacrificialWindowsRangeTests(unittest.TestCase):
         self.assertEqual(provider.exit_codes, [0])
         backend.destroy(instance)
 
+    def test_execution_identity_binds_security_source_revision(self) -> None:
+        provider = _FakeMachineProvider(self.machine)
+        backend = self._build_backend(provider)
+        identity = backend.execution_identity
+        security_source = identity["securitySource"]
+        self.assertIsInstance(security_source, dict)
+        self.assertEqual(security_source["componentId"], "ordivon-security")
+        self.assertIn("revision", security_source)
+
     def test_checkpoint_is_deliberately_absent_in_s3(self) -> None:
         provider = _FakeMachineProvider(self.machine)
         backend = self._build_backend(provider)

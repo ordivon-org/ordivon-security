@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, validate_json
+from ordivon_security.identity import security_source_identity
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
@@ -96,6 +97,7 @@ class AdversarialWindowsRange:
             "kind": "ordivon.security.windows-sacrificial-range",
             "rangeId": self.range_id,
             "implementationRevision": "1",
+            "securitySource": security_source_identity(),
             "machineProvider": self.machine_provider.execution_identity,
             "canary": {
                 "canaryId": _CANARY_ID,
