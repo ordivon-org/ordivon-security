@@ -15,7 +15,7 @@ audience:
   - evaluator
   - agent
 updated: 2026-08-07
-summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, controlled DeepSeek/Harness Actors, streaming SampleVault, static Evaluation, evolving Case snapshots, and a P0-admitted benign-only disposable Windows KVM Provider.
+summary: Canonical entry to persistent and synchronous adversarial Ranges, the accepted S3 sacrificial Windows node, controlled model Actors, software Evaluation, and evidence-backed disposable KVM infrastructure.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -66,6 +66,7 @@ The active `0.8` core provides:
 - read-only quarantine drift audits;
 - digest-bound Case Snapshots with explicit static, uncontrolled, or controlled execution status;
 - an S2 `WindowsKvmMachineProvider` substrate for sealed base identity, disposable overlay/UEFI/TPM state, root-owned lifecycle ledgers, external QMP topology truth, recovery, and residual closure without Sample admission;
+- an accepted S3 single-node `AdversarialWindowsRange` where the maintained Guest claim reports loss of Guest-local control/observation, persistence across reboot, and synthetic telemetry deletion while external no-NIC containment, QMP reset truth, machine lifecycle, and zero-residual closure remain authoritative;
 - a P0 Windows Evaluation adapter that remains restricted to the exact maintained benign fixture;
 - a DeepSeek Flash `NativeHarnessActorBackend` with exact Provider, Harness, Host, Runtime, Protocol, prompt, budget, and credential-scope identity;
 - a P0-A CAGE path where Harness is consumed while Host and Runtime non-consumption remain explicit experimental facts;
@@ -76,7 +77,7 @@ The active `0.8` core provides:
 
 In the CAGE adapter, one Security Red Actor controls the CAGE Red team and one Security Blue Actor controls five CAGE Blue agents. Every Red and Blue CAGE action is explicitly supplied by Ordivon to the joint step; Green agents remain CAGE-controlled environmental actors. The current action surface is intentionally narrow: each side selects either the pinned native team policy or Sleep. Parameter-level model control is a later integration.
 
-It does **not yet** provide parameterized model-built CAGE actions, arbitrary model-generated shell execution, an admitted unknown-Sample Windows execution path, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The accepted P0-B/P0-C comparison is limited to one seed, one CAGE tick, and team-plan selection; it does not establish multi-tick continuity, injected cancellation recovery, strategic superiority, or production readiness. The reusable Windows KVM machine substrate does not itself authorize Sample execution. The admitted Windows Evaluation path remains restricted to the exact maintained benign fixture; unknown Samples and third-party installers remain outside that path. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
+It does **not yet** provide parameterized model-built CAGE actions, arbitrary model-generated shell execution, an admitted unknown-Sample Windows Evaluation path, multi-node adversarial networking, out-of-band reconstruction of Guest-internal behavior, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The accepted P0-B/P0-C comparison is limited to one seed, one CAGE tick, and team-plan selection; it does not establish multi-tick continuity, injected cancellation recovery, strategic superiority, or production readiness. The reusable Windows KVM machine substrate does not itself authorize Sample execution. The admitted Windows Evaluation path remains restricted to the exact maintained benign fixture; unknown Samples and third-party installers remain outside that path. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
 
 ## Run a local Evaluation Trial dry run
 

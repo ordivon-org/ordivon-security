@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-s3-sacrificial-node-acceptance",
+  "status": "accepted",
+  "implementationRevision": "git:fc5740aa83df8d4ec2aae657e4f72810b982f6de",
+  "privateReceipt": {
+    "digest": "sha256:86d9eaae1dba28faffb5871b4a94f8b7abad85a540442668b919f84fb7a92f95",
+    "byteLength": 14406
+  },
+  "scope": {
+    "maintainedSyntheticCanary": true,
+    "thirdPartySample": false,
+    "realUserData": false,
+    "realExternalTarget": false,
+    "networkDeviceConfigured": false,
+    "actorCount": 0,
+    "guestAuthority": "untrusted-disposable"
+  },
+  "machine": {
+    "environmentImageDigest": "sha256:37ebebb36b0e05a9c3f1cd02e84f086d8c8c245553b4bf175539ce279f1e4cad",
+    "baseImageDigest": "sha256:adc81b60a93a6c7e008a6384c69b9bfeb354c08e76db788b0b9e1c2022e9ea57",
+    "guestRunnerDigest": "sha256:92a90727af3fa1609e2b3e15648144fd76b15850c183f3efbb36b70780158ce3",
+    "windowsBuild": "10.0.26200.0",
+    "networkMode": "deny-all-no-nic"
+  },
+  "canary": {
+    "canaryId": "ordivon-s3-sacrificial-canary-v1",
+    "sourceDigest": "sha256:a01eaea02b1b56c9c690e10dfd4d7f268654be61864e9bf8363d8f8ffcfbc60e",
+    "compiledDigest": "sha256:4dbb44c26ebe32568cd9d649b72bcfcbbeb561237d23bc9266868c5cacac6f2e",
+    "compiledByteLength": 23040,
+    "compilerDigest": "sha256:72e858c616806ff2b230452c5ed2df0c45ec2a965e544b51d6e5188ec4971d1e",
+    "compilationDigest": "sha256:f6e75e9595f157c6efb0c2917486cbe9ac1e6e87342b9552df4b36de3e81533d",
+    "networkImportMatches": []
+  },
+  "externalAcceptance": {
+    "containmentConfirmedByQmp": true,
+    "networkDeviceAbsent": true,
+    "guestResetObservedByQmp": true,
+    "qemuExited": true,
+    "residualClosureClean": true
+  },
+  "guestClaim": {
+    "authority": "guest-claim-not-world-truth",
+    "present": true,
+    "claimPasses": true,
+    "stage1Observed": true,
+    "observerKilled": true,
+    "guestRunnerKilled": true,
+    "persistenceFiredAfterReboot": true,
+    "syntheticGuestLogDeleted": true,
+    "rebootContinuationObserved": true,
+    "networkRequested": false
+  },
+  "closure": {
+    "qemuClosed": true,
+    "swtpmClosed": true,
+    "runDirectoryRemoved": true,
+    "ledgerRemoved": true,
+    "residualObjects": []
+  },
+  "diagnosticHistory": {
+    "firstPhysicalReceiptDigest": "sha256:7cdaf70f02d250eda27161f5ded61eb74e9eb30d680db68ef38d5bb5ff3a8128",
+    "firstPhysicalStatus": "failed",
+    "firstPhysicalGuestClaimPassed": true,
+    "firstPhysicalResidualClosureClean": true,
+    "firstPhysicalFailure": "QMP RESET watcher used repeated short timeouts on a buffered socket reader and terminated with OSError before the later Guest reset; the Provider wait implementation was corrected and regression-tested before final acceptance."
+  },
+  "limitations": [
+    "Guest-internal canary effects are retained only as an explicitly untrusted Guest claim; S3 does not independently reconstruct those mutations from out-of-band sensors.",
+    "The maintained canary is designed to kill a dedicated synthetic Guest observer and its Guest Runner parent; the Guest claim of those effects does not establish truth about arbitrary malware, exploits, or third-party software.",
+    "S3 uses one isolated Windows node with no network device and no autonomous Red or Blue Actor.",
+    "Checkpoint, fork, multi-node topology, lateral movement, external network truth, and contested evidence reconstruction remain outside S3."
+  ]
+}
