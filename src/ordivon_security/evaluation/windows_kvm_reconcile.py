@@ -8,8 +8,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue
-
-from .windows_kvm import (
+from ordivon_security.providers.windows_kvm import (
     _fsync_directory,
     _load_object,
     _process_identity,

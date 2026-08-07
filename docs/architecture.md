@@ -84,6 +84,13 @@ ContestRunner
  10. repeat until Range terminal or tick limit
  11. seal semantic and operational evidence independently
 
+WindowsKvmMachineProvider
+  → sealed base identity + disposable overlay / UEFI / TPM
+  → root-owned machine lifecycle ledger
+  → QMP status and PCI topology truth
+  → process-identity-aware terminate / destroy / reconcile
+  → no Sample or fixture admission of its own
+
 EvaluationSpec
   1. validate Sample, Authority, Environment, Guardian, Observation plan, and actions
   2. verify Sample bytes from the local content-addressed Vault
@@ -155,7 +162,7 @@ The `LocalStaticEvaluationBackend` invokes admitted classical analyzers without 
 
 Observer and Guardian are separate authorities. Observer records may support a Finding but cannot alter the environment. Guardian decisions represent hard boundary enforcement and may terminate a Run without inventing a Finding. A Run is invalid when Sample verification, backend execution, or residual closure is incomplete.
 
-Current Runtime `contained_local` remains outside dynamic Sample execution because it does not provide hostile-code isolation, management-plane egress control, or disposable-machine semantics. Static Evaluation runs locally but permits only declared non-executing analyzers. The P0-admitted Windows KVM backend is an external QEMU/KVM integration behind `EvaluationRangeBackend`; its admission remains restricted to the exact Ordivon benign fixture. See [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md), [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md), and [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
+Current Runtime `contained_local` remains outside dynamic Sample execution because it does not provide hostile-code isolation, management-plane egress control, or disposable-machine semantics. Static Evaluation runs locally but permits only declared non-executing analyzers. S2 extracts the reusable `WindowsKvmMachineProvider` beneath Evaluation; machine lifecycle and QMP topology are Provider facts, while `WindowsKvmEvaluationBackend` retains exact Sample/fixture admission and Guardian semantics. The admitted Evaluation path remains restricted to the exact Ordivon benign fixture. See [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md), [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md), and [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
 
 ## Case Snapshot P0
 

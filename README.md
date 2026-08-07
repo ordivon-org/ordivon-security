@@ -65,7 +65,8 @@ The active `0.8` core provides:
 - native report Artifacts bound into Evaluation Evidence schema revision 2;
 - read-only quarantine drift audits;
 - digest-bound Case Snapshots with explicit static, uncontrolled, or controlled execution status;
-- a P0-admitted QEMU/KVM disposable Windows Provider restricted to the maintained benign fixture;
+- an S2 `WindowsKvmMachineProvider` substrate for sealed base identity, disposable overlay/UEFI/TPM state, root-owned lifecycle ledgers, external QMP topology truth, recovery, and residual closure without Sample admission;
+- a P0 Windows Evaluation adapter that remains restricted to the exact maintained benign fixture;
 - a DeepSeek Flash `NativeHarnessActorBackend` with exact Provider, Harness, Host, Runtime, Protocol, prompt, budget, and credential-scope identity;
 - a P0-A CAGE path where Harness is consumed while Host and Runtime non-consumption remain explicit experimental facts;
 - an accepted P0-B CAGE path where Host owns the durable Task, compiled Context, committed Assignment, Run receipt, CompletionProposal, and CompletionDecision while Runtime remains explicitly unconsumed;
@@ -75,7 +76,7 @@ The active `0.8` core provides:
 
 In the CAGE adapter, one Security Red Actor controls the CAGE Red team and one Security Blue Actor controls five CAGE Blue agents. Every Red and Blue CAGE action is explicitly supplied by Ordivon to the joint step; Green agents remain CAGE-controlled environmental actors. The current action surface is intentionally narrow: each side selects either the pinned native team policy or Sleep. Parameter-level model control is a later integration.
 
-It does **not yet** provide parameterized model-built CAGE actions, arbitrary model-generated shell execution, an admitted unknown-Sample Windows execution path, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The accepted P0-B/P0-C comparison is limited to one seed, one CAGE tick, and team-plan selection; it does not establish multi-tick continuity, injected cancellation recovery, strategic superiority, or production readiness. The Windows KVM Provider is admitted only for the exact maintained benign fixture; unknown Samples and third-party installers remain outside the admitted execution path. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
+It does **not yet** provide parameterized model-built CAGE actions, arbitrary model-generated shell execution, an admitted unknown-Sample Windows execution path, Ghidra, YARA, capa, Volatility, containerlab, CALDERA, Zeek, Campaign execution, or production cyber operations. The accepted P0-B/P0-C comparison is limited to one seed, one CAGE tick, and team-plan selection; it does not establish multi-tick continuity, injected cancellation recovery, strategic superiority, or production readiness. The reusable Windows KVM machine substrate does not itself authorize Sample execution. The admitted Windows Evaluation path remains restricted to the exact maintained benign fixture; unknown Samples and third-party installers remain outside that path. Static analyzers may read Sample bytes as data. A historical local Wine run remains outside the admitted Evaluation path.
 
 ## Run a local Evaluation Trial dry run
 

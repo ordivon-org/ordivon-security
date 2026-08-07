@@ -15,7 +15,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-06
+updated: 2026-08-07
 summary: Authority map for the active Contest core, CAGE Range, software Evaluation, Static P0, Case Snapshot P0, P0-admitted Windows KVM Provider, research program, authorization boundary, evidence, and frozen Round 1 materials.
 evidence_status: not_applicable
 readiness: READY
@@ -43,6 +43,7 @@ related:
 - [`architecture.md`](architecture.md) owns active contracts, data flow, CAGE composition, and cross-project ownership.
 - [`RANGE-SESSION-S0.md`](RANGE-SESSION-S0.md) owns the experimental persistent Range Session contracts, capability-envelope authority, asynchronous event semantics, and S0 acceptance boundary.
 - [`SYNCHRONOUS-CONTEST-S1.md`](SYNCHRONOUS-CONTEST-S1.md) owns the S1 compatibility boundary between persistent Range Sessions and accepted synchronous Contest execution.
+- [`WINDOWS-KVM-SUBSTRATE-S2.md`](WINDOWS-KVM-SUBSTRATE-S2.md) owns the S2 machine-level Provider boundary, external topology/process truth, reusable lifecycle substrate, and separation from Evaluation admission.
 - [`MIGRATION-ROUND-1.md`](MIGRATION-ROUND-1.md) owns the Contest Core replacement record.
 - [`MIGRATION-ROUND-2.md`](MIGRATION-ROUND-2.md) owns the first-class CAGE 4 Range migration and acceptance record.
 - [`MIGRATION-ROUND-3-P0.md`](MIGRATION-ROUND-3-P0.md) owns fail-closed tick semantics, Trial execution identity, semantic/operational evidence separation, and the Harness Domain Tool Bridge prerequisite.
