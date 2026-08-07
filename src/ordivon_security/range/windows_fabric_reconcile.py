@@ -77,7 +77,6 @@ def _validated_range_ledger(
     for key in (
         "overlayPath",
         "varsPath",
-        "runDiskPath",
         "qmpPath",
         "tpmSocketPath",
         "tpmStatePath",
