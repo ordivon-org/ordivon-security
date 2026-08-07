@@ -138,4 +138,4 @@ S4 does not provide:
 - unknown or third-party malware execution;
 - autonomous Agents or evaluator warfare.
 
-Those omissions are intentional. There is still no contested network in the current physical Range, so building network telemetry in S4 would manufacture a consumer. The next real failure mode is S5: **when several disposable nodes can attack each other through an isolated fabric, can topology, egress containment, lifecycle, and network facts remain external authority?**
+Those omissions were intentional. S4 had no contested network, so building network telemetry there would have manufactured a consumer. The next pressure was therefore to introduce real contested networking while keeping topology, containment, lifecycle, and observation authority outside the Guest. Post-S4 physical probes later narrowed that question further: S5 first tested one real Windows Guest plus one lightweight peer rather than assuming several full VMs were required.
