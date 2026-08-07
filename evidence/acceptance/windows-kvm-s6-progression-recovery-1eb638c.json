@@ -1,0 +1,117 @@
+{
+  "acceptanceClaims": [
+    "S6 topology replacement no longer depends on RangeSession inspect initiating the physical effect",
+    "the final normal Guest-driven S6 run retained the exact peer-a-present, peer-a-removed, peer-b-present Host topology sequence and completed both maintained TCP challenges",
+    "the owner-loss gate was reached only after root-owned state durably recorded peer-b-present while QEMU, swtpm, peer B, and tcpdump were all live",
+    "after SIGKILL of the exact owner, all four managed child processes were independently confirmed live before a new management reconciler started",
+    "the S5/S6 Range reconciler then closed the exact processes, deterministic namespaces, run directory, ledger, and maintained canary with zero declared residuals"
+  ],
+  "falsifiers": [
+    {
+      "failure": "a live Guest consumed one-shot peer B and the process exited 0 before process-start-time sampling, so successful completion was incorrectly classified as missing process identity",
+      "implementationRevision": "git:726a4db7f08ed6a1edfc71c4f6413e8cb6c9f6df",
+      "logicalName": "unexpected-normal-s6-726a4db.json",
+      "privateReceiptByteLength": 32675,
+      "privateReceiptSha256": "sha256:99e00312ffb57a143bfa92add6349c7a8f8f9d1111b5eba9a98964da9b744f19",
+      "status": "failed"
+    },
+    {
+      "failure": "ip netns del returned before Host bridge truth stopped showing the retired peer port, exposing the invalid assumption that command completion equals physical topology convergence",
+      "implementationRevision": "git:6e67dfd",
+      "logicalName": "unexpected-normal-s6-6e67dfd.json",
+      "privateReceiptByteLength": 24421,
+      "privateReceiptSha256": "sha256:8ec17cb03594f0235656ab6481324f5d3e196535a53bca6f412573228a5ffa10",
+      "status": "failed"
+    },
+    {
+      "failure": "one recovery attempt did not reach the Guest workload before the maintained peer-A socket timeout; recovery testing was then isolated from Windows cold-start variance rather than changing recovery semantics",
+      "implementationRevision": "git:7073fe2207755247e92eb06bb69b4f191fa88b0b",
+      "logicalName": "unexpected-normal-s6-recovery-7073fe2.json",
+      "privateReceiptByteLength": 20786,
+      "privateReceiptSha256": "sha256:5ef6469cde372aceb32ec0d83faf89cb0701f768318ac1b54d6594db6c600f43",
+      "status": "failed-experiment-design"
+    },
+    {
+      "failure": "the first real owner-loss gate reached durable peer-b-present with live managed processes, but Range reconciliation rejected the otherwise valid ledger because the validator required Evaluation-only runDiskPath",
+      "implementationRevision": "git:7073fe2207755247e92eb06bb69b4f191fa88b0b",
+      "preKillLedgerByteLength": 2271,
+      "preKillLedgerSha256": "sha256:6d3b86e8c7a4aaf8cfd836533aeffec51040c6bb881edd8cab43ee6ceb753428",
+      "reconciliationReceiptByteLength": 560,
+      "reconciliationReceiptSha256": "sha256:1148d36d4665b83f006e681e34bd02f00245270300600127f4db54db51f440ce",
+      "status": "attention-required"
+    }
+  ],
+  "implementationRevision": "git:1eb638c962ac023d19514f645930cbefa4de08e9",
+  "kind": "ordivon.security.windows-kvm-s6-progression-recovery-acceptance",
+  "limitations": [
+    "the owner-loss challenge is gated after peer-b-present is durably committed and does not prove crash atomicity at every instruction inside the topology transition",
+    "the recovery-specific trigger completes peer A from its own namespace to isolate recovery from Windows cold-start variance; the ordinary Guest-driven A-to-B path is verified by a separate final normal acceptance on the same revision",
+    "the reconciler admits only the exact S5/S6 fabric Range identities and is not a generic recovery framework",
+    "physical owner-loss recovery was accepted for S6; S5 support remains deterministic/unit-tested rather than separately physically accepted",
+    "the Range remains structurally unrouted with no external egress and does not admit unknown Samples or external targets",
+    "packet capture remains a fallible sensor observation rather than world truth"
+  ],
+  "normalPath": {
+    "externalAcceptance": {
+      "bothChallengeFlowsObserved": true,
+      "currentTopologyIsPeerB": true,
+      "guestObservedBothPeers": true,
+      "peerARemovalObserved": true,
+      "peerBAdditionObserved": true,
+      "replacementCompleted": true,
+      "replacementStarted": true,
+      "residualClosureClean": true,
+      "singleNetworkDevicePresent": true,
+      "topologyChurnCompleted": true,
+      "topologyHistoryRetained": true
+    },
+    "fixtureResultDigest": "sha256:9f82b3b3660f5fb7e189ec7fef9a329261c040d1f30216f96e62664541cb517e",
+    "logicalName": "s6-final-normal-1eb638c.json",
+    "packetLineCount": 18,
+    "pcapDigest": "sha256:41d7a37452f28e6bd16da3fcf5e78b0e16c4338b85af374b64c0c6f7c531fbff",
+    "privateReceiptByteLength": 36783,
+    "privateReceiptSha256": "sha256:789de7acb5e23a7afda1dffa23edfc632e0927afdc21ce8f4b225ef04a0ee9c7",
+    "topologyHistory": [
+      "peer-a-present",
+      "peer-a-removed",
+      "peer-b-present"
+    ]
+  },
+  "ownerLoss": {
+    "allManagedProcessesLiveBeforeReconcile": true,
+    "currentPeerAddressAtKillGate": "10.253.70.4",
+    "preKillLedger": {
+      "byteLength": 2250,
+      "logicalName": "prekill-ledger-1eb638c.json",
+      "sha256": "sha256:9122f12b6ad54497000fe324ca09d81abe0ee83cc4179463f360cc0c08b6279b"
+    },
+    "preReconcileLive": {
+      "byteLength": 352,
+      "logicalName": "pre-reconcile-live-1eb638c.json",
+      "sha256": "sha256:f7508bd7334d05d30e02268848b4da325ff3902a625bda5b6070eaaf0251428e"
+    },
+    "reconciliation": {
+      "attentionRequired": 0,
+      "canaryRemoved": true,
+      "captureClosed": true,
+      "ledgerRemoved": true,
+      "peerClosed": true,
+      "qemuClosed": true,
+      "reconciled": 1,
+      "residualNamespaces": [],
+      "runDirectoryRemoved": true,
+      "status": "passed",
+      "swtpmClosed": true,
+      "topologyPhase": "peer-b-present"
+    },
+    "reconciliationReceipt": {
+      "byteLength": 663,
+      "logicalName": "s6-owner-loss-reconcile-1eb638c.json",
+      "sha256": "sha256:0bb603976749d72c44fefaa56445c5463e3c1c8d639ce28b5821505d2fe98af0"
+    },
+    "topologyPhaseAtKillGate": "peer-b-present"
+  },
+  "rangeId": "range:windows-topology-churn-s6",
+  "schemaVersion": 1,
+  "status": "accepted"
+}

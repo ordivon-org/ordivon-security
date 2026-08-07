@@ -15,7 +15,7 @@ audience:
   - evaluator
   - agent
 updated: 2026-08-07
-summary: Machine-level Windows KVM Provider separated from Evaluation admission so disposable lifecycle, external topology truth, recovery, and residual closure can be reused by future adversarial Ranges.
+summary: Machine-level Windows KVM Provider separated from Evaluation admission so disposable lifecycle, external topology truth, recovery primitives, and residual closure can be reused by future adversarial Ranges.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -25,6 +25,7 @@ related:
   - security.synchronous-contest-s1
   - security.windows-kvm-p0
   - security.windows-kvm-recovery-p0.1
+  - security.persistent-range-recovery-s6r
   - security.architecture
 ---
 # Windows KVM Machine Substrate S2
@@ -71,7 +72,7 @@ WindowsKvmMachineProvider
   ├─ root-owned ledger
   ├─ process identity
   ├─ QMP topology truth
-  ├─ terminate / destroy / reconcile
+  ├─ terminate / destroy / recovery primitives
   │
   ├──── WindowsKvmEvaluationBackend
   │       └─ exact Sample + Guardian policy
@@ -90,7 +91,7 @@ S2 proves that:
 - Provider identity contains no Evaluation Sample or fixture admission fields;
 - a generic Range machine identity can use the same root-owned ledger and obtain clean residual closure;
 - existing Windows Evaluation behavior remains compatible through a thin adapter;
-- normal closure and crash reconciliation share the same low-level process/ledger truth implementation;
+- normal closure and policy-specific crash reconcilers can reuse the same low-level process/ledger truth primitives;
 - existing Evaluation P0 tests and the full Security unit suite remain green.
 
-S2 does **not** create a sacrificial War Range, enable Internet egress, execute an unknown Sample, run Case A, or prove that management truth survives a fully compromised Guest. Those are physical Range acceptance questions for the next stage.
+S2 does **not** claim that every Provider consumer automatically has hard-failure reconciliation. P0.1 later accepts the Evaluation-specific reconciler; S6-R separately accepts the exact S5/S6 fabric-Range reconciliation policy on the same machine/process/ledger primitives. S2 also does not create a sacrificial War Range, enable Internet egress, execute an unknown Sample, run Case A, or prove that management truth survives a fully compromised Guest.

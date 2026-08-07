@@ -24,6 +24,7 @@ related:
   - security.isolated-fabric-s5
   - security.range-session-s0
   - security.architecture
+  - security.persistent-range-recovery-s6r
 ---
 # Live Topology Churn S6
 
@@ -203,8 +204,12 @@ S6 does not provide:
 - arbitrary offensive actions, lateral movement, credentials, or cross-host persistence;
 - lossless packet truth or causal attribution from pcap alone.
 
+## Post-S6 strengthening
+
+The original S6 physical acceptance remains valid, but a later source audit found two nearer implementation debts: the first implementation still used `inspect()` to trigger the replacement, and its Range resources did not yet have an accepted owner-loss reconciliation path. S6-R corrects those implementation semantics without changing the S6 research result. The final revision `1eb638c962ac023d19514f645930cbefa4de08e9` re-ran the ordinary Guest-driven A-to-B challenge successfully after those changes. See [`PERSISTENT-RANGE-RECOVERY-S6R.md`](PERSISTENT-RANGE-RECOVERY-S6R.md).
+
 ## Next pressure
 
-S6 should stop here. Exogenous topology churn did **not** justify expanding the generic `RangeSession` API.
+S6 should still stop at topology churn. Exogenous world change and its recovery did **not** justify expanding the generic `RangeSession` API.
 
-The next useful question should come from a different consumer. One strong candidate is the first consequential world change requested by a contested Actor: can an Actor propose an effect, can Security admit it, can the backend execute it, and can external world truth verify or reject the claimed result while preserving `proposal ≠ effect`? That should be audited against current code before any generic action gateway is designed.
+With S6-R closed, the next useful question can come from a different consumer: the first consequential world change requested by a contested Actor. That experiment should preserve `proposal ≠ admission ≠ execution ≠ effect receipt ≠ external verification` and decide from failure whether any persistent Range action gateway is actually required.
