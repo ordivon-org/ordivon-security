@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import subprocess
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -14,6 +15,7 @@ from ordivon_security.identity import security_source_identity
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
+    _process_start_time,
     _set_owner,
     windows_kvm_machine_base_arguments,
 )
@@ -111,6 +113,7 @@ class _FabricRun:
     sensor_recorded: bool = False
     guest_claim: JsonObject | None = None
     sensor_observation: JsonObject | None = None
+    lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
 
 
 class WindowsIsolatedFabricRange:
@@ -190,15 +193,23 @@ class WindowsIsolatedFabricRange:
         event_type: str,
         payload: JsonObject,
     ) -> None:
-        run.events.append(
-            PendingRangeEvent(
-                cursor=len(run.events),
-                logical_time=logical_time,
-                plane=plane,
-                source_id=source_id,
-                event_type=event_type,
-                payload=payload,
+        with run.lock:
+            run.events.append(
+                PendingRangeEvent(
+                    cursor=len(run.events),
+                    logical_time=logical_time,
+                    plane=plane,
+                    source_id=source_id,
+                    event_type=event_type,
+                    payload=payload,
+                )
             )
+
+    def _owned_namespace_candidates(self, session_id: str) -> tuple[str, ...]:
+        token = hashlib.sha256(session_id.encode("utf-8")).hexdigest()[:8]
+        return (
+            f"{self.namespace_prefix}f{token}",
+            f"{self.namespace_prefix}p{token}",
         )
 
     def _ledger_extra(self, spec: RangeSessionSpec, state: JsonObject) -> JsonObject:
@@ -211,7 +222,38 @@ class WindowsIsolatedFabricRange:
             "peerNamespace": state.get("peerNamespace"),
             "bridgeName": state.get("bridgeName"),
             "tapName": state.get("tapName"),
+            "peerPid": state.get("peerPid", 0),
+            "peerStartTime": state.get("peerStartTime"),
+            "capturePid": state.get("capturePid", 0),
+            "captureStartTime": state.get("captureStartTime"),
+            "ownedNamespaceCandidates": list(self._owned_namespace_candidates(spec.session_id)),
+            "canaryPath": str(self.config.canary_path),
+            "canaryDigest": self.config.canary_digest,
         }
+
+    def _run_ledger_extra(self, run: _FabricRun) -> JsonObject:
+        return {
+            "rangeSessionId": run.instance.session_id,
+            "rangeSpecDigest": cast(str, run.state["rangeSpecDigest"]),
+            "rangeId": self.range_id,
+            "networkMode": "isolated-l2-no-uplink",
+            "fabricNamespace": run.state.get("fabricNamespace"),
+            "peerNamespace": run.state.get("peerNamespace"),
+            "bridgeName": run.state.get("bridgeName"),
+            "tapName": run.state.get("tapName"),
+            "peerPid": run.state.get("peerPid", 0),
+            "peerStartTime": run.state.get("peerStartTime"),
+            "capturePid": run.state.get("capturePid", 0),
+            "captureStartTime": run.state.get("captureStartTime"),
+            "ownedNamespaceCandidates": list(
+                self._owned_namespace_candidates(run.instance.session_id)
+            ),
+            "canaryPath": str(self.config.canary_path),
+            "canaryDigest": self.config.canary_digest,
+        }
+
+    def _initial_fabric_truth(self, state: JsonObject) -> JsonObject:
+        return cast(JsonObject, state["fabricTruth"])
 
     def _stage_run_disk(self, state: JsonObject, spec: RangeSessionSpec) -> None:
         run_path = Path(cast(str, state["runPath"]))
@@ -471,6 +513,11 @@ class WindowsIsolatedFabricRange:
             )
             capture_stdout.close()
             capture_stderr.close()
+            capture_start_time = _process_start_time(capture.pid)
+            if capture_start_time is None:
+                raise RuntimeError("S5 packet sensor process identity was not observable")
+            state["capturePid"] = capture.pid
+            state["captureStartTime"] = capture_start_time
 
             peer_stdout = (run_path / "peer.stdout.log").open("xb")
             peer_stderr = (run_path / "peer.stderr.log").open("xb")
@@ -503,6 +550,11 @@ class WindowsIsolatedFabricRange:
             )
             peer_stdout.close()
             peer_stderr.close()
+            peer_start_time = _process_start_time(peer.pid)
+            if peer_start_time is None:
+                raise RuntimeError("S5 synthetic peer process identity was not observable")
+            state["peerPid"] = peer.pid
+            state["peerStartTime"] = peer_start_time
             time.sleep(0.25)
             if capture.poll() is not None:
                 raise RuntimeError("S5 external packet sensor exited during startup")
@@ -632,6 +684,8 @@ class WindowsIsolatedFabricRange:
             fabric_truth = cast(JsonObject, state["fabricTruth"])
             fabric_truth["bridgePorts"] = cast(list[JsonValue], post_qemu_ports)
             fabric_truth["tapCarrierObserved"] = True
+            fabric_truth = self._initial_fabric_truth(state)
+            state["fabricTruth"] = fabric_truth
             self._emit(
                 run,
                 logical_time=0,
@@ -811,16 +865,7 @@ class WindowsIsolatedFabricRange:
             generation=generation,
             state=run.state,
             exit_code=exit_code,
-            ledger_extra={
-                "rangeSessionId": run.instance.session_id,
-                "rangeSpecDigest": cast(str, run.state["rangeSpecDigest"]),
-                "rangeId": self.range_id,
-                "networkMode": "isolated-l2-no-uplink",
-                "fabricNamespace": run.state.get("fabricNamespace"),
-                "peerNamespace": run.state.get("peerNamespace"),
-                "bridgeName": run.state.get("bridgeName"),
-                "tapName": run.state.get("tapName"),
-            },
+            ledger_extra=self._run_ledger_extra(run),
         )
         run.exit_recorded = True
         self._extract_guest_claim(run)
@@ -853,7 +898,8 @@ class WindowsIsolatedFabricRange:
         self, instance: RangeSessionInstance, *, after_cursor: int
     ) -> tuple[PendingRangeEvent, ...]:
         run = self._run_for(instance)
-        return tuple(event for event in run.events if event.cursor > after_cursor)
+        with run.lock:
+            return tuple(event for event in run.events if event.cursor > after_cursor)
 
     def checkpoint(self, instance: RangeSessionInstance, label: str) -> BackendCheckpoint:
         self._run_for(instance)
@@ -884,16 +930,7 @@ class WindowsIsolatedFabricRange:
             instance_id=instance.instance_id,
             generation=generation,
             state=run.state,
-            ledger_extra={
-                "rangeSessionId": run.instance.session_id,
-                "rangeSpecDigest": cast(str, run.state["rangeSpecDigest"]),
-                "rangeId": self.range_id,
-                "networkMode": "isolated-l2-no-uplink",
-                "fabricNamespace": run.state.get("fabricNamespace"),
-                "peerNamespace": run.state.get("peerNamespace"),
-                "bridgeName": run.state.get("bridgeName"),
-                "tapName": run.state.get("tapName"),
-            },
+            ledger_extra=self._run_ledger_extra(run),
         )
         fabric = self._delete_namespaces(run.state)
         self._runs.pop(instance.instance_id, None)

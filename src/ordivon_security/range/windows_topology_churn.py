@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
+import threading
 import time
 from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue, validate_json
+from ordivon_security.providers.windows_kvm import _process_start_time
 
 from .model import RangeSessionSpec
 from .protocol import RangeSessionInstance
@@ -44,12 +47,14 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
 
     def __init__(self, config: WindowsFabricRangeConfig) -> None:
         super().__init__(config)
+        self._controller_stops: dict[str, threading.Event] = {}
+        self._controller_threads: dict[str, threading.Thread] = {}
 
     @property
     def execution_identity(self) -> JsonObject:
         identity = super().execution_identity
         identity["kind"] = "ordivon.security.windows-topology-churn-range"
-        identity["implementationRevision"] = "1"
+        identity["implementationRevision"] = "2"
         identity["network"] = {
             "guestAddress": self.guest_address,
             "peerAAddress": self.peer_address,
@@ -68,6 +73,43 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
         }
         validate_json(identity)
         return identity
+
+    def _owned_namespace_candidates(self, session_id: str) -> tuple[str, ...]:
+        token = hashlib.sha256(session_id.encode("utf-8")).hexdigest()[:8]
+        return (f"s6f{token}", f"s6p{token}", f"s6q{token}")
+
+    def _ledger_extra(self, spec: RangeSessionSpec, state: JsonObject) -> JsonObject:
+        extra = super()._ledger_extra(spec, state)
+        extra["topologyPhase"] = state.get("topologyPhase", "peer-a-present")
+        extra["currentPeerAddress"] = state.get("currentPeerAddress", self.peer_address)
+        return extra
+
+    def _run_ledger_extra(self, run: _FabricRun) -> JsonObject:
+        extra = super()._run_ledger_extra(run)
+        extra["topologyPhase"] = run.state.get("topologyPhase", "peer-a-present")
+        extra["currentPeerAddress"] = run.state.get("currentPeerAddress", self.peer_address)
+        return extra
+
+    def _initial_fabric_truth(self, state: JsonObject) -> JsonObject:
+        initial = {
+            **super()._initial_fabric_truth(state),
+            "phase": "peer-a-present",
+            "currentPeerAddress": self.peer_address,
+        }
+        state["topologyPhase"] = "peer-a-present"
+        state["currentPeerAddress"] = self.peer_address
+        validate_json(initial)
+        return initial
+
+    def _persist_running_state(self, run: _FabricRun) -> None:
+        generation = f"windows-kvm:{self.machine_provider.base.environment_image_digest[-16:]}"
+        self.machine_provider.persist_state(
+            instance_id=run.instance.instance_id,
+            generation=generation,
+            state=run.state,
+            phase="executing",
+            extra=self._run_ledger_extra(run),
+        )
 
     def _snapshot(self, run: _FabricRun, *, phase: str) -> JsonObject:
         fabric_ns = cast(str, run.state["fabricNamespace"])
@@ -120,7 +162,7 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
         return snapshot
 
     def _start_peer_b(self, run: _FabricRun) -> subprocess.Popen[bytes]:
-        suffix = run.instance.session_id.encode("utf-8").hex()[-8:]
+        suffix = hashlib.sha256(run.instance.session_id.encode("utf-8")).hexdigest()[:8]
         fabric_ns = cast(str, run.state["fabricNamespace"])
         bridge_name = cast(str, run.state["bridgeName"])
         peer_ns = f"s6q{suffix}"
@@ -128,6 +170,7 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
         fabric_veth = f"w{suffix}"
         run_path = Path(cast(str, run.state["runPath"]))
         created = False
+        process: subprocess.Popen[bytes] | None = None
         try:
             _run([str(self.config.ip_path), "netns", "add", peer_ns])
             created = True
@@ -231,89 +274,153 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
                     f"S6 replacement peer failed during startup: exit={exit_code}; "
                     f"stderr={detail!r}"
                 )
+            peer_start_time = _process_start_time(process.pid)
+            if peer_start_time is None:
+                raise RuntimeError("S6 replacement peer process identity was not observable")
             run.state["peerNamespace"] = peer_ns
             run.state["peerVethName"] = peer_veth
             run.state["fabricVethName"] = fabric_veth
+            run.state["peerPid"] = process.pid
+            run.state["peerStartTime"] = peer_start_time
             run.state["peerBAddress"] = self.peer_b_address
             run.state["peerBRoutes"] = cast(list[JsonValue], peer_routes)
             return process
         except BaseException:
+            _stop_process(process)
             if created:
                 _run([str(self.config.ip_path), "netns", "del", peer_ns], check=False)
             raise
 
-    def _replace_peer_if_ready(self, run: _FabricRun) -> None:
-        if run.state.get("topologyChurnCompleted") is True:
-            return
-        if run.process.poll() is not None or run.peer_process.poll() is None:
-            return
-        old_namespace = cast(str, run.state["peerNamespace"])
-        old_veth = cast(str, run.state["fabricVethName"])
-        self._emit(
-            run,
-            logical_time=1,
-            plane="management",
-            source_id="security:s6-topology-controller",
-            event_type="fabric.peer-replacement-started",
-            payload={
-                "peerAAddress": self.peer_address,
-                "peerBAddress": self.peer_b_address,
-                "qemuRunning": True,
-            },
-        )
-        _run([str(self.config.ip_path), "netns", "del", old_namespace])
-        removed = self._snapshot(run, phase="peer-a-removed")
-        removed["currentPeerAddress"] = None
-        run.state["fabricTruth"] = removed
-        history = cast(list[JsonValue], run.state.get("topologyHistory", []))
-        history.append(removed)
-        run.state["topologyHistory"] = history
-        if old_veth in cast(list[JsonValue], removed["portNames"]):
-            raise RuntimeError("S6 retired peer port remained attached after namespace deletion")
-        self._emit(
-            run,
-            logical_time=1,
-            plane="world-truth",
-            source_id="host:linux-netlink",
-            event_type="world.fabric-topology-observed",
-            payload=removed,
-        )
-        peer_b = self._start_peer_b(run)
-        run.peer_process = peer_b
-        added = self._snapshot(run, phase="peer-b-present")
-        tap_name = cast(str, run.state["tapName"])
-        new_veth = cast(str, run.state["fabricVethName"])
-        if set(cast(list[str], added["portNames"])) != {tap_name, new_veth}:
-            raise RuntimeError(
-                "S6 replacement topology differs from the declared TAP plus peer-B set"
+    def _replace_peer_if_ready(self, run: _FabricRun) -> bool:
+        with run.lock:
+            if run.state.get("topologyChurnCompleted") is True or run.process.poll() is not None:
+                return False
+            peer_a_exit = run.peer_process.poll()
+            if peer_a_exit is None:
+                return False
+            if peer_a_exit != 0:
+                run.state["topologyControllerError"] = {
+                    "reason": "peer-a-exited-nonzero",
+                    "exitCode": peer_a_exit,
+                }
+                self._emit(
+                    run, logical_time=1, plane="management",
+                    source_id="security:s6-topology-controller",
+                    event_type="fabric.peer-a-failed",
+                    payload={"exitCode": peer_a_exit, "qemuRunning": True},
+                )
+                return False
+            old_namespace = cast(str, run.state["peerNamespace"])
+            old_veth = cast(str, run.state["fabricVethName"])
+            self._emit(
+                run, logical_time=1, plane="management",
+                source_id="security:s6-topology-controller",
+                event_type="fabric.peer-replacement-started",
+                payload={
+                    "peerAAddress": self.peer_address, "peerAExitCode": peer_a_exit,
+                    "peerBAddress": self.peer_b_address, "qemuRunning": True,
+                },
             )
-        added["currentPeerAddress"] = self.peer_b_address
-        added["peerRoutes"] = cast(list[JsonValue], run.state["peerBRoutes"])
-        run.state["fabricTruth"] = added
-        history = cast(list[JsonValue], run.state.get("topologyHistory", []))
-        history.append(added)
-        run.state["topologyHistory"] = history
-        run.state["topologyChurnCompleted"] = True
-        self._emit(
-            run,
-            logical_time=1,
-            plane="world-truth",
-            source_id="host:linux-netlink",
-            event_type="world.fabric-topology-observed",
-            payload=added,
+            _run([str(self.config.ip_path), "netns", "del", old_namespace])
+            run.state["peerNamespace"] = None
+            run.state["peerVethName"] = None
+            run.state["fabricVethName"] = None
+            run.state["peerPid"] = 0
+            run.state["peerStartTime"] = None
+            run.state["topologyPhase"] = "peer-a-removed"
+            run.state["currentPeerAddress"] = None
+            removed = self._snapshot(run, phase="peer-a-removed")
+            removed["currentPeerAddress"] = None
+            run.state["fabricTruth"] = removed
+            history = cast(list[JsonValue], run.state.get("topologyHistory", []))
+            history.append(removed)
+            run.state["topologyHistory"] = history
+            if old_veth in cast(list[JsonValue], removed["portNames"]):
+                raise RuntimeError(
+                    "S6 retired peer port remained attached after namespace deletion"
+                )
+            self._persist_running_state(run)
+            self._emit(
+                run, logical_time=1, plane="world-truth", source_id="host:linux-netlink",
+                event_type="world.fabric-topology-observed", payload=removed,
+            )
+            peer_b = self._start_peer_b(run)
+            run.peer_process = peer_b
+            added = self._snapshot(run, phase="peer-b-present")
+            tap_name = cast(str, run.state["tapName"])
+            new_veth = cast(str, run.state["fabricVethName"])
+            if set(cast(list[str], added["portNames"])) != {tap_name, new_veth}:
+                raise RuntimeError(
+                    "S6 replacement topology differs from the declared TAP plus peer-B set"
+                )
+            added["currentPeerAddress"] = self.peer_b_address
+            added["peerRoutes"] = cast(list[JsonValue], run.state["peerBRoutes"])
+            run.state["fabricTruth"] = added
+            history = cast(list[JsonValue], run.state.get("topologyHistory", []))
+            history.append(added)
+            run.state["topologyHistory"] = history
+            run.state["topologyPhase"] = "peer-b-present"
+            run.state["currentPeerAddress"] = self.peer_b_address
+            run.state["topologyChurnCompleted"] = True
+            self._persist_running_state(run)
+            self._emit(
+                run, logical_time=1, plane="world-truth", source_id="host:linux-netlink",
+                event_type="world.fabric-topology-observed", payload=added,
+            )
+            self._emit(
+                run, logical_time=1, plane="management",
+                source_id="security:s6-topology-controller",
+                event_type="fabric.peer-replacement-completed",
+                payload={
+                    "peerAAddress": self.peer_address, "peerBAddress": self.peer_b_address,
+                    "qemuRunning": run.process.poll() is None,
+                },
+            )
+            return True
+
+    def _controller_loop(self, run: _FabricRun, stop: threading.Event) -> None:
+        while not stop.wait(0.1):
+            if run.state.get("topologyChurnCompleted") is True or run.process.poll() is not None:
+                return
+            if run.peer_process.poll() is None:
+                continue
+            try:
+                self._replace_peer_if_ready(run)
+            except BaseException as error:
+                with run.lock:
+                    run.state["topologyControllerError"] = {
+                        "reason": "replacement-failed",
+                        "errorType": type(error).__name__,
+                        "errorMessage": str(error),
+                    }
+                    self._emit(
+                        run, logical_time=1, plane="management",
+                        source_id="security:s6-topology-controller",
+                        event_type="fabric.peer-replacement-failed",
+                        payload=cast(JsonObject, run.state["topologyControllerError"]),
+                    )
+            return
+
+    def _start_controller(self, run: _FabricRun) -> None:
+        stop = threading.Event()
+        thread = threading.Thread(
+            target=self._controller_loop, args=(run, stop),
+            name=f"ordivon-s6-topology-{run.instance.instance_id.rsplit(':', 1)[-1]}",
+            daemon=True,
         )
-        self._emit(
-            run,
-            logical_time=1,
-            plane="management",
-            source_id="security:s6-topology-controller",
-            event_type="fabric.peer-replacement-completed",
-            payload={
-                "peerAAddress": self.peer_address,
-                "peerBAddress": self.peer_b_address,
-                "qemuRunning": run.process.poll() is None,
-            },
-        )
+        self._controller_stops[run.instance.instance_id] = stop
+        self._controller_threads[run.instance.instance_id] = thread
+        thread.start()
+
+    def _stop_controller(self, instance_id: str) -> None:
+        stop = self._controller_stops.pop(instance_id, None)
+        thread = self._controller_threads.pop(instance_id, None)
+        if stop is not None:
+            stop.set()
+        if thread is not None and thread.is_alive():
+            thread.join(timeout=10)
+            if thread.is_alive():
+                raise RuntimeError("S6 topology controller did not stop before Range closure")
 
     def _record_sensor(self, run: _FabricRun) -> JsonObject:
         if run.sensor_recorded:
@@ -357,29 +464,27 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
 
     def inspect(self, instance: RangeSessionInstance) -> JsonObject:
         run = self._run_for(instance)
-        self._replace_peer_if_ready(run)
-        state = super().inspect(instance)
-        state["topologyChurnCompleted"] = run.state.get("topologyChurnCompleted") is True
-        state["topologyHistory"] = run.state.get("topologyHistory")
-        return state
+        with run.lock:
+            state = super().inspect(instance)
+            state["topologyChurnCompleted"] = run.state.get("topologyChurnCompleted") is True
+            state["topologyHistory"] = run.state.get("topologyHistory")
+            state["topologyControllerError"] = run.state.get("topologyControllerError")
+            return state
 
     def create(self, spec: RangeSessionSpec) -> RangeSessionInstance:
         instance = super().create(spec)
         run = self._run_for(instance)
-        initial = {
-            **cast(JsonObject, run.state["fabricTruth"]),
-            "phase": "peer-a-present",
-            "currentPeerAddress": self.peer_address,
-        }
-        validate_json(initial)
-        run.state["fabricTruth"] = initial
-        run.state["topologyHistory"] = cast(list[JsonValue], [initial])
-        self._emit(
-            run,
-            logical_time=0,
-            plane="world-truth",
-            source_id="host:linux-netlink",
-            event_type="world.fabric-topology-observed",
-            payload=initial,
-        )
+        with run.lock:
+            initial = cast(JsonObject, run.state["fabricTruth"])
+            run.state["topologyHistory"] = cast(list[JsonValue], [initial])
+        self._persist_running_state(run)
+        self._start_controller(run)
         return instance
+
+    def terminate(self, instance: RangeSessionInstance, reason: str) -> JsonObject:
+        self._stop_controller(instance.instance_id)
+        return super().terminate(instance, reason)
+
+    def destroy(self, instance: RangeSessionInstance) -> JsonObject:
+        self._stop_controller(instance.instance_id)
+        return super().destroy(instance)
