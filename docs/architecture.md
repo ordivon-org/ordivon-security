@@ -14,7 +14,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-06
+updated: 2026-08-07
 summary: Canonical architecture for fail-closed Contest execution and authorized software Evaluation Trials with exact identity, separated authorities, residual closure, and sealed evidence.
 evidence_status: verified
 readiness: EXPERIMENTAL
@@ -55,6 +55,13 @@ RangeSession
   → asynchronous backend/world events
   → management + contested RangeEvent stream
   → checkpoint / terminate / destroy
+
+SynchronousContestProfile
+  → records profile start in RangeSession management events
+  → runs the existing ContestRunner unchanged
+  → binds sealed Contest evidence digests on completion
+  → leaves the persistent RangeSession running
+  → does not claim the Contest Range and persistent Range are one physical world
 
 ScenarioManifest
   ├─ Range binding and exact revision

@@ -14,7 +14,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-06
+updated: 2026-08-07
 summary: Canonical entry to the Contest laboratory, pinned CAGE 4 Range, controlled DeepSeek/Harness Actors, streaming SampleVault, static Evaluation, evolving Case snapshots, and a P0-admitted benign-only disposable Windows KVM Provider.
 evidence_status: verified
 readiness: EXPERIMENTAL
@@ -37,13 +37,14 @@ related:
 
 Ordivon Security is an **authorized adversarial-Agent laboratory** for studying autonomous Red, Blue, neutral, observer, and evaluator actors in contested digital worlds.
 
-Its central executable object is a **Contest**: multiple goal-bearing actors receive different observations, propose actions concurrently, act through an authoritative Range, and leave independently verifiable evidence. Cyber is the first domain. Campaigns, organizations, deception, adaptation, and coevolution are later research layers—not substitutes for a working Contest.
+Its emerging persistent execution spine is **RangeSession**: a contested world may continue changing without a global tick barrier or one Action Proposal per Actor. The existing **Contest** remains the stable synchronous profile for reproducible controlled comparisons: multiple goal-bearing actors receive different observations, propose actions concurrently, act through an authoritative Range, and leave independently verifiable evidence.
 
 ## Current capability
 
 The active `0.8` core provides:
 
 - an experimental S0 `RangeSession` core for persistent contested worlds without mandatory ticks or action menus;
+- an S1 `SynchronousContestProfile` that attaches bounded Contest results and sealed evidence references to a persistent Range Session without merging their execution semantics;
 - a multi-Actor `ScenarioManifest`;
 - actor-specific observations separated from hidden world truth;
 - simultaneous Action Proposals followed by explicit admission and deterministic resolution;
