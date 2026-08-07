@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import subprocess
+import tempfile
 import threading
 import unittest
 from pathlib import Path
@@ -184,6 +185,55 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
             "fabric.peer-replacement-completed",
             [event.event_type for event in run.events],
         )
+
+    def test_peer_b_exit_zero_before_identity_sample_has_no_live_process_to_recover(
+        self,
+    ) -> None:
+        backend = self._backend()
+        backend.config = SimpleNamespace(
+            ip_path=Path("/usr/bin/ip"),
+            bridge_path=Path("/usr/bin/bridge"),
+            sysctl_path=Path("/usr/bin/sysctl"),
+            python_path=Path("/usr/bin/python3"),
+            machine=SimpleNamespace(
+                setpriv_path=Path("/usr/bin/setpriv"),
+                run_user="qemu",
+                run_group="qemu",
+            ),
+        )
+        run = self._run(peer_exit=0)
+        completed = _Process(0)
+        completed.pid = 7777
+        with tempfile.TemporaryDirectory() as temporary:
+            run.state["runPath"] = temporary
+
+            def command(arguments: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+                output = "[]" if "route" in arguments else ""
+                return subprocess.CompletedProcess(arguments, 0, output, "")
+
+            with (
+                patch(
+                    "ordivon_security.range.windows_topology_churn._run",
+                    side_effect=command,
+                ),
+                patch(
+                    "ordivon_security.range.windows_topology_churn.subprocess.Popen",
+                    return_value=completed,
+                ),
+                patch(
+                    "ordivon_security.range.windows_topology_churn.time.sleep"
+                ),
+                patch(
+                    "ordivon_security.range.windows_topology_churn._process_start_time"
+                ) as process_start_time,
+            ):
+                returned = backend._start_peer_b(run)
+
+        self.assertIs(returned, completed)
+        process_start_time.assert_not_called()
+        self.assertEqual(run.state["peerPid"], 0)
+        self.assertIsNone(run.state["peerStartTime"])
+        self.assertTrue(str(run.state["peerNamespace"]).startswith("s6q"))
 
     def test_nonzero_peer_a_exit_is_not_promoted_to_topology_change(self) -> None:
         backend = self._backend()

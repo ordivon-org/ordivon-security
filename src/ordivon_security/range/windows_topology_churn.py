@@ -274,13 +274,20 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
                     f"S6 replacement peer failed during startup: exit={exit_code}; "
                     f"stderr={detail!r}"
                 )
-            peer_start_time = _process_start_time(process.pid)
-            if peer_start_time is None:
-                raise RuntimeError("S6 replacement peer process identity was not observable")
+            if exit_code == 0:
+                peer_pid = 0
+                peer_start_time = None
+            else:
+                peer_pid = process.pid
+                peer_start_time = _process_start_time(peer_pid)
+                if peer_start_time is None:
+                    raise RuntimeError(
+                        "S6 live replacement peer process identity was not observable"
+                    )
             run.state["peerNamespace"] = peer_ns
             run.state["peerVethName"] = peer_veth
             run.state["fabricVethName"] = fabric_veth
-            run.state["peerPid"] = process.pid
+            run.state["peerPid"] = peer_pid
             run.state["peerStartTime"] = peer_start_time
             run.state["peerBAddress"] = self.peer_b_address
             run.state["peerBRoutes"] = cast(list[JsonValue], peer_routes)
