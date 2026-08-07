@@ -134,6 +134,26 @@ class RangeSession:
         self._backend_cursor = previous_cursor
         return tuple(emitted)
 
+    def record_management_event(
+        self,
+        *,
+        logical_time: int,
+        source_id: str,
+        event_type: str,
+        payload: JsonObject,
+        causal_parents: tuple[str, ...] = (),
+    ) -> RangeEvent:
+        self._require_live()
+        self._validate_logical_time(logical_time)
+        return self._append_event(
+            logical_time=logical_time,
+            plane="management",
+            source_id=source_id,
+            event_type=event_type,
+            payload=payload,
+            causal_parents=causal_parents,
+        )
+
     def checkpoint(self, label: str, *, logical_time: int) -> RangeCheckpoint:
         self._require_live()
         self._validate_logical_time(logical_time)

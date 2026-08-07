@@ -12,6 +12,7 @@ from .protocol import (
     RangeSessionInstance,
 )
 from .session import RangeSession
+from .synchronous import SynchronousContestProfile
 
 __all__ = [
     "ActorPresence",
@@ -24,4 +25,5 @@ __all__ = [
     "RangeSessionBackend",
     "RangeSessionInstance",
     "RangeSessionSpec",
+    "SynchronousContestProfile",
 ]

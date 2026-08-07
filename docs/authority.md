@@ -42,6 +42,7 @@ related:
 - [`../CHARTER.md`](../CHARTER.md) owns mission, principles, and repository responsibility.
 - [`architecture.md`](architecture.md) owns active contracts, data flow, CAGE composition, and cross-project ownership.
 - [`RANGE-SESSION-S0.md`](RANGE-SESSION-S0.md) owns the experimental persistent Range Session contracts, capability-envelope authority, asynchronous event semantics, and S0 acceptance boundary.
+- [`SYNCHRONOUS-CONTEST-S1.md`](SYNCHRONOUS-CONTEST-S1.md) owns the S1 compatibility boundary between persistent Range Sessions and accepted synchronous Contest execution.
 - [`MIGRATION-ROUND-1.md`](MIGRATION-ROUND-1.md) owns the Contest Core replacement record.
 - [`MIGRATION-ROUND-2.md`](MIGRATION-ROUND-2.md) owns the first-class CAGE 4 Range migration and acceptance record.
 - [`MIGRATION-ROUND-3-P0.md`](MIGRATION-ROUND-3-P0.md) owns fail-closed tick semantics, Trial execution identity, semantic/operational evidence separation, and the Harness Domain Tool Bridge prerequisite.
