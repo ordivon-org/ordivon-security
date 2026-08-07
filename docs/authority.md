@@ -45,6 +45,7 @@ related:
 - [`SYNCHRONOUS-CONTEST-S1.md`](SYNCHRONOUS-CONTEST-S1.md) owns the S1 compatibility boundary between persistent Range Sessions and accepted synchronous Contest execution.
 - [`WINDOWS-KVM-SUBSTRATE-S2.md`](WINDOWS-KVM-SUBSTRATE-S2.md) owns the S2 machine-level Provider boundary, external topology/process truth, reusable lifecycle substrate, and separation from Evaluation admission.
 - [`SACRIFICIAL-NODE-S3.md`](SACRIFICIAL-NODE-S3.md) owns the S3 single-node challenge, management-plane acceptance gates, Guest-claim boundary, and the transition to out-of-band truth research.
+- [`OUT-OF-BAND-TRUTH-S4.md`](OUT-OF-BAND-TRUTH-S4.md) owns the first physical Range `world-truth` plane, read-only offline NTFS authority, selected post-run disk facts, S4 limitations, and the transition to a multi-node isolated Range.
 - [`MIGRATION-ROUND-1.md`](MIGRATION-ROUND-1.md) owns the Contest Core replacement record.
 - [`MIGRATION-ROUND-2.md`](MIGRATION-ROUND-2.md) owns the first-class CAGE 4 Range migration and acceptance record.
 - [`MIGRATION-ROUND-3-P0.md`](MIGRATION-ROUND-3-P0.md) owns fail-closed tick semantics, Trial execution identity, semantic/operational evidence separation, and the Harness Domain Tool Bridge prerequisite.

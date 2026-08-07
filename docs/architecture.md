@@ -53,7 +53,7 @@ RangeSessionSpec
 RangeSession
   → RangeSessionBackend lifecycle
   → asynchronous backend/world events
-  → management + contested RangeEvent stream
+  → management + contested + world-truth RangeEvent stream
   → checkpoint / terminate / destroy
 
 SynchronousContestProfile
@@ -97,6 +97,13 @@ AdversarialWindowsRange (S3)
   → maintained canary may kill Guest-side observer/bootstrap assumptions and reboot
   → QMP/process/ledger/provider closure remain management authority
   → Guest canary result is contested trial-completeness evidence, not world truth
+
+S4 out-of-band disk truth
+  → wait for the disposable Guest machine to stop
+  → attach the qcow2 backing-chain view through read-only qemu-nbd
+  → read selected NTFS objects from the Host and bind exact presence / digest / absence facts
+  → emit those observations on the Range world-truth plane
+  → detach NBD before normal provider residual closure
 
 EvaluationSpec
   1. validate Sample, Authority, Environment, Guardian, Observation plan, and actions
