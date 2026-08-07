@@ -54,7 +54,7 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
     def execution_identity(self) -> JsonObject:
         identity = super().execution_identity
         identity["kind"] = "ordivon.security.windows-topology-churn-range"
-        identity["implementationRevision"] = "2"
+        identity["implementationRevision"] = "3"
         identity["network"] = {
             "guestAddress": self.guest_address,
             "peerAAddress": self.peer_address,
@@ -160,6 +160,27 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
         }
         validate_json(snapshot)
         return snapshot
+
+    def _wait_for_port_absent(
+        self,
+        run: _FabricRun,
+        port_name: str,
+        *,
+        timeout_seconds: float = 10.0,
+    ) -> JsonObject:
+        deadline = time.monotonic() + timeout_seconds
+        last: JsonObject | None = None
+        while True:
+            last = self._snapshot(run, phase="peer-a-removal-pending")
+            if port_name not in cast(list[JsonValue], last["portNames"]):
+                last["phase"] = "peer-a-removed"
+                validate_json(last)
+                return last
+            if time.monotonic() >= deadline:
+                raise RuntimeError(
+                    "S6 retired peer port remained attached past the topology convergence bound"
+                )
+            time.sleep(0.05)
 
     def _start_peer_b(self, run: _FabricRun) -> subprocess.Popen[bytes]:
         suffix = hashlib.sha256(run.instance.session_id.encode("utf-8")).hexdigest()[:8]
@@ -329,6 +350,7 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
                 },
             )
             _run([str(self.config.ip_path), "netns", "del", old_namespace])
+            removed = self._wait_for_port_absent(run, old_veth)
             run.state["peerNamespace"] = None
             run.state["peerVethName"] = None
             run.state["fabricVethName"] = None
@@ -336,16 +358,11 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
             run.state["peerStartTime"] = None
             run.state["topologyPhase"] = "peer-a-removed"
             run.state["currentPeerAddress"] = None
-            removed = self._snapshot(run, phase="peer-a-removed")
             removed["currentPeerAddress"] = None
             run.state["fabricTruth"] = removed
             history = cast(list[JsonValue], run.state.get("topologyHistory", []))
             history.append(removed)
             run.state["topologyHistory"] = history
-            if old_veth in cast(list[JsonValue], removed["portNames"]):
-                raise RuntimeError(
-                    "S6 retired peer port remained attached after namespace deletion"
-                )
             self._persist_running_state(run)
             self._emit(
                 run, logical_time=1, plane="world-truth", source_id="host:linux-netlink",
