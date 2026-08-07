@@ -186,6 +186,33 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
             [event.event_type for event in run.events],
         )
 
+    def test_peer_removal_waits_for_host_truth_convergence(self) -> None:
+        backend = self._backend()
+        run = self._run(peer_exit=0)
+        snapshots = [
+            {
+                "phase": "peer-a-removal-pending",
+                "portNames": ["tdeadbeef", "vdeadbeef"],
+            },
+            {
+                "phase": "peer-a-removal-pending",
+                "portNames": ["tdeadbeef"],
+            },
+        ]
+        with (
+            patch.object(backend, "_snapshot", side_effect=snapshots) as snapshot,
+            patch(
+                "ordivon_security.range.windows_topology_churn.time.sleep"
+            ) as sleep,
+        ):
+            observed = backend._wait_for_port_absent(
+                run, "vdeadbeef", timeout_seconds=1.0
+            )
+        self.assertEqual(snapshot.call_count, 2)
+        sleep.assert_called_once_with(0.05)
+        self.assertEqual(observed["phase"], "peer-a-removed")
+        self.assertEqual(observed["portNames"], ["tdeadbeef"])
+
     def test_peer_b_exit_zero_before_identity_sample_has_no_live_process_to_recover(
         self,
     ) -> None:
