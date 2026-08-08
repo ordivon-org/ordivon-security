@@ -307,28 +307,6 @@ The accepted recipient implementation records the effectId/application count bef
 
 ## Next pressure
 
-The next useful experiment is the **recipient commit gap**.
+C1-J has now faulted the recipient commit gap in both directions. Consequence-before-marker duplicated on retry; marker-before-consequence suppressed an effect that never happened. An explicit pre-effect inbox phase `reserved` then preserved exact identity but still produced byte-identical recovery state for crash-before-effect and effect-before-completed histories. See [`RECIPIENT-COMMIT-GAP-C1J.md`](RECIPIENT-COMMIT-GAP-C1J.md).
 
-Construct a recipient where:
-
-```text
-physical consequence occurs
-↓
-💥 recipient/controller loss
-↓
-durable dedup/effect record not yet committed
-```
-
-Then retry the same effectId.
-
-If that produces a duplicate, C1-I has not solved exactly-once; it has merely moved the ambiguity from the sender to the recipient.
-
-That experiment should determine whether the unavoidable primitive is:
-
-- atomic consequence + dedup commit inside one recipient transaction;
-- an intrinsically idempotent downstream effect;
-- a durable recipient-side inbox/effect record established before the irreversible consequence;
-- compensation semantics;
-- or explicit `UNKNOWN` when the recipient itself loses the commit boundary.
-
-Only that fault should decide whether a stronger transaction-like abstraction is actually required.
+The next pressure is therefore not another dedup ordering or more inbox phases. It should test whether an **intrinsically idempotent downstream consequence**, keyed by exact effect identity, can remove retry harm at the consequence boundary itself. Only if that fails or cannot represent the domain should Security test a stronger shared transaction or compensation mechanism.
