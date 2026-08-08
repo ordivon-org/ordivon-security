@@ -6,6 +6,21 @@ from pathlib import Path
 
 
 class WindowsKvmP1ObserverRuntimeProbeTests(unittest.TestCase):
+    def test_observer_runtime_is_channel_fail_soft(self) -> None:
+        observer = Path(
+            str(
+                files("ordivon_security").joinpath(
+                    "resources", "windows_kvm", "p1-observer.ps1"
+                )
+            )
+        ).read_text(encoding="utf-8")
+        self.assertIn("function Get-OptionalProperty", observer)
+        self.assertIn("function Invoke-Channel", observer)
+        self.assertIn("channelErrors = @($channelErrors)", observer)
+        self.assertIn("degradedChannelCount = [int]$channelErrors.Count", observer)
+        self.assertIn("Get-OptionalProperty -InputObject $_ -Name 'DisplayName'", observer)
+        self.assertNotIn("if ($null -ne $_.DisplayName)", observer)
+
     def test_probe_matches_orchestrator_observer_contract(self) -> None:
         source = Path(
             str(
