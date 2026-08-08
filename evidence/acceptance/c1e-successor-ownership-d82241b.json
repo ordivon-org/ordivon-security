@@ -1,0 +1,87 @@
+{
+  "acceptanceClaims": [
+    "the pre-fix physical race released a preflight-valid successor and the existing dead-owner reconciler against the same partial S6 world, and both physically mutated it",
+    "the baseline successor moved part of the q/w veth pair before the reconciler deleted the same world, then failed because its previously validated namespace/link disappeared",
+    "the minimal fix separates predecessor provenance from current recovery authority and binds successor claim acquisition to the exact inherited ledger digest",
+    "the actual single-host mutex is one per-Run kernel flock; durable claim metadata records provenance but is not trusted as physical authority",
+    "while a live successor held the recovery gate, the first reconciler returned skipped-successor-active and independent Host observation proved it made no world mutation",
+    "the successor then continued the same partial effect to peer-b-present while holding the claim",
+    "successor SIGKILL left durable claim metadata in held state but automatically released the kernel gate, allowing a second reconciler to acquire recovery authority",
+    "the second reconciler preserved the exact stale claim in its receipt, closed every declared process and namespace, removed the claim metadata, and left zero physical residuals"
+  ],
+  "baselineFalsifier": {
+    "implementationRevision": "git:351140fb9d8c2611b3e4c7b09908ca52fdd3bd04",
+    "privateReceiptByteLength": 13377,
+    "privateReceiptSha256": "sha256:45f8ce4a07f5d5520db3a8aeb22e4e63e946c5ba1ab3bfeb2b45aa389914ff0f",
+    "status": "falsifier-observed",
+    "successorErrorType": "CalledProcessError",
+    "successorError": "peer-B namespace/link disappeared during concurrent reconciliation",
+    "reconcilerRequestedHostLinks": [
+      "w19285f06"
+    ],
+    "effectId": "range-effect:bbf7999d6283f7b3e7bb5e0f"
+  },
+  "implementationRevision": "git:d82241b2f49994ee819dfb5d32a990bf97ea2830",
+  "kind": "ordivon.security.c1e-successor-ownership-acceptance",
+  "limitations": [
+    "the accepted mutex is single-host Linux flock and is not evidence for a distributed ownership protocol",
+    "only one successor versus one reconciler was physically arbitrated",
+    "fairness and priority between multiple successors are unproved",
+    "successor-to-successor handoff without crash is unproved",
+    "the experiment does not prove generic exactly-once semantics or generic causal-DAG requirements",
+    "the accepted Range remains structurally unrouted and does not authorize external or uncontrolled targets"
+  ],
+  "physicalAcceptance": {
+    "claim": {
+      "claimId": "recovery-claim:70f3f1ae24ed3f34be2359e0",
+      "ledgerDigest": "sha256:0c49489e6424784c7d5a5c02dd233f2f9f13da1338bfc8eef654613730d71522",
+      "predecessorOwnerPid": 130284,
+      "predecessorOwnerStartTime": 756874,
+      "claimantPid": 133359,
+      "claimantStartTime": 770748,
+      "effectId": "range-effect:45c5c74675f9be39869949d6"
+    },
+    "continuedWorld": {
+      "topologyPhase": "peer-b-present",
+      "currentPeerAddress": "10.253.70.4",
+      "peerNamespace": "s6q4aecfee6",
+      "peerPid": 133399,
+      "peerStartTime": 770824
+    },
+    "firstReconciler": {
+      "privateReceiptByteLength": 441,
+      "privateReceiptSha256": "sha256:ff04901816827ba086dc571c94705eb168907d91954f12b927adb58118d4d645",
+      "reconciled": 0,
+      "skippedSuccessorActive": 1,
+      "attentionRequired": 0
+    },
+    "secondReconciler": {
+      "privateReceiptByteLength": 1358,
+      "privateReceiptSha256": "sha256:9ce3eabc8c2b7f2192f0f61afd0e5d4dbb212a7ff866edc2d4608aa7c5a0f85a",
+      "reconciled": 1,
+      "skippedSuccessorActive": 0,
+      "attentionRequired": 0,
+      "observedClaimId": "recovery-claim:70f3f1ae24ed3f34be2359e0"
+    },
+    "gates": {
+      "claimMetadataRemovedAfterFinalClosure": true,
+      "durableClaimRetainedCrashProvenance": true,
+      "experimentCleanupFoundNoResidualWork": true,
+      "finalRecoveryClosedWorld": true,
+      "firstReconcilerDeferredToLiveSuccessor": true,
+      "firstReconcilerDidNotMutateWorld": true,
+      "ownerKilledAtPartialGate": true,
+      "predecessorHistoryWasNotRewritten": true,
+      "secondReconcilerAcquiredAfterSuccessorDeath": true,
+      "secondReconcilerObservedExactStaleClaim": true,
+      "successorAcquiredExactGenerationClaim": true,
+      "successorContinuedWhileHoldingClaim": true,
+      "successorSigkillReleasedPhysicalAuthority": true
+    },
+    "privateReceiptByteLength": 19459,
+    "privateReceiptSha256": "sha256:7eaca997fb6fe8588f49d6c61652f38db88513e1d01d3c3e57cfac8e9f712c6d",
+    "status": "accepted"
+  },
+  "schemaVersion": 1,
+  "status": "accepted"
+}

@@ -145,8 +145,10 @@ When a stronger experiment needs a currently closed capability, the first questi
 | exact identity, evidence digests, durable resource identity | **keep as constitutional infrastructure** |
 | Host / Runtime / Security authority separation | **keep as constitutional law** |
 | exact owner-loss reconciliation and `attention-required` on unresolved authority | **keep as autonomy-enabling recovery infrastructure** |
+| one recovery mutator per exact world generation | **constitutional recovery-authority law; C1-E proves predecessor provenance must remain distinct from current recovery ownership** |
+| C1-E per-Run `flock` + claim metadata | **current single-host mechanism, not universal law; claim binds exact generation/provenance while kernel gate enforces exclusion** |
 | zone/capability `RangeAuthority` | **constitutional law; executable for one accepted C1 physical effect, not yet generic** |
-| `RangeEvent.causalParents` | **keep intent; C1-B/C1-C/C1-D resolved interruption, partial materialization, and one real successor continuation without a generic DAG, so strengthen only when ownership races, concurrency, shared resources, or compensation creates genuine causal ambiguity** |
+| `RangeEvent.causalParents` | **keep intent; C1-B through C1-E resolved interruption, partial materialization, continuation, and one ownership race without a generic DAG, so strengthen only when multiple successors, shared effects, compensation, or distributed causation creates genuine ambiguity** |
 | Harness resource budgets | **keep as configurable resource grants** |
 | synchronous Contest tick/action rules | **retain as explicit profile, never generalize to RangeSession** |
 | CAGE two-plan model action surface | **retain only as P0 fixture** |
