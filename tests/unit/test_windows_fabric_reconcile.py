@@ -122,6 +122,64 @@ class WindowsFabricRangeReconcileTests(unittest.TestCase):
         self.assertEqual(item["residualNamespaces"], [])
         self.assertEqual(item["residualHostLinks"], [])
 
+    def test_final_reconciliation_preserves_then_clears_successor_claim_history(self) -> None:
+        ledger_path, canary = self._s6_ledger()
+        ledger = json.loads(ledger_path.read_text())
+        run_path = Path(ledger["runPath"])
+        namespaces = tuple(ledger["ownedNamespaceCandidates"])
+        first = acquire_windows_fabric_successor_claim(
+            self.root,
+            ledger_path=ledger_path,
+            expected_ledger_digest="sha256:" + hashlib.sha256(ledger_path.read_bytes()).hexdigest(),
+            purpose="unit-test-first",
+        )
+        self.assertIsNotNone(first)
+        assert first is not None
+        first_id = first.claim["claimId"]
+        first.release(disposition="released-first")
+        ledger["updatedAtNs"] = 2
+        ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
+        second = acquire_windows_fabric_successor_claim(
+            self.root,
+            ledger_path=ledger_path,
+            expected_ledger_digest="sha256:" + hashlib.sha256(ledger_path.read_bytes()).hexdigest(),
+            purpose="unit-test-second",
+        )
+        self.assertIsNotNone(second)
+        assert second is not None
+        second_id = second.claim["claimId"]
+        second.release(disposition="released-second")
+        with (
+            patch(
+                "ordivon_security.range.windows_fabric_reconcile._remove_namespaces",
+                return_value=(list(namespaces), []),
+            ),
+            patch(
+                "ordivon_security.range.windows_fabric_reconcile._terminate_from_ledger",
+                return_value=True,
+            ),
+            patch(
+                "ordivon_security.range.windows_fabric_reconcile._remove_host_links",
+                return_value=(list(ledger["ownedHostLinkCandidates"]), []),
+            ),
+            patch(
+                "ordivon_security.range.windows_fabric_reconcile._root_link_kinds",
+                return_value={},
+            ),
+        ):
+            result = reconcile_windows_fabric_range_runs(self.root)
+        item = result["results"][0]
+        self.assertEqual(item["successorClaimObserved"]["claimId"], second_id)
+        self.assertEqual(
+            [claim["claimId"] for claim in item["successorClaimHistoryObserved"]],
+            [first_id],
+        )
+        self.assertFalse((self.root / "recovery-claims" / "s6-12345678.json").exists())
+        self.assertFalse((self.root / "recovery-claims" / "history" / "s6-12345678").exists())
+        self.assertFalse(run_path.exists())
+        self.assertFalse(ledger_path.exists())
+        self.assertFalse(canary.exists())
+
     def test_active_exact_owner_is_skipped(self) -> None:
         ledger_path, _ = self._s6_ledger()
         with patch(

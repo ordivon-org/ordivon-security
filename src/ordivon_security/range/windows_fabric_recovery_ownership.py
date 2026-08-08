@@ -48,6 +48,94 @@ def _claim_paths(state_root: Path, run_token: str) -> tuple[Path, Path]:
     return root / f"{run_token}.lock", root / f"{run_token}.json"
 
 
+def _claim_history_root(state_root: Path, run_token: str) -> Path:
+    _claim_paths(state_root, run_token)
+    root = _claims_root(state_root) / "history" / run_token
+    root.mkdir(parents=True, exist_ok=True)
+    root.chmod(0o700)
+    return root
+
+
+def _validated_claim_id(value: object) -> str:
+    if not isinstance(value, str) or not value.startswith("recovery-claim:"):
+        raise RuntimeError("Windows fabric recovery claim lacks a valid claimId")
+    suffix = value.removeprefix("recovery-claim:")
+    if len(suffix) != 24 or any(character not in "0123456789abcdef" for character in suffix):
+        raise RuntimeError("Windows fabric recovery claimId is unsafe")
+    return value
+
+
+def _archive_previous_claim(
+    state_root: Path,
+    *,
+    run_token: str,
+    claim: JsonObject,
+) -> tuple[str, str]:
+    if claim.get("kind") != "ordivon.security.windows-fabric-successor-claim":
+        raise RuntimeError("Windows fabric recovery current claim has unexpected kind")
+    if claim.get("runToken") != run_token:
+        raise RuntimeError("Windows fabric recovery current claim belongs to another Run")
+    claim_id = _validated_claim_id(claim.get("claimId"))
+    claim_digest = canonical_digest(claim)
+    archive = _claim_history_root(state_root, run_token) / (
+        claim_id.removeprefix("recovery-claim:") + ".json"
+    )
+    if archive.exists():
+        existing = _load_object(archive, "Windows fabric archived recovery claim")
+        if canonical_digest(existing) != claim_digest:
+            raise RuntimeError(
+                "Windows fabric archived recovery claim conflicts with current claim"
+            )
+    else:
+        _replace_private_json(archive, claim)
+    return claim_id, claim_digest
+
+
+def read_windows_fabric_recovery_claim_history(
+    state_root: Path,
+    *,
+    run_token: str,
+) -> list[JsonObject]:
+    root = _claims_root(state_root) / "history" / run_token
+    if not root.exists():
+        return []
+    if root.is_symlink() or not root.is_dir():
+        raise RuntimeError("Windows fabric recovery claim history root is unsafe")
+    claims: list[JsonObject] = []
+    for path in sorted(root.glob("*.json")):
+        if path.is_symlink() or not path.is_file():
+            raise RuntimeError("Windows fabric recovery claim history entry is unsafe")
+        claim = _load_object(path, "Windows fabric archived recovery claim")
+        if claim.get("runToken") != run_token:
+            raise RuntimeError("Windows fabric archived recovery claim belongs to another Run")
+        claim_id = _validated_claim_id(claim.get("claimId"))
+        if path.stem != claim_id.removeprefix("recovery-claim:"):
+            raise RuntimeError("Windows fabric archived recovery claim filename mismatches claimId")
+        claims.append(claim)
+    claims.sort(key=lambda item: int(item.get("acquiredAtNs", 0)))
+    return claims
+
+
+def clear_windows_fabric_recovery_claim_history(
+    state_root: Path,
+    *,
+    run_token: str,
+) -> None:
+    root = _claims_root(state_root) / "history" / run_token
+    if not root.exists():
+        return
+    if root.is_symlink() or not root.is_dir():
+        raise RuntimeError("Windows fabric recovery claim history root is unsafe")
+    for path in root.iterdir():
+        if path.is_symlink() or not path.is_file() or path.suffix != ".json":
+            raise RuntimeError("Windows fabric recovery claim history contains an unsafe entry")
+        path.unlink()
+    root.rmdir()
+    parent = root.parent
+    if parent.exists() and not any(parent.iterdir()):
+        parent.rmdir()
+
+
 @dataclass(slots=True)
 class WindowsFabricRecoveryGate:
     run_token: str
@@ -63,6 +151,11 @@ class WindowsFabricRecoveryGate:
             return _load_object(self.claim_path, "Windows fabric recovery claim")
         except (OSError, ValueError, json.JSONDecodeError):
             return None
+
+    def read_claim_history(self) -> list[JsonObject]:
+        return read_windows_fabric_recovery_claim_history(
+            self.claim_path.parent.parent, run_token=self.run_token
+        )
 
     def release(self) -> None:
         if self.released:
@@ -161,6 +254,15 @@ def acquire_windows_fabric_successor_claim(
             raise RuntimeError("successor claim process identity is not observable")
         effect = ledger.get("actorReplacementRequest")
         effect_id = effect.get("effectId") if isinstance(effect, dict) else None
+        predecessor_claim_id: str | None = None
+        predecessor_claim_digest: str | None = None
+        if gate.claim_path.exists():
+            previous_claim = _load_object(
+                gate.claim_path, "Windows fabric previous successor claim"
+            )
+            predecessor_claim_id, predecessor_claim_digest = _archive_previous_claim(
+                state_root, run_token=run_token, claim=previous_claim
+            )
         base: JsonObject = {
             "schemaVersion": 1,
             "kind": "ordivon.security.windows-fabric-successor-claim",
@@ -177,6 +279,9 @@ def acquire_windows_fabric_successor_claim(
             "effectId": effect_id,
             "acquiredAtNs": time.time_ns(),
         }
+        if predecessor_claim_id is not None:
+            base["predecessorClaimId"] = predecessor_claim_id
+            base["predecessorClaimDigest"] = predecessor_claim_digest
         claim_id = "recovery-claim:" + canonical_digest(base).removeprefix("sha256:")[:24]
         base["claimId"] = claim_id
         validate_json(base)
