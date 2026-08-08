@@ -29,6 +29,7 @@ _RESOURCE_PATHS: dict[str, PurePosixPath] = {
         "ProgramData/Ordivon/acceptance/p1-execution-control-canary.exe"
     ),
     "orchestrator": PurePosixPath("ProgramData/Ordivon/p1-orchestrator.ps1"),
+    "observer": PurePosixPath("ProgramData/Ordivon/p1-observer.ps1"),
 }
 
 
@@ -36,21 +37,27 @@ _RESOURCE_PATHS: dict[str, PurePosixPath] = {
 class WindowsKvmP1SealedResource:
     slot: str
     sample: SampleIdentity
+    replaces: SampleIdentity | None = None
 
     def __post_init__(self) -> None:
         if self.slot not in _RESOURCE_PATHS:
             raise ValueError(f"Unsupported P1 sealed-resource slot: {self.slot}")
+        if self.replaces is not None and self.replaces.sha256 == self.sample.sha256:
+            raise ValueError("P1 sealed-resource replacement identity must differ")
 
     @property
     def guest_path(self) -> str:
         return "/" + _RESOURCE_PATHS[self.slot].as_posix()
 
     def to_dict(self) -> JsonObject:
-        return {
+        value: JsonObject = {
             "slot": self.slot,
             "guestPath": self.guest_path,
             "sample": self.sample.to_dict(),
         }
+        if self.replaces is not None:
+            value["replaces"] = self.replaces.to_dict()
+        return value
 
 
 @dataclass(frozen=True, slots=True)
@@ -340,14 +347,22 @@ def _copy_resources(
         if target.exists():
             existing_digest, existing_length = _digest_path(target)
             if (
-                existing_digest != resource.sample.sha256
-                or existing_length != resource.sample.byte_length
+                existing_digest == resource.sample.sha256
+                and existing_length == resource.sample.byte_length
             ):
+                continue
+            if resource.replaces is None:
                 raise ValueError(
                     f"Derived-base managed resource already exists with different bytes: "
                     f"{resource.slot}"
                 )
-            continue
+            if (
+                existing_digest != resource.replaces.sha256
+                or existing_length != resource.replaces.byte_length
+            ):
+                raise ValueError(
+                    f"Derived-base replacement source identity differs: {resource.slot}"
+                )
         shutil.copyfile(source, target)
         digest, byte_length = _digest_path(target)
         if digest != resource.sample.sha256 or byte_length != resource.sample.byte_length:

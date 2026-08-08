@@ -9,6 +9,7 @@ from ordivon_security._canonical import canonical_digest
 from ordivon_security.evaluation.models import SampleIdentity
 from ordivon_security.evaluation.windows_kvm_p1_derived_base import (
     WindowsKvmP1SealedResource,
+    _copy_resources,
     _resource_identity,
 )
 from ordivon_security.providers.windows_kvm import WindowsKvmBaseImage
@@ -48,6 +49,37 @@ class WindowsKvmP1DerivedBaseTests(unittest.TestCase):
             WindowsKvmP1SealedResource("arbitrary-path", sample)
         with self.assertRaisesRegex(ValueError, "slots must be unique"):
             _resource_identity((controller, controller))
+
+    def test_resource_replacement_requires_exact_previous_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as raw_root:
+            root = Path(raw_root)
+            mount = root / "mount"
+            target = mount / "ProgramData" / "Ordivon" / "p1-observer.ps1"
+            target.parent.mkdir(parents=True)
+            target.write_bytes(b"accepted-old-observer")
+            source = root / "new-observer.ps1"
+            source.write_bytes(b"accepted-new-observer")
+            previous = SampleIdentity.create(
+                sha256=_digest(target),
+                byte_length=target.stat().st_size,
+                media_type="text/x-powershell",
+            )
+            replacement = SampleIdentity.create(
+                sha256=_digest(source),
+                byte_length=source.stat().st_size,
+                media_type="text/x-powershell",
+            )
+            resource = WindowsKvmP1SealedResource(
+                "observer",
+                replacement,
+                replaces=previous,
+            )
+            _copy_resources(mount, (resource,), {"observer": source})
+            self.assertEqual(target.read_bytes(), b"accepted-new-observer")
+
+            target.write_bytes(b"unexpected-observer")
+            with self.assertRaisesRegex(ValueError, "replacement source identity differs"):
+                _copy_resources(mount, (resource,), {"observer": source})
 
     def test_base_loader_validates_explicit_parent_dependency(self) -> None:
         with tempfile.TemporaryDirectory() as raw_root:

@@ -7,8 +7,8 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
 $observerPath = 'C:\ProgramData\Ordivon\p1-observer.ps1'
-$observerDigest = 'sha256:efeb283d513bfa9f59b4869b1b3385dad881013d64cfe65d3344c864879753d0'
-$observerBytes = 5527
+$observerDigest = 'sha256:e2aeb44c5a640b89ef95b86aebc4bfd0f97ef5eb01d3e09f39dbe77b8ff2c30f'
+$observerBytes = 8689
 $observerOutput = "$ResultPath.observer.json"
 $stagingRoot = Join-Path $env:TEMP 'DaVinci Resolve'
 $nestedRoot = Join-Path $stagingRoot 'nested'

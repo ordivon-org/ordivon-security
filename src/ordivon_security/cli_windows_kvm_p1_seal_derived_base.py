@@ -30,14 +30,26 @@ _ORCHESTRATOR = SampleIdentity.create(
     media_type="text/x-powershell",
     original_name="p1-orchestrator.ps1",
 )
+_PREVIOUS_OBSERVER = SampleIdentity.create(
+    sha256="sha256:efeb283d513bfa9f59b4869b1b3385dad881013d64cfe65d3344c864879753d0",
+    byte_length=5_527,
+    media_type="text/x-powershell",
+    original_name="p1-observer.ps1",
+)
+_OBSERVER = SampleIdentity.create(
+    sha256="sha256:e2aeb44c5a640b89ef95b86aebc4bfd0f97ef5eb01d3e09f39dbe77b8ff2c30f",
+    byte_length=8_689,
+    media_type="text/x-powershell",
+    original_name="p1-observer.ps1",
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Seal one layered P1 Windows base from the accepted parent and exact accepted "
-            "generic-Controller/execution-control/orchestrator Vault objects. This command "
-            "does not authorize or execute Case A."
+            "generic-Controller/execution-control/orchestrator/Observer Vault objects. This "
+            "command does not authorize or execute Case A."
         )
     )
     parser.add_argument("--parent-manifest", type=Path, required=True)
@@ -53,6 +65,7 @@ def main() -> None:
         WindowsKvmP1SealedResource("generic-controller", _GENERIC_CONTROLLER),
         WindowsKvmP1SealedResource("execution-control-canary", _EXECUTION_CONTROL_CANARY),
         WindowsKvmP1SealedResource("orchestrator", _ORCHESTRATOR),
+        WindowsKvmP1SealedResource("observer", _OBSERVER, replaces=_PREVIOUS_OBSERVER),
     )
     receipt = seal_windows_kvm_p1_derived_base(
         parent_manifest_path=args.parent_manifest,
