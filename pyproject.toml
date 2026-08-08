@@ -52,6 +52,7 @@ ordivon-security-windows-kvm-p1-reconcile = "ordivon_security.cli_windows_kvm_p1
 ordivon-security-windows-kvm-p1-materialize-case = "ordivon_security.cli_windows_kvm_p1_materialize_case:main"
 ordivon-security-windows-kvm-p1-materialize-execution-media = "ordivon_security.cli_windows_kvm_p1_materialize_execution_media:main"
 ordivon-security-windows-kvm-p1-controller-canary = "ordivon_security.cli_windows_kvm_p1_controller_canary:main"
+ordivon-security-windows-kvm-p1-generic-controller-canary = "ordivon_security.cli_windows_kvm_p1_generic_controller_canary:main"
 ordivon-security-windows-kvm-p1-execution-control-canary = "ordivon_security.cli_windows_kvm_p1_execution_control_canary:main"
 ordivon-security-windows-host-p1-baseline = "ordivon_security.cli_windows_host_p1_baseline:main"
 
