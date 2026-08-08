@@ -98,6 +98,16 @@ def _private_balance_path(root: Path) -> Path:
     return root / "balance.json"
 
 
+def _private_world_inventory(root: Path) -> list[str]:
+    if not root.exists():
+        return []
+    return sorted(
+        path.relative_to(root).as_posix()
+        for path in root.rglob("*")
+        if path.is_file() or path.is_symlink()
+    )
+
+
 def _initialize_private_world(root: Path) -> JsonObject:
     root.mkdir(parents=True, exist_ok=True)
     root.chmod(0o700)
@@ -696,7 +706,15 @@ def _supervisor(args: argparse.Namespace) -> None:
                 "readSucceeded"
             ]
             is False,
-            "noAdjacentCompensationReceiptOrDedupObject": True,
+            "privateWorldContainsOnlyConsequenceState": all(
+                _private_world_inventory(_private_root_from_history(history)) == ["balance.json"]
+                for history in (
+                    baseline_compensated,
+                    baseline_uncompensated,
+                    idem_compensated,
+                    idem_uncompensated,
+                )
+            ),
             "allPublicEndpointsClosed": all(
                 item.get("publicEndpointClosed") is True
                 for item in (
@@ -741,6 +759,20 @@ def _supervisor(args: argparse.Namespace) -> None:
                     "compensatedHistory": blind_comp,
                     "uncompensatedHistory": blind_uncomp,
                 },
+            },
+            "privateWorldInventories": {
+                "baselineCompensated": _private_world_inventory(
+                    _private_root_from_history(baseline_compensated)
+                ),
+                "baselineUncompensated": _private_world_inventory(
+                    _private_root_from_history(baseline_uncompensated)
+                ),
+                "idempotentCompensated": _private_world_inventory(
+                    _private_root_from_history(idem_compensated)
+                ),
+                "idempotentUncompensated": _private_world_inventory(
+                    _private_root_from_history(idem_uncompensated)
+                ),
             },
             "idempotentCompensator": {
                 "compensated": idem_compensated,
