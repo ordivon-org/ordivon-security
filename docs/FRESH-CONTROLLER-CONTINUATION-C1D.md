@@ -252,25 +252,8 @@ The acceptance runner is a research consumer, not a declaration of a universal r
 
 ## New pressure: successor ownership
 
-The experiment exposed a new boundary precisely because continuation succeeded.
+C1-E has now run this race physically. Without arbitration, a preflight-valid successor moved one side of the partial veth pair while the existing dead-owner reconciler simultaneously closed QEMU/namespaces and removed the same world; the successor then failed because its namespace disappeared. See [`SUCCESSOR-OWNERSHIP-C1E.md`](SUCCESSOR-OWNERSHIP-C1E.md).
 
-During and after fresh-controller continuation, the durable ledger still identifies the original owner process. That process is dead:
+The accepted correction does not rewrite the dead predecessor as the successor. It separates historical provenance from current recovery authority: the successor CAS-binds a durable claim to the exact ledger digest, while one per-Run kernel gate makes successor continuation and reconciliation mutually exclusive. Successor SIGKILL releases the physical gate automatically, so a later reconciler can recover while retaining the stale claim as evidence.
 
-```text
-pre-continuation ownerAlive  = false
-post-continuation ownerAlive = false
-```
-
-Meanwhile the fresh controller has created a live peer-B process and is mutating the world.
-
-Under the current reconciler rule, an independently invoked reconciler would still see the ledger as orphaned and therefore be eligible to close the world while the successor is continuing it.
-
-C1-D did not experience that race because the experiment has exactly one successor and does not run reconciliation concurrently.
-
-Therefore the next structural question is no longer primarily physical substep state. It is:
-
-> **How does a successor obtain durable, exclusive recovery ownership without turning one dead-owner field into a global lock or human approval gate?**
-
-The next experiment should introduce two competing post-crash actors: a continuation controller and the existing reconciler. It should test the smallest claim/lease/CAS mechanism that prevents simultaneous continuation and closure, while preserving recoverability if the successor itself disappears.
-
-Only that race should determine whether Security needs a durable successor claim, lease expiry, generation/epoch, or another ownership-transfer mechanism.
+The next pressure is therefore multiple successor candidates over the same exact generation, not a generic distributed lease protocol.

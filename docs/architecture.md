@@ -109,7 +109,15 @@ C1-D fresh-controller continuation profile
   → the successor completes only the missing peer-B suffix and independently verifies peer-b-present
   → peer-B process identity is durably published for later closure while the backend receipt remains non-truth
   → the same Guest completes B and the same packet sensor observes A and B across controller replacement
-  → durable owner identity still names the dead predecessor, exposing successor-claim/reconciler arbitration as the next pressure
+
+C1-E successor ownership profile
+  → predecessor PID/start-time remains historical provenance and is not rewritten to the successor
+  → successor claim acquisition CAS-binds to one exact inherited ledger digest
+  → a per-Run kernel recovery gate is the single-host mutex; claim metadata is provenance, not the lock
+  → reconciler must acquire the same gate before orphan mutation and returns skipped-successor-active while a successor holds it
+  → successor may continue the partial world while holding recovery authority
+  → successor SIGKILL automatically releases the kernel gate while stale claim metadata remains inspectable
+  → a later reconciler can acquire the gate, preserve the stale claim in its receipt, and close to zero
 
 SynchronousContestProfile
   → records profile start in RangeSession management events
