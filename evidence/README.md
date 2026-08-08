@@ -142,6 +142,8 @@ The sanitized R5 selective-execution-control index is retained at [`acceptance/w
 
 The sanitized R6-A generic-Controller index is retained at [`acceptance/windows-kvm-p1-generic-controller-e352e86.json`](acceptance/windows-kvm-p1-generic-controller-e352e86.json). It binds a clean Security source revision, the exact accepted Controller PE retained in the root-only Vault, its fixed sealed-orchestrator production boundary, manifest SHA-256 verification, Job Object child ownership, bounded timeout termination, QMP no-network truth, and residual closure. The index explicitly rejects arbitrary executable targeting and does not treat recompilation as the accepted PE identity. It does not prove the production orchestrator path, seal the Controller into a P1 base, execute Case A, or authorize Case A or Case B.
 
+The sanitized R6-B layered-base index is retained at [`acceptance/windows-kvm-p1-derived-base-5d4b9ca.json`](acceptance/windows-kvm-p1-derived-base-5d4b9ca.json). It binds the accepted immutable Windows parent, the corrected clean sealer revision, the qcow2 backing relationship, exact Vault resource identities, read-only Guest-file verification, parent immutability, NBD closure, the Provider's `root:qemu 0710` images-directory traversal authority, and a separate booted-Guest probe over the exact sealed Controller and R5 self-test bytes. Both sealed self-tests complete successfully under the no-NIC Provider and residual closure remains clean. It explicitly preserves `productionOrchestratorSealed=false`, `productionControllerPathExercised=false`, `thirdPartySampleExecuted=false`, and `caseAExecutionAuthorized=false`.
+
 ## Active Case Snapshot bundle
 
 An evolving local Case may be retained as:
