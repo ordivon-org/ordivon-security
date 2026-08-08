@@ -15,13 +15,14 @@ audience:
   - builder
   - agent
 updated: 2026-08-08
-summary: Physical World Entity KVM recovery boundary: predecessor ownership remains provenance, completed unpublished carriers require independent observation before publication, and the tested single-host publication-only path needs no durable Entity successor claim.
+summary: Physical World Entity KVM recovery boundary: predecessor ownership remains provenance, completed unpublished carriers require independent observation before publication, safely observable pre-body abandonment can be compensated to zero residuals, and ambiguous QEMU launch evidence remains UNKNOWN.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
   - world-entity-migration
   - windows-kvm
 related:
+  - security.compensation-c1l
   - security.unpublished-completion-c1h
   - security.mid-successor-recovery-c1g
   - security.successor-ownership-c1e
@@ -50,11 +51,11 @@ The Entity integration question therefore became:
 
 Yes, for the exact single-host publication path tested here.
 
-The destination uses execution identity revision `3`:
+The destination now uses execution identity revision `4`:
 
 ```text
-recoveryMode = reobserve-and-publish-only-no-owner-rewrite
-unpublishedNativeState = unknown-unless-completion-reobserved
+recoveryMode = reobserve-publish-or-prebody-compensate-no-owner-rewrite
+unpublishedNativeState = unknown-unless-completion-or-safe-abandonment-observed
 ```
 
 It preserves these boundaries:
@@ -197,6 +198,72 @@ The reusable rule is narrower:
 
 The current `flock` is only a single-host publication mutex. It is not a universal distributed recovery law, and it does not establish completion by itself.
 
+## Physical pre-body abandonment acceptance
+
+Revision `4` applies the C1-L compensation law to one narrower class of Entity failures: preparatory local consequences that can be independently proven not to contain a QEMU Entity body and can be removed to zero residuals.
+
+Canonical evidence:
+
+```text
+evidence/acceptance/world-entity-prebody-abandonment-e640b28.json
+sha256:855ea1f6ebefcb9342d2993c26388d4371db3c9069657d052182e17a73f7e7e1
+sourceRevision = e640b281d2506454dc1a2fc8f5a39b70ce72af80
+```
+
+Three real controller-SIGKILL windows were exercised.
+
+### Staged fence, no native process
+
+The controller died after the durable `migration-staged` fence existed and before swtpm or QEMU started. Fresh reconciliation observed a dead predecessor, no QEMU launch evidence, and no native process. It removed the exact Run and ledger and returned:
+
+```text
+status                      = not_committed
+abandonedPreBodyCompensated = true
+zeroResidualsObserved       = true
+exactOriginalRetrySafe      = true
+receipt                     = absent
+```
+
+### TPM-only preparation
+
+The controller died after `swtpm-started`. The exact swtpm process survived the controller, while QEMU had not started and no QEMU launch evidence existed. Fresh reconciliation closed that exact TPM process, removed the Run and ledger, observed zero residuals, and returned the same `not_committed` / exact-retry-safe result.
+
+This is compensation, not ownership takeover. It removes a reversible preparatory consequence after independently proving the Entity body never launched; it does not rewrite the historical fact that staging or TPM startup occurred.
+
+### Ambiguous QEMU launch evidence
+
+The third fault was placed after QEMU stdout/stderr launch files were created but before a QEMU PID/body was published. The durable ledger still said `swtpm-started`, `qemuPid` remained zero, and swtpm remained alive.
+
+Fresh reconciliation returned:
+
+```text
+status                      = unknown
+reason                      = unresolved-native-materialization:qemu
+abandonedPreBodyCompensated = false
+exactOriginalRetrySafe      = false
+receipt                     = absent
+```
+
+Only the acceptance harness then performed explicit cleanup to leave the machine clean. The Entity reconciler itself did not use missing `qemuPid` as proof that launch never happened.
+
+This establishes the sharper boundary:
+
+```text
+no published QEMU PID
+!=
+proof of no QEMU launch
+```
+
+and:
+
+```text
+provably body-free + compensable to zero residuals
+→ NOT_COMMITTED / retry-safe
+
+ambiguous launch evidence
+→ UNKNOWN
+```
+
 ## What remains valid from the earlier Entity work
 
 - migration identity binds one exact Entity, source World, destination World, source-departure digest, and continuity-payload digest;
@@ -210,8 +277,7 @@ The current `flock` is only a single-host publication mutex. It is not a univers
 
 Entity Migration remains experimental and is not yet promoted to the World production contract surface. The accepted evidence does not prove:
 
-- cleanup or retry authorization for a retained pre-body fence;
-- safe recovery when native launch evidence exists but no exact live carrier or stable publication can be established;
+- retry authorization when ambiguous QEMU launch evidence exists but no exact live carrier or stable publication can be established;
 - current Entity presence after the native carrier later exits;
 - authenticated source-World authority beyond the current caller trust boundary;
 - distributed or multi-host publication arbitration;
@@ -219,12 +285,28 @@ Entity Migration remains experimental and is not yet promoted to the World produ
 
 ## Next pressure
 
-The next local Entity recovery problem is **pre-body abandonment**, not publication authority. A controller may die after the durable migration fence exists but before QEMU materially starts. The discriminating states are:
+The local single-host recovery boundary is now sufficiently discriminated that another generic recovery abstraction is not justified. The next useful pressure is cross-repository production admission.
+
+In particular, the current destination still declares:
 
 ```text
-migration-staged + no native launch evidence
-swtpm-started + exact TPM-only process
-ambiguous launch evidence + no stable QEMU publication
+sourceAuthorityAuthentication = caller-trust-boundary
 ```
 
-The first two may justify exact cleanup followed by `not_committed` / retry-safe only if independent process and filesystem observation proves that no Entity carrier body launched and cleanup reaches zero residuals. The third must remain `UNKNOWN` unless stronger evidence removes the ambiguity.
+Before Entity Migration is promoted to the World production contract surface, a fresh Game → World → Security trajectory should test whether the exact source-departure authority can be authenticated by its real owner and consumed by Security without turning World into a global authority translator.
+
+The promotion test should retain the current recovery laws:
+
+```text
+stable or independently re-observed completion
+→ publish MATERIALIZED
+
+provably body-free abandoned preparation
++ zero-residual compensation
+→ NOT_COMMITTED / exact retry-safe
+
+ambiguous launch evidence
+→ UNKNOWN
+```
+
+If that cross-repository trajectory passes on current canonical revisions, Entity Migration can be reconsidered for production promotion. If it requires a new global World authority primitive merely to work, that requirement should be falsified separately rather than assumed.
