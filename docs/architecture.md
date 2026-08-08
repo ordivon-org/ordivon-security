@@ -145,6 +145,16 @@ C1-H unpublished-completion profile
   → the successor does not restart the transient peer service and performs no Range-world replay; it repairs only durable peer-b-present publication with peerPid=0
   → current + archived recovery claims remain distinct from completion evidence; final reconciler later closes the still-live sensor and remaining substrate
 
+World Entity publication-only recovery profile
+  → the original Entity controller may die while the exact QEMU/swtpm carrier remains live and durable state still says executing
+  → predecessor owner PID/start-time remains historical provenance and is never rewritten to the fresh publisher
+  → a fresh publisher independently re-observes exact process identity, QEMU command binding, QMP running/no-NIC truth, continuity disk presence, and QMP block binding
+  → only an independently complete carrier may advance to migration-running-contained; insufficient evidence remains UNKNOWN
+  → the per-migration process-scoped flock serializes publication only; it grants no continuation/body mutation authority
+  → competing publishers converge on one publication and one receipt without physical body replay
+  → publisher SIGKILL after stable-ledger write but before receipt commit is recovered by reconstructing the receipt from stable publication without changing ledger or carrier identity
+  → C1-H completion/publication/executor separation is shared law; Range successor lineage is not copied into this narrower consumer unless a later recovery action actually needs continuation authority
+
 SynchronousContestProfile
   → records profile start in RangeSession management events
   → runs the existing ContestRunner unchanged

@@ -15,13 +15,14 @@ audience:
   - builder
   - agent
 updated: 2026-08-08
-summary: Deterministic and physical controller-loss baseline for World Entity KVM materialization: fresh execution and stable historical receipts remain supported, while every unpublished native state is observation-only UNKNOWN and no successor rewrites predecessor owner authority.
+summary: Physical World Entity KVM recovery boundary: predecessor ownership remains provenance, completed unpublished carriers require independent observation before publication, and the tested single-host publication-only path needs no durable Entity successor claim.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
   - world-entity-migration
   - windows-kvm
 related:
+  - security.unpublished-completion-c1h
   - security.mid-successor-recovery-c1g
   - security.successor-ownership-c1e
   - security.partial-materialization-c1c
@@ -31,109 +32,199 @@ related:
 
 ## Question
 
-The earlier W2 Entity experiment proved that Security can materialize an opaque World Entity continuity payload as a contained Windows KVM carrier. Its recovery implementation also allowed a fresh controller to claim an existing machine state and rewrote `ownerPid` / `ownerStartTime` to that controller.
+The earlier W2 Entity experiment proved that Security can materialize an opaque World Entity continuity payload as a contained Windows KVM carrier. Its recovery path also rewrote `ownerPid` / `ownerStartTime` when another controller claimed an existing machine state.
 
-C1-E through C1-G later established a stronger recovery law for persistent physical worlds: predecessor ownership is historical provenance, current recovery authority is a separate fact, and a durable ledger generation does not by itself reveal current physical progress.
+C1-E through C1-H later established stronger recovery laws:
 
-The integration question is therefore narrower than "can the old Entity branch still merge?":
+- predecessor ownership is historical provenance;
+- durable publication is not a physical-world progress oracle;
+- completion fact, completion publication, and executor liveness are distinct;
+- a successor must independently observe enough current truth before deciding whether to continue, adopt, publish, or refuse;
+- observation must not silently become intervention.
 
-> Can the useful Entity materialization semantics survive after removing owner takeover and blind continuation from unpublished native state?
+The Entity integration question therefore became:
 
-## Baseline
+> Can an unpublished carrier recover truthfully without owner takeover, blind body replay, or importing a broader successor protocol than the recovery action actually needs?
 
-The current experimental destination keeps the original source binding, continuity carrier, no-network topology check, and historical materialization receipt. It changes recovery semantics to the following table.
+## Current result
 
-| Observed state | Result | Mutation during recovery |
-|---|---|---|
-| no Run and no ledger | `not_committed` | none |
-| retained exact materialization receipt | `materialized` | none |
-| exact stable `migration-running-contained` ledger | reconstruct historical `materialized` receipt | receipt persistence only |
-| Run without ledger | `unknown` | none |
-| `migration-staged` ledger | `unknown` | none |
-| `swtpm-started` ledger | `unknown` | none |
-| `executing` ledger | `unknown` | none |
-| launch evidence not represented by a stable publication | `unknown` | none |
+Yes, for the exact single-host publication path tested here.
 
-A new `materialize` request follows the same rule. If an exact unpublished ledger already exists, it does not resume that native Run and does not start another body.
-
-## Falsifier result
-
-The deterministic fault model constructs an `executing` Entity ledger whose predecessor owner is deliberately fixed to another PID/start-time pair. Reconciliation then asserts all of the following simultaneously:
+The destination uses execution identity revision `3`:
 
 ```text
-status = UNKNOWN
-ledger bytes unchanged
-ownerPid unchanged
-ownerStartTime unchanged
-Provider persist calls unchanged
-QMP inspect calls unchanged
+recoveryMode = reobserve-and-publish-only-no-owner-rewrite
+unpublishedNativeState = unknown-unless-completion-reobserved
 ```
 
-A second test retains only a `migration-staged` pre-body fence and retries `materialize`. The destination returns `UNKNOWN` and starts neither swtpm nor QEMU.
+It preserves these boundaries:
 
-These checks directly reject the previous recovery behavior in which a successor could call `claim_existing_state`, rewrite Provider ownership, and continue an `executing` Run.
+- the original `ownerPid` / `ownerStartTime` remains predecessor provenance;
+- a fresh publisher never starts, restarts, or repairs the Entity body while recovering publication;
+- an `executing` ledger is not itself proof of completion;
+- completion must be independently re-observed from exact QEMU/swtpm process identities, QEMU command binding, QMP running/no-NIC truth, the continuity run disk, and QMP block topology;
+- only after those observations agree may the publisher write `migration-running-contained` and commit the materialization receipt;
+- if the observations cannot establish completion, the outcome remains `UNKNOWN`.
 
-## Physical controller-loss acceptance
-
-The same boundary was then exercised against the real Windows KVM substrate at source revision `09a350c4ab2f81e0bd84c0323eeae1efc18a2c49`. The controller was stopped with `SIGKILL` after QEMU had started and QMP independently confirmed `networkDevicePresent=false`, but before `migration-running-contained` was durably published.
-
-The retained acceptance index is [`../evidence/acceptance/world-entity-controller-loss-09a350c.json`](../evidence/acceptance/world-entity-controller-loss-09a350c.json), SHA-256 `84131f1b992b2cad4835027e92349afe70674d16bde914b3cff9d7dc7e2dc415`.
-
-The physical run established all of the following for that exact fault window:
+The current recovery coordinates are deliberately separate:
 
 ```text
-controller exit            = SIGKILL / -9
-QEMU survived controller   = true
-swtpm survived controller  = true
-fresh reconcile            = UNKNOWN
-ledger bytes changed       = false
-predecessor owner changed  = false
-materialization receipt    = absent
-repeat materialize resumed = false
-final residual closure     = clean
+per-migration flock      → publication exclusion
+current physical observe → completion evidence
+stable KVM ledger        → durable publication
+receipt                  → reconstructable historical outcome
+ownerPid/startTime       → predecessor provenance
 ```
 
-This is a positive physical result for **non-overreach under uncertainty**. It does not convert the `executing` ledger into proof of completion and does not grant a fresh controller recovery authority merely because the original controller is dead.
+## Negative baseline: do not take over the old owner
 
-## What remains valid from the earlier Entity experiment
+The first corrected baseline removed `claim_existing_state` from Entity recovery. Deterministic tests proved that an ambiguous `executing` ledger remains read-only and that retrying `materialize` cannot silently resume an unpublished Run.
 
-The following semantics survive unchanged:
+Physical acceptance at revision `09a350c4ab2f81e0bd84c0323eeae1efc18a2c49` then killed the original controller after QEMU had started and QMP had confirmed no network device, but before stable materialization publication. The retained index is [`../evidence/acceptance/world-entity-controller-loss-09a350c.json`](../evidence/acceptance/world-entity-controller-loss-09a350c.json), SHA-256 `84131f1b992b2cad4835027e92349afe70674d16bde914b3cff9d7dc7e2dc415`.
+
+That baseline established:
+
+```text
+controller exit           = SIGKILL / -9
+QEMU survived             = true
+swtpm survived            = true
+fresh reconcile           = UNKNOWN
+ledger bytes changed      = false
+predecessor owner changed = false
+body replay               = false
+cleanup                   = clean
+```
+
+The result falsified the idea that a fresh controller must rewrite historical ownership merely to recover an Entity trajectory.
+
+## Clean revision-3 physical acceptance
+
+The final implementation revision tested physically is `03a55aab0741d3f2259384f543a088cd3ea3f5a7`. That exact revision is retained in canonical ancestry so the following acceptance evidence remains source-bound.
+
+### Competing publishers
+
+The retained index is [`../evidence/acceptance/world-entity-publication-race-03a55aa.json`](../evidence/acceptance/world-entity-publication-race-03a55aa.json), SHA-256 `17270028f90ddee68bef94f7e75a81d83692e58d94cff932acd74be7b074645f`.
+
+After the original controller was killed, two fresh publishers were released concurrently against the same exact migration:
+
+```text
+materialized responses      = 2
+responses equal             = true
+stable publication attempts = 1
+stable phase                = migration-running-contained
+predecessor owner preserved = true
+QEMU identity preserved     = true
+swtpm identity preserved    = true
+physical body replay        = false
+cleanup                     = clean
+```
+
+The per-migration process-scoped `flock` serialized this publication race. The losing publisher reused the same retained result rather than creating another publication or replaying the body.
+
+### Publisher dies after stable ledger, before receipt
+
+The retained index is [`../evidence/acceptance/world-entity-publisher-crash-03a55aa.json`](../evidence/acceptance/world-entity-publisher-crash-03a55aa.json), SHA-256 `100e32509f61a6b1492933a075093c9d8f233194022e23e705fd730458e541e6`.
+
+A first fresh publisher independently re-observed the carrier and durably wrote `migration-running-contained`, then was killed with `SIGKILL` before receipt commit. A second fresh process produced:
+
+```text
+first publisher exit              = SIGKILL / -9
+stable ledger existed             = true
+receipt absent at first crash     = true
+second response                   = materialized
+second stable publication attempt = false
+stable ledger bytes unchanged     = true
+receipt reconstructed             = true
+predecessor owner preserved       = true
+QEMU identity preserved           = true
+swtpm identity preserved          = true
+physical body replay              = false
+cleanup                           = clean
+```
+
+The stable ledger therefore survives publisher death as the durable publication fact, while the receipt remains reconstructable output rather than a second authority.
+
+## Relation to C1-H
+
+C1-H independently reaches the same core separation in a harder Range profile: the peer-B consequence can be complete and consumed while durable completion publication is stale and the one-shot peer service and Guest executor are already gone. A later successor combines persistent Host topology with independent Guest and read-only sensor evidence, then repairs publication without replaying the Range effect.
+
+Entity revision 3 agrees with that law but has a different consumer-specific mechanism:
+
+```text
+C1-H Range
+persistent consequence
++ independent completion evidence
++ exclusive recovery authority
++ successor lineage
+→ publication-only repair
+
+Entity rev3
+live exact carrier
++ independent completion evidence
++ per-migration publication exclusion
+→ publication-only repair
+```
+
+The difference is intentional. C1 Range successors can continue or mutate an incomplete physical world, so C1-E/F/G/H retain explicit recovery ownership and successor lineage. Entity revision 3 performs no continuation body mutation when repairing publication. Its physical race and publisher-crash tests did not expose a need for an additional durable Entity successor claim.
+
+This does **not** mean executor liveness is universally required for completed-but-unpublished recovery. C1-H proves the opposite for consumed one-shot consequences. QEMU/swtpm liveness is part of this Entity profile's evidence because the claim being published is that the exact carrier is currently materialized and running.
+
+Both profiles preserve the stronger law:
+
+```text
+completion fact
+!=
+completion publication
+!=
+executor liveness
+```
+
+and the evidence-method law:
+
+```text
+observation
+!=
+intervention
+```
+
+## Resulting law
+
+For this bounded single-host Entity consumer, the evidence does **not** justify a durable successor claim or lease for publication-only recovery.
+
+The reusable rule is narrower:
+
+> Recovery mechanisms should match the authority of the recovery action. Publication of already-observed truth does not automatically require the same successor protocol as continuation that changes the world.
+
+The current `flock` is only a single-host publication mutex. It is not a universal distributed recovery law, and it does not establish completion by itself.
+
+## What remains valid from the earlier Entity work
 
 - migration identity binds one exact Entity, source World, destination World, source-departure digest, and continuity-payload digest;
 - the continuity payload remains opaque to Security and is staged on a removable FAT carrier;
 - Guest self-report is not destination materialization authority;
 - the KVM carrier is launched without a network device;
-- an exact stable materialization publication can reconstruct a lost historical receipt without launching a second body;
+- exact stable publication can reconstruct a lost historical receipt without launching a second body;
 - changed source departure, continuity payload, environment generation, or materialization identity fails closed.
-
-The execution identity is revision `2` and explicitly declares:
-
-```text
-recoveryMode = observe-only-no-owner-rewrite
-unpublishedNativeState = unknown
-```
 
 ## What this does not prove
 
-The physical acceptance proves the observation-only boundary for one controller-loss window; it does not prove recovery completion and does not promote Entity Migration to the World production contract surface. In particular, it does not prove:
+Entity Migration remains experimental and is not yet promoted to the World production contract surface. The accepted evidence does not prove:
 
-- safe successor continuation after controller death;
 - cleanup or retry authorization for a retained pre-body fence;
-- completed-but-unpublished native materialization detection;
-- current Entity presence from a historical materialization receipt;
+- safe recovery when native launch evidence exists but no exact live carrier or stable publication can be established;
+- current Entity presence after the native carrier later exits;
 - authenticated source-World authority beyond the current caller trust boundary;
-- distributed recovery or multi-host arbitration.
+- distributed or multi-host publication arbitration;
+- recovery of an information-theoretically ambiguous one-shot effect whose delivered and undelivered histories converge to the same observable state.
 
 ## Next pressure
 
-The first real controller-loss window now confirms that an `executing` ledger may survive with live QEMU/swtpm while a fresh controller remains read-only. The next experiment should move the fault deeper into native consequence and add only the independent observations needed to distinguish materialization progress without trusting the unchanged ledger.
-
-The useful next falsifier is the remaining C1-G boundary applied to Entity migration:
+The next local Entity recovery problem is **pre-body abandonment**, not publication authority. A controller may die after the durable migration fence exists but before QEMU materially starts. The discriminating states are:
 
 ```text
-completed but unpublished
-vs
-still partial
+migration-staged + no native launch evidence
+swtpm-started + exact TPM-only process
+ambiguous launch evidence + no stable QEMU publication
 ```
 
-Only if independent observation can distinguish those states should successor continuation or cleanup be introduced. If it cannot, the missing evidence should be identified before adding a generic recovery framework.
+The first two may justify exact cleanup followed by `not_committed` / retry-safe only if independent process and filesystem observation proves that no Entity carrier body launched and cleanup reaches zero residuals. The third must remain `UNKNOWN` unless stronger evidence removes the ambiguity.
