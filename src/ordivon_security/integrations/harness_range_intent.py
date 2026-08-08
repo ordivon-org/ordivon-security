@@ -83,10 +83,19 @@ class DeepSeekRangeIntentConfig:
 
 
 class _RangeIntentBridge:
-    def __init__(self, *, catalog: Any, observation_type: Any, max_effect_requests: int) -> None:
+    def __init__(
+        self,
+        *,
+        catalog: Any,
+        observation_type: Any,
+        max_effect_requests: int,
+        bridge_identity: JsonObject,
+    ) -> None:
         self.catalog = catalog
         self.observation_type = observation_type
         self.max_effect_requests = max_effect_requests
+        self.bridge_identity = bridge_identity
+        validate_json(self.bridge_identity)
         self.requests: list[JsonObject] | None = None
 
     def execute(self, call: Any, *, step_id: str) -> Any:
@@ -214,6 +223,13 @@ class DeepSeekRangeIntentDriver:
             catalog=catalog,
             observation_type=domain_module.ToolObservation,
             max_effect_requests=self.config.max_effect_requests,
+            bridge_identity={
+                "schemaVersion": 1,
+                "kind": "ordivon.security.af2-range-intent-bridge",
+                "actorId": context.actor_id,
+                "contextDigest": context.digest,
+                "promptRevision": _PROMPT_REVISION,
+            },
         )
         runner = domain_module.DomainToolLoopRunner(adapter, bridge)
         budget = domain_module.RunBudget(
