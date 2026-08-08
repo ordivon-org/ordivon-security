@@ -91,6 +91,13 @@ from .windows_kvm_p1_execution_media import (
     windows_kvm_p1_execution_media_arguments,
 )
 from .windows_kvm_reconcile import reconcile_windows_kvm_runs
+from .world_resource import (
+    WorldResourceIdentityConflict,
+    WorldResourceInbox,
+    WorldResourcePolicyRejected,
+    WorldResourceRequestError,
+    rejected_world_resource_response,
+)
 
 __all__ = [
     "ArchiveInventoryAnalyzer",
@@ -162,5 +169,10 @@ __all__ = [
     "windows_kvm_p1_sample_disk_arguments",
     "windows_kvm_install_arguments",
     "windows_kvm_qemu_arguments",
+    "WorldResourceIdentityConflict",
+    "WorldResourceInbox",
+    "WorldResourcePolicyRejected",
+    "WorldResourceRequestError",
+    "rejected_world_resource_response",
     "write_quarantine_audit",
 ]
