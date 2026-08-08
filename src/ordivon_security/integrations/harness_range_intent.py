@@ -97,11 +97,15 @@ class _RangeIntentBridge:
         observation_type: Any,
         max_effect_requests: int,
         bridge_identity: JsonObject,
+        tool_bridge_error_type: Any,
+        model_correctable_kind: Any,
     ) -> None:
         self.catalog = catalog
         self.observation_type = observation_type
         self.max_effect_requests = max_effect_requests
         self.bridge_identity = bridge_identity
+        self.tool_bridge_error_type = tool_bridge_error_type
+        self.model_correctable_kind = model_correctable_kind
         validate_json(self.bridge_identity)
         self.requests: list[JsonObject] | None = None
 
@@ -117,7 +121,14 @@ class _RangeIntentBridge:
         if len(raw_requests) > self.max_effect_requests:
             raise ValueError("AF2 range-intent request count exceeds configured bound")
         if self.requests is not None:
-            raise ValueError("AF2 range-intent Tool may be called only once per model turn")
+            raise self.tool_bridge_error_type(
+                (
+                    "Range intent is already recorded for this bounded decision. Do not call "
+                    "submit_range_intents again; submit candidate_completed using the Tool "
+                    "observation already returned."
+                ),
+                kind=self.model_correctable_kind,
+            )
         parsed: list[JsonObject] = []
         expected = {"authorityId", "zoneRef", "capability", "effectType", "payload"}
         for index, item in enumerate(raw_requests):
@@ -237,6 +248,8 @@ class DeepSeekRangeIntentDriver:
                 "contextDigest": context.digest,
                 "promptRevision": _PROMPT_REVISION,
             },
+            tool_bridge_error_type=domain_module.ToolBridgeError,
+            model_correctable_kind=domain_module.ToolBridgeErrorKind.MODEL_CORRECTABLE,
         )
         runner = domain_module.DomainToolLoopRunner(adapter, bridge)
         budget = domain_module.RunBudget(

@@ -4,6 +4,7 @@ import unittest
 
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
 from ordivon_security.integrations import RangeIntentHarnessFailure
+from ordivon_security.integrations.harness_range_intent import _RangeIntentBridge
 from ordivon_security.range import RangeAuthority, RangeEffectRequest
 
 
@@ -116,6 +117,35 @@ class AutonomousRangeIntentTests(unittest.TestCase):
                     ),
                 )
             )
+
+    def test_second_intent_submission_is_model_correctable_not_harness_failure(self) -> None:
+        class FakeError(RuntimeError):
+            def __init__(self, message: str, *, kind: str) -> None:
+                super().__init__(message)
+                self.kind = kind
+
+        class FakeObservation:
+            def __init__(self, **kwargs: object) -> None:
+                self.kwargs = kwargs
+
+        class FakeCall:
+            name = "submit_range_intents"
+            arguments = {"requests": []}
+            tool_call_id = "call:test"
+
+        bridge = _RangeIntentBridge(
+            catalog=object(),
+            observation_type=FakeObservation,
+            max_effect_requests=8,
+            bridge_identity={"kind": "test"},
+            tool_bridge_error_type=FakeError,
+            model_correctable_kind="model_correctable",
+        )
+        bridge.execute(FakeCall(), step_id="step:1")
+        with self.assertRaises(FakeError) as raised:
+            bridge.execute(FakeCall(), step_id="step:2")
+        self.assertEqual(raised.exception.kind, "model_correctable")
+        self.assertIn("already recorded", str(raised.exception))
 
     def test_harness_failure_retains_structured_evidence(self) -> None:
         evidence = {
