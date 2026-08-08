@@ -16,8 +16,24 @@ KIND = "test-resource"
 
 
 def request(operation: str) -> dict[str, object]:
-    source_evidence = {"kind": "source", "factId": "fact:w2-race"}
     payload = {"kind": "portable-resource", "value": "race"}
+    occurrence = {"factId": "fact:w2-race"}
+    source_egress = {
+        "schemaVersion": 1,
+        "kind": "ordivon.world.resource-egress-receipt",
+        "transferId": "transfer:w2-race",
+        "sourceWorldId": SOURCE,
+        "destinationWorldId": DESTINATION,
+        "resourceKind": KIND,
+        "payloadDigest": canonical_digest(payload),
+        "sourceOccurrenceId": "resource-occurrence:w2-race",
+        "sourceOccurrenceDigest": canonical_digest(occurrence),
+        "authority": {
+            "authorityId": "source-authority:w2-race:A",
+            "mechanism": "test-source-egress.v1",
+            "evidence": occurrence,
+        },
+    }
     plan = {
         "schemaVersion": 1,
         "kind": "ordivon.world.prepared-resource-transfer",
@@ -25,7 +41,7 @@ def request(operation: str) -> dict[str, object]:
         "sourceWorldId": SOURCE,
         "destinationWorldId": DESTINATION,
         "resourceKind": KIND,
-        "sourceEvidenceDigest": canonical_digest(source_evidence),
+        "sourceEgressDigest": canonical_digest(source_egress),
         "payloadDigest": canonical_digest(payload),
     }
     value: dict[str, object] = {
@@ -36,7 +52,7 @@ def request(operation: str) -> dict[str, object]:
         "planDigest": canonical_digest(plan),
     }
     if operation == "materialize":
-        value["sourceEvidence"] = source_evidence
+        value["sourceEgress"] = source_egress
         value["payload"] = payload
     return value
 
