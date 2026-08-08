@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
 
-from .model import ActorPresence, RangeCheckpoint, RangeEvent, RangeSessionSpec
+from .model import (
+    ActorPresence,
+    RangeCheckpoint,
+    RangeEffectAdmission,
+    RangeEffectRequest,
+    RangeEvent,
+    RangeSessionSpec,
+)
 from .protocol import RangeSessionBackend, RangeSessionInstance
 
 _SESSION_STATES = {"created", "running", "terminated", "destroyed"}
@@ -24,6 +31,7 @@ class RangeSession:
             actor_id: ActorPresence(actor_id=actor_id, state="unknown")
             for actor_id in spec.actor_ids
         }
+        self._effect_admissions: dict[str, tuple[str, RangeEffectAdmission]] = {}
 
     @property
     def state(self) -> str:
@@ -153,6 +161,76 @@ class RangeSession:
             payload=payload,
             causal_parents=causal_parents,
         )
+
+    def admit_effect(
+        self,
+        request: RangeEffectRequest,
+        *,
+        logical_time: int,
+    ) -> RangeEffectAdmission:
+        """Admit one Actor-requested effect against exact zone/capability authority.
+
+        Admission is idempotent by request identity. It does not execute the effect and it
+        does not claim that an admitted effect is supported by a particular Range backend.
+        """
+
+        self._require_live()
+        self._validate_logical_time(logical_time)
+        existing = self._effect_admissions.get(request.request_id)
+        if existing is not None:
+            request_digest, admission = existing
+            if request_digest != request.digest:
+                raise ValueError("Range effect request identity was reused with different content")
+            return admission
+
+        self._append_event(
+            logical_time=logical_time,
+            plane="contested",
+            source_id=request.actor_id,
+            event_type="actor.effect-requested",
+            payload=request.to_dict(),
+        )
+
+        actor_known = request.actor_id in self._presence
+        authority = next(
+            (item for item in self.spec.authorities if item.authority_id == request.authority_id),
+            None,
+        )
+        authority_digest = None if authority is None else authority.digest
+        if not actor_known:
+            admitted, reason = False, "unknown-actor"
+        elif authority is None:
+            admitted, reason = False, "unknown-authority"
+        elif authority.actor_id != request.actor_id:
+            admitted, reason = False, "authority-actor-mismatch"
+        elif request.zone_ref not in authority.zone_refs:
+            admitted, reason = False, "zone-not-granted"
+        elif request.capability not in authority.capabilities:
+            admitted, reason = False, "capability-not-granted"
+        else:
+            admitted, reason = True, "admitted"
+
+        admission = RangeEffectAdmission(
+            request_id=request.request_id,
+            request_digest=request.digest,
+            actor_id=request.actor_id,
+            authority_id=request.authority_id,
+            authority_digest=authority_digest,
+            zone_ref=request.zone_ref,
+            capability=request.capability,
+            effect_type=request.effect_type,
+            admitted=admitted,
+            reason=reason,
+        )
+        self._effect_admissions[request.request_id] = (request.digest, admission)
+        self._append_event(
+            logical_time=logical_time,
+            plane="management",
+            source_id="security:range-session",
+            event_type="effect.admitted" if admitted else "effect.rejected",
+            payload=admission.to_dict(),
+        )
+        return admission
 
     def checkpoint(self, label: str, *, logical_time: int) -> RangeCheckpoint:
         self._require_live()

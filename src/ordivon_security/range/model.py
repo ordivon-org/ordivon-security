@@ -69,6 +69,97 @@ class RangeAuthority:
 
 
 @dataclass(frozen=True, slots=True)
+class RangeEffectRequest:
+    request_id: str
+    actor_id: str
+    authority_id: str
+    zone_ref: str
+    capability: str
+    effect_type: str
+    payload: JsonObject = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        _text(self.request_id, "Range effect request identity", prefix="range-effect-request")
+        _text(self.actor_id, "Range effect request Actor identity", prefix="actor")
+        _text(
+            self.authority_id, "Range effect request authority identity", prefix="range-authority"
+        )
+        _text(self.zone_ref, "Range effect request zone")
+        _text(self.capability, "Range effect request capability")
+        _text(self.effect_type, "Range effect request type")
+        validate_json(self.payload)
+
+    @property
+    def digest(self) -> str:
+        return canonical_digest(self.to_dict())
+
+    def to_dict(self) -> JsonObject:
+        return {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.range-effect-request",
+            "requestId": self.request_id,
+            "actorId": self.actor_id,
+            "authorityId": self.authority_id,
+            "zoneRef": self.zone_ref,
+            "capability": self.capability,
+            "effectType": self.effect_type,
+            "payload": self.payload,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class RangeEffectAdmission:
+    request_id: str
+    request_digest: str
+    actor_id: str
+    authority_id: str
+    authority_digest: str | None
+    zone_ref: str
+    capability: str
+    effect_type: str
+    admitted: bool
+    reason: str
+
+    def __post_init__(self) -> None:
+        _text(
+            self.request_id,
+            "Range effect admission request identity",
+            prefix="range-effect-request",
+        )
+        _text(self.request_digest, "Range effect admission request digest", prefix="sha256")
+        _text(self.actor_id, "Range effect admission Actor identity", prefix="actor")
+        _text(
+            self.authority_id, "Range effect admission authority identity", prefix="range-authority"
+        )
+        if self.authority_digest is not None:
+            _text(self.authority_digest, "Range effect admission authority digest", prefix="sha256")
+        _text(self.zone_ref, "Range effect admission zone")
+        _text(self.capability, "Range effect admission capability")
+        _text(self.effect_type, "Range effect admission type")
+        _text(self.reason, "Range effect admission reason")
+
+    @property
+    def digest(self) -> str:
+        return canonical_digest(self.to_dict())
+
+    def to_dict(self) -> JsonObject:
+        return {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.range-effect-admission",
+            "requestId": self.request_id,
+            "requestDigest": self.request_digest,
+            "actorId": self.actor_id,
+            "authorityId": self.authority_id,
+            "authorityDigest": self.authority_digest,
+            "zoneRef": self.zone_ref,
+            "capability": self.capability,
+            "effectType": self.effect_type,
+            "admitted": self.admitted,
+            "reason": self.reason,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class ActorPresence:
     actor_id: str
     state: str

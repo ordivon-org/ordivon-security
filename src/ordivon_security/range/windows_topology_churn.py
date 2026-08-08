@@ -11,7 +11,7 @@ from typing import cast
 from ordivon_security._canonical import JsonObject, JsonValue, validate_json
 from ordivon_security.providers.windows_kvm import _process_start_time
 
-from .model import RangeSessionSpec
+from .model import RangeEffectAdmission, RangeSessionSpec
 from .protocol import RangeSessionInstance
 from .windows_fabric import (
     WindowsFabricRangeConfig,
@@ -25,6 +25,10 @@ from .windows_fabric import (
 _RANGE_ID = "range:windows-topology-churn-s6"
 _PEER_B_ADDRESS = "10.253.70.4"
 _PEER_B_BANNER = "ORDIVON-S6-PEER-B"
+_EFFECT_ZONE = "zone:s6-fabric"
+_EFFECT_CAPABILITY = "fabric.peer-replacement"
+_EFFECT_TYPE = "fabric.replace-peer-a-with-peer-b"
+_REPLACEMENT_TRIGGERS = {"backend-owned", "actor-authorized"}
 
 
 class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
@@ -45,8 +49,16 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
     peer_b_address = _PEER_B_ADDRESS
     peer_b_banner = _PEER_B_BANNER
 
-    def __init__(self, config: WindowsFabricRangeConfig) -> None:
+    def __init__(
+        self,
+        config: WindowsFabricRangeConfig,
+        *,
+        replacement_trigger: str = "backend-owned",
+    ) -> None:
+        if replacement_trigger not in _REPLACEMENT_TRIGGERS:
+            raise ValueError("S6 replacement trigger is unsupported")
         super().__init__(config)
+        self.replacement_trigger = replacement_trigger
         self._controller_stops: dict[str, threading.Event] = {}
         self._controller_threads: dict[str, threading.Thread] = {}
 
@@ -54,7 +66,7 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
     def execution_identity(self) -> JsonObject:
         identity = super().execution_identity
         identity["kind"] = "ordivon.security.windows-topology-churn-range"
-        identity["implementationRevision"] = "3"
+        identity["implementationRevision"] = "4"
         identity["network"] = {
             "guestAddress": self.guest_address,
             "peerAAddress": self.peer_address,
@@ -70,6 +82,12 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
             "peerA": "linux-network-namespace-process",
             "peerB": "linux-network-namespace-process",
             "fabric": "linux-network-namespace-bridge-tap-veth",
+        }
+        identity["replacementTrigger"] = self.replacement_trigger
+        identity["actorEffect"] = {
+            "zoneRef": _EFFECT_ZONE,
+            "capability": _EFFECT_CAPABILITY,
+            "effectType": _EFFECT_TYPE,
         }
         validate_json(identity)
         return identity
@@ -326,28 +344,47 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
             peer_a_exit = run.peer_process.poll()
             if peer_a_exit is None:
                 return False
+            run.state["peerAExitCode"] = peer_a_exit
             if peer_a_exit != 0:
                 run.state["topologyControllerError"] = {
                     "reason": "peer-a-exited-nonzero",
                     "exitCode": peer_a_exit,
                 }
                 self._emit(
-                    run, logical_time=1, plane="management",
+                    run,
+                    logical_time=1,
+                    plane="management",
                     source_id="security:s6-topology-controller",
                     event_type="fabric.peer-a-failed",
                     payload={"exitCode": peer_a_exit, "qemuRunning": True},
                 )
                 return False
+            if (
+                self.replacement_trigger == "actor-authorized"
+                and run.state.get("actorReplacementRequest") is None
+            ):
+                return False
             old_namespace = cast(str, run.state["peerNamespace"])
             old_veth = cast(str, run.state["fabricVethName"])
+            request_binding = run.state.get("actorReplacementRequest")
+            started_payload: JsonObject = {
+                "peerAAddress": self.peer_address,
+                "peerAExitCode": peer_a_exit,
+                "peerBAddress": self.peer_b_address,
+                "qemuRunning": True,
+                "replacementTrigger": self.replacement_trigger,
+            }
+            if isinstance(request_binding, dict):
+                started_payload["effectRequestId"] = request_binding.get("requestId")
+                started_payload["effectId"] = request_binding.get("effectId")
+                started_payload["admissionDigest"] = request_binding.get("admissionDigest")
             self._emit(
-                run, logical_time=1, plane="management",
+                run,
+                logical_time=1,
+                plane="management",
                 source_id="security:s6-topology-controller",
                 event_type="fabric.peer-replacement-started",
-                payload={
-                    "peerAAddress": self.peer_address, "peerAExitCode": peer_a_exit,
-                    "peerBAddress": self.peer_b_address, "qemuRunning": True,
-                },
+                payload=started_payload,
             )
             _run([str(self.config.ip_path), "netns", "del", old_namespace])
             removed = self._wait_for_port_absent(run, old_veth)
@@ -365,8 +402,12 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
             run.state["topologyHistory"] = history
             self._persist_running_state(run)
             self._emit(
-                run, logical_time=1, plane="world-truth", source_id="host:linux-netlink",
-                event_type="world.fabric-topology-observed", payload=removed,
+                run,
+                logical_time=1,
+                plane="world-truth",
+                source_id="host:linux-netlink",
+                event_type="world.fabric-topology-observed",
+                payload=removed,
             )
             peer_b = self._start_peer_b(run)
             run.peer_process = peer_b
@@ -388,28 +429,113 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
             run.state["topologyChurnCompleted"] = True
             self._persist_running_state(run)
             self._emit(
-                run, logical_time=1, plane="world-truth", source_id="host:linux-netlink",
-                event_type="world.fabric-topology-observed", payload=added,
+                run,
+                logical_time=1,
+                plane="world-truth",
+                source_id="host:linux-netlink",
+                event_type="world.fabric-topology-observed",
+                payload=added,
             )
+            completed_payload: JsonObject = {
+                "peerAAddress": self.peer_address,
+                "peerBAddress": self.peer_b_address,
+                "qemuRunning": run.process.poll() is None,
+                "replacementTrigger": self.replacement_trigger,
+            }
+            if isinstance(request_binding, dict):
+                completed_payload["effectRequestId"] = request_binding.get("requestId")
+                completed_payload["effectId"] = request_binding.get("effectId")
+                completed_payload["admissionDigest"] = request_binding.get("admissionDigest")
             self._emit(
-                run, logical_time=1, plane="management",
+                run,
+                logical_time=1,
+                plane="management",
                 source_id="security:s6-topology-controller",
                 event_type="fabric.peer-replacement-completed",
-                payload={
-                    "peerAAddress": self.peer_address, "peerBAddress": self.peer_b_address,
-                    "qemuRunning": run.process.poll() is None,
-                },
+                payload=completed_payload,
             )
             return True
+
+    def request_peer_replacement(
+        self,
+        instance: RangeSessionInstance,
+        admission: RangeEffectAdmission,
+    ) -> JsonObject:
+        """Bind one admitted C1 Actor request to the existing S6 replacement effect.
+
+        This method consumes Security admission; it does not decide authority itself and its
+        receipt does not claim that the physical topology has changed.
+        """
+
+        if self.replacement_trigger != "actor-authorized":
+            raise RuntimeError("S6 backend-owned profile does not consume Actor effect requests")
+        if not admission.admitted:
+            raise ValueError("S6 Actor-requested replacement requires admitted Security authority")
+        if admission.zone_ref != _EFFECT_ZONE:
+            raise ValueError("S6 Actor-requested replacement requires the fabric zone")
+        if admission.capability != _EFFECT_CAPABILITY:
+            raise ValueError("S6 Actor-requested replacement requires peer-replacement capability")
+        if admission.effect_type != _EFFECT_TYPE:
+            raise ValueError("S6 Actor-requested replacement effect type is unsupported")
+
+        run = self._run_for(instance)
+        effect_id = f"range-effect:{admission.request_digest.removeprefix('sha256:')[:24]}"
+        binding: JsonObject = {
+            "requestId": admission.request_id,
+            "requestDigest": admission.request_digest,
+            "admissionDigest": admission.digest,
+            "authorityId": admission.authority_id,
+            "authorityDigest": admission.authority_digest,
+            "actorId": admission.actor_id,
+            "zoneRef": admission.zone_ref,
+            "capability": admission.capability,
+            "effectType": admission.effect_type,
+            "effectId": effect_id,
+        }
+        receipt: JsonObject = {
+            "effectId": effect_id,
+            "requestId": admission.request_id,
+            "admissionDigest": admission.digest,
+            "status": "accepted-pending-execution",
+            "worldEffectVerified": False,
+        }
+        with run.lock:
+            existing = run.state.get("actorReplacementRequest")
+            if existing is not None:
+                if existing != binding:
+                    raise ValueError("S6 replacement effect is already bound to another request")
+                existing_receipt = run.state.get("actorReplacementReceipt")
+                if not isinstance(existing_receipt, dict):
+                    raise RuntimeError("S6 replacement request binding is missing its receipt")
+                return cast(JsonObject, existing_receipt)
+            run.state["actorReplacementRequest"] = binding
+            run.state["actorReplacementReceipt"] = receipt
+            self._persist_running_state(run)
+            self._emit(
+                run,
+                logical_time=1,
+                plane="management",
+                source_id="security:s6-topology-controller",
+                event_type="fabric.peer-replacement-request-bound",
+                payload=receipt,
+            )
+            return receipt
 
     def _controller_loop(self, run: _FabricRun, stop: threading.Event) -> None:
         while not stop.wait(0.1):
             if run.state.get("topologyChurnCompleted") is True or run.process.poll() is not None:
                 return
-            if run.peer_process.poll() is None:
+            peer_exit = run.peer_process.poll()
+            if peer_exit is None:
+                continue
+            if (
+                peer_exit == 0
+                and self.replacement_trigger == "actor-authorized"
+                and run.state.get("actorReplacementRequest") is None
+            ):
                 continue
             try:
-                self._replace_peer_if_ready(run)
+                changed = self._replace_peer_if_ready(run)
             except BaseException as error:
                 with run.lock:
                     run.state["topologyControllerError"] = {
@@ -418,17 +544,22 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
                         "errorMessage": str(error),
                     }
                     self._emit(
-                        run, logical_time=1, plane="management",
+                        run,
+                        logical_time=1,
+                        plane="management",
                         source_id="security:s6-topology-controller",
                         event_type="fabric.peer-replacement-failed",
                         payload=cast(JsonObject, run.state["topologyControllerError"]),
                     )
-            return
+                return
+            if changed or peer_exit != 0:
+                return
 
     def _start_controller(self, run: _FabricRun) -> None:
         stop = threading.Event()
         thread = threading.Thread(
-            target=self._controller_loop, args=(run, stop),
+            target=self._controller_loop,
+            args=(run, stop),
             name=f"ordivon-s6-topology-{run.instance.instance_id.rsplit(':', 1)[-1]}",
             daemon=True,
         )
@@ -493,6 +624,13 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
             state["topologyChurnCompleted"] = run.state.get("topologyChurnCompleted") is True
             state["topologyHistory"] = run.state.get("topologyHistory")
             state["topologyControllerError"] = run.state.get("topologyControllerError")
+            state["replacementTrigger"] = self.replacement_trigger
+            peer_a_exit = run.state.get("peerAExitCode")
+            if peer_a_exit is None and run.state.get("topologyChurnCompleted") is not True:
+                peer_a_exit = run.peer_process.poll()
+            state["peerAExitCode"] = peer_a_exit
+            state["actorReplacementRequest"] = run.state.get("actorReplacementRequest")
+            state["actorReplacementReceipt"] = run.state.get("actorReplacementReceipt")
             return state
 
     def create(self, spec: RangeSessionSpec) -> RangeSessionInstance:
@@ -501,6 +639,7 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
         with run.lock:
             initial = cast(JsonObject, run.state["fabricTruth"])
             run.state["topologyHistory"] = cast(list[JsonValue], [initial])
+            run.state["replacementTrigger"] = self.replacement_trigger
         self._persist_running_state(run)
         self._start_controller(run)
         return instance
