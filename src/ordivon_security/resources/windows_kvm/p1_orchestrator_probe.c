@@ -149,7 +149,7 @@ static int run_controller(
     length = swprintf(
         command, ARRAYSIZE(command),
         L"\"%ls\" --run-id \"%ls\" --manifest \"%ls\" "
-        L"--manifest-digest \"sha256:%S\" --result \"%ls\" --timeout-ms 180000",
+        L"--manifest-digest \"sha256:%S\" --result \"%ls\" --timeout-ms 60000",
         CONTROLLER_PATH, RUN_ID_W, manifest_path, manifest_digest, controller_result
     );
     if (length < 0 || (size_t)length >= ARRAYSIZE(command)) return 0;
@@ -162,7 +162,7 @@ static int run_controller(
         return 0;
     }
     CloseHandle(process.hThread);
-    waited = WaitForSingleObject(process.hProcess, 210000);
+    waited = WaitForSingleObject(process.hProcess, 90000);
     if (waited != WAIT_OBJECT_0) {
         TerminateProcess(process.hProcess, 95);
         WaitForSingleObject(process.hProcess, 10000);
