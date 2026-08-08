@@ -893,6 +893,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "p1_controller_canary.c",
             "p1_execution_control_canary.ps1",
             "p1_execution_control_launcher.c",
+            "p1_sealed_base_probe.c",
             "windows-host-caseb-baseline.ps1",
         }
         self.assertEqual({path.name for path in resource_root.iterdir()}, expected)
@@ -902,6 +903,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "p1_controller.c",
             "p1_controller_canary.c",
             "p1_execution_control_launcher.c",
+            "p1_sealed_base_probe.c",
         ):
             source = (resource_root / source_name).read_text(encoding="utf-8").lower()
             for token in ("ws2_32", "wininet", "winhttp", "urlmon", "socket(", "connect("):
