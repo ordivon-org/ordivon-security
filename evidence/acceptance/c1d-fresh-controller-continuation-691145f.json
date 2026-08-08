@@ -1,0 +1,76 @@
+{
+  "acceptanceClaims": [
+    "the Windows Guest itself consumed peer A before the original controller was killed at the accepted C1-C partial-materialization fault point",
+    "after owner SIGKILL the admitted effect identity, QEMU, swtpm, packet sensor, isolated fabric, peer-B namespace, and root q/w veth pair remained independently observable",
+    "a fresh process continued the missing peer-B suffix from the inherited effect/resource identity and current Host placement without restoring the old Python Range object, RangeSession, event stream, or durable substep state",
+    "the same Windows Guest then connected peer B and completed the maintained challenge, while one surviving packet capture observed both A and B flows",
+    "the fresh controller published peer-B namespace/process identity and peer-b-present only after Host topology verification while preserving the original non-truth backend receipt",
+    "the existing reconciler subsequently closed the continued world with zero managed-process, namespace, and Host-link residuals",
+    "the experiment exposes successor ownership as the next pressure because ownerAlive remained false during continuation, so concurrent reconciliation was intentionally not tested"
+  ],
+  "faultPoint": "after-peer-b-root-veth-created-before-placement",
+  "implementationRevision": "git:691145f8466bc2a0633882ebd6540d0e480f0f82",
+  "inheritedEffect": {
+    "admissionDigest": "sha256:44f3d99a51666ad72ae5b0713193f47f6966a63113d4eec3484db04b833f31bb",
+    "effectId": "range-effect:8b73398929693d0d49d593c5",
+    "requestDigest": "sha256:8b73398929693d0d49d593c5517fdf84a8a4fe28f4366a26f2a73a22f3b6ff04"
+  },
+  "interpretation": {
+    "automaticGenericExactlyOnceProved": false,
+    "durableSubstepStateConsumed": false,
+    "oldPythonRangeObjectRecovered": false,
+    "oldRangeEventStreamRecovered": false,
+    "wholeRangeClosedBeforeContinuation": false,
+    "worldObservationUsedAsProgressState": true
+  },
+  "kind": "ordivon.security.c1d-fresh-controller-continuation-acceptance",
+  "limitations": [
+    "only the accepted root-veth partial-materialization fault point was continued physically",
+    "the continuation suffix was not interrupted a second time",
+    "only one successor controller participated and no reconciler ran concurrently during continuation",
+    "the durable owner identity remained the dead original controller, so durable successor ownership/lease transfer is not solved",
+    "the experiment does not prove generic exactly-once, compensation, or causal-DAG requirements",
+    "the accepted Range remains structurally unrouted and does not authorize external or uncontrolled targets"
+  ],
+  "physicalAcceptance": {
+    "gates": {
+      "backendReceiptStillDoesNotClaimWorldTruth": true,
+      "closureHasZeroManagedProcesses": true,
+      "closureHasZeroNamespaces": true,
+      "closureHasZeroRootLinks": true,
+      "completedWorldStillPeerB": true,
+      "freshControllerDurablyPublishedPeerIdentity": true,
+      "freshControllerReachedPeerBPresent": true,
+      "guestCompletedAfterFreshController": true,
+      "guestObservedBothPeers": true,
+      "oldOwnerDeadButGuestSubstrateLive": true,
+      "ownerKilledAtExactPartialGate": true,
+      "partialWorldObservedBeforeContinuation": true,
+      "peerBServiceCompleted": true,
+      "reconcilerClosedContinuedWorld": true,
+      "semanticEffectIdentityInherited": true,
+      "sensorObservedBothFlows": true,
+      "singleWindowsNicSurvivedControllerReplacement": true,
+      "stablePhaseWasPeerARemoved": true
+    },
+    "inheritedLedgerByteLength": 3188,
+    "inheritedLedgerSha256": "sha256:7702114a6b9d079425d6c6f7b1f708fe12bc2e9488b8e3d6f520b2d5b5c5d078",
+    "continuedLedgerByteLength": 3213,
+    "continuedLedgerSha256": "sha256:102ae89441f3242a87ebfcc64e279b57460010ba163201f18be0a45991688684",
+    "continuedPeerPid": 117307,
+    "continuedPeerStartTime": 637036,
+    "packetLineCount": 16,
+    "pcapDigest": "sha256:705a9fcffbf140114203ffc5ad025552520c634730e2f1ee3843333a22c6f774",
+    "privateReceiptByteLength": 32010,
+    "privateReceiptSha256": "sha256:fcec0d65cf7d23e33f446ebbafd2338fc06b8b41086c463ac8602f16167f32a0",
+    "status": "accepted"
+  },
+  "rangeEffect": {
+    "capability": "fabric.peer-replacement",
+    "effectType": "fabric.replace-peer-a-with-peer-b",
+    "receiptWorldEffectVerified": false,
+    "zoneRef": "zone:s6-fabric"
+  },
+  "schemaVersion": 1,
+  "status": "accepted"
+}

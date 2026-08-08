@@ -285,12 +285,6 @@ This does not demote causality law. It sharpens when stronger causal structure s
 
 ## Resulting pressure
 
-The next experiment should stop testing whether an interrupted world can be cleaned. C1-C now proves truthful closure for this partial materialization.
+C1-D has now physically continued this exact partial world without first closing the Range. The same Windows Guest consumed peer A, survived the original controller SIGKILL, and then consumed peer B after a fresh process completed the missing materialization suffix from durable effect/resource identity plus current Host placement. No durable substep state, old Range object, or old event stream was needed. See [`FRESH-CONTROLLER-CONTINUATION-C1D.md`](FRESH-CONTROLLER-CONTINUATION-C1D.md).
 
-The stronger unresolved question is:
-
-> Can a fresh controller continue or repair the same admitted effect from a known partial world **without destroying the whole world first**?
-
-That experiment should start from exact durable effect identity and observed partial resources, then attempt the smallest idempotent suffix that converts the partial B materialization into the already accepted `peer-b-present` world while the Windows Guest remains alive.
-
-Only if exact resource identity and live Host observation cannot make that suffix safe should Security introduce finer durable substep identity, compensation semantics, or stronger causal ordering.
+The new pressure is ownership rather than progress representation. During continuation, durable owner identity still names the dead predecessor, so current reconciliation law would still consider the world orphaned. The next experiment should race successor continuation against reconciliation and require an exact durable claim/lease/epoch only if that race proves it necessary.

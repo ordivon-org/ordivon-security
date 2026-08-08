@@ -101,7 +101,15 @@ C1-C partial materialization profile
   → same-name Host objects are deleted only when Host netlink identifies them as veth links
   → clean requires process closure + namespace closure + Host-link residual closure
   → corrected partial owner-loss recovery needs no experiment cleanup
-  → this evidence strengthens recovery ownership; it does not claim fresh-controller continuation
+
+C1-D fresh-controller continuation profile
+  → the old controller dies while the Windows Guest and partial world remain live
+  → the successor reconstructs effect/resource identity from durable state and current Host placement
+  → no old `_FabricRun`, RangeSession event stream, or durable substep state is restored
+  → the successor completes only the missing peer-B suffix and independently verifies peer-b-present
+  → peer-B process identity is durably published for later closure while the backend receipt remains non-truth
+  → the same Guest completes B and the same packet sensor observes A and B across controller replacement
+  → durable owner identity still names the dead predecessor, exposing successor-claim/reconciler arbitration as the next pressure
 
 SynchronousContestProfile
   → records profile start in RangeSession management events
