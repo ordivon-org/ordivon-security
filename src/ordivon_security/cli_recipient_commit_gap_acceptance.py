@@ -131,6 +131,56 @@ def _emit_pulse(fd: int, *, source: str) -> None:
     os.write(fd, canonical_bytes(event) + b"\n")
 
 
+def _inbox_state(path: Path) -> JsonObject:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.parent.chmod(0o700)
+    if not path.exists():
+        value: JsonObject = {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.c1j-recipient-inbox-state",
+            "effectId": _EFFECT_ID,
+            "phase": "new",
+        }
+        _atomic_write(path, value)
+        path.chmod(0o600)
+        return value
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError("C1-J inbox state must be an object")
+    validate_json(value)
+    return cast(JsonObject, value)
+
+
+def _persist_inbox_reserved(path: Path) -> None:
+    _atomic_write(
+        path,
+        {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.c1j-recipient-inbox-state",
+            "effectId": _EFFECT_ID,
+            "phase": "reserved",
+        },
+    )
+    path.chmod(0o600)
+
+
+def _inbox_worker_main(args: argparse.Namespace) -> None:
+    if args.inbox_state is None or args.oracle_fd is None or args.inbox_mode is None:
+        raise ValueError("C1-J inbox worker requires state/oracle/mode")
+    _inbox_state(args.inbox_state)
+    _persist_inbox_reserved(args.inbox_state)
+    if args.inbox_mode == "reserved-effect-crash":
+        _emit_pulse(args.oracle_fd, source=args.inbox_mode)
+    os.kill(os.getpid(), signal.SIGKILL)
+    raise RuntimeError("C1-J inbox worker survived SIGKILL")
+
+
+def _pulse_once_main(args: argparse.Namespace) -> None:
+    if args.oracle_fd is None:
+        raise ValueError("C1-J pulse worker requires oracle-fd")
+    _emit_pulse(args.oracle_fd, source="reserved-recovery-retry")
+
+
 def _recipient_main(args: argparse.Namespace) -> None:
     if args.socket_path is None or args.oracle_fd is None or args.marker_state is None:
         raise ValueError("C1-J recipient requires socket/oracle/marker state")
@@ -429,6 +479,84 @@ def _run_gap(
     return result
 
 
+def _run_inbox_worker(*, state_path: Path, mode: str) -> tuple[list[JsonObject], JsonObject]:
+    read_fd, write_fd = os.pipe()
+    process = subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "ordivon_security.cli_recipient_commit_gap_acceptance",
+            "--inbox-worker",
+            "--inbox-mode",
+            mode,
+            "--inbox-state",
+            str(state_path),
+            "--oracle-fd",
+            str(write_fd),
+        ],
+        pass_fds=(write_fd,),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    os.close(write_fd)
+    return _collect_recipient(process, read_fd, expected_sigkill=True)
+
+
+def _run_recovery_pulse_once() -> tuple[list[JsonObject], JsonObject]:
+    read_fd, write_fd = os.pipe()
+    process = subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "ordivon_security.cli_recipient_commit_gap_acceptance",
+            "--pulse-once",
+            "--oracle-fd",
+            str(write_fd),
+        ],
+        pass_fds=(write_fd,),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    os.close(write_fd)
+    return _collect_recipient(process, read_fd, expected_sigkill=False)
+
+
+def _run_reserved_history(*, root: Path, mode: str) -> JsonObject:
+    state_path = root / "recipient-inbox" / f"{mode}.json"
+    initial_events, worker_truth = _run_inbox_worker(state_path=state_path, mode=mode)
+    state_bytes = state_path.read_bytes()
+    state = _inbox_state(state_path)
+    recovery_view: JsonObject = {
+        "schemaVersion": 1,
+        "kind": "ordivon.security.c1j-recipient-recovery-view",
+        "effectId": state.get("effectId"),
+        "phase": state.get("phase"),
+        "completionEvidenceAvailable": False,
+    }
+    validate_json(recovery_view)
+    retry_events, retry_truth = _run_recovery_pulse_once()
+    initial_count = sum(item.get("status") == "applied" for item in initial_events)
+    retry_count = sum(item.get("status") == "applied" for item in retry_events)
+    result: JsonObject = {
+        "schemaVersion": 1,
+        "history": mode,
+        "durableInboxState": state,
+        "durableInboxDigest": _digest_bytes(state_bytes),
+        "recipientRecoveryView": recovery_view,
+        "recipientRecoveryViewDigest": canonical_digest(recovery_view),
+        "evaluatorOnlyInitialEvents": initial_events,
+        "workerTruth": worker_truth,
+        "counterfactualRetry": {
+            "events": retry_events,
+            "workerTruth": retry_truth,
+            "totalPhysicalPulseCount": initial_count + retry_count,
+        },
+        "counterfactualSuppress": {"totalPhysicalPulseCount": initial_count},
+    }
+    validate_json(result)
+    return result
+
+
 def _supervisor(args: argparse.Namespace) -> None:
     revision = _git_revision(Path.cwd(), "Security")
     if args.state_root is None or args.receipt is None:
@@ -447,6 +575,12 @@ def _supervisor(args: argparse.Namespace) -> None:
             root=args.state_root,
             public_root=public_root,
             gap="marker-before-effect-crash",
+        )
+        reserved_no_effect = _run_reserved_history(
+            root=args.state_root, mode="reserved-before-effect-crash"
+        )
+        reserved_after_effect = _run_reserved_history(
+            root=args.state_root, mode="reserved-effect-crash"
         )
         same_sender = effect_first.get("senderLedgerDigest") == marker_first.get(
             "senderLedgerDigest"
@@ -477,6 +611,18 @@ def _supervisor(args: argparse.Namespace) -> None:
         marker_first_send = cast(dict[str, object], marker_first_attempt["restrictedSend"])
         effect_recovery_send = cast(dict[str, object], effect_recovery["restrictedSend"])
         marker_recovery_send = cast(dict[str, object], marker_recovery["restrictedSend"])
+        reserved_views_identical = canonical_bytes(
+            cast(JsonObject, reserved_no_effect["recipientRecoveryView"])
+        ) == canonical_bytes(cast(JsonObject, reserved_after_effect["recipientRecoveryView"]))
+        reserved_states_identical = reserved_no_effect.get(
+            "durableInboxDigest"
+        ) == reserved_after_effect.get("durableInboxDigest")
+        no_effect_retry = cast(dict[str, object], reserved_no_effect["counterfactualRetry"])
+        after_effect_retry = cast(dict[str, object], reserved_after_effect["counterfactualRetry"])
+        no_effect_suppress = cast(dict[str, object], reserved_no_effect["counterfactualSuppress"])
+        after_effect_suppress = cast(
+            dict[str, object], reserved_after_effect["counterfactualSuppress"]
+        )
         gates = {
             "sameDurableSenderStateAcrossCommitGaps": same_sender,
             "effectBeforeMarkerCrashEmittedOnePulse": len(
@@ -514,6 +660,19 @@ def _supervisor(args: argparse.Namespace) -> None:
             and effect_recovery_send.get("uid") == 65534
             and marker_first_send.get("uid") == 65534
             and marker_recovery_send.get("uid") == 65534,
+            "durableReservedInboxStatesByteEquivalent": reserved_states_identical,
+            "reservedRecoveryViewsByteEquivalent": reserved_views_identical,
+            "reservedHistoriesHaveDifferentGroundTruth": len(
+                cast(list[object], reserved_no_effect["evaluatorOnlyInitialEvents"])
+            )
+            == 0
+            and len(cast(list[object], reserved_after_effect["evaluatorOnlyInitialEvents"])) == 1,
+            "retryFromReservedDuplicatesOneHistory": no_effect_retry.get("totalPhysicalPulseCount")
+            == 1
+            and after_effect_retry.get("totalPhysicalPulseCount") == 2,
+            "suppressFromReservedLosesOneHistory": no_effect_suppress.get("totalPhysicalPulseCount")
+            == 0
+            and after_effect_suppress.get("totalPhysicalPulseCount") == 1,
             "publicEndpointsClosed": effect_first.get("publicEndpointClosed") is True
             and marker_first.get("publicEndpointClosed") is True,
             "noNetworkOrExternalTargetConsumed": True,
@@ -529,12 +688,18 @@ def _supervisor(args: argparse.Namespace) -> None:
             "effectBinding": _effect_binding(),
             "effectBeforeMarkerGap": effect_first,
             "markerBeforeEffectGap": marker_first,
+            "reservedInboxAmbiguity": {
+                "reservedBeforeEffectCrash": reserved_no_effect,
+                "reservedAfterEffectCrash": reserved_after_effect,
+            },
             "gates": gates,
             "interpretation": {
                 "postEffectDedupCommitGapDuplicatesOnRetry": passed,
                 "preEffectDedupCommitGapCanLoseConsequence": passed,
                 "orderingTwoIndependentWritesIsSufficientForExactlyOnce": False,
                 "recipientDedupAloneIsSufficientForExactlyOnce": False,
+                "durablePreEffectInboxAloneResolvesHistory": False,
+                "reservedInboxStateCanRepresentUnknownButNotResolveIt": passed,
                 "atomicOrIntrinsicallyIdempotentConsequenceBoundaryNowPressured": passed,
                 "genericTransactionManagerRequired": False,
                 "genericCausalDagRequired": False,
@@ -557,6 +722,8 @@ def build_parser() -> argparse.ArgumentParser:
         )
     )
     parser.add_argument("--recipient", action="store_true")
+    parser.add_argument("--inbox-worker", action="store_true")
+    parser.add_argument("--pulse-once", action="store_true")
     parser.add_argument(
         "--recipient-mode",
         choices=(
@@ -567,6 +734,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--socket-path", type=Path)
     parser.add_argument("--marker-state", type=Path)
+    parser.add_argument("--inbox-state", type=Path)
+    parser.add_argument(
+        "--inbox-mode",
+        choices=("reserved-before-effect-crash", "reserved-effect-crash"),
+    )
     parser.add_argument("--oracle-fd", type=int)
     parser.add_argument("--state-root", type=Path)
     parser.add_argument("--receipt", type=Path)
@@ -577,6 +749,12 @@ def main() -> None:
     args = build_parser().parse_args()
     if args.recipient:
         _recipient_main(args)
+        return
+    if args.inbox_worker:
+        _inbox_worker_main(args)
+        return
+    if args.pulse_once:
+        _pulse_once_main(args)
         return
     _supervisor(args)
 
