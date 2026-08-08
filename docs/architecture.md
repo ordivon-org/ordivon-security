@@ -119,6 +119,15 @@ C1-E successor ownership profile
   → successor SIGKILL automatically releases the kernel gate while stale claim metadata remains inspectable
   → a later reconciler can acquire the gate, preserve the stale claim in its receipt, and close to zero
 
+C1-F multiple-successor profile
+  → two candidates may observe the same exact dead-owner generation, but only one acquires the per-Run recovery gate
+  → the losing candidate is explicitly non-mutating
+  → the winner may advance physical world state and publish a new ledger generation without changing semantic effect identity
+  → after winner death, the loser re-observes and claims against the newer generation rather than its stale original observation
+  → an already-materialized persistent consequence can be adopted without whole-effect replay even if a transient challenge service has exited
+  → before current-claim replacement, the exact prior claim is archived and the new claim records predecessorClaimId/digest
+  → final reconciliation preserves current + archived recovery lineage in its receipt before clearing recovery metadata
+
 SynchronousContestProfile
   → records profile start in RangeSession management events
   → runs the existing ContestRunner unchanged
