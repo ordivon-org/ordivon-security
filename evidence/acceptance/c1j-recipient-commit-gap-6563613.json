@@ -1,0 +1,50 @@
+{
+  "acceptanceClaims": [
+    "effect-before-marker recipient SIGKILL emitted one real vanishing pulse but left no durable marker, and same-effect retry emitted a second pulse",
+    "marker-before-effect recipient SIGKILL durably recorded the effectId before any pulse, and same-effect retry was duplicate-suppressed so the consequence never occurred",
+    "both commit-gap histories retained the same durable sender state and all sender deliveries used restricted UID 65534 while recipient-private markers remained unreadable",
+    "a durable reserved inbox was then faulted both before and after physical consequence; both histories left byte-identical reserved inbox state and byte-identical recovery views despite different evaluator ground truth",
+    "retry from the common reserved state produced one pulse in the never-executed history and two in the already-executed history, while suppressing retry produced zero and one respectively",
+    "all public Unix-domain capability endpoints closed to zero and no IP network or external target was consumed"
+  ],
+  "implementationRevision": "git:6563613bc0757f8db15caf1c9014bab577d893f8",
+  "kind": "ordivon.security.c1j-recipient-commit-gap-acceptance-index",
+  "limitations": [
+    "the experiment uses one local non-idempotent vanishing pulse and does not establish a universal transaction requirement",
+    "intrinsically idempotent downstream effects, atomic local transactions and compensation remain untested candidate resolutions",
+    "reserved inbox state preserves uncertainty but the experiment does not test richer distributed inbox protocols",
+    "multi-host, multi-recipient, partition and external-target semantics remain unproved"
+  ],
+  "physicalAcceptance": {
+    "effectId": "range-effect:c1j-recipient-commit-gap-pulse-v1",
+    "requestDigest": "sha256:25301a8b7ae4dfb70cfb54b6a75d6c2ce715f07c8f98b25a52079a6b7b3295e4",
+    "admissionDigest": "sha256:4c187b9620938dcd996fde90c794c98e3073bc2b2f69757bfb7ce19f85361959",
+    "senderLedgerSha256": "sha256:68ea00db85d1439c0f7668d4b45e68ed3c80d238188deffefc1c8aea298e76da",
+    "reservedInboxSha256": "sha256:107ecb3e4c64ad93a1c8028467f5bf241c7f0c243b6b2c19b55806f1ee56a8d9",
+    "reservedRecoveryViewSha256": "sha256:8be64a988cfa78d73c18aaca93e549aa7726f5867c26f82d601671945be38107",
+    "effectBeforeMarker": {
+      "initialPulseCount": 1,
+      "markerPresentAfterCrash": false,
+      "totalPulseCountAfterRetry": 2
+    },
+    "markerBeforeEffect": {
+      "initialPulseCount": 0,
+      "markerPresentAfterCrash": true,
+      "totalPulseCountAfterRetry": 0
+    },
+    "reservedInbox": {
+      "neverExecutedInitialPulseCount": 0,
+      "alreadyExecutedInitialPulseCount": 1,
+      "neverExecutedTotalAfterRetry": 1,
+      "alreadyExecutedTotalAfterRetry": 2,
+      "neverExecutedTotalAfterSuppress": 0,
+      "alreadyExecutedTotalAfterSuppress": 1
+    },
+    "privateReceiptByteLength": 11797,
+    "privateReceiptSha256": "sha256:f393ab3d2ef2666b70c3fe33312d554bbf935bf2f0a37441fcb3af3f3e8bac65",
+    "gateCount": 19,
+    "status": "accepted"
+  },
+  "schemaVersion": 1,
+  "status": "accepted"
+}
