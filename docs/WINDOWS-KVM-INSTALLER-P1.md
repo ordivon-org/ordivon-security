@@ -53,7 +53,16 @@ Later execution requires a new admitted Guest observation protocol, an exact ins
 
 The retained static decision at [`../research/cases/windows-kvm-p1-caseb-static-entry.json`](../research/cases/windows-kvm-p1-caseb-static-entry.json) rejects generation of an executable profile for the current Case. It binds the archive, wrapper, outer MSI, nested GetintoWAY MSI, embedded downloader script, replacement `intl.dll`, and main `Resolve.exe` identities.
 
-The decisive evidence is the nested MSI first-install chain:
+The original rejection remains correct, but the R2 causality re-assessment sharpens the attack model into two independent branches rather than pretending the package is one continuous proven chain.
+
+The **ordinary wrapper installation path is statically bound**:
+
+- the wrapper's 312,380-byte PE overlay contains one configured prerequisite action, `SetupFile=目标产品B Resolve\\目标产品B.msi` with `CommandLine=/qr`;
+- the outer MSI binds the 152,576-byte unsigned replacement `intl.dll`, the 20,848-byte `intl_original.dll`, and `Patches.txt` to `ResolveFeature` under `INSTALLATIONDIR`;
+- the replacement DLL exports the expected `libintl` proxy surface, references `intl_original.dll`, imports `VirtualProtect`, and contains `Patches.txt`, `Resolve.exe`, offset-regeneration, and in-memory patch logic;
+- the observed `Resolve.exe` import table does not directly import `intl.dll`, so the exact runtime loader remains a separate question.
+
+The package also contains a **malicious nested branch**. `目标产品B Resolve.7z` contains exactly one unsigned GetintoWAY MSI whose first-install chain still independently verifies:
 
 - `AI_DATA_SETTER` at sequence 6401;
 - `PowerShellScriptInline` at sequence 6402;
@@ -62,7 +71,9 @@ The decisive evidence is the nested MSI first-install chain:
 - highest-privilege `OneDriveStandaloneUpdate####` scheduled-task creation;
 - execution of every EXE found in the downloaded archive.
 
-The exact runtime edge from the wrapper or outer MSI to the nested MSI is not yet fully traced. That uncertainty does not weaken the rejection decision: the distributed package contains the malicious installer and the current profile remains non-executable. The independent static gate passed from revision `91f08e0`; its sanitized index is [`../evidence/acceptance/windows-kvm-p1-caseb-static-91f08e0.json`](../evidence/acceptance/windows-kvm-p1-caseb-static-91f08e0.json).
+However, the same R2 re-assessment found no literal reference to the nested archive, nested MSI, downloader URL, or PowerShell chain anywhere in the outer MSI database, and the wrapper overlay lists the nested archive as a distributed file rather than as its configured `SetupFile`. `chainComplete` therefore remains false for a sharper reason: **the malicious nested MSI is real, but ordinary wrapper-to-nested-MSI reachability is not established**. We do not manufacture that missing edge merely to make the attack graph look continuous.
+
+This does not reverse product rejection. The primary path already installs an unsigned runtime patch engine in place of the signed control DLL, and the distribution separately contains a first-install downloader MSI. The original static gate passed from revision `91f08e0`; the later sanitized causality index is [`../evidence/acceptance/windows-kvm-p1-caseb-causality-r2.json`](../evidence/acceptance/windows-kvm-p1-caseb-causality-r2.json).
 
 ## Observation contract
 

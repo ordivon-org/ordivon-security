@@ -110,6 +110,45 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(profile_decision["attachToGuest"], False)
         self.assertIs(profile_decision["executeInstaller"], False)
 
+    def test_目标产品B_causality_reassessment_keeps_unproven_edges_explicit(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "evidence"
+            / "acceptance"
+            / "windows-kvm-p1-caseb-causality-r2.json"
+        )
+        value = __import__("json").loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(value["status"], "accepted-static-causality-reassessment")
+        self.assertIs(value["sample"]["identityReverified"], True)
+        self.assertIs(value["sample"]["executedDuringReassessment"], False)
+        self.assertEqual(
+            value["wrapperBootstrapper"]["configuredSetupFile"],
+            "目标产品B Resolve\\目标产品B.msi",
+        )
+        self.assertIs(value["wrapperBootstrapper"]["nestedArchiveConfiguredAsSetupFile"], False)
+        self.assertEqual(value["outerMsi"]["nestedArchiveLiteralReferenceCount"], 0)
+        self.assertEqual(value["outerMsi"]["nestedMsiLiteralReferenceCount"], 0)
+        self.assertEqual(
+            value["causality"]["primaryInstallationPath"]["status"],
+            "statically-bound",
+        )
+        self.assertEqual(
+            value["causality"]["containedMaliciousBranch"]["status"],
+            "contained-reachability-unproven",
+        )
+        self.assertIs(value["causality"]["chainComplete"], False)
+        self.assertIs(value["hostControlRevalidation"]["resolveExe"]["matchesPriorBaseline"], True)
+        self.assertIs(value["hostControlRevalidation"]["intlDll"]["matchesPriorBaseline"], True)
+        self.assertEqual(value["hostControlRevalidation"]["oneDriveStandaloneUpdateTaskMatches"], 0)
+        self.assertEqual(
+            value["historicalIsolatedDynamicEvidence"]["corehubExactBundleAttempts"]["acceptedCount"],
+            0,
+        )
+        self.assertEqual(
+            value["historicalIsolatedDynamicEvidence"]["corehubExactBundleAttempts"]["controllerCompletedCount"],
+            0,
+        )
+
     def test_installer_observation_profile_requires_complete_authority(self) -> None:
         path = (
             Path(__file__).parents[2]
