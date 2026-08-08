@@ -1,0 +1,79 @@
+{
+  "acceptanceClaims": [
+    "the original controller was SIGKILLed at the accepted root-veth partial state and a first successor acquired recovery authority against the inherited durable ledger digest",
+    "the first successor moved q into the peer-B namespace, moved w into the fabric namespace, attached w to the bridge, and was SIGKILLed before link-up/address/service/stable topology publication",
+    "the durable ledger digest before the first successor mutation and after its physical progress was exactly identical, proving durable ledger generation is not a physical-world progress version",
+    "a second successor acquired recovery authority against that same durable digest, preserved the first successor as predecessor claim lineage, and independently re-observed the changed Host midpoint",
+    "the second successor executed only the missing suffix, did not replay the whole effect, and then published a new stable peer-b-present durable generation",
+    "the same Windows Guest completed peer A and peer B across the original controller death plus the first successor death, while one surviving packet capture observed both flows",
+    "after the second successor was SIGKILLed, final reconciliation preserved current plus archived recovery lineage and closed the world with zero residuals"
+  ],
+  "implementationRevision": "git:38f6e52f5fec9309e6fc5a9f36420a2cdbe9735a",
+  "kind": "ordivon.security.c1g-mid-successor-recovery-acceptance",
+  "limitations": [
+    "only the exact after-veth-placement-and-bridge-before-link-up successor fault point was physically accepted",
+    "the experiment does not prove recovery from non-persistent or externally ambiguous effect progress",
+    "the second successor was not itself interrupted during the missing suffix",
+    "the acceptance receipt preserves the midpoint observation, but production successor claim metadata does not claim to retain a full physical handoff snapshot",
+    "the experiment is single-host and does not prove distributed fencing or partition recovery",
+    "generic exactly-once semantics, shared-resource concurrency and causal-DAG requirements remain unproved",
+    "the accepted Range remains structurally unrouted and does not authorize external or uncontrolled targets"
+  ],
+  "physicalAcceptance": {
+    "effectId": "range-effect:530c8a4d2a65ebd36e5f15b8",
+    "initialLedgerDigest": "sha256:c1e7f1b948e7082b1bbdd8f2bcd2cdd1560c2f75966b8fa2071713bf612e653c",
+    "firstSuccessor": {
+      "claimId": "recovery-claim:55cb73ea51bf5798ad2540e5",
+      "claimantPid": 217453,
+      "claimantStartTime": 1065304,
+      "faultPoint": "after-successor-veth-placement-and-bridge-before-link-up",
+      "ledgerDigestAtKill": "sha256:c1e7f1b948e7082b1bbdd8f2bcd2cdd1560c2f75966b8fa2071713bf612e653c"
+    },
+    "secondSuccessor": {
+      "claimId": "recovery-claim:36650bca6db73b6c9a523488",
+      "claimantPid": 217495,
+      "claimantStartTime": 1065395,
+      "ledgerDigestAtClaim": "sha256:c1e7f1b948e7082b1bbdd8f2bcd2cdd1560c2f75966b8fa2071713bf612e653c",
+      "predecessorClaimId": "recovery-claim:55cb73ea51bf5798ad2540e5",
+      "predecessorClaimDigest": "sha256:63b352171af2292761f62b0af3b2fd343c165453b9e78e8e8c4209e21fd31bee",
+      "status": "continued-from-midpoint"
+    },
+    "continuedLedgerDigest": "sha256:76a4ce16c60179ff5c5915bf5095c9667c0eed484f4cc0492a52f56fd5d55f1b",
+    "guestFixtureResultDigest": "sha256:9f82b3b3660f5fb7e189ec7fef9a329261c040d1f30216f96e62664541cb517e",
+    "packetLineCount": 16,
+    "pcapDigest": "sha256:dc85839e393e266ad75e50ff580fbf071ce010de58883e26f0155602585f1f66",
+    "finalReconciler": {
+      "privateReceiptByteLength": 2139,
+      "privateReceiptSha256": "sha256:af288cc129bb799bba4036a9443806f21f307440f947697ac9a48232774175c7",
+      "reconciled": 1,
+      "attentionRequired": 0,
+      "currentClaimIdObserved": "recovery-claim:36650bca6db73b6c9a523488",
+      "archivedClaimIdsObserved": [
+        "recovery-claim:55cb73ea51bf5798ad2540e5"
+      ]
+    },
+    "gates": {
+      "experimentCleanupFoundNoResidualWork": true,
+      "finalReconcilerClosedWorld": true,
+      "finalReconcilerPreservedRecoveryLineage": true,
+      "firstSuccessorAcquiredAuthority": true,
+      "firstSuccessorDiedAtMidContinuation": true,
+      "originalOwnerKilledAtInitialPartialGate": true,
+      "sameGuestCompletedAcrossTwoControllerDeaths": true,
+      "sameLedgerDigestContainedDifferentPhysicalProgress": true,
+      "secondSuccessorClaimedSameDurableGeneration": true,
+      "secondSuccessorContinuedOnlyMissingSuffix": true,
+      "secondSuccessorPreservedFirstClaimLineage": true,
+      "secondSuccessorPublishedStableGeneration": true,
+      "secondSuccessorReobservedMidpointWorld": true,
+      "secondSuccessorSigkillReleasedAuthority": true,
+      "semanticEffectIdentitySurvivedFirstSuccessorCrash": true,
+      "sensorObservedAAndBFlowsAcrossSuccession": true
+    },
+    "privateReceiptByteLength": 26859,
+    "privateReceiptSha256": "sha256:b7c77760cf757df3c422c22912a6b92a0b3c890dafeb27264af6a398fcb4dfc2",
+    "status": "accepted"
+  },
+  "schemaVersion": 1,
+  "status": "accepted"
+}
