@@ -1,0 +1,115 @@
+{
+  "acceptanceClaims": [
+    "the pre-fix physical baseline killed the exact owner after peer-B namespace and root q/w veth creation while the durable topology still truthfully said peer-a-removed",
+    "the pre-fix S5/S6 reconciler reported passed and reconciled=1 after closing declared processes and namespaces, but independent Host root-netlink observation still found both q/w veth links, proving the clean claim false",
+    "the minimal production change persists exact S6 Host-link ownership candidates derived from Range Session identity rather than introducing a generic substep transaction log",
+    "the reconciler independently derives expected q/w names from the S6 session identity, refuses mismatched declarations, verifies a present same-name object is a veth before deletion, and re-observes Host links after cleanup",
+    "the repeated physical fault on the fixed implementation closed the exact q/w links and namespaces with residualHostLinks=[] and required no experiment cleanup",
+    "the final ordinary Guest-driven S6 regression retained peer-a-present, peer-a-removed, peer-b-present world evolution, dual-peer Guest success, packet-sensor dual-flow observation, final peer-B truth, and clean closure",
+    "partial materialization forced complete transient resource ownership and truthful residual verification; it did not force generic causalParents enforcement, durable RangeSession resurrection, or an exactly-once transaction framework"
+  ],
+  "baselineFalsifier": {
+    "admissionDigest": "sha256:c81d311fa08ca167b5e6d759bce206059daa33670d46dafefe056a9221abf26b",
+    "authorityDigest": "sha256:aa7f3eefbe4289687ed05eb9b01b23adc055847db949a39ff5ab4920392909f3",
+    "effectId": "range-effect:b31aa94b43733b2af30f9a4b",
+    "faultPoint": "after-peer-b-root-veth-created-before-placement",
+    "gates": {
+      "effectIdentitySurvivedOwnerLoss": true,
+      "existingCleanClaimWasFalse": true,
+      "existingReconcilerLeftRootVethResidual": true,
+      "existingReconcilerRemovedNamespaces": true,
+      "existingReconcilerReportedPassed": true,
+      "experimentCleanupRemovedExactResidualLinks": true,
+      "hostObservedBothPartialRootVethEnds": true,
+      "hostObservedPeerBNamespaceCandidate": true,
+      "ownerDeadWhilePhysicalSubstrateStillLive": true,
+      "ownerKilledAtPartialMaterializationGate": true,
+      "stableLedgerPhaseStillSaysPeerARemoved": true
+    },
+    "implementationRevision": "git:2458ad7225d3e4727f06534c2ebc7f12409bca88",
+    "privateReceiptByteLength": 11323,
+    "privateReceiptSha256": "sha256:04d8ad872b1618d806439fc3868e69f875f4db67d1c6966f2ac820bf19bfab99",
+    "requestDigest": "sha256:b31aa94b43733b2af30f9a4b32f0c81ffe154216bde98e4f8c0eee9963ecc86c",
+    "status": "falsifier-observed"
+  },
+  "implementationRevision": "git:39693ebf1fc51a2814a8d15ddc136530ecf46533",
+  "kind": "ordivon.security.c1c-partial-materialization-acceptance",
+  "limitations": [
+    "C1-C proves truthful closure to zero, not fresh-controller continuation of the partial peer-B materialization",
+    "only the exact after-peer-b-root-veth-created-before-placement fault point is physically accepted; other instruction boundaries remain untested",
+    "the accepted resource ownership model is specific to deterministic S6 q/w Host links and does not define a universal transient-resource registry",
+    "the experiment does not prove exactly-once semantics, generic compensation, or durable RangeSession resurrection",
+    "the experiment does not prove causal graphs are unnecessary for concurrent, cross-Agent, shared-resource, or compensation-dependent effects",
+    "the accepted Range remains structurally unrouted and does not authorize external or uncontrolled targets"
+  ],
+  "normalS6Regression": {
+    "externalAcceptance": {
+      "bothChallengeFlowsObserved": true,
+      "currentTopologyIsPeerB": true,
+      "guestObservedBothPeers": true,
+      "peerARemovalObserved": true,
+      "peerBAdditionObserved": true,
+      "replacementCompleted": true,
+      "replacementStarted": true,
+      "residualClosureClean": true,
+      "singleNetworkDevicePresent": true,
+      "topologyChurnCompleted": true,
+      "topologyHistoryRetained": true
+    },
+    "fixtureResultDigest": "sha256:9f82b3b3660f5fb7e189ec7fef9a329261c040d1f30216f96e62664541cb517e",
+    "packetLineCount": 17,
+    "pcapDigest": "sha256:1a82ea5fde34904021632e1baacd6053329011c88aee8275af8215ab71f8dd0a",
+    "privateReceiptByteLength": 36899,
+    "privateReceiptSha256": "sha256:f4fea77742afdf899341cb6a96d87cbbc2081ac5547e29e8088f84b827f00599",
+    "securitySourceRevision": "git:39693ebf1fc51a2814a8d15ddc136530ecf46533",
+    "status": "accepted",
+    "topologyHistory": [
+      "peer-a-present",
+      "peer-a-removed",
+      "peer-b-present"
+    ]
+  },
+  "partialRecoveryAcceptance": {
+    "admissionDigest": "sha256:3da084e9b9ae85f4c8f2efa7b918e3f0769a3e0da854873d0a49425a7296e4c6",
+    "authorityDigest": "sha256:aa7f3eefbe4289687ed05eb9b01b23adc055847db949a39ff5ab4920392909f3",
+    "effectId": "range-effect:c2a6e8959881f28f2715e82a",
+    "experimentCleanupRequested": [],
+    "faultPoint": "after-peer-b-root-veth-created-before-placement",
+    "gates": {
+      "effectIdentitySurvivedOwnerLoss": true,
+      "experimentCleanupFoundNoResidualWork": true,
+      "hostObservedBothPartialRootVethEnds": true,
+      "hostObservedPeerBNamespaceCandidate": true,
+      "ownerDeadWhilePhysicalSubstrateStillLive": true,
+      "ownerKilledAtPartialMaterializationGate": true,
+      "reconcilerReceiptOwnsHostLinkClosure": true,
+      "reconcilerRemovedNamespaces": true,
+      "reconcilerRemovedPartialRootVeth": true,
+      "reconcilerReportedPassed": true,
+      "stableLedgerPhaseStillSaysPeerARemoved": true
+    },
+    "ownedHostLinkCandidateCount": 2,
+    "privateReceiptByteLength": 10359,
+    "privateReceiptSha256": "sha256:01a17aed872f0f13582ea28257f64d91273f9fe176e47905ada7e638b824f6d8",
+    "reconciliation": {
+      "attentionRequired": 0,
+      "reconciled": 1,
+      "requestedHostLinkCount": 2,
+      "residualHostLinks": [],
+      "residualNamespaces": [],
+      "status": "passed"
+    },
+    "requestDigest": "sha256:c2a6e8959881f28f2715e82a11079a54bea5e06a4351424e9264a709f778bb37",
+    "status": "accepted",
+    "topologyPhaseAtKill": "peer-a-removed"
+  },
+  "rangeEffect": {
+    "capability": "fabric.peer-replacement",
+    "effectType": "fabric.replace-peer-a-with-peer-b",
+    "receiptWorldEffectVerified": false,
+    "zoneRef": "zone:s6-fabric"
+  },
+  "rangeId": "range:windows-topology-churn-s6",
+  "schemaVersion": 1,
+  "status": "accepted"
+}

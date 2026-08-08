@@ -94,6 +94,15 @@ C1-B interrupted consequence profile
   → existing S5/S6 reconciler still owns safe closure to zero, not automatic continuation
   → no generic causal DAG or durable RangeSession is introduced by this evidence
 
+C1-C partial materialization profile
+  → transient peer-B resources may exist before the stable topology phase publishes them
+  → S6 persists deterministic `ownedHostLinkCandidates` beside effect and namespace identity
+  → reconciler independently derives exact q/w candidates from Range Session identity
+  → same-name Host objects are deleted only when Host netlink identifies them as veth links
+  → clean requires process closure + namespace closure + Host-link residual closure
+  → corrected partial owner-loss recovery needs no experiment cleanup
+  → this evidence strengthens recovery ownership; it does not claim fresh-controller continuation
+
 SynchronousContestProfile
   → records profile start in RangeSession management events
   → runs the existing ContestRunner unchanged
