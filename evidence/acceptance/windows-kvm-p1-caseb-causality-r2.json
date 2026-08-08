@@ -146,8 +146,30 @@
     "oneDriveStandaloneUpdateTaskMatches": 0,
     "hostModifiedByReassessment": false
   },
+  "currentP1ControllerEvidence": {
+    "acceptanceIndex": "windows-kvm-p1-controller-canary-e011541.json",
+    "implementationRevision": "git:e01154192164a679b38ab5c56e1747f55ef1bf94",
+    "status": "accepted-maintained-controller-canary",
+    "controllerSealedInP1Base": false,
+    "selectiveSecondaryBlocking": false,
+    "caseAExecutionAuthorized": false,
+    "jobObjectTreeOwned": true,
+    "killOnJobCloseRootTerminated": true,
+    "killOnJobCloseDescendantTerminated": true,
+    "qmpNoNetworkDevice": true,
+    "residualClosure": true,
+    "runtimeJobId": "job-019fe0cb-7402-7fa0-a920-817bc4eb6e63"
+  },
+  "privateStaticEvidence": {
+    "downloaderExtract": {
+      "logicalPath": "quarantine/2026-08-05_目标产品B/EXTRACTED_PAYLOAD_downloader.ps1.txt",
+      "byteLength": 2910,
+      "digest": "sha256:fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397",
+      "mode": "0600",
+      "role": "private-static-extract"
+    }
+  },
   "historicalIsolatedDynamicEvidence": {
-    "currentMainCapability": false,
     "candidateBranchRevision": "git:f19683d0e07adefc26bc2a381133d74ebc16af11",
     "benignControllerCanary": {
       "logicalName": "c2-d0-controller-canary-1f8137e15e/canary-receipt.json",

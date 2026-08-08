@@ -141,6 +141,16 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(value["hostControlRevalidation"]["intlDll"]["matchesPriorBaseline"], True)
         self.assertEqual(value["hostControlRevalidation"]["oneDriveStandaloneUpdateTaskMatches"], 0)
         self.assertEqual(
+            value["currentP1ControllerEvidence"]["status"],
+            "accepted-maintained-controller-canary",
+        )
+        self.assertIs(value["currentP1ControllerEvidence"]["selectiveSecondaryBlocking"], False)
+        self.assertIs(value["currentP1ControllerEvidence"]["caseAExecutionAuthorized"], False)
+        self.assertEqual(
+            value["privateStaticEvidence"]["downloaderExtract"]["digest"],
+            "sha256:fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397",
+        )
+        self.assertEqual(
             value["historicalIsolatedDynamicEvidence"]["corehubExactBundleAttempts"]["acceptedCount"],
             0,
         )
