@@ -663,6 +663,7 @@ class WorldEntityKvmDestination:
         try:
             os.fchmod(descriptor, 0o600)
             with os.fdopen(descriptor, "wb", closefd=True) as handle:
+                descriptor = -1
                 handle.write(canonical_bytes(receipt) + b"\n")
                 handle.flush()
                 os.fsync(handle.fileno())
@@ -682,8 +683,9 @@ class WorldEntityKvmDestination:
                 os.close(directory_fd)
             return receipt
         finally:
-            with contextlib.suppress(OSError):
-                os.close(descriptor)
+            if descriptor >= 0:
+                with contextlib.suppress(OSError):
+                    os.close(descriptor)
             temporary.unlink(missing_ok=True)
 
     def _receipt_for_exact_plan(
