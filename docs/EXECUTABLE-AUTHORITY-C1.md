@@ -156,4 +156,6 @@ C1 does not prove generic action/RBAC/policy design, arbitrary shell authority, 
 
 ## Resulting pressure
 
-`RangeAuthority` is no longer merely descriptive, but it is executable for one narrow consumer and its admission state remains process-local. The next experiment should be chosen by pressure from autonomous asynchronous action: bind a real model/Harness Actor to this path, interrupt an admitted effect and reconcile without duplicate mutation, or strengthen causal-parent law where such interruption actually requires it. C1 alone does not justify a generic action bus or policy engine.
+C1-A has now tested the first branch of this pressure. A real DeepSeek/Harness Actor used the same visible world and authority as optional power: it chose `hold` for a stability objective and `request-effect` for continuation, then drove the existing C1 physical effect without Security repairing its scope. See [`AUTONOMOUS-INTENT-C1A.md`](AUTONOMOUS-INTENT-C1A.md).
+
+That experiment did not show an immediate need for a generic action bus. Instead it exposed a truth/causality defect—live references from `inspect()` could let future topology changes rewrite retained past history—and forced immutable Range snapshots. The next stronger pressure is therefore interruption after admission/request binding: reconcile the actual world without duplicate mutation and let that failure surface determine whether durable effect state, enforced causal linkage, or resumable `RangeSession` is necessary.

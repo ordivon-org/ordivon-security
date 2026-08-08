@@ -146,7 +146,7 @@ When a stronger experiment needs a currently closed capability, the first questi
 | Host / Runtime / Security authority separation | **keep as constitutional law** |
 | exact owner-loss reconciliation and `attention-required` on unresolved authority | **keep as autonomy-enabling recovery infrastructure** |
 | zone/capability `RangeAuthority` | **constitutional law; executable for one accepted C1 physical effect, not yet generic** |
-| `RangeEvent.causalParents` | **keep intent; strengthen into enforceable causal law after C1 pressure** |
+| `RangeEvent.causalParents` | **keep intent; strengthen only when interrupted-effect reconstruction proves the causal consumer** |
 | Harness resource budgets | **keep as configurable resource grants** |
 | synchronous Contest tick/action rules | **retain as explicit profile, never generalize to RangeSession** |
 | CAGE two-plan model action surface | **retain only as P0 fixture** |

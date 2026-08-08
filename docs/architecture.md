@@ -77,6 +77,14 @@ C1 executable authority profile
   → backend receipt explicitly does not claim world truth
   → Host netlink independently verifies A removed and B present
 
+C1-A autonomous intent profile
+  → Harness DomainToolLoopRunner exposes one intent-only Tool
+  → same model + visible world + authority can choose hold or request-effect by objective
+  → Tool performs neither Security admission nor effect execution
+  → model effect scope is carried verbatim into C1 admission without correction
+  → Range inspect returns independent JSON snapshots so later world mutation cannot rewrite past reads
+  → accepted effect still converges through Host world truth rather than model or Tool claims
+
 SynchronousContestProfile
   → records profile start in RangeSession management events
   → runs the existing ContestRunner unchanged
