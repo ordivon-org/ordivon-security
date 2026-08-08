@@ -188,6 +188,28 @@ class RangeSessionS0Tests(unittest.TestCase):
         self.assertNotIn("actions", value)
         self.assertNotIn("allowedActions", value)
 
+    def test_external_boundary_is_profile_defined_not_core_enum(self) -> None:
+        authority = RangeAuthority(
+            authority_id="range-authority:delegated",
+            revision="1",
+            actor_id="actor:red",
+            zone_refs=("zone:battlefield",),
+            capabilities=("range-network",),
+            external_boundary="owned-delegated-world",
+        )
+        self.assertEqual(authority.to_dict()["externalBoundary"], "owned-delegated-world")
+
+    def test_external_boundary_must_still_be_exact_nonempty_text(self) -> None:
+        with self.assertRaises(ValueError):
+            RangeAuthority(
+                authority_id="range-authority:bad-boundary",
+                revision="1",
+                actor_id="actor:red",
+                zone_refs=("zone:battlefield",),
+                capabilities=("range-network",),
+                external_boundary=" ",
+            )
+
     def test_management_and_contested_planes_are_distinct(self) -> None:
         backend = _MemoryRangeBackend()
         session = RangeSession(backend, _spec("actor:red"))

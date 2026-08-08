@@ -6,7 +6,6 @@ from ordivon_security._canonical import JsonObject, canonical_digest, validate_j
 
 _RANGE_EVENT_PLANES = {"contested", "management", "sensor", "world-truth"}
 _ACTOR_PRESENCE_STATES = {"unknown", "active", "unreachable", "stopped", "compromised"}
-_EXTERNAL_BOUNDARIES = {"denied"}
 
 
 def _text(value: str, label: str, *, prefix: str | None = None) -> str:
@@ -46,8 +45,9 @@ class RangeAuthority:
             raise ValueError("Range authority must declare at least one zone")
         if not self.capabilities:
             raise ValueError("Range authority must declare at least one capability")
-        if self.external_boundary not in _EXTERNAL_BOUNDARIES:
-            raise ValueError("Range authority external boundary is unsupported")
+        # The core binds an exact profile-defined boundary label but does not interpret it.
+        # `denied` is the current no-uplink profile, not a constitutional global enum.
+        _text(self.external_boundary, "Range authority external boundary")
         validate_json(self.metadata)
 
     @property

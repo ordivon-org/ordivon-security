@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject
-from ordivon_security.evaluation.world_message import (
+from ordivon_security.world_boundary import (
     WorldMessageInbox,
     WorldMessageRequestError,
     rejected_world_message_response,

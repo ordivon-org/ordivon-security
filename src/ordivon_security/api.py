@@ -1,4 +1,9 @@
-"""Stable public facade for Security Range, Contest, and Evaluation contracts."""
+"""Mixed-maturity compatibility facade.
+
+Use :func:`ordivon_security.security_surface_manifest` to distinguish reusable
+constitution, scoped profiles, integrations, and research apparatus. Presence here
+does not itself imply constitutional or stable status.
+"""
 
 from .actors import (
     ActorBackend,
@@ -10,10 +15,10 @@ from .actors import (
     AgentTurnEvidence,
     DeepSeekHarnessTurnDriver,
     HarnessBudgetConfig,
-    HostAssignedDeepSeekHarnessTurnDriver,
     NativeHarnessActorBackend,
     SequenceActorBackend,
 )
+from .integrations import HostAssignedDeepSeekHarnessTurnDriver
 from .contest import (
     ActionAdmission,
     ActionProposal,
