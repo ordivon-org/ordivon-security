@@ -208,6 +208,10 @@ class _FakeMachineProvider:
         state["networkDevicePresent"] = False
         return {"status": {"status": "running", "running": True}, "networkDevicePresent": False}
 
+    def qmp_execute(self, state, command):
+        assert command == "query-block"
+        return [{"device": "migrationdisk"}]
+
 
 class WorldEntityKvmDestinationTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -261,11 +265,15 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         )
         return state, Path(state["runStatePath"])
 
-    def test_execution_identity_declares_observation_only_recovery(self) -> None:
+    def test_execution_identity_declares_publication_only_recovery(self) -> None:
         identity = self.destination.execution_identity
-        self.assertEqual(identity["revision"], "2")
-        self.assertEqual(identity["recoveryMode"], "observe-only-no-owner-rewrite")
-        self.assertEqual(identity["unpublishedNativeState"], "unknown")
+        self.assertEqual(identity["revision"], "3")
+        self.assertEqual(
+            identity["recoveryMode"], "reobserve-and-publish-only-no-owner-rewrite"
+        )
+        self.assertEqual(
+            identity["unpublishedNativeState"], "unknown-unless-completion-reobserved"
+        )
 
     def test_reconcile_without_run_proves_native_non_materialization(self) -> None:
         prepared = plan()
@@ -323,6 +331,56 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         self.assertEqual(self.provider.persist_calls, persist_calls)
         self.assertEqual(self.provider.inspect_calls, inspect_calls)
         retained = json.loads(ledger.read_text(encoding="utf-8"))
+        self.assertEqual(retained["ownerPid"], 424242)
+        self.assertEqual(retained["ownerStartTime"], 31337)
+
+    def test_completed_executing_reconcile_publishes_without_rewriting_owner(self) -> None:
+        prepared = plan()
+        state, ledger = self._stage_only(prepared)
+        run_disk = Path(state["runPath"]) / "ordivon-migration.img"
+        value = json.loads(ledger.read_text(encoding="utf-8"))
+        value.update(
+            {
+                "phase": "executing",
+                "ownerPid": 424242,
+                "ownerStartTime": 31337,
+                "qemuPid": 222,
+                "qemuStartTime": 2002,
+                "swtpmPid": 111,
+                "swtpmStartTime": 1001,
+                "networkDevicePresent": False,
+            }
+        )
+        ledger.write_text(json.dumps(value, sort_keys=True), encoding="utf-8")
+        qemu_arguments = (
+            "/usr/bin/qemu-system-x86_64",
+            f"file={run_disk},if=none,format=raw,cache=none,aio=threads,id=migrationdisk",
+            "usb-storage,drive=migrationdisk,bus=xhci.0,removable=on,serial=ORDIVON_MIG",
+        )
+
+        def process_start_time(pid: int) -> int | None:
+            return {222: 2002, 111: 1001}.get(pid)
+
+        persist_calls = self.provider.persist_calls
+        with (
+            patch(
+                "ordivon_security.evaluation.world_entity._process_start_time",
+                side_effect=process_start_time,
+            ),
+            patch(
+                "ordivon_security.evaluation.world_entity._process_arguments",
+                return_value=qemu_arguments,
+            ),
+        ):
+            response = self.destination.handle(reconcile_request(prepared))
+
+        self.assertEqual(response["status"], "materialized")
+        self.assertEqual(self.provider.persist_calls, persist_calls + 1)
+        self.assertEqual(self.provider.inspect_calls, 1)
+        self.assertEqual(self.provider.start_swtpm_calls, 0)
+        self.assertEqual(self.provider.start_qemu_calls, 0)
+        retained = json.loads(ledger.read_text(encoding="utf-8"))
+        self.assertEqual(retained["phase"], "migration-running-contained")
         self.assertEqual(retained["ownerPid"], 424242)
         self.assertEqual(retained["ownerStartTime"], 31337)
 
