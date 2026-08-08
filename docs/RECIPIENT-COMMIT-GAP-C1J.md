@@ -282,14 +282,6 @@ C1-J does not prove:
 
 ## Next pressure
 
-The next experiment should compare the smallest mechanisms that can actually cross this boundary instead of merely moving it.
+C1-K has now tested the smaller intrinsic-idempotency candidate and accepted it for one exact local ensure-state consequence: repeated invocation across ACK loss converged to one semantic world result without an adjacent dedup/inbox object. See [`INTRINSIC-IDEMPOTENCY-C1K.md`](INTRINSIC-IDEMPOTENCY-C1K.md).
 
-Candidate 1 is an **intrinsically idempotent consequence** keyed by exact effect identity: repeated execution must converge physically, not merely be hidden by an adjacent marker.
-
-Candidate 2 is an **atomic local transaction** only where the consequence and completion record genuinely share one transactional substrate.
-
-Candidate 3 is **compensation** for effects that cannot be atomic or idempotent.
-
-A durable inbox should remain because it preserves intent and `UNKNOWN`, but C1-J provides no evidence that adding more inbox phases alone can solve the commit gap.
-
-The next experiment should start with the smallest candidate—intrinsic idempotency—before inventing a generic transaction layer.
+The next experiment should therefore test a consequence that is genuinely **non-idempotent but compensable**. If compensation can restore a declared invariant after duplicate execution, it may solve a different class without demanding a universal transaction system. Only after compensation is physically faulted should Security decide whether a shared atomic transaction primitive is unavoidable for the remaining class.

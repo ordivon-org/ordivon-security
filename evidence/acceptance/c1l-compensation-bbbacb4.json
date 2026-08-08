@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.c1l-compensation-acceptance-index",
+  "status": "accepted",
+  "implementationRevision": "git:bbbacb4828a9975cfc347a38e24437cef43613c0",
+  "acceptanceClaims": [
+    "a non-idempotent original +1 consequence duplicated from balance 1 to 2 after acknowledgement loss and retry",
+    "one naive -1 compensation restored balance 2 to 1 but acknowledgement loss followed by blind compensation retry overcompensated to 0",
+    "compensation crash before mutation left observable balance 2, so fresh recovery classified needs-compensation and restored balance to 1",
+    "compensation crash after mutation but before acknowledgement left observable balance 1, so fresh recovery classified already-repaired and performed publication-only repair without a second decrement",
+    "original and compensation effect identities remained distinct and accepted recovery authorized compensation only from the exact duplicate state",
+    "all delivery principals were UID 65534, all public Unix-domain endpoints closed to zero, and no IP network or external target was consumed"
+  ],
+  "physicalAcceptance": {
+    "originalEffectId": "range-effect:c1l-non-idempotent-increment-v1",
+    "compensationEffectId": "range-effect:c1l-compensate-duplicate-increment-v1",
+    "requestDigest": "sha256:f05df3307a862b66988e15ad4ff7573a24fe66d5db6b9e42985363271515e3c0",
+    "admissionDigest": "sha256:31f9476f492b745a841d302c483d6b446ab49201f1482acd04983543db6ffb9a",
+    "senderLedgerSha256": "sha256:c6a2524494b6c1b235498f7ffa1ac50b638b7193d4e585204ba65060cc9ea951",
+    "counterfactualBlindRetry": {
+      "duplicateBalance": 2,
+      "balanceAfterFirstCompensation": 1,
+      "balanceAfterBlindRetry": 0
+    },
+    "crashBeforeCompensation": {
+      "balanceAfterCrash": 2,
+      "classification": "needs-compensation",
+      "finalBalance": 1
+    },
+    "crashAfterCompensationBeforeAck": {
+      "balanceAfterCrash": 1,
+      "classification": "already-repaired",
+      "publicationOnlyRepair": true,
+      "finalBalance": 1
+    },
+    "privateReceiptByteLength": 20864,
+    "privateReceiptSha256": "sha256:751bcbf73f557b054dda5d7637e91ba5f96e0dcd1fcb082310cb9b56bbb886d4",
+    "gateCount": 17,
+    "status": "accepted"
+  },
+  "limitations": [
+    "the accepted repair invariant is a single local integer balance and remains independently observable",
+    "unobservable compensation progress, multi-resource repair, concurrency, distributed compensation and generic saga semantics remain unproved",
+    "the counterfactual blind-retry world intentionally ends at balance 0 and is not an accepted recovery path"
+  ]
+}
