@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 from typing import cast
 
-from ordivon_security._canonical import JsonObject, validate_json
+from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
 from ordivon_security.cli_windows_kvm_c1a_acceptance import _git_revision
 from ordivon_security.cli_windows_kvm_c1b_acceptance import (
     _host_namespace_truth,
@@ -44,6 +44,7 @@ from ordivon_security.range.windows_fabric_reconcile import (
 from ordivon_security.range.windows_fabric_recovery_ownership import (
     RecoveryClaimStaleError,
     acquire_windows_fabric_successor_claim,
+    read_windows_fabric_recovery_claim_history,
 )
 
 
@@ -412,10 +413,21 @@ def _supervisor(args: argparse.Namespace) -> None:
     current_claim_on_disk = _load_object(claim_path, "retry successor durable claim")
     lineage_fields = {
         "predecessorClaimId": current_claim_on_disk.get("predecessorClaimId"),
-        "previousClaimId": current_claim_on_disk.get("previousClaimId"),
-        "priorClaimId": current_claim_on_disk.get("priorClaimId"),
+        "predecessorClaimDigest": current_claim_on_disk.get("predecessorClaimDigest"),
     }
-    lineage_preserved = first_claim.get("claimId") in set(lineage_fields.values())
+    archived_claims = read_windows_fabric_recovery_claim_history(
+        args.state_root, run_token=ledger_path.stem
+    )
+    first_archived = next(
+        (claim for claim in archived_claims if claim.get("claimId") == first_claim.get("claimId")),
+        None,
+    )
+    lineage_preserved = (
+        current_claim_on_disk.get("predecessorClaimId") == first_claim.get("claimId")
+        and isinstance(first_archived, dict)
+        and current_claim_on_disk.get("predecessorClaimDigest")
+        == canonical_digest(cast(JsonObject, first_archived))
+    )
 
     loser_process = workers[loser]
     loser_process.kill()
@@ -427,6 +439,17 @@ def _supervisor(args: argparse.Namespace) -> None:
     final_reconcile = reconcile_windows_fabric_range_runs(
         args.state_root, receipt_path=args.final_reconciler_result
     )
+    final_result = (
+        final_reconcile["results"][0]
+        if isinstance(final_reconcile.get("results"), list) and final_reconcile["results"]
+        else {}
+    )
+    final_history = (
+        final_result.get("successorClaimHistoryObserved", [])
+        if isinstance(final_result, dict)
+        else []
+    )
+    history_root = args.state_root / "recovery-claims" / "history" / ledger_path.stem
     final_ledger_count = len(list((args.state_root / "run-ledgers").glob("*.json")))
     final_process = _process_truth(current_ledger)
     final_namespace = _host_namespace_truth(current_ledger)
@@ -457,6 +480,16 @@ def _supervisor(args: argparse.Namespace) -> None:
         "firstSuccessorClaimLineagePreserved": lineage_preserved,
         "retrySuccessorSigkillReleasedAuthority": loser_process.returncode == -signal.SIGKILL
         and loser_dead,
+        "finalReconcilerPreservedSuccessorHistory": isinstance(final_history, list)
+        and any(
+            isinstance(item, dict) and item.get("claimId") == first_claim.get("claimId")
+            for item in final_history
+        )
+        and isinstance(final_result, dict)
+        and isinstance(final_result.get("successorClaimObserved"), dict)
+        and cast(dict[str, object], final_result["successorClaimObserved"]).get("claimId")
+        == retry_claim.get("claimId"),
+        "historyMetadataRemovedAfterClosure": not history_root.exists() and not claim_path.exists(),
         "finalReconcilerClosedWorld": final_reconcile.get("reconciled") == 1
         and final_ledger_count == 0
         and final_process.get("qemuAlive") is False
@@ -521,6 +554,7 @@ def _supervisor(args: argparse.Namespace) -> None:
             "result": retry,
             "claimOnDisk": current_claim_on_disk,
             "lineageFieldsObserved": lineage_fields,
+            "archivedClaims": archived_claims,
             "firstClaimId": first_claim.get("claimId"),
             "lineagePreserved": lineage_preserved,
         },
