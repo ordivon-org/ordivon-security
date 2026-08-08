@@ -1,0 +1,98 @@
+{
+  "acceptanceClaims": [
+    "the first successor fully materialized peer B, the maintained Windows Guest consumed the one-shot peer-B service and completed, and the successor was SIGKILLed before peer-b-present/currentPeerAddress/peer identity were durably published",
+    "the durable ledger digest remained unchanged across completed physical consequence and successor death while persistent Host topology already showed complete peer B",
+    "a second lineage-linked successor acquired recovery authority against that same unpublished durable generation and independently recovered persistent topology, the completed Guest result from the closed run disk, and read-only packet-sensor evidence showing both peer-A and peer-B flows",
+    "the corrected sensor observation left the capture process alive before and after the read and attempted no capture mutation",
+    "the second successor classified completed-but-unpublished, did not restart the transient peer-B service, did not replay or mutate the Range world, and repaired only durable peer-b-present publication with peerPid=0/peerStartTime=null",
+    "final reconciliation preserved current plus archived successor claims, closed the still-live capture and remaining Range substrate, and left zero residuals"
+  ],
+  "implementationRevision": "git:6fce713dd44578293bec97f9e4ac14b229ae7612",
+  "kind": "ordivon.security.c1h-unpublished-completion-acceptance",
+  "methodologyCandidate": {
+    "implementationRevision": "git:1161ff80ce0fbae35b39f9dc1124a9b677c4578f",
+    "privateReceiptByteLength": 26060,
+    "privateReceiptSha256": "sha256:11aec99484f5fa8118a82f75880a6f55289329553988e09dd2b041cc0eac6666",
+    "status": "domain-result-passed-but-observation-mutated-sensor",
+    "reason": "the candidate reused a helper that terminated tcpdump before reading pcap, so it was not accepted as evidence-preserving no-world-replay methodology"
+  },
+  "limitations": [
+    "the experiment proves recovery only for the exact isolated S6 peer-replacement consequence with persistent topology plus matching Guest and sensor evidence",
+    "Guest and packet-sensor evidence are treated as independent evidence planes, not infallible world truth",
+    "effects whose delivered and undelivered histories converge to an observationally identical world remain untested",
+    "generic exactly-once delivery, arbitrary non-idempotent effects, shared-resource concurrency and causal-DAG requirements remain unproved",
+    "the accepted Range remains structurally unrouted and does not authorize external or uncontrolled targets"
+  ],
+  "physicalAcceptance": {
+    "effectId": "range-effect:84860155ca3cc44ada6f6be6",
+    "initialLedgerDigest": "sha256:edd0825bc32daf6fd7717680101eb8fb03d612aa37e2f98df41b394d04b9d7f6",
+    "firstSuccessor": {
+      "claimId": "recovery-claim:7f5d3f2da6c0176418123901",
+      "claimantPid": 340284,
+      "claimantStartTime": 1463515,
+      "faultPoint": "after-peer-b-consumed-and-guest-completed-before-stable-ledger-publication",
+      "peerServiceExitCode": 0,
+      "qemuGone": true,
+      "ledgerDigestAtKill": "sha256:edd0825bc32daf6fd7717680101eb8fb03d612aa37e2f98df41b394d04b9d7f6"
+    },
+    "secondSuccessor": {
+      "claimId": "recovery-claim:412f83032f30b02752cda57c",
+      "claimantPid": 341261,
+      "claimantStartTime": 1464906,
+      "ledgerDigestAtClaim": "sha256:edd0825bc32daf6fd7717680101eb8fb03d612aa37e2f98df41b394d04b9d7f6",
+      "predecessorClaimId": "recovery-claim:7f5d3f2da6c0176418123901",
+      "predecessorClaimDigest": "sha256:6fe747507f562f1b2b2cf9c7dec5db8796542c600f647e7dadd2a1b1eefff3b4",
+      "classification": "completed-but-unpublished",
+      "transientPeerServiceRestarted": false,
+      "rangeWorldMutationAttempted": false,
+      "durablePublicationRepaired": true
+    },
+    "continuedLedgerDigest": "sha256:6395bc6bca7b7a39fa4bf564a4096eb4dae1229cfa66e8bc37d15c93b5a192c3",
+    "guestFixtureResultDigest": "sha256:9f82b3b3660f5fb7e189ec7fef9a329261c040d1f30216f96e62664541cb517e",
+    "sensorObservation": {
+      "captureAliveBefore": true,
+      "captureAliveAfter": true,
+      "captureMutationAttempted": false,
+      "pcapSnapshotByteLength": 1228,
+      "packetLineCount": 16,
+      "pcapDigest": "sha256:5e6d9fe4b3700cc8198cb3e2a5e6c7e228a8338bed266c9803be58a385768497",
+      "peerATrafficObserved": true,
+      "peerBTrafficObserved": true
+    },
+    "finalReconciler": {
+      "privateReceiptByteLength": 2133,
+      "privateReceiptSha256": "sha256:e26c6e934c29b3f9543e429fb303baae453e26b30acd3e7cd966b9bf784beb7e",
+      "reconciled": 1,
+      "attentionRequired": 0,
+      "currentClaimIdObserved": "recovery-claim:412f83032f30b02752cda57c",
+      "archivedClaimIdsObserved": [
+        "recovery-claim:7f5d3f2da6c0176418123901"
+      ]
+    },
+    "gates": {
+      "durableLedgerRemainedUnpublishedAfterCompletion": true,
+      "experimentCleanupFoundNoResidualWork": true,
+      "finalReconcilerClosedWorld": true,
+      "finalReconcilerPreservedRecoveryLineage": true,
+      "firstSuccessorAcquiredAuthority": true,
+      "firstSuccessorReachedCompletedUnpublishedFault": true,
+      "originalOwnerKilledAtInitialPartialGate": true,
+      "secondSuccessorClaimedSameDurableGeneration": true,
+      "secondSuccessorClassifiedCompletedButUnpublished": true,
+      "secondSuccessorDidNotReplayOrPhysicallyMutate": true,
+      "secondSuccessorDidNotRestartTransientPeerService": true,
+      "secondSuccessorObservedPersistentPeerBTopology": true,
+      "secondSuccessorPreservedFirstClaimLineage": true,
+      "secondSuccessorRecoveredGuestCompletionEvidence": true,
+      "secondSuccessorRecoveredIndependentPeerBSensorEvidence": true,
+      "secondSuccessorRepairedOnlyDurablePublication": true,
+      "secondSuccessorSigkillReleasedAuthority": true,
+      "semanticEffectIdentitySurvivedUnpublishedCompletion": true
+    },
+    "privateReceiptByteLength": 26294,
+    "privateReceiptSha256": "sha256:e55a98860f1f6edc2b64347a48af8f7ec67ca65356ba8f9dff39556ced041a4c",
+    "status": "accepted"
+  },
+  "schemaVersion": 1,
+  "status": "accepted"
+}

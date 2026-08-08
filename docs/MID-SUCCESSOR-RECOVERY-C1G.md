@@ -279,8 +279,6 @@ The acceptance receipt records the midpoint observation as experimental evidence
 
 ## Resulting pressure
 
-The next useful experiment should attack the remaining assumption behind world-state-as-progress: that the relevant consequence remains persistently observable.
+C1-H has now executed this completed-but-unpublished fault. Peer B was fully materialized and consumed, the one-shot peer service and Guest exited, and the first successor died before stable ledger publication. A second successor combined persistent Host topology with completed Guest evidence and a read-only packet-sensor snapshot, classified `completed-but-unpublished`, and repaired only durable publication without service restart or Range-world replay. See [`UNPUBLISHED-COMPLETION-C1H.md`](UNPUBLISHED-COMPLETION-C1H.md).
 
-A stronger fault point is after peer B has been fully materialized and its one-shot service has been consumed, but **before** `peer-b-present` is durably published. A successor would then see durable state still at `peer-a-removed`, persistent topology already complete, transient service liveness possibly gone, and possibly Guest completion evidence already present.
-
-That experiment should ask whether persistent topology + independent consequence evidence is enough to reconstruct an unpublished completion without replay. Only if it is ambiguous should Security add a durable completion/substep receipt.
+The next pressure is no longer another observable topology case. It should make two histories converge to the same observable post-crash world—delivery happened versus delivery never happened—so that recovery must confront genuine information loss rather than merely reconstruct persistent progress.
