@@ -14,20 +14,17 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-07
-summary: Canonical entry to persistent and synchronous adversarial Ranges, the accepted S3 sacrificial Windows node, controlled model Actors, software Evaluation, and evidence-backed disposable KVM infrastructure.
+updated: 2026-08-08
+summary: Canonical entry to an Agent-first adversarial-autonomy laboratory built around persistent Ranges, explicit authority, independent truth, verified consequence, recovery, scoped cyber/software profiles, and evidence-backed experiments.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
   - ordivon-security
 related:
   - security.charter
+  - security.law-profiles-c0
+  - security.range-session-s0
   - security.architecture
-  - security.evaluation-trial-p0
-  - security.static-evaluation-p0
-  - security.case-snapshot-p0
-  - security.windows-kvm-p0
-  - security.agent-experiment-p0
   - security.research-agenda
   - security.research-boundary
   - security.evidence
@@ -35,15 +32,24 @@ related:
 ---
 # Ordivon Security
 
-Ordivon Security is an **authorized adversarial-Agent laboratory** for studying autonomous Red, Blue, neutral, observer, and evaluator actors in contested digital worlds.
+Ordivon Security is an **authorized adversarial-autonomy laboratory** for studying how autonomous principals act, communicate, deceive, conflict, cause consequences, and recover under bounded authority and incomplete truth. Cyber is the first high-fidelity domain; it is not the definition of the project.
 
-Its emerging persistent execution spine is **RangeSession**: a contested world may continue changing without a global tick barrier or one Action Proposal per Actor. The existing **Contest** remains the stable synchronous profile for reproducible controlled comparisons: multiple goal-bearing actors receive different observations, propose actions concurrently, act through an authoritative Range, and leave independently verifiable evidence.
+The persistent execution spine is **RangeSession**: a contested world may continue changing without a global tick barrier, one Action Proposal per Actor, or a universal action menu. **Contest** remains a bounded synchronous profile for reproducible comparisons. Software Evaluation, CAGE, Windows KVM, no-uplink ranges, Guardian limits, and P0/P1 procedures are likewise scoped profiles or experimental apparatus unless a separate consumer proves a more general law.
 
-Security distinguishes **constitutional law**, **authority/resource grants**, **experiment profiles/fixtures**, and **evaluator judgments**. A P0/P1 restriction is not automatically a universal Agent law, and unsupported behavior is not automatically constitutionally forbidden. [`docs/LAW-PROFILES-C0.md`](docs/LAW-PROFILES-C0.md) is the canonical interpretation.
+Security distinguishes **constitutional law**, **authority/resource grants**, **experiment profiles/fixtures**, and **evaluator judgments**. The current constitutional direction is intentionally small: exact principal/Actor identity, explicit authority, separated information/truth planes, typed consequential intent, independent consequence verification, honest `UNKNOWN`, recovery authority, and evidence sufficient for later reconstruction. [`docs/LAW-PROFILES-C0.md`](docs/LAW-PROFILES-C0.md) is the canonical interpretation.
 
-## Current capability
+Security does not own the Agent's generic cognitive loop or the machinery beneath the world. Harness owns generic model/tool cognition mechanics; Host owns semantic Task/work continuity; Runtime owns physical execution truth; World owns external capability/consequence interfaces; mature hypervisors, cyber ranges, scanners, operating systems, and telemetry systems retain their own mechanics. Security binds these systems where adversarial semantics require authority, information boundaries, conflict, consequence, or recovery.
 
-The active `0.8` core provides:
+### Maturity map
+
+- **Constitution / reusable substrate:** C0 law distinctions, `RangeSession`, exact `RangeAuthority` actor/zone/capability grants, separated evidence planes, independent world-truth verification, and the recovery laws repeatedly forced by C1 experiments.
+- **Profiles:** `SynchronousContestProfile`, CAGE team-plan control, software Evaluation/SampleVault/Guardian, Windows KVM ranges, and World destination adapters. A profile may be accepted and useful without defining universal Agent behavior.
+- **Research apparatus:** S/C acceptance runners, P0/P1 probes, fault injectors, Host/Runtime integration variants, and physical receipts. Accepted evidence remains canonical history; the apparatus itself is not automatically a stable API.
+- **Open research:** persistent Agent-native intent beyond per-tick action menus; deception, trust, collusion, organization, infection and strategic conflict; effect-contract reuse beyond current experiments; witness freshness; and any stronger transaction/replication mechanism only if a real consumer forces it.
+
+## Accepted capability and evidence inventory
+
+The list below records accepted capabilities and experimentally established boundaries. It deliberately mixes reusable substrate with scoped profiles and research results; inclusion here does **not** assign one stability tier to every item:
 
 - an experimental S0 `RangeSession` core for persistent contested worlds without mandatory ticks or action menus;
 - an S1 `SynchronousContestProfile` that attaches bounded Contest results and sealed evidence references to a persistent Range Session without merging their execution semantics;
@@ -338,7 +344,7 @@ EvaluationSpec
   → Findings + sealed evidence
 ```
 
-Security owns the adversarial domain semantics: Scenario, Contest, Campaign and organization hypotheses, actor information boundaries, domain action admission, Range truth, scoring, and adversarial evaluation.
+Security owns adversarial-domain semantics: contested-Range bindings, principal information boundaries, domain effect admission, truth/uncertainty classification, recovery meaning, raw metrics, scoring, and adversarial evaluation. Campaign, coalition, organization, trust, and infection structures remain research hypotheses until experiments prove the minimum Security-owned state.
 
 Security does not rebuild model Providers, general Agent Harnesses, process runtimes, hypervisors, container engines, C2 frameworks, scanners, SIEMs, or generic workflow systems. Host, Harness, Runtime, World, external ranges, and mature security tools retain those responsibilities.
 

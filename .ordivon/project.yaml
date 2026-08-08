@@ -15,8 +15,13 @@ documentation_roots:
   - evidence
 managed_paths:
   - README.md
+  - AGENTS.md
   - CHARTER.md
+  - docs/LAW-PROFILES-C0.md
+  - docs/RANGE-SESSION-S0.md
+  - docs/SYNCHRONOUS-CONTEST-S1.md
   - docs/architecture.md
+  - docs/authority.md
   - docs/MIGRATION-ROUND-1.md
   - docs/MIGRATION-ROUND-2.md
   - docs/EVALUATION-TRIAL-P0.md
@@ -29,9 +34,8 @@ managed_paths:
   - docs/research-agenda.md
   - docs/research-boundary.md
   - evidence/README.md
-  - docs/authority.md
 enforcement: strict
 maintainers:
   - zycxfyh
 public_projection: ordivon-web
-description: Authorized Contest and software Evaluation laboratory with static analysis, evolving Case snapshots, a P0-admitted benign-only disposable Windows KVM Provider, deterministic and pinned Ranges, exact authority, residual closure, and evidence.
+description: Agent-first adversarial-autonomy research laboratory for bounded authority, incomplete truth, verified consequence, recovery, deception and conflict across persistent Ranges and scoped cyber/software-evaluation profiles.
