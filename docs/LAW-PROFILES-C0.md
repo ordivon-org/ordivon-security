@@ -57,12 +57,12 @@ The following current properties are constitutional because stronger Agents stil
 
 These laws exist to make autonomous action intelligible and recoverable. They do not tell an Agent which strategy is prudent.
 
-Two constitutional mechanisms are intentionally incomplete in the current implementation:
+C0 identified two constitutional mechanisms that were incomplete. C1 has now made one of them physically executable without generalizing it prematurely:
 
-- `RangeAuthority` already models zone and capability grants, but persistent Actor-requested effects do not yet consume those grants as executable admission law;
-- `RangeEvent.causalParents` records causal claims, but current code does not yet validate parent existence, same-Session ownership, parent-before-child ordering, or acyclicity.
+- `RangeAuthority` zone/capability grants are consumed by `RangeSession.admit_effect()` and physically accepted for one exact S6 peer-replacement effect; this proves the law path, not a universal action framework;
+- `RangeEvent.causalParents` still records causal claims without validating parent existence, same-Session ownership, parent-before-child ordering, or acyclicity.
 
-C1 and later experiments must strengthen those laws before relying on them for asynchronous conflict.
+See [`EXECUTABLE-AUTHORITY-C1.md`](EXECUTABLE-AUTHORITY-C1.md). Later experiments should broaden authority or strengthen causality only when a real autonomous/asynchronous consumer creates that pressure.
 
 ## Authority and resource grants
 
@@ -145,7 +145,7 @@ When a stronger experiment needs a currently closed capability, the first questi
 | exact identity, evidence digests, durable resource identity | **keep as constitutional infrastructure** |
 | Host / Runtime / Security authority separation | **keep as constitutional law** |
 | exact owner-loss reconciliation and `attention-required` on unresolved authority | **keep as autonomy-enabling recovery infrastructure** |
-| zone/capability `RangeAuthority` | **keep and make executable in C1** |
+| zone/capability `RangeAuthority` | **constitutional law; executable for one accepted C1 physical effect, not yet generic** |
 | `RangeEvent.causalParents` | **keep intent; strengthen into enforceable causal law after C1 pressure** |
 | Harness resource budgets | **keep as configurable resource grants** |
 | synchronous Contest tick/action rules | **retain as explicit profile, never generalize to RangeSession** |

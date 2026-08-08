@@ -65,7 +65,17 @@ RangeSession
   → RangeSessionBackend lifecycle
   → asynchronous backend/world events
   → management + contested + sensor + world-truth RangeEvent stream
+  → RangeEffectRequest → exact Actor/authority/zone/capability admission
+  → admitted effects remain separate from backend execution and world truth
   → checkpoint / terminate / destroy
+
+C1 executable authority profile
+  → one Actor owns zone:s6-fabric + fabric.peer-replacement
+  → fake authority / wrong zone / wrong capability are rejected
+  → actor-authorized S6 waits even after peer A exits successfully
+  → admitted request binds one typed A→B replacement effect
+  → backend receipt explicitly does not claim world truth
+  → Host netlink independently verifies A removed and B present
 
 SynchronousContestProfile
   → records profile start in RangeSession management events

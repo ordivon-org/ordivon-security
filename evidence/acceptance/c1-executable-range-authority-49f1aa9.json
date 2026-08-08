@@ -1,0 +1,102 @@
+{
+  "acceptanceClaims": [
+    "peer A completed its physical one-shot service before valid Actor authority was admitted, yet the actor-authorized S6 profile retained peer-A current world truth and performed no topology replacement",
+    "nonexistent authority, wrong zone, and wrong capability requests were rejected before physical mutation",
+    "the valid Actor effect request was bound to exact RangeAuthority, zone, capability, request, admission, and effect identities",
+    "exact in-process replay of Security admission and backend request converged without duplicate request events",
+    "the backend receipt retained worldEffectVerified=false while Host Linux netlink independently established peer-A removal and peer-B addition",
+    "the maintained Windows Guest and external packet sensor both observed peer-A and peer-B challenge flows and residual closure was clean",
+    "the same implementation passed a separate physical regression of the original backend-owned S6 profile"
+  ],
+  "authority": {
+    "actorId": "actor:c1-fabric-controller",
+    "authorityDigest": "sha256:8cc16329d5f7ef1b901f99cf44ddd24af711ce67fceca1d902257f378329a133",
+    "authorityId": "range-authority:c1-fabric-controller",
+    "capability": "fabric.peer-replacement",
+    "effectType": "fabric.replace-peer-a-with-peer-b",
+    "zoneRef": "zone:s6-fabric"
+  },
+  "effect": {
+    "admissionDigest": "sha256:a7aa227dc0228a0e6584c307dad84bfc638f73012ae1a76ffeb3e181c92f075c",
+    "effectId": "range-effect:96c717377b7e9e6db289811b",
+    "receiptStatus": "accepted-pending-execution",
+    "worldEffectVerifiedByReceipt": false
+  },
+  "externalAcceptance": {
+    "actorRequestBound": true,
+    "admissionExactReplayConverged": true,
+    "backendRequestExactReplayConverged": true,
+    "bothChallengeFlowsObserved": true,
+    "currentTopologyIsPeerB": true,
+    "effectIdentityPropagated": true,
+    "effectReceiptDoesNotClaimWorldTruth": true,
+    "guestObservedBothPeers": true,
+    "negativeAuthorityCasesRejected": true,
+    "peerARemovalObserved": true,
+    "peerBAdditionObserved": true,
+    "physicalPreconditionReachedBeforeAuthority": true,
+    "replacementCompleted": true,
+    "replacementStarted": true,
+    "residualClosureClean": true,
+    "singleNetworkDevicePresent": true,
+    "topologyHistoryRetained": true,
+    "validAuthorityAdmitted": true,
+    "worldUnchangedBeforeValidAuthority": true
+  },
+  "implementationRevision": "git:49f1aa976cd3b78076f97f78accd921870b0ac02",
+  "kind": "ordivon.security.c1-executable-range-authority-acceptance",
+  "limitations": [
+    "one typed peer-replacement effect is accepted; this is not a generic Range action, RBAC, or policy framework",
+    "the acceptance runner deterministically generated the Actor request rather than a model selecting it strategically",
+    "RangeSession effect admission and replay state remain process-local and are not resumable after controller replacement",
+    "exactly-once physical effect semantics across process death are not proved",
+    "RangeEvent causalParents remain descriptive rather than a validated causal graph",
+    "the accepted Range remains isolated and structurally unrouted with no external target authority"
+  ],
+  "negativeAdmissions": ["unknown-authority", "zone-not-granted", "capability-not-granted"],
+  "physicalReceipt": {
+    "byteLength": 56820,
+    "logicalName": "c1-executable-authority-49f1aa9-r1.json",
+    "sha256": "sha256:99655ee1176cd5b825ca24b6150b418d5e778982c914f976d6f23a894684fb22"
+  },
+  "rangeId": "range:windows-topology-churn-s6",
+  "regression": {
+    "profile": "backend-owned",
+    "receiptByteLength": 36677,
+    "receiptLogicalName": "s6-regression-49f1aa9.json",
+    "receiptSha256": "sha256:3d2bc3933db58a4427ef03b593aef313ed9a51cbcbf0f84c01abfcb98a76b7a8",
+    "status": "accepted"
+  },
+  "schemaVersion": 1,
+  "sensorObservation": {
+    "authority": "external-packet-sensor-not-world-truth",
+    "packetLineCount": 16,
+    "pcapDigest": "sha256:958919194e574a2bf7c363abd2687f887c5954813f14f73497392d0eb9e0080a",
+    "peerATrafficObserved": true,
+    "peerBTrafficObserved": true
+  },
+  "setupFalsifier": {
+    "failure": "the first C1 state root was mode 0700, preventing the qemu-owned swtpm process from traversing the experiment root before RangeSession startup",
+    "privateReceiptByteLength": 3231,
+    "privateReceiptSha256": "sha256:baed60ab8f9f9f3b791d3ac3b7a41e00723e0846c0632eccdd22c4edba3dee90",
+    "scope": "experiment-setup-before-authority",
+    "status": "failed"
+  },
+  "status": "accepted",
+  "topologyTruth": {
+    "authority": "host-linux-netlink-bridge",
+    "current": {"currentPeerAddress": "10.253.70.4", "externalRouteAbsent": true, "phase": "peer-b-present"},
+    "history": [
+      {"currentPeerAddress": "10.253.70.3", "phase": "peer-a-present"},
+      {"currentPeerAddress": null, "phase": "peer-a-removed"},
+      {"currentPeerAddress": "10.253.70.4", "phase": "peer-b-present"}
+    ]
+  },
+  "guestChallengeClaim": {
+    "authority": "guest-claim-not-world-truth",
+    "canaryDigest": "sha256:817bac89c2e1229bc9db53b172676411b46c767e36d6d70daccb576a7c660f61",
+    "fixtureResultDigest": "sha256:9f82b3b3660f5fb7e189ec7fef9a329261c040d1f30216f96e62664541cb517e",
+    "peerAConnected": true,
+    "peerBConnected": true
+  }
+}
