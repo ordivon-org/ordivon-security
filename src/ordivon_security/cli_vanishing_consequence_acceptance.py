@@ -21,13 +21,13 @@ from ordivon_security._canonical import (
 from ordivon_security.cli_windows_kvm_c1a_acceptance import _git_revision
 from ordivon_security.cli_windows_kvm_s3_acceptance import _write_receipt
 
-_EFFECT_ID = "range-effect:c1i-vanishing-debit-v1"
-_REQUEST_ID = "range-effect-request:c1i-vanishing-debit-v1"
+_EFFECT_ID = "range-effect:c1i-vanishing-pulse-v1"
+_REQUEST_ID = "range-effect-request:c1i-vanishing-pulse-v1"
 _AUTHORITY_ID = "range-authority:c1i-local-vanishing-consequence"
 _ACTOR_ID = "actor:c1i-local-controller"
 _ZONE_REF = "zone:c1i-local-no-uplink"
-_CAPABILITY = "local.ephemeral-debit"
-_EFFECT_TYPE = "local.consume-one-ephemeral-credit"
+_CAPABILITY = "local.ephemeral-pulse"
+_EFFECT_TYPE = "local.emit-one-ephemeral-pulse"
 
 
 def _sha256_bytes(value: bytes) -> str:
@@ -171,6 +171,7 @@ def _recipient_main(args: argparse.Namespace) -> None:
     if dedup_path is not None:
         _recipient_state(dedup_path)
     server = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+    pulse_count = 0
     try:
         server.bind(str(socket_path))
         socket_path.chmod(0o777)
@@ -184,10 +185,12 @@ def _recipient_main(args: argparse.Namespace) -> None:
                     "status": "rejected",
                 }
             elif dedup_path is None:
+                pulse_count += 1
                 event: JsonObject = {
                     "schemaVersion": 1,
                     "effectId": _EFFECT_ID,
                     "status": "applied",
+                    "pulseOrdinal": pulse_count,
                 }
                 os.write(args.oracle_fd, canonical_bytes(event) + b"\n")
                 ack = {
@@ -485,7 +488,7 @@ def _history_paths(
 
 def _prepare_sender_ledger(path: Path) -> tuple[bytes, JsonObject, JsonObject]:
     ledger = _sender_ledger()
-    data = canonical_bytes(ledger) + b"\n"
+    data = canonical_bytes(ledger)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(data)
     view = _successor_view(ledger)
@@ -496,7 +499,7 @@ def _run_baseline_history(root: Path, public_socket_root: Path, history: str) ->
     ledger_path, socket_path, client_path, _ = _history_paths(
         root, public_socket_root, "baseline", history
     )
-    ledger_bytes, ledger, view = _prepare_sender_ledger(ledger_path)
+    ledger_bytes, ledger, _ = _prepare_sender_ledger(ledger_path)
     recipient, oracle_fd = _start_recipient(socket_path=socket_path, dedup_state=None)
     controller_evidence = _run_crashing_controller(
         history=history,
@@ -506,6 +509,10 @@ def _run_baseline_history(root: Path, public_socket_root: Path, history: str) ->
     initial_oracle = _stop_recipient(recipient, oracle_fd, socket_path)
     if socket_path.exists() or client_path.exists():
         raise RuntimeError("C1-I baseline left transient sockets before recovery observation")
+    post_crash_value = json.loads(ledger_path.read_bytes())
+    if not isinstance(post_crash_value, dict):
+        raise ValueError("C1-I baseline durable ledger must remain an object")
+    view = _successor_view(cast(JsonObject, post_crash_value))
     classification = classify_successor_view(view)
 
     replay_recipient, replay_oracle_fd = _start_recipient(socket_path=socket_path, dedup_state=None)
@@ -548,7 +555,7 @@ def _run_idempotent_history(root: Path, public_socket_root: Path, history: str) 
     ledger_path, socket_path, client_path, dedup_path = _history_paths(
         root, public_socket_root, "recipient-idempotency", history
     )
-    ledger_bytes, ledger, view = _prepare_sender_ledger(ledger_path)
+    ledger_bytes, ledger, _ = _prepare_sender_ledger(ledger_path)
     _recipient_state(dedup_path)
     recipient, oracle_fd = _start_recipient(socket_path=socket_path, dedup_state=dedup_path)
     controller_evidence = _run_crashing_controller(
@@ -559,6 +566,10 @@ def _run_idempotent_history(root: Path, public_socket_root: Path, history: str) 
     initial_oracle = _stop_recipient(recipient, oracle_fd, socket_path)
     state_after_crash = _recipient_state(dedup_path)
     privacy_probe = _recipient_privacy_probe(dedup_path)
+    post_crash_value = json.loads(ledger_path.read_bytes())
+    if not isinstance(post_crash_value, dict):
+        raise ValueError("C1-I idempotent durable ledger must remain an object")
+    view = _successor_view(cast(JsonObject, post_crash_value))
     classification = classify_successor_view(view)
 
     recovery_recipient, recovery_oracle_fd = _start_recipient(
