@@ -285,15 +285,8 @@ The constitutional result is exclusivity of recovery authority for one exact wor
 
 ## Resulting pressure
 
-The next experiment should not immediately generalize this into distributed consensus.
+C1-F has now run the multiple-successor experiment physically. Two candidates over the same exact generation produced exactly one recovery-authority winner and one non-mutating loser. After the winner advanced the world and died, the loser re-read the new ledger generation, acquired authority against that generation, and adopted the existing peer-B consequence without replay. See [`MULTIPLE-SUCCESSORS-C1F.md`](MULTIPLE-SUCCESSORS-C1F.md).
 
-The nearest unresolved question is **multiple successors** on the same accepted single-host substrate:
+C1-F also exposed a provenance boundary C1-E could not see with only one successor: replacing one current claim with another erased successor-to-successor history. The accepted correction archives the exact predecessor claim and links the new current claim by `predecessorClaimId` and digest. The per-Run kernel gate remains the mutex.
 
-```text
-old owner dies
-→ successor A and successor B both want the same exact generation
-```
-
-We should test whether exactly one acquires the claim/gate, whether the loser remains non-mutating, and whether a loser can later become the successor after the winner dies without rewriting predecessor history or replaying the whole effect.
-
-Only after real multi-node execution exists should Security ask whether the single-host recovery gate must become a lease, quorum, fencing token, or another distributed ownership mechanism.
+The next pressure is therefore successor death during its own partially completed continuation, not distributed consensus or a third stable succession merely to lengthen the chain.
