@@ -318,22 +318,8 @@ The first physical setup attempt also missed the initial Guest challenge window 
 
 ## Resulting pressure
 
-The C1 line has now recovered both partial and completed-but-unpublished effects **when enough consequence truth remains observable**.
+C1-I has now executed this information-loss experiment. A delivered vanishing pulse and a never-delivered history were reduced to byte-identical durable sender ledgers and post-crash successor views. Recovery therefore returned `UNKNOWN`; a deliberately blind restricted-principal resend duplicated the delivered history.
 
-A stronger next experiment should remove that advantage rather than add more topology cases.
+C1-I then showed one alternative to sender-side completion certainty: the same exact effectId can be resent safely when a recipient-private durable dedup record suppresses duplicates and acknowledges both first application and replay. See [`INFORMATION-LOSS-C1I.md`](INFORMATION-LOSS-C1I.md).
 
-Create an isolated one-shot, non-idempotent consequence whose final observable world can be identical in two histories:
-
-```text
-History A: delivery happened, publication was lost
-History B: delivery never happened
-
-current physical world after crash
-= observationally indistinguishable
-```
-
-Then kill the controller between physical delivery and durable acknowledgement.
-
-The successor must not guess or blindly resend. The experiment should determine whether the minimum unavoidable structure is downstream idempotency, a durable effect/completion receipt, an acknowledgement identity, or simply an explicit `UNKNOWN` outcome when information has been destroyed.
-
-Only that information-loss experiment should decide whether an exactly-once-style primitive is genuinely necessary.
+The remaining pressure is now inside that recipient mechanism: crash after the real consequence occurs but before recipient dedup/effect identity is durably committed. That fault should determine whether consequence + dedup must share an atomic boundary or whether the effect itself must be intrinsically idempotent.
