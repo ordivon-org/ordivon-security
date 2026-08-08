@@ -230,6 +230,77 @@ def _identity_alive(pid: object, start_time: object) -> bool:
     )
 
 
+def _process_command(pid: object) -> str:
+    if not isinstance(pid, int) or pid < 1:
+        return ""
+    try:
+        return (
+            Path(f"/proc/{pid}/cmdline")
+            .read_bytes()
+            .replace(b"\0", b" ")
+            .decode("utf-8", errors="replace")
+        )
+    except OSError:
+        return ""
+
+
+def _observe_unpublished_physical_state(
+    destination: WorldEntityKvmDestination,
+    request: JsonObject,
+    ledger_path: Path,
+    ledger_before: bytes,
+) -> JsonObject:
+    plan = cast(JsonObject, request["plan"])
+    plan_digest = cast(str, request["planDigest"])
+    observed = destination._observe_existing_state(plan, plan_digest)
+    topology = destination.machine_provider.inspect_qmp(observed)
+    block = destination.machine_provider.qmp_execute(observed, "query-block")
+    run_disk = Path(str(observed["runPath"])) / "ordivon-migration.img"
+    qemu_command = _process_command(observed.get("qemuPid"))
+    block_text = json.dumps(block, sort_keys=True, separators=(",", ":"))
+    status = topology.get("status")
+    qmp_running = isinstance(status, dict) and status.get("running") is True
+    command_binds_carrier = all(
+        marker in qemu_command
+        for marker in (
+            str(run_disk),
+            "id=migrationdisk",
+            "usb-storage",
+            "drive=migrationdisk",
+            "serial=ORDIVON_MIG",
+        )
+    )
+    block_binds_carrier = "migrationdisk" in block_text
+    run_disk_present = run_disk.is_file() and not run_disk.is_symlink()
+    ledger_unchanged = ledger_path.read_bytes() == ledger_before
+    qemu_alive = _identity_alive(observed.get("qemuPid"), observed.get("qemuStartTime"))
+    swtpm_alive = _identity_alive(observed.get("swtpmPid"), observed.get("swtpmStartTime"))
+    no_network = topology.get("networkDevicePresent") is False
+    completion_observable = all(
+        (
+            qemu_alive,
+            swtpm_alive,
+            qmp_running,
+            no_network,
+            run_disk_present,
+            command_binds_carrier,
+            block_binds_carrier,
+            ledger_unchanged,
+        )
+    )
+    return {
+        "qemuAlive": qemu_alive,
+        "swtpmAlive": swtpm_alive,
+        "qmpRunning": qmp_running,
+        "networkDevicePresent": topology.get("networkDevicePresent"),
+        "runDiskPresent": run_disk_present,
+        "qemuCommandBindsCarrier": command_binds_carrier,
+        "qmpBlockBindsCarrier": block_binds_carrier,
+        "ledgerBytesUnchanged": ledger_unchanged,
+        "completedButUnpublishedObservable": completion_observable,
+    }
+
+
 def _cleanup(
     destination: WorldEntityKvmDestination,
     request: JsonObject,
@@ -317,32 +388,45 @@ def _parent(args: argparse.Namespace) -> int:
             memory_mib=args.memory_mib,
         )
         identity = destination.execution_identity
-        if identity.get("revision") != "2":
-            raise RuntimeError("Entity acceptance is not using recovery identity revision 2")
+        if identity.get("revision") != "3":
+            raise RuntimeError("Entity acceptance is not using recovery identity revision 3")
+        post_kill_observation = _observe_unpublished_physical_state(
+            destination,
+            request,
+            ledger_path,
+            ledger_before,
+        )
         reconcile = destination.handle(_reconcile_request(request))
         ledger_after_reconcile = ledger_path.read_bytes()
         owner_after = _read_object(ledger_path, "post-reconcile Entity ledger")
+        receipt_path = destination._receipt_path(MIGRATION_ID)
+        qemu_preserved = _identity_alive(
+            owner_after.get("qemuPid"), owner_after.get("qemuStartTime")
+        )
+        swtpm_preserved = _identity_alive(
+            owner_after.get("swtpmPid"), owner_after.get("swtpmStartTime")
+        )
         reconcile_ok = (
-            reconcile.get("status") == "unknown"
-            and reconcile.get("reason") == "unpublished-native-phase:executing"
-            and ledger_after_reconcile == ledger_before
+            post_kill_observation.get("completedButUnpublishedObservable") is True
+            and reconcile.get("status") == "materialized"
+            and ledger_after_reconcile != ledger_before
+            and owner_after.get("phase") == "migration-running-contained"
             and owner_after.get("ownerPid") == ledger_value.get("ownerPid")
             and owner_after.get("ownerStartTime") == ledger_value.get("ownerStartTime")
+            and qemu_preserved
+            and swtpm_preserved
+            and receipt_path.is_file()
         )
         if not reconcile_ok:
-            raise RuntimeError("fresh Entity reconcile mutated or promoted unpublished state")
+            raise RuntimeError(
+                "fresh Entity reconcile did not publish the observed carrier exactly"
+            )
 
         repeated = destination.handle(request)
         ledger_after_repeat = ledger_path.read_bytes()
-        repeat_ok = (
-            repeated.get("status") == "unknown"
-            and repeated.get("reason") == "existing-unpublished-phase:executing"
-            and ledger_after_repeat == ledger_before
-        )
+        repeat_ok = repeated == reconcile and ledger_after_repeat == ledger_after_reconcile
         if not repeat_ok:
-            raise RuntimeError("repeated Entity materialize resumed unpublished native state")
-        if destination._receipt_path(MIGRATION_ID).exists():
-            raise RuntimeError("unpublished Entity state acquired a false materialization receipt")
+            raise RuntimeError("repeated Entity materialize changed the recovered publication")
 
         cleanup = _cleanup(destination, request)
         qemu_closed = not _identity_alive(
@@ -377,21 +461,24 @@ def _parent(args: argparse.Namespace) -> int:
                 "qemuSurvived": qemu_survived,
                 "swtpmSurvived": swtpm_survived,
             },
+            "postKillObservation": post_kill_observation,
             "freshReconcile": {
                 "status": reconcile.get("status"),
-                "reason": reconcile.get("reason"),
-                "ledgerBytesUnchanged": ledger_after_reconcile == ledger_before,
+                "stablePublicationCreated": ledger_after_reconcile != ledger_before,
+                "stablePhase": owner_after.get("phase"),
                 "predecessorOwnerPreserved": (
                     owner_after.get("ownerPid") == ledger_value.get("ownerPid")
                     and owner_after.get("ownerStartTime") == ledger_value.get("ownerStartTime")
                 ),
-                "receiptAbsent": True,
+                "qemuIdentityPreserved": qemu_preserved,
+                "swtpmIdentityPreserved": swtpm_preserved,
+                "receiptPresent": receipt_path.is_file(),
+                "physicalBodyReplay": False,
             },
             "repeatedMaterialize": {
-                "status": repeated.get("status"),
-                "reason": repeated.get("reason"),
-                "ledgerBytesUnchanged": ledger_after_repeat == ledger_before,
-                "blindResume": False,
+                "sameResponse": repeated == reconcile,
+                "ledgerBytesUnchanged": ledger_after_repeat == ledger_after_reconcile,
+                "physicalBodyReplay": False,
             },
             "cleanup": {
                 "clean": cleanup.get("clean"),
