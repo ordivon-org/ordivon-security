@@ -2,6 +2,8 @@ from .model import (
     ActorPresence,
     RangeAuthority,
     RangeCheckpoint,
+    RangeEffectAdmission,
+    RangeEffectRequest,
     RangeEvent,
     RangeSessionSpec,
 )
@@ -24,6 +26,8 @@ __all__ = [
     "PendingRangeEvent",
     "RangeAuthority",
     "RangeCheckpoint",
+    "RangeEffectAdmission",
+    "RangeEffectRequest",
     "RangeEvent",
     "RangeSession",
     "RangeSessionBackend",

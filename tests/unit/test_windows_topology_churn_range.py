@@ -9,7 +9,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from ordivon_security.range.model import RangeSessionSpec
+from ordivon_security.range.model import RangeEffectAdmission, RangeSessionSpec
 from ordivon_security.range.protocol import RangeSessionInstance
 from ordivon_security.range.windows_fabric import WindowsIsolatedFabricRange
 from ordivon_security.range.windows_topology_churn import WindowsTopologyChurnRange
@@ -32,9 +32,31 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
             canary_path=Path("/tmp/canary.exe"),
             canary_digest="sha256:" + "1" * 64,
         )
+        backend.replacement_trigger = "backend-owned"
         backend._controller_stops = {}
         backend._controller_threads = {}
         return backend
+
+    @staticmethod
+    def _admission(
+        *,
+        admitted: bool = True,
+        zone_ref: str = "zone:s6-fabric",
+        capability: str = "fabric.peer-replacement",
+        effect_type: str = "fabric.replace-peer-a-with-peer-b",
+    ) -> RangeEffectAdmission:
+        return RangeEffectAdmission(
+            request_id="range-effect-request:c1-replace-peer",
+            request_digest="sha256:" + "3" * 64,
+            actor_id="actor:c1-red",
+            authority_id="range-authority:c1-red",
+            authority_digest="sha256:" + "4" * 64,
+            zone_ref=zone_ref,
+            capability=capability,
+            effect_type=effect_type,
+            admitted=admitted,
+            reason="admitted" if admitted else "capability-not-granted",
+        )
 
     @staticmethod
     def _run(*, peer_exit: int | None = 0) -> SimpleNamespace:
@@ -113,6 +135,51 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
         self.assertEqual(truth["currentPeerAddress"], "10.253.70.3")
         self.assertEqual(state["topologyPhase"], "peer-a-present")
         self.assertEqual(state["currentPeerAddress"], "10.253.70.3")
+
+    def test_actor_authorized_mode_does_not_replace_peer_without_request(self) -> None:
+        backend = self._backend()
+        backend.replacement_trigger = "actor-authorized"
+        run = self._run(peer_exit=0)
+        with patch("ordivon_security.range.windows_topology_churn._run") as physical_mutation:
+            changed = backend._replace_peer_if_ready(run)
+        self.assertIs(changed, False)
+        physical_mutation.assert_not_called()
+        self.assertIsNone(run.state.get("actorReplacementRequest"))
+        self.assertEqual(run.state["fabricTruth"]["phase"], "peer-a-present")
+
+    def test_actor_replacement_request_binds_admission_and_exact_replay_is_idempotent(self) -> None:
+        backend = self._backend()
+        backend.replacement_trigger = "actor-authorized"
+        run = self._run(peer_exit=0)
+        with (
+            patch.object(backend, "_run_for", return_value=run),
+            patch.object(backend, "_persist_running_state") as persist,
+        ):
+            first = backend.request_peer_replacement(run.instance, self._admission())
+            event_count = len(run.events)
+            second = backend.request_peer_replacement(run.instance, self._admission())
+        self.assertEqual(first, second)
+        self.assertEqual(first["status"], "accepted-pending-execution")
+        self.assertIs(first["worldEffectVerified"], False)
+        self.assertEqual(len(run.events), event_count)
+        self.assertEqual(run.events[-1].event_type, "fabric.peer-replacement-request-bound")
+        persist.assert_called_once()
+
+    def test_actor_replacement_request_rejects_unadmitted_or_wrong_effect_scope(self) -> None:
+        backend = self._backend()
+        backend.replacement_trigger = "actor-authorized"
+        run = self._run(peer_exit=0)
+        with patch.object(backend, "_run_for", return_value=run):
+            cases = (
+                self._admission(admitted=False),
+                self._admission(zone_ref="zone:other"),
+                self._admission(capability="fabric.observe"),
+                self._admission(effect_type="fabric.add-peer-c"),
+            )
+            for admission in cases:
+                with self.assertRaises(ValueError):
+                    backend.request_peer_replacement(run.instance, admission)
+        self.assertIsNone(run.state.get("actorReplacementRequest"))
 
     def test_successful_peer_a_exit_persists_removed_and_added_resource_truth(self) -> None:
         backend = self._backend()
@@ -201,13 +268,9 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
         ]
         with (
             patch.object(backend, "_snapshot", side_effect=snapshots) as snapshot,
-            patch(
-                "ordivon_security.range.windows_topology_churn.time.sleep"
-            ) as sleep,
+            patch("ordivon_security.range.windows_topology_churn.time.sleep") as sleep,
         ):
-            observed = backend._wait_for_port_absent(
-                run, "vdeadbeef", timeout_seconds=1.0
-            )
+            observed = backend._wait_for_port_absent(run, "vdeadbeef", timeout_seconds=1.0)
         self.assertEqual(snapshot.call_count, 2)
         sleep.assert_called_once_with(0.05)
         self.assertEqual(observed["phase"], "peer-a-removed")
@@ -247,9 +310,7 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
                     "ordivon_security.range.windows_topology_churn.subprocess.Popen",
                     return_value=completed,
                 ),
-                patch(
-                    "ordivon_security.range.windows_topology_churn.time.sleep"
-                ),
+                patch("ordivon_security.range.windows_topology_churn.time.sleep"),
                 patch(
                     "ordivon_security.range.windows_topology_churn._process_start_time"
                 ) as process_start_time,
@@ -265,9 +326,7 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
     def test_nonzero_peer_a_exit_is_not_promoted_to_topology_change(self) -> None:
         backend = self._backend()
         run = self._run(peer_exit=9)
-        with patch(
-            "ordivon_security.range.windows_topology_churn._run"
-        ) as physical_mutation:
+        with patch("ordivon_security.range.windows_topology_churn._run") as physical_mutation:
             changed = backend._replace_peer_if_ready(run)
         self.assertIs(changed, False)
         physical_mutation.assert_not_called()

@@ -7,6 +7,7 @@ from ordivon_security.range import (
     BackendCheckpoint,
     PendingRangeEvent,
     RangeAuthority,
+    RangeEffectRequest,
     RangeSession,
     RangeSessionInstance,
     RangeSessionSpec,
@@ -232,6 +233,107 @@ class RangeSessionS0Tests(unittest.TestCase):
         event = session.poll_backend()[0]
         self.assertEqual(event.plane, "sensor")
         self.assertNotEqual(event.plane, "world-truth")
+
+    def test_effect_admission_uses_exact_actor_zone_and_capability_authority(self) -> None:
+        session = RangeSession(_MemoryRangeBackend(), _spec("actor:red"))
+        session.start()
+        request = RangeEffectRequest(
+            request_id="range-effect-request:red-replace-peer",
+            actor_id="actor:red",
+            authority_id="range-authority:red",
+            zone_ref="zone:battlefield",
+            capability="range-network",
+            effect_type="fabric.replace-peer",
+            payload={"peer": "b"},
+        )
+        admission = session.admit_effect(request, logical_time=2)
+        self.assertTrue(admission.admitted)
+        self.assertEqual(admission.reason, "admitted")
+        self.assertEqual(admission.authority_digest, _authority("actor:red").digest)
+        self.assertEqual(session.events[-2].plane, "contested")
+        self.assertEqual(session.events[-2].event_type, "actor.effect-requested")
+        self.assertEqual(session.events[-1].plane, "management")
+        self.assertEqual(session.events[-1].event_type, "effect.admitted")
+
+    def test_effect_admission_rejects_fake_authority_wrong_zone_and_wrong_capability(self) -> None:
+        session = RangeSession(_MemoryRangeBackend(), _spec("actor:red"))
+        session.start()
+        cases = (
+            (
+                "fake",
+                "range-authority:fake",
+                "zone:battlefield",
+                "range-network",
+                "unknown-authority",
+            ),
+            ("zone", "range-authority:red", "zone:elsewhere", "range-network", "zone-not-granted"),
+            (
+                "cap",
+                "range-authority:red",
+                "zone:battlefield",
+                "destroy-world",
+                "capability-not-granted",
+            ),
+        )
+        for suffix, authority_id, zone_ref, capability, reason in cases:
+            admission = session.admit_effect(
+                RangeEffectRequest(
+                    request_id=f"range-effect-request:red-{suffix}",
+                    actor_id="actor:red",
+                    authority_id=authority_id,
+                    zone_ref=zone_ref,
+                    capability=capability,
+                    effect_type="fabric.replace-peer",
+                ),
+                logical_time=2,
+            )
+            self.assertFalse(admission.admitted)
+            self.assertEqual(admission.reason, reason)
+            self.assertEqual(session.events[-1].event_type, "effect.rejected")
+
+    def test_effect_admission_rejects_authority_owned_by_another_actor(self) -> None:
+        session = RangeSession(_MemoryRangeBackend(), _spec("actor:red", "actor:blue"))
+        session.start()
+        admission = session.admit_effect(
+            RangeEffectRequest(
+                request_id="range-effect-request:red-using-blue",
+                actor_id="actor:red",
+                authority_id="range-authority:blue",
+                zone_ref="zone:battlefield",
+                capability="range-network",
+                effect_type="fabric.replace-peer",
+            ),
+            logical_time=2,
+        )
+        self.assertFalse(admission.admitted)
+        self.assertEqual(admission.reason, "authority-actor-mismatch")
+
+    def test_effect_admission_exact_replay_is_idempotent_and_changed_replay_fails(self) -> None:
+        session = RangeSession(_MemoryRangeBackend(), _spec("actor:red"))
+        session.start()
+        request = RangeEffectRequest(
+            request_id="range-effect-request:red-replay",
+            actor_id="actor:red",
+            authority_id="range-authority:red",
+            zone_ref="zone:battlefield",
+            capability="range-network",
+            effect_type="fabric.replace-peer",
+        )
+        first = session.admit_effect(request, logical_time=3)
+        event_count = len(session.events)
+        second = session.admit_effect(request, logical_time=99)
+        self.assertEqual(first, second)
+        self.assertEqual(len(session.events), event_count)
+        changed = RangeEffectRequest(
+            request_id=request.request_id,
+            actor_id="actor:red",
+            authority_id="range-authority:red",
+            zone_ref="zone:battlefield",
+            capability="native-execution",
+            effect_type="fabric.replace-peer",
+        )
+        with self.assertRaisesRegex(ValueError, "reused with different content"):
+            session.admit_effect(changed, logical_time=4)
 
     def test_checkpoint_is_backend_owned_but_session_identified(self) -> None:
         session = RangeSession(_MemoryRangeBackend(), _spec("actor:red"))
