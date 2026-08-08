@@ -40,6 +40,7 @@ related:
 
 - [`../README.md`](../README.md) owns the public entry and current runnable capability.
 - [`../CHARTER.md`](../CHARTER.md) owns mission, principles, and repository responsibility.
+- [`LAW-PROFILES-C0.md`](LAW-PROFILES-C0.md) owns the interpretation boundary between constitutional law, authority/resource grants, experiment profiles/fixtures, and evaluator judgments. Local profile restrictions cannot silently become universal Security doctrine.
 - [`architecture.md`](architecture.md) owns active contracts, data flow, CAGE composition, and cross-project ownership.
 - [`RANGE-SESSION-S0.md`](RANGE-SESSION-S0.md) owns the experimental persistent Range Session contracts, capability-envelope authority, asynchronous event semantics, and S0 acceptance boundary.
 - [`SYNCHRONOUS-CONTEST-S1.md`](SYNCHRONOUS-CONTEST-S1.md) owns the S1 compatibility boundary between persistent Range Sessions and accepted synchronous Contest execution.

@@ -40,6 +40,17 @@ Ordivon Security is the adversarial domain layer. It defines who is contesting w
 
 It composes rather than replaces Host, Harness, Runtime, external ranges, model Providers, and classical security tools.
 
+## Rule layers
+
+Architecture does not give every constraint constitutional scope. [`LAW-PROFILES-C0.md`](LAW-PROFILES-C0.md) is authoritative for the distinction:
+
+- constitutional laws preserve sovereignty, truth separation, causal accountability, exact identity, recovery, and subsystem authority;
+- authority/resource grants define what one Actor or experiment may control or spend;
+- profiles and fixtures deliberately narrow an experiment to isolate a variable;
+- evaluator judgments interpret evidence but do not become world truth or action authority.
+
+Therefore current Contest tick barriers, CAGE action menus, benign-only Windows admission, no-network P0/P1 modes, and preparation-only execution gates describe their named profiles. They must not be generalized into persistent RangeSession law. Conversely, current `RangeAuthority` and `RangeEvent.causalParents` express constitutional intent that is not yet fully executable; later stages must strengthen them rather than compensate with generic risk vetoes.
+
 ## Active `0.8` flows
 
 Range Session S0 is a new parallel core for persistent contested worlds. It does not replace or reinterpret accepted Contest Trials.

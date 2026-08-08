@@ -39,6 +39,8 @@ Ordivon Security is an **authorized adversarial-Agent laboratory** for studying 
 
 Its emerging persistent execution spine is **RangeSession**: a contested world may continue changing without a global tick barrier or one Action Proposal per Actor. The existing **Contest** remains the stable synchronous profile for reproducible controlled comparisons: multiple goal-bearing actors receive different observations, propose actions concurrently, act through an authoritative Range, and leave independently verifiable evidence.
 
+Security distinguishes **constitutional law**, **authority/resource grants**, **experiment profiles/fixtures**, and **evaluator judgments**. A P0/P1 restriction is not automatically a universal Agent law, and unsupported behavior is not automatically constitutionally forbidden. [`docs/LAW-PROFILES-C0.md`](docs/LAW-PROFILES-C0.md) is the canonical interpretation.
+
 ## Current capability
 
 The active `0.8` core provides:
@@ -335,6 +337,7 @@ The former single-Actor experiment/evaluation framework is frozen at Git revisio
 ## Read next
 
 - [`CHARTER.md`](CHARTER.md) — project purpose and ownership;
+- [`docs/LAW-PROFILES-C0.md`](docs/LAW-PROFILES-C0.md) — constitutional laws, grants, experiment profiles, fixtures, and evaluator-judgment boundaries;
 - [`docs/architecture.md`](docs/architecture.md) — active contracts and integrations;
 - [`docs/MIGRATION-ROUND-1.md`](docs/MIGRATION-ROUND-1.md) — Contest Core replacement;
 - [`docs/MIGRATION-ROUND-2.md`](docs/MIGRATION-ROUND-2.md) — first-class CAGE 4 Range;
