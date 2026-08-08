@@ -889,10 +889,15 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "guest-runner.ps1",
             "install-bootstrap.ps1",
             "p1-observer.ps1",
+            "p1_controller_canary.c",
             "windows-host-resolve-baseline.ps1",
         }
         self.assertEqual({path.name for path in resource_root.iterdir()}, expected)
-        for source_name in ("benign_fixture.c", "sacrificial_canary.c"):
+        for source_name in (
+            "benign_fixture.c",
+            "sacrificial_canary.c",
+            "p1_controller_canary.c",
+        ):
             source = (resource_root / source_name).read_text(encoding="utf-8").lower()
             for token in ("ws2_32", "wininet", "winhttp", "urlmon", "socket(", "connect("):
                 self.assertNotIn(token, source)

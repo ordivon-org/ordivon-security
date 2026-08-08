@@ -147,7 +147,7 @@ The host baseline can be reproduced with `ordivon-security-windows-host-p1-basel
 
 ## R4 architecture decision: one controller/orchestrator Runner
 
-**Status: selected; execution contract and read-only media materializer implemented; Controller and execution remain pending.**
+**Status: selected; execution contract, read-only media materializer, and Controller canary implemented; sealed Controller, selective execution control, and Case execution remain pending.**
 
 P1 will use one Runner architecture:
 
@@ -195,6 +195,20 @@ The retained contract at [`../research/cases/windows-kvm-p1-davinci-case-a-execu
 The materializer writes the tree to an NTFS image through a private `nodev,nosuid,noexec` mount, unmounts it, remounts it read-only, and rehashes the complete payload plus the retained tree manifest. A successful result is `materialized-not-admitted`: the manifest declares QEMU read-only arguments but keeps `qemuAttachmentAuthorized`, `controllerAdmitted`, and `executionAuthorized` false.
 
 A benign two-file canary completed archive listing, Host extraction, NTFS population, read-only remount, full digest readback, unmount, and cleanup. Its sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-case-a-execution-media-canary-6c141b9.json`](../evidence/acceptance/windows-kvm-p1-case-a-execution-media-canary-6c141b9.json). The actual Case A archive was not materialized or executed by that canary.
+
+### R4-B Controller and execution-control canary
+
+`p1_controller_canary.c` is an Ordivon-maintained, locally compiled Windows PE used only as a disposable no-network canary. It exercises three separable facts before any third-party installer execution is admitted:
+
+- a directly launched child and its descendants are accounted inside one Windows Job Object;
+- `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE` terminates both the owned root and a live descendant when controller ownership closes;
+- `JOB_OBJECT_LIMIT_ACTIVE_PROCESS` with a limit of one prevents a maintained secondary executable from completing.
+
+The canary deliberately reports `selectiveSecondaryBlocking: false`. The active-process limit is therefore **not** the Case A execution-control policy: it blocks all additional descendant processes and would also reject legitimate installer subprocesses. Its value is narrower: it proves the kernel-level process-tree ownership and broad blocking primitives work in the accepted Windows base, while falsifying the idea that a simple process-count limit can satisfy `block-unknown-secondary-executable-launch`.
+
+The first physical working-tree trial exposed an over-strong canary assertion that required Job accounting to report zero active processes immediately after the root child became signaled. The same trial independently showed descendant accounting, kill-on-close for root and descendant, broad secondary blocking, no QEMU network device, and clean residual closure. The assertion was corrected so process-tree ownership is established by successful child completion, descendant evidence, and Job total-process accounting; residual termination remains owned by the separate kill-on-close gate. A second working-tree trial passed all three canary gates with clean residual closure. The implementation was then committed at `e011541` and reproduced from that exact clean revision: all three Controller gates passed, QMP reported zero network devices, the Provider reported no error, and residual closure was clean. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-controller-canary-e011541.json`](../evidence/acceptance/windows-kvm-p1-controller-canary-e011541.json).
+
+Case A remains non-executable until a **selective** Windows execution-control canary can allow required installer/system subprocesses while denying the declared secondary staging surface, and until the Controller is sealed into a new P1 base.
 
 ### Network boundary
 
