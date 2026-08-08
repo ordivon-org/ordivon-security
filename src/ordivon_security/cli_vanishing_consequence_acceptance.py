@@ -142,6 +142,8 @@ def _atomic_write_json(path: Path, value: JsonObject) -> None:
 
 
 def _recipient_state(path: Path) -> JsonObject:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.parent.chmod(0o700)
     if not path.exists():
         state: JsonObject = {
             "schemaVersion": 1,
@@ -150,6 +152,7 @@ def _recipient_state(path: Path) -> JsonObject:
             "applicationCount": 0,
         }
         _atomic_write_json(path, state)
+        path.chmod(0o600)
         return state
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
@@ -170,6 +173,7 @@ def _recipient_main(args: argparse.Namespace) -> None:
     server = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
     try:
         server.bind(str(socket_path))
+        socket_path.chmod(0o777)
         while True:
             payload, client = server.recvfrom(65536)
             message = json.loads(payload)
@@ -372,32 +376,110 @@ def _run_crashing_controller(
     return cast(JsonObject, evidence)
 
 
-def _send_effect_once(*, socket_path: Path, client_path: Path) -> JsonObject:
-    client_path.unlink(missing_ok=True)
-    client = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+def _send_effect_once_unprivileged(*, socket_path: Path, client_path: Path) -> JsonObject:
+    script = r"""
+import json
+import os
+import socket
+import sys
+socket_path, client_path, effect_id = sys.argv[1:4]
+try:
+    os.unlink(client_path)
+except FileNotFoundError:
+    pass
+client = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+try:
+    client.bind(client_path)
+    client.settimeout(10)
+    payload = json.dumps(
+        {"schemaVersion": 1, "effectId": effect_id},
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+    client.sendto(payload, socket_path)
+    ack_bytes, _ = client.recvfrom(65536)
+    print(json.dumps({"uid": os.geteuid(), "ack": json.loads(ack_bytes)}, sort_keys=True))
+finally:
+    client.close()
     try:
-        client.bind(str(client_path))
-        client.settimeout(10)
-        message: JsonObject = {"schemaVersion": 1, "effectId": _EFFECT_ID}
-        client.sendto(canonical_bytes(message), str(socket_path))
-        ack_bytes, _ = client.recvfrom(65536)
-        ack = json.loads(ack_bytes)
-        if not isinstance(ack, dict):
-            raise ValueError("C1-I recovery acknowledgement must be an object")
-        validate_json(ack)
-        return cast(JsonObject, ack)
-    finally:
-        client.close()
-        client_path.unlink(missing_ok=True)
+        os.unlink(client_path)
+    except FileNotFoundError:
+        pass
+"""
+    completed = subprocess.run(
+        [
+            "/usr/bin/setpriv",
+            "--reuid",
+            "65534",
+            "--regid",
+            "65534",
+            "--clear-groups",
+            "--",
+            "/usr/bin/python3",
+            "-c",
+            script,
+            str(socket_path),
+            str(client_path),
+            _EFFECT_ID,
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "C1-I restricted successor resend failed: "
+            f"{completed.returncode}: {completed.stderr[-2048:]!r}"
+        )
+    value = json.loads(completed.stdout)
+    if not isinstance(value, dict):
+        raise ValueError("C1-I restricted successor result must be an object")
+    validate_json(value)
+    return cast(JsonObject, value)
 
 
-def _history_paths(root: Path, phase: str, history: str) -> tuple[Path, Path, Path, Path]:
+def _recipient_privacy_probe(path: Path) -> JsonObject:
+    completed = subprocess.run(
+        [
+            "/usr/bin/setpriv",
+            "--reuid",
+            "65534",
+            "--regid",
+            "65534",
+            "--clear-groups",
+            "--",
+            "/usr/bin/cat",
+            str(path),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    result: JsonObject = {
+        "principalUid": 65534,
+        "readSucceeded": completed.returncode == 0,
+        "returnCode": completed.returncode,
+        "stdoutByteLength": len(completed.stdout.encode()),
+        "stderrPresent": bool(completed.stderr),
+    }
+    validate_json(result)
+    return result
+
+
+def _history_paths(
+    root: Path,
+    public_socket_root: Path,
+    phase: str,
+    history: str,
+) -> tuple[Path, Path, Path, Path]:
     base = root / phase / history
     return (
         base / "sender-ledger.json",
-        root / "sockets" / f"{phase}-{history}.sock",
-        root / "sockets" / f"{phase}-{history}-client.sock",
-        base / "recipient-private-state.json",
+        public_socket_root / f"{phase}-{history}.sock",
+        public_socket_root / f"{phase}-{history}-client.sock",
+        root / "recipient-private" / f"{phase}-{history}.json",
     )
 
 
@@ -410,8 +492,10 @@ def _prepare_sender_ledger(path: Path) -> tuple[bytes, JsonObject, JsonObject]:
     return data, ledger, view
 
 
-def _run_baseline_history(root: Path, history: str) -> JsonObject:
-    ledger_path, socket_path, client_path, _ = _history_paths(root, "baseline", history)
+def _run_baseline_history(root: Path, public_socket_root: Path, history: str) -> JsonObject:
+    ledger_path, socket_path, client_path, _ = _history_paths(
+        root, public_socket_root, "baseline", history
+    )
     ledger_bytes, ledger, view = _prepare_sender_ledger(ledger_path)
     recipient, oracle_fd = _start_recipient(socket_path=socket_path, dedup_state=None)
     controller_evidence = _run_crashing_controller(
@@ -425,7 +509,10 @@ def _run_baseline_history(root: Path, history: str) -> JsonObject:
     classification = classify_successor_view(view)
 
     replay_recipient, replay_oracle_fd = _start_recipient(socket_path=socket_path, dedup_state=None)
-    replay_ack = _send_effect_once(socket_path=socket_path, client_path=client_path)
+    replay_result = _send_effect_once_unprivileged(socket_path=socket_path, client_path=client_path)
+    replay_ack = replay_result.get("ack")
+    if not isinstance(replay_ack, dict):
+        raise RuntimeError("C1-I baseline restricted resend lacks acknowledgement")
     replay_oracle = _stop_recipient(replay_recipient, replay_oracle_fd, socket_path)
 
     initial_applied = sum(event.get("status") == "applied" for event in initial_oracle)
@@ -441,6 +528,7 @@ def _run_baseline_history(root: Path, history: str) -> JsonObject:
         "evaluatorOnlyInitialOracle": initial_oracle,
         "counterfactualBlindReplay": {
             "ack": replay_ack,
+            "restrictedSuccessorUid": replay_result.get("uid"),
             "evaluatorOnlyReplayOracle": replay_oracle,
             "initialAppliedCount": initial_applied,
             "replayAppliedCount": replay_applied,
@@ -456,9 +544,9 @@ def _run_baseline_history(root: Path, history: str) -> JsonObject:
     return result
 
 
-def _run_idempotent_history(root: Path, history: str) -> JsonObject:
+def _run_idempotent_history(root: Path, public_socket_root: Path, history: str) -> JsonObject:
     ledger_path, socket_path, client_path, dedup_path = _history_paths(
-        root, "recipient-idempotency", history
+        root, public_socket_root, "recipient-idempotency", history
     )
     ledger_bytes, ledger, view = _prepare_sender_ledger(ledger_path)
     _recipient_state(dedup_path)
@@ -470,13 +558,19 @@ def _run_idempotent_history(root: Path, history: str) -> JsonObject:
     )
     initial_oracle = _stop_recipient(recipient, oracle_fd, socket_path)
     state_after_crash = _recipient_state(dedup_path)
+    privacy_probe = _recipient_privacy_probe(dedup_path)
     classification = classify_successor_view(view)
 
     recovery_recipient, recovery_oracle_fd = _start_recipient(
         socket_path=socket_path,
         dedup_state=dedup_path,
     )
-    recovery_ack = _send_effect_once(socket_path=socket_path, client_path=client_path)
+    recovery_result = _send_effect_once_unprivileged(
+        socket_path=socket_path, client_path=client_path
+    )
+    recovery_ack = recovery_result.get("ack")
+    if not isinstance(recovery_ack, dict):
+        raise RuntimeError("C1-I idempotent restricted resend lacks acknowledgement")
     recovery_oracle = _stop_recipient(
         recovery_recipient,
         recovery_oracle_fd,
@@ -500,8 +594,10 @@ def _run_idempotent_history(root: Path, history: str) -> JsonObject:
         "controllerEvidence": controller_evidence,
         "evaluatorOnlyInitialOracle": initial_oracle,
         "recipientPrivateStateAfterCrash": state_after_crash,
+        "restrictedSuccessorPrivacyProbe": privacy_probe,
         "recoveryResend": {
             "ack": recovery_ack,
+            "restrictedSuccessorUid": recovery_result.get("uid"),
             "evaluatorOnlyOracle": recovery_oracle,
         },
         "recipientPrivateFinalState": final_state,
@@ -517,10 +613,12 @@ def _run_idempotent_history(root: Path, history: str) -> JsonObject:
 def _supervisor(args: argparse.Namespace) -> None:
     revision = _git_revision(Path.cwd(), "Security")
     args.state_root.mkdir(parents=True, exist_ok=False)
-    (args.state_root / "sockets").mkdir(mode=0o700)
+    public_socket_root = Path("/tmp") / f"ordivon-c1i-{os.getpid()}"
+    public_socket_root.mkdir(mode=0o777)
+    public_socket_root.chmod(0o777)
 
     baseline = {
-        history: _run_baseline_history(args.state_root, history)
+        history: _run_baseline_history(args.state_root, public_socket_root, history)
         for history in ("delivered", "undelivered")
     }
     baseline_delivered = cast(JsonObject, baseline["delivered"])
@@ -539,7 +637,7 @@ def _supervisor(args: argparse.Namespace) -> None:
     ]
 
     idempotent = {
-        history: _run_idempotent_history(args.state_root, history)
+        history: _run_idempotent_history(args.state_root, public_socket_root, history)
         for history in ("delivered", "undelivered")
     }
     idem_delivered = cast(JsonObject, idempotent["delivered"])
@@ -579,12 +677,34 @@ def _supervisor(args: argparse.Namespace) -> None:
         is False,
         "counterfactualBlindResendDuplicatesDeliveredHistory": delivered_total == 2,
         "counterfactualBlindResendAppliesUndeliveredHistoryOnce": undelivered_total == 1,
+        "counterfactualBlindResendUsedRestrictedSuccessor": cast(
+            dict[str, object], baseline_delivered["counterfactualBlindReplay"]
+        )["restrictedSuccessorUid"]
+        == 65534
+        and cast(dict[str, object], baseline_undelivered["counterfactualBlindReplay"])[
+            "restrictedSuccessorUid"
+        ]
+        == 65534,
+        "recipientIdempotencyPrivateStateUnreadableByRestrictedSuccessor": cast(
+            dict[str, object], idem_delivered["restrictedSuccessorPrivacyProbe"]
+        )["readSucceeded"]
+        is False
+        and cast(dict[str, object], idem_undelivered["restrictedSuccessorPrivacyProbe"])[
+            "readSucceeded"
+        ]
+        is False,
         "recipientIdempotencySenderViewsRemainEquivalent": idem_views_identical
         and idem_ledgers_identical,
         "recipientIdempotencyDeliveredRetrySuppressed": isinstance(delivered_ack, dict)
         and delivered_ack.get("status") == "duplicate-suppressed",
         "recipientIdempotencyUndeliveredRetryApplied": isinstance(undelivered_ack, dict)
         and undelivered_ack.get("status") == "applied",
+        "recipientIdempotencyRetryUsedRestrictedSuccessor": cast(
+            dict[str, object], idem_delivered["recoveryResend"]
+        )["restrictedSuccessorUid"]
+        == 65534
+        and cast(dict[str, object], idem_undelivered["recoveryResend"])["restrictedSuccessorUid"]
+        == 65534,
         "recipientIdempotencyConvergesBothToOneApplication": delivered_final_state.get(
             "applicationCount"
         )
@@ -599,6 +719,10 @@ def _supervisor(args: argparse.Namespace) -> None:
         and cast(dict[str, object], idem_undelivered["completion"])["acknowledged"] is True,
         "noNetworkOrExternalTargetConsumed": True,
     }
+    residual_public_entries = sorted(path.name for path in public_socket_root.iterdir())
+    if not residual_public_entries:
+        public_socket_root.rmdir()
+    gates["publicDeliveryEndpointClosedToZero"] = not residual_public_entries
     passed = all(gates.values())
     receipt: JsonObject = {
         "schemaVersion": 1,
