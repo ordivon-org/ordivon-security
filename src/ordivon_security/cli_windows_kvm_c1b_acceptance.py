@@ -39,7 +39,9 @@ _AUTHORITY_ID = "range-authority:c1b-interrupted-controller"
 _ZONE_REF = "zone:s6-fabric"
 _CAPABILITY = "fabric.peer-replacement"
 _EFFECT_TYPE = "fabric.replace-peer-a-with-peer-b"
-_FAULT_POINT = "after-peer-a-removed-before-peer-b"
+_MID_FAULT_POINT = "after-peer-a-removed-before-peer-b"
+_COMPLETE_FAULT_POINT = "after-peer-b-persisted-before-completion-event"
+_FAULT_POINTS = {_MID_FAULT_POINT, _COMPLETE_FAULT_POINT}
 
 
 def _digest_bytes(value: bytes) -> str:
@@ -105,18 +107,21 @@ def _host_namespace_truth(ledger: JsonObject, *, ip_path: Path = Path("/usr/bin/
     return truth
 
 
-class _KillAfterPeerARemovedRange(WindowsTopologyChurnRange):
-    def __init__(self, *args: object, gate_path: Path, **kwargs: object) -> None:
+class _InterruptedConsequenceRange(WindowsTopologyChurnRange):
+    def __init__(self, *args: object, gate_path: Path, fault_point: str, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
+        if fault_point not in _FAULT_POINTS:
+            raise ValueError("C1-B fault point is unsupported")
         self._c1b_gate_path = gate_path
+        self._c1b_fault_point = fault_point
 
-    def _start_peer_b(self, run):  # type: ignore[no-untyped-def]
+    def _kill_at_gate(self, run) -> None:  # type: ignore[no-untyped-def]
         ledger_path = Path(cast(str, run.state["runStatePath"]))
         ledger_bytes = ledger_path.read_bytes()
         payload: JsonObject = {
             "schemaVersion": 1,
             "kind": "ordivon.security.c1b-owner-loss-gate",
-            "faultPoint": _FAULT_POINT,
+            "faultPoint": self._c1b_fault_point,
             "ownerPid": os.getpid(),
             "sessionId": run.instance.session_id,
             "instanceId": run.instance.instance_id,
@@ -131,6 +136,20 @@ class _KillAfterPeerARemovedRange(WindowsTopologyChurnRange):
         _replace_private_json(self._c1b_gate_path, payload)
         os.kill(os.getpid(), signal.SIGKILL)
         raise RuntimeError("C1-B owner survived SIGKILL injection")
+
+    def _start_peer_b(self, run):  # type: ignore[no-untyped-def]
+        if self._c1b_fault_point == _MID_FAULT_POINT:
+            self._kill_at_gate(run)
+        return super()._start_peer_b(run)
+
+    def _persist_running_state(self, run) -> None:  # type: ignore[no-untyped-def]
+        super()._persist_running_state(run)
+        if (
+            self._c1b_fault_point == _COMPLETE_FAULT_POINT
+            and run.state.get("topologyPhase") == "peer-b-present"
+            and run.state.get("actorReplacementRequest") is not None
+        ):
+            self._kill_at_gate(run)
 
 
 def _machine_config(args: argparse.Namespace) -> WindowsKvmMachineConfig:
@@ -165,7 +184,7 @@ def _owner(args: argparse.Namespace) -> None:
         external_boundary="denied",
         metadata={"purpose": "c1b-interrupted-consequence"},
     )
-    backend = _KillAfterPeerARemovedRange(
+    backend = _InterruptedConsequenceRange(
         WindowsFabricRangeConfig(
             machine=_machine_config(args),
             canary_path=canary_path,
@@ -174,6 +193,7 @@ def _owner(args: argparse.Namespace) -> None:
         ),
         replacement_trigger="actor-authorized",
         gate_path=args.gate,
+        fault_point=args.fault_point,
     )
     session = RangeSession(
         backend,
@@ -185,7 +205,7 @@ def _owner(args: argparse.Namespace) -> None:
             authorities=(authority,),
             metadata={
                 "purpose": "c1b-interrupted-consequence-baseline",
-                "faultPoint": _FAULT_POINT,
+                "faultPoint": args.fault_point,
                 "externalNetwork": "structurally-unrouted",
             },
         ),
@@ -265,6 +285,8 @@ def _supervisor(args: argparse.Namespace) -> None:
         str(args.gate),
         "--token",
         token,
+        "--fault-point",
+        args.fault_point,
         "--memory-mib",
         str(args.memory_mib),
         "--vcpus",
@@ -327,15 +349,34 @@ def _supervisor(args: argparse.Namespace) -> None:
 
     common_gates = {
         "ownerKilledAtExactInjectedGate": owner.returncode == -signal.SIGKILL
-        and gate.get("faultPoint") == _FAULT_POINT,
+        and gate.get("faultPoint") == args.fault_point,
         "inMemoryEffectBindingExistedBeforeKill": isinstance(gate_binding, dict)
         and gate_binding.get("effectId") is not None
         and gate_binding.get("requestDigest") is not None
         and gate_binding.get("admissionDigest") is not None,
-        "ledgerReachedIntermediatePhysicalPhase": ledger.get("topologyPhase") == "peer-a-removed"
-        and ledger.get("currentPeerAddress") is None,
-        "hostObservedFabricWithoutPeerNamespace": host_truth.get("fabricNamespacePresent") is True
-        and len(cast(list[object], host_truth.get("ownedNamespacesPresent", []))) == 1,
+        "ledgerReachedExpectedPhysicalPhase": (
+            args.fault_point == _MID_FAULT_POINT
+            and ledger.get("topologyPhase") == "peer-a-removed"
+            and ledger.get("currentPeerAddress") is None
+        )
+        or (
+            args.fault_point == _COMPLETE_FAULT_POINT
+            and ledger.get("topologyPhase") == "peer-b-present"
+            and ledger.get("currentPeerAddress") == "10.253.70.4"
+        ),
+        "hostObservedExpectedPhysicalWorld": host_truth.get("fabricNamespacePresent") is True
+        and (
+            (
+                args.fault_point == _MID_FAULT_POINT
+                and len(cast(list[object], host_truth.get("ownedNamespacesPresent", []))) == 1
+                and len(cast(list[object], host_truth.get("bridgePorts", []))) == 1
+            )
+            or (
+                args.fault_point == _COMPLETE_FAULT_POINT
+                and len(cast(list[object], host_truth.get("ownedNamespacesPresent", []))) == 2
+                and len(cast(list[object], host_truth.get("bridgePorts", []))) == 2
+            )
+        ),
         "ownerDeadChildrenStillRecoverable": process_truth.get("ownerAlive") is False
         and process_truth.get("qemuAlive") is True
         and process_truth.get("swtpmAlive") is True
@@ -381,7 +422,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         ),
         "status": status,
         "securityRevision": security_revision,
-        "faultPoint": _FAULT_POINT,
+        "faultPoint": args.fault_point,
         "expectedEffect": {
             "actorId": _ACTOR_ID,
             "authorityId": _AUTHORITY_ID,
@@ -396,8 +437,13 @@ def _supervisor(args: argparse.Namespace) -> None:
         "interpretation": {
             "physicalRecoveryAvailable": True,
             "semanticEffectReconstructionAvailable": binding is not None,
-            "interruptedWorldState": "peer-a-removed-before-peer-b",
+            "interruptedWorldState": (
+                "peer-a-removed-before-peer-b"
+                if args.fault_point == _MID_FAULT_POINT
+                else "peer-b-present-before-completion-event"
+            ),
             "wholeEffectReplayJustified": False,
+            "physicalEffectAlreadyMaterialized": args.fault_point == _COMPLETE_FAULT_POINT,
             "automaticSuffixContinuationProved": False,
         },
     }
@@ -416,6 +462,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--receipt", type=Path)
     parser.add_argument("--gate", type=Path, required=True)
     parser.add_argument("--token", default="c1b")
+    parser.add_argument("--fault-point", choices=sorted(_FAULT_POINTS), default=_MID_FAULT_POINT)
     parser.add_argument("--memory-mib", type=int, default=4096)
     parser.add_argument("--vcpus", type=int, default=2)
     parser.add_argument("--max-runtime-seconds", type=int, default=360)
