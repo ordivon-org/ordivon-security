@@ -15,8 +15,8 @@ audience:
   - builder
   - agent
 updated: 2026-08-08
-summary: Deterministic current-law baseline for World Entity KVM materialization: fresh execution and stable historical receipts remain supported, while every unpublished native state is observation-only UNKNOWN and no successor rewrites predecessor owner authority.
-evidence_status: deterministic
+summary: Deterministic and physical controller-loss baseline for World Entity KVM materialization: fresh execution and stable historical receipts remain supported, while every unpublished native state is observation-only UNKNOWN and no successor rewrites predecessor owner authority.
+evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
   - world-entity-migration
@@ -73,6 +73,28 @@ A second test retains only a `migration-staged` pre-body fence and retries `mate
 
 These checks directly reject the previous recovery behavior in which a successor could call `claim_existing_state`, rewrite Provider ownership, and continue an `executing` Run.
 
+## Physical controller-loss acceptance
+
+The same boundary was then exercised against the real Windows KVM substrate at source revision `09a350c4ab2f81e0bd84c0323eeae1efc18a2c49`. The controller was stopped with `SIGKILL` after QEMU had started and QMP independently confirmed `networkDevicePresent=false`, but before `migration-running-contained` was durably published.
+
+The retained acceptance index is [`../evidence/acceptance/world-entity-controller-loss-09a350c.json`](../evidence/acceptance/world-entity-controller-loss-09a350c.json), SHA-256 `84131f1b992b2cad4835027e92349afe70674d16bde914b3cff9d7dc7e2dc415`.
+
+The physical run established all of the following for that exact fault window:
+
+```text
+controller exit            = SIGKILL / -9
+QEMU survived controller   = true
+swtpm survived controller  = true
+fresh reconcile            = UNKNOWN
+ledger bytes changed       = false
+predecessor owner changed  = false
+materialization receipt    = absent
+repeat materialize resumed = false
+final residual closure     = clean
+```
+
+This is a positive physical result for **non-overreach under uncertainty**. It does not convert the `executing` ledger into proof of completion and does not grant a fresh controller recovery authority merely because the original controller is dead.
+
 ## What remains valid from the earlier Entity experiment
 
 The following semantics survive unchanged:
@@ -93,7 +115,7 @@ unpublishedNativeState = unknown
 
 ## What this does not prove
 
-This is not yet physical crash-recovery acceptance and does not promote Entity Migration to the World production contract surface. In particular, it does not prove:
+The physical acceptance proves the observation-only boundary for one controller-loss window; it does not prove recovery completion and does not promote Entity Migration to the World production contract surface. In particular, it does not prove:
 
 - safe successor continuation after controller death;
 - cleanup or retry authorization for a retained pre-body fence;
@@ -104,9 +126,9 @@ This is not yet physical crash-recovery acceptance and does not promote Entity M
 
 ## Next pressure
 
-The next experiment should kill a real Entity materialization controller at distinct native windows, especially after QEMU exists but before `migration-running-contained` publication. A fresh controller should first re-observe the physical carrier and must not mutate merely because the inherited ledger is exact.
+The first real controller-loss window now confirms that an `executing` ledger may survive with live QEMU/swtpm while a fresh controller remains read-only. The next experiment should move the fault deeper into native consequence and add only the independent observations needed to distinguish materialization progress without trusting the unchanged ledger.
 
-The useful falsifier is the C1-G boundary applied to Entity migration:
+The useful next falsifier is the remaining C1-G boundary applied to Entity migration:
 
 ```text
 completed but unpublished
