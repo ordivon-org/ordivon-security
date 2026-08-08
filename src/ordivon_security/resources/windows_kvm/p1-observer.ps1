@@ -5,8 +5,49 @@ param(
     [int]$MaxFileEntries = 20000,
     [int]$MaxEventEntries = 4000
 )
+
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
+$channelErrors = @()
+
+function Get-OptionalProperty {
+    param(
+        [Parameter(Mandatory = $true)]$InputObject,
+        [Parameter(Mandatory = $true)][string]$Name
+    )
+    $property = $InputObject.PSObject.Properties[$Name]
+    if ($null -eq $property) {
+        return $null
+    }
+    return $property.Value
+}
+
+function Add-ChannelError {
+    param(
+        [Parameter(Mandatory = $true)][string]$Channel,
+        [Parameter(Mandatory = $true)]$ErrorRecord
+    )
+    $script:channelErrors += [ordered]@{
+        channel = $Channel
+        errorType = $ErrorRecord.Exception.GetType().FullName
+        errorMessage = $ErrorRecord.Exception.Message
+        scriptStackTrace = $ErrorRecord.ScriptStackTrace
+    }
+}
+
+function Invoke-Channel {
+    param(
+        [Parameter(Mandatory = $true)][string]$Channel,
+        [Parameter(Mandatory = $true)][scriptblock]$Body,
+        $DefaultValue
+    )
+    try {
+        return & $Body
+    } catch {
+        Add-ChannelError -Channel $Channel -ErrorRecord $_
+        return $DefaultValue
+    }
+}
 
 function Get-FileSnapshot {
     $records = @()
@@ -34,13 +75,14 @@ function Get-UninstallEntries {
         'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'
     )) {
         Get-ItemProperty $root -ErrorAction SilentlyContinue | ForEach-Object {
-            if ($null -ne $_.DisplayName) {
+            $displayName = Get-OptionalProperty -InputObject $_ -Name 'DisplayName'
+            if ($null -ne $displayName) {
                 $values += [ordered]@{
-                    displayName = [string]$_.DisplayName
-                    displayVersion = [string]$_.DisplayVersion
-                    publisher = [string]$_.Publisher
-                    uninstallString = [string]$_.UninstallString
-                    registryPath = [string]$_.PSPath
+                    displayName = [string]$displayName
+                    displayVersion = [string](Get-OptionalProperty -InputObject $_ -Name 'DisplayVersion')
+                    publisher = [string](Get-OptionalProperty -InputObject $_ -Name 'Publisher')
+                    uninstallString = [string](Get-OptionalProperty -InputObject $_ -Name 'UninstallString')
+                    registryPath = [string](Get-OptionalProperty -InputObject $_ -Name 'PSPath')
                 }
             }
         }
@@ -65,28 +107,65 @@ function Get-RegistryStartupEntries {
 }
 
 function Get-EventSlice {
-    param([string]$LogName)
+    param([string]$Channel, [string]$LogName)
     try {
         return @(Get-WinEvent -LogName $LogName -MaxEvents $MaxEventEntries -ErrorAction Stop | ForEach-Object {
             [ordered]@{
-                logName = $_.LogName
-                id = [int]$_.Id
-                level = [int]$_.Level
-                provider = [string]$_.ProviderName
-                recordId = [int64]$_.RecordId
+                logName = [string](Get-OptionalProperty -InputObject $_ -Name 'LogName')
+                id = [int](Get-OptionalProperty -InputObject $_ -Name 'Id')
+                level = [int](Get-OptionalProperty -InputObject $_ -Name 'Level')
+                provider = [string](Get-OptionalProperty -InputObject $_ -Name 'ProviderName')
+                recordId = [int64](Get-OptionalProperty -InputObject $_ -Name 'RecordId')
                 timeCreatedUtc = if ($null -ne $_.TimeCreated) { $_.TimeCreated.ToUniversalTime().ToString('o') } else { $null }
-                message = [string]$_.Message
+                message = [string](Get-OptionalProperty -InputObject $_ -Name 'Message')
             }
         })
-    } catch { return @() }
+    } catch {
+        Add-ChannelError -Channel $Channel -ErrorRecord $_
+        return @()
+    }
 }
 
-$bits = try { @(Get-BitsTransfer -AllUsers -ErrorAction Stop | Select-Object DisplayName, JobId, JobState, OwnerAccount, TransferType) } catch { @() }
-$defender = try { Get-MpComputerStatus | Select-Object * } catch { $null }
-$threats = try { @(Get-MpThreatDetection | Select-Object *) } catch { @() }
-$certificates = @(Get-ChildItem Cert:\LocalMachine\Root, Cert:\LocalMachine\My -ErrorAction SilentlyContinue | ForEach-Object {
-    [ordered]@{ subject=$_.Subject; issuer=$_.Issuer; thumbprint=$_.Thumbprint; notAfter=$_.NotAfter.ToUniversalTime().ToString('o') }
-})
+$files = Invoke-Channel -Channel 'files' -DefaultValue @() -Body { @(Get-FileSnapshot) }
+$registryStartup = Invoke-Channel -Channel 'registry-startup' -DefaultValue @() -Body { @(Get-RegistryStartupEntries) }
+$services = Invoke-Channel -Channel 'services' -DefaultValue @() -Body {
+    @(Get-CimInstance Win32_Service | Select-Object Name, State, StartMode, PathName, StartName)
+}
+$drivers = Invoke-Channel -Channel 'drivers' -DefaultValue @() -Body {
+    @(Get-CimInstance Win32_SystemDriver | Select-Object Name, State, StartMode, PathName, ServiceType)
+}
+$scheduledTasks = Invoke-Channel -Channel 'scheduled-tasks' -DefaultValue @() -Body {
+    @(Get-ScheduledTask | Select-Object TaskName, TaskPath, State, Author, Description)
+}
+$bits = Invoke-Channel -Channel 'bits' -DefaultValue @() -Body {
+    @(Get-BitsTransfer -AllUsers | Select-Object DisplayName, JobId, JobState, OwnerAccount, TransferType)
+}
+$installedProducts = Invoke-Channel -Channel 'installed-products' -DefaultValue @() -Body { @(Get-UninstallEntries) }
+$users = Invoke-Channel -Channel 'local-users' -DefaultValue @() -Body {
+    @(Get-LocalUser | Select-Object Name, Enabled, LastLogon, PasswordRequired, PrincipalSource)
+}
+$groups = Invoke-Channel -Channel 'local-groups' -DefaultValue @() -Body {
+    @(Get-LocalGroup | Select-Object Name, Description, PrincipalSource)
+}
+$certificates = Invoke-Channel -Channel 'certificates' -DefaultValue @() -Body {
+    @(Get-ChildItem Cert:\LocalMachine\Root, Cert:\LocalMachine\My -ErrorAction Stop | ForEach-Object {
+        [ordered]@{
+            subject = [string](Get-OptionalProperty -InputObject $_ -Name 'Subject')
+            issuer = [string](Get-OptionalProperty -InputObject $_ -Name 'Issuer')
+            thumbprint = [string](Get-OptionalProperty -InputObject $_ -Name 'Thumbprint')
+            notAfter = if ($null -ne $_.NotAfter) { $_.NotAfter.ToUniversalTime().ToString('o') } else { $null }
+        }
+    })
+}
+$defenderStatus = Invoke-Channel -Channel 'defender-status' -DefaultValue $null -Body {
+    Get-MpComputerStatus | Select-Object *
+}
+$defenderThreats = Invoke-Channel -Channel 'defender-threats' -DefaultValue @() -Body {
+    @(Get-MpThreatDetection | Select-Object *)
+}
+$networkAdapters = Invoke-Channel -Channel 'network-adapters' -DefaultValue @() -Body {
+    @(Get-NetAdapter -IncludeHidden | Select-Object Name, InterfaceDescription, Status, MacAddress)
+}
 
 $result = [ordered]@{
     schemaVersion = 1
@@ -94,30 +173,34 @@ $result = [ordered]@{
     phase = $Phase
     capturedAtUtc = [DateTime]::UtcNow.ToString('o')
     computerName = $env:COMPUTERNAME
-    files = Get-FileSnapshot
-    registry = [ordered]@{ startupEntries = Get-RegistryStartupEntries }
-    services = @(Get-CimInstance Win32_Service | Select-Object Name, State, StartMode, PathName, StartName)
-    drivers = @(Get-CimInstance Win32_SystemDriver | Select-Object Name, State, StartMode, PathName, ServiceType)
-    scheduledTasks = @(Get-ScheduledTask | Select-Object TaskName, TaskPath, State, Author, Description)
+    files = $files
+    registry = [ordered]@{ startupEntries = $registryStartup }
+    services = $services
+    drivers = $drivers
+    scheduledTasks = $scheduledTasks
     bitsJobs = $bits
-    startupEntries = Get-RegistryStartupEntries
-    installedProducts = Get-UninstallEntries
-    usersGroups = [ordered]@{
-        users = @(Get-LocalUser | Select-Object Name, Enabled, LastLogon, PasswordRequired, PrincipalSource)
-        groups = @(Get-LocalGroup | Select-Object Name, Description, PrincipalSource)
-    }
+    startupEntries = $registryStartup
+    installedProducts = $installedProducts
+    usersGroups = [ordered]@{ users = $users; groups = $groups }
     certificates = $certificates
-    defender = [ordered]@{ status = $defender; threats = $threats }
+    defender = [ordered]@{ status = $defenderStatus; threats = $defenderThreats }
     eventLogs = [ordered]@{
-        powershell = Get-EventSlice 'Microsoft-Windows-PowerShell/Operational'
-        taskScheduler = Get-EventSlice 'Microsoft-Windows-TaskScheduler/Operational'
-        defender = Get-EventSlice 'Microsoft-Windows-Windows Defender/Operational'
-        system = Get-EventSlice 'System'
-        application = Get-EventSlice 'Application'
+        powershell = Get-EventSlice 'event-powershell' 'Microsoft-Windows-PowerShell/Operational'
+        taskScheduler = Get-EventSlice 'event-task-scheduler' 'Microsoft-Windows-TaskScheduler/Operational'
+        defender = Get-EventSlice 'event-defender' 'Microsoft-Windows-Windows Defender/Operational'
+        system = Get-EventSlice 'event-system' 'System'
+        application = Get-EventSlice 'event-application' 'Application'
     }
-    networkAdapters = @(Get-NetAdapter -IncludeHidden -ErrorAction SilentlyContinue | Select-Object Name, InterfaceDescription, Status, MacAddress)
+    networkAdapters = $networkAdapters
+    channelErrors = @($channelErrors)
+    degradedChannelCount = [int]$channelErrors.Count
     readOnlyObserver = $true
 }
+
 $temporary = "$OutputPath.partial"
-[System.IO.File]::WriteAllText($temporary, ($result | ConvertTo-Json -Depth 12 -Compress) + "`n", [System.Text.UTF8Encoding]::new($false))
+[System.IO.File]::WriteAllText(
+    $temporary,
+    ($result | ConvertTo-Json -Depth 12 -Compress) + "`n",
+    [System.Text.UTF8Encoding]::new($false)
+)
 Move-Item -LiteralPath $temporary -Destination $OutputPath -Force
