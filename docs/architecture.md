@@ -161,7 +161,42 @@ C1-J recipient-commit-gap profile
   → an explicit recipient inbox phase `reserved` is then persisted before the effect in two histories: crash before pulse versus crash after pulse but before completion publication
   → both histories leave byte-identical durable inbox state and byte-identical recipient recovery views while evaluator ground truth differs
   → retry from reserved duplicates one history; suppress from reserved loses the other
-  → reservation honestly preserves uncertainty but does not resolve the commit gap; intrinsic idempotency or a genuinely shared atomic consequence/completion boundary is now pressured
+  → reservation honestly preserves uncertainty but does not resolve the commit gap
+
+C1-K intrinsic-idempotency profile
+  → the consequence itself is an exact atomic ensure-symlink world state, not an adjacent dedup marker
+  → apply-then-SIGKILL-before-ACK followed by the same retry executes the recipient twice but mutates the world once and leaves one semantic consequence
+  → crash-before-apply uses the same retry and creates the missing exact consequence
+  → preexisting exact state returns already-satisfied with zero request-owned mutation
+  → exact type/value observation distinguishes already-satisfied from same-name conflict
+  → for this declarative effect, verified invariant satisfaction can establish semantic completion without proving one exact invocation caused the state
+  → exactly-once invocation is therefore not required for exactly-one semantic consequence
+
+C1-L compensation profile
+  → the original local effect is non-idempotent balance += 1; ACK loss plus retry physically creates duplicate balance 2 instead of desired balance 1
+  → compensation has its own distinct effect identity and repairs 2 → 1 without rewriting the original duplicate history
+  → naive compensation is itself non-idempotent: apply-then-ACK-loss followed by blind retry drives 1 → 0 and overcompensates
+  → accepted recovery therefore re-observes current balance before any repair: exact 2 authorizes compensation, exact 1 proves already-repaired and authorizes publication-only closure
+  → crash-before-compensation remains at 2 and is repaired once; crash-after-compensation-before-ACK remains at 1 and performs no second decrement
+  → compensation is a separate recovery primitive when repair progress remains observable; exactly-once compensation invocation is not required in this fault model
+
+C1-M compensation-information-loss profile
+  → the downstream balance remains durable but is private to the compensation authority; restricted callers can invoke the capability but cannot read repair truth
+  → naive compensated and uncompensated crash histories expose byte-identical sender ledgers and caller recovery views, so caller history remains UNKNOWN
+  → blind replay of subtract-one compensation overrepairs hidden balance 1 to 0 but correctly repairs hidden balance 2 to 1
+  → the repeat-safe candidate is a distinct effect identity/capability/effectType with retrySemantics=convergent-repair-duplicate
+  → under that contract the caller views remain equally UNKNOWN, while downstream private truth maps 1→already-repaired/no-op and 2→applied/1
+  → both hidden histories converge to repaired balance 1 without caller read authority, caller-visible compensation receipt, or shared transaction boundary
+  → private truth can remain authority-local; retry safety belongs to the effect boundary that owns and can verify the consequence
+
+C1-N downstream-truth-failure profile
+  → the owning compensation authority itself loses trustworthy predicate truth through exact missing, malformed, and fork-conflict states
+  → repaired and unrepaired pre-fault histories collapse to identical authority observations for each fault class
+  → the unchanged convergent ensure-repaired effect performs zero mutation and returns truth-unavailable/truth-conflict; idempotency does not reconstruct missing truth
+  → a distinct digest-bound state witness outside the private truth boundary restores the exact pre-fault state in this targeted single-host fault model
+  → restored balance 1 returns already-repaired; restored balance 2 returns applied and converges to 1
+  → tampered witness data is rejected with zero mutation
+  → witness integrity is demonstrated, but freshness, independent failure domain, and atomic consequence/witness publication are not
 
 World Entity publication-only recovery profile
   → the original Entity controller may die while the exact QEMU/swtpm carrier remains live and durable state still says executing

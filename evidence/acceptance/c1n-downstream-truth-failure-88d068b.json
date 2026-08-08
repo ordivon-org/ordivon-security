@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.c1n-downstream-truth-failure-acceptance-index",
+  "status": "accepted",
+  "implementationRevision": "git:88d068b1bce471faf3298fa050fec9c4de4eb27c",
+  "acceptanceClaims": [
+    "missing, corrupt and forked downstream truth each collapsed repaired balance 1 and unrepaired balance 2 histories to identical owning-authority observations",
+    "the unchanged C1-M convergent compensation effect performed zero mutation for all six truth-failure histories and returned truth-unavailable or truth-conflict instead of guessing",
+    "a distinct digest-bound state witness outside the private truth boundary restored exact pre-fault truth for all three fault classes, after which repaired histories returned already-repaired and unrepaired histories returned applied, all ending at balance 1",
+    "a tampered witness was rejected with zero world mutation",
+    "the witness recovery identity remained distinct from the C1-M compensation effect identity",
+    "no IP network or external target was consumed"
+  ],
+  "physicalAcceptance": {
+    "compensationEffectId": "range-effect:c1m-idempotent-private-compensation-v1",
+    "truthRecoveryId": "truth-recovery:c1n-sealed-state-witness-v1",
+    "faultClasses": ["missing", "corrupt", "fork"],
+    "preFaultBalances": {"repaired": 1, "unrepaired": 2},
+    "withoutWitness": {
+      "missing": "truth-unavailable",
+      "corrupt": "truth-unavailable",
+      "fork": "truth-conflict",
+      "worldMutation": false
+    },
+    "afterWitnessRestore": {
+      "repairedHistoryStatus": "already-repaired",
+      "unrepairedHistoryStatus": "applied",
+      "finalBalance": 1
+    },
+    "tamperedWitnessStatus": "invalid-witness",
+    "privateReceiptByteLength": 39058,
+    "privateReceiptSha256": "sha256:396c3460824fec69da0e2eba4e188548b0374a1b89880b6ad9168ac7ebf58835",
+    "gateCount": 19,
+    "status": "accepted"
+  },
+  "limitations": [
+    "the witness is outside the private truth boundary but remains on the same Host/state-root substrate",
+    "witness freshness and consequence/witness publication atomicity are not tested",
+    "multi-node replication, quorum, consensus, concurrent writers and dynamic partitions remain unproved"
+  ]
+}

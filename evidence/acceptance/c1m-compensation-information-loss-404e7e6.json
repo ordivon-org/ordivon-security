@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.c1m-compensation-information-loss-acceptance-index",
+  "status": "accepted",
+  "implementationRevision": "git:404e7e691fd2ed6e557ad525c9ff0b63c8aceedd",
+  "acceptanceClaims": [
+    "naive compensation-applied and compensation-not-applied histories produced different evaluator-private balances but byte-equivalent sender ledgers and byte-equivalent caller recovery views, forcing UNKNOWN",
+    "restricted UID-65534 callers were physically denied downstream private balance reads while retaining the public compensation invocation capability",
+    "blind replay of the naive subtract-one compensation overcompensated the already-repaired hidden history from 1 to 0 while correctly repairing the hidden unrepaired history from 2 to 1",
+    "the repeat-safe candidate used a distinct request/effect/capability/effectType identity with retrySemantics=convergent-repair-duplicate",
+    "under the idempotent compensation protocol the caller views remained byte-equivalent and historically UNKNOWN, but same-protocol retry returned already-repaired for hidden balance 1 and applied for hidden balance 2, converging both to 1",
+    "all downstream private worlds physically contained only balance.json, all public local endpoints closed to zero, and no IP network or external target was consumed"
+  ],
+  "physicalAcceptance": {
+    "baselineNaive": {
+      "compensationEffectId": "range-effect:c1m-naive-private-compensation-v1",
+      "requestDigest": "sha256:a888c967b680b8eccedf418ea03bc70e653e3c49cbb291df66f36383e94ad357",
+      "admissionDigest": "sha256:dbbeb88d9e8e5017c36732991124f2c55e1dbbe05ac9a22168dd05e9f97782b6",
+      "senderLedgerSha256": "sha256:c0f7551b7a6f9ac1c70af9f8cbc64fddaed1aca21bda3469e93743c526dfc38e",
+      "successorViewSha256": "sha256:485509bf26a8527f77c59edd06a37b0241f96ec39f4c2ce259ebddf9a6285704",
+      "compensatedBalanceAfterFault": 1,
+      "uncompensatedBalanceAfterFault": 2,
+      "compensatedBalanceAfterBlindRetry": 0,
+      "uncompensatedBalanceAfterBlindRetry": 1
+    },
+    "idempotentCompensator": {
+      "compensationEffectId": "range-effect:c1m-idempotent-private-compensation-v1",
+      "requestDigest": "sha256:8718a1a25ca1058edabafd356e504bd4af90b88125b60229f01bc8c96771506f",
+      "admissionDigest": "sha256:1402b3b703bbeeea6f30f4da172fbf6a6338d162c38d2a0ed5c6034f6e1dbfd4",
+      "senderLedgerSha256": "sha256:311ce5706376e8438d60f96ba4df76da3f9e72450cecde2664fb125d97cd044d",
+      "successorViewSha256": "sha256:f038637698fe7108075f397806b8e4581548f74d2858d88220a981fc06aeb0e1",
+      "repairedHistoryRetryStatus": "already-repaired",
+      "unrepairedHistoryRetryStatus": "applied",
+      "repairedHistoryFinalBalance": 1,
+      "unrepairedHistoryFinalBalance": 1
+    },
+    "privateWorldInventory": ["balance.json"],
+    "privateReceiptByteLength": 23067,
+    "privateReceiptSha256": "sha256:3934099d0d07e86a4b8f8ab16ec1679d1bfc0509f36dc6b40d432407fded50ca",
+    "gateCount": 20,
+    "status": "accepted"
+  },
+  "limitations": [
+    "the downstream private state remains durable, single-host and internally readable by the compensation authority",
+    "loss, corruption, fork or partition of downstream private truth remains untested",
+    "multi-resource, cross-party, concurrent and distributed compensation remain unproved",
+    "the experiment does not establish generic exactly-once, saga or transaction semantics"
+  ]
+}

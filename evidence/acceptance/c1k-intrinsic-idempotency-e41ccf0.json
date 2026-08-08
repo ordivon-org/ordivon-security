@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.c1k-intrinsic-idempotency-acceptance-index",
+  "status": "accepted",
+  "implementationRevision": "git:e41ccf0ca852c7dc689ca8f6931321b9129e533b",
+  "acceptanceClaims": [
+    "an exact local ensure-state consequence was invoked twice across acknowledgement loss but mutated the world once and ended with one semantic consequence",
+    "crash-before-apply used the same retry policy and created the one missing consequence",
+    "an exact preexisting target caused zero request-owned world mutations while recovery returned already-satisfied",
+    "the effect world contained only the exact consequence object and no adjacent dedup or inbox object",
+    "wrong-type same-name target handling is fail-closed in unit coverage",
+    "all public local capability endpoints closed to zero and no IP network or external target was consumed"
+  ],
+  "physicalAcceptance": {
+    "effectId": "range-effect:c1k-idempotent-world-object-v1",
+    "requestDigest": "sha256:46cc4d19d49c2019b30e76d7a436359b071a1715ff1be5fed4a4732086f3561b",
+    "admissionDigest": "sha256:6888af8fe226f794a399695aebe486e03a960d8066d41adfb9cd86816107fca3",
+    "targetKey": "effect-bf78afed8c7a661aea2781e9",
+    "desiredValue": "ordivon-world-state:c1k-idempotent-v1",
+    "senderLedgerSha256": "sha256:aeb2b3f47d4716b06406c52129797551f9423af85b1b0a3e192bdbc889352c9b",
+    "appliedThenAckLost": {"physicalInvocationCount": 2, "worldMutationCount": 1, "finalSemanticConsequenceCount": 1, "retryStatus": "already-satisfied"},
+    "crashBeforeApply": {"physicalInvocationCount": 2, "worldMutationCount": 1, "finalSemanticConsequenceCount": 1, "retryStatus": "applied"},
+    "preexistingExactState": {"physicalInvocationCount": 2, "worldMutationCount": 0, "finalSemanticConsequenceCount": 1, "retryStatus": "already-satisfied"},
+    "privateReceiptByteLength": 15273,
+    "privateReceiptSha256": "sha256:7a78aad1388b82d5ae6ff27d73b5157e4a703ac763b68c992a9836c908563303",
+    "gateCount": 18,
+    "status": "accepted"
+  },
+  "limitations": [
+    "the accepted effect is one local atomic ensure-symlink state transition, not an irreversible event consequence",
+    "multi-resource atomicity, compensation, distributed effects and generic exactly-once remain unproved",
+    "verified invariant satisfaction is a valid semantic completion rule only for effects whose contract is explicitly declarative/idempotent"
+  ]
+}

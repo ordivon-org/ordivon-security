@@ -323,6 +323,7 @@ class WorldMessageInbox:
         try:
             os.fchmod(descriptor, 0o600)
             with os.fdopen(descriptor, "wb", closefd=True) as handle:
+                descriptor = -1
                 handle.write(canonical_bytes(record) + b"\n")
                 handle.flush()
                 os.fsync(handle.fileno())
@@ -345,8 +346,9 @@ class WorldMessageInbox:
                 raise RuntimeError("Committed World Message admission record cannot be reloaded")
             return retained
         finally:
-            with contextlib.suppress(OSError):
-                os.close(descriptor)
+            if descriptor >= 0:
+                with contextlib.suppress(OSError):
+                    os.close(descriptor)
             temporary_path.unlink(missing_ok=True)
 
     def _receipt_for_exact_plan(
