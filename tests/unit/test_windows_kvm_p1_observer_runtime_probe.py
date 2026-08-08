@@ -18,8 +18,14 @@ class WindowsKvmP1ObserverRuntimeProbeTests(unittest.TestCase):
         self.assertIn("function Invoke-Channel", observer)
         self.assertIn("channelErrors = @($channelErrors)", observer)
         self.assertIn("degradedChannelCount = [int]$channelErrors.Count", observer)
-        self.assertIn("Get-OptionalProperty -InputObject $_ -Name 'DisplayName'", observer)
+        self.assertIn("$displayName = Get-OptionalProperty -InputObject $item -Name 'DisplayName'", observer)
+        self.assertIn("function Convert-BoundedText", observer)
+        self.assertIn("if ($property.Name -like 'PS*') { continue }", observer)
+        self.assertIn("Select-Object -First $maxRecordEntries", observer)
+        self.assertIn("ConvertTo-Json -Depth 8 -Compress", observer)
         self.assertNotIn("if ($null -ne $_.DisplayName)", observer)
+        self.assertNotIn("values = $item | Select-Object *", observer)
+        self.assertNotIn("Get-MpComputerStatus | Select-Object *", observer)
 
     def test_probe_matches_orchestrator_observer_contract(self) -> None:
         source = Path(
