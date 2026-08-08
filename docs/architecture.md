@@ -145,6 +145,15 @@ C1-H unpublished-completion profile
   → the successor does not restart the transient peer service and performs no Range-world replay; it repairs only durable peer-b-present publication with peerPid=0
   → current + archived recovery claims remain distinct from completion evidence; final reconciler later closes the still-live sensor and remaining substrate
 
+C1-I information-loss profile
+  → one local no-uplink effect emits a non-idempotent vanishing pulse under one exact effectId
+  → delivered and undelivered controller-SIGKILL histories are normalized until durable sender bytes and post-crash successor views are byte-identical
+  → evaluator-only ground truth differs, so the successor cannot infer history and must classify UNKNOWN rather than publish completion or authorize blind resend
+  → a restricted UID-65534 blind resend proves the danger: delivered history reaches two pulses while undelivered history reaches one
+  → recipient-owned durable effectId dedup remains unreadable to that restricted successor while the public delivery capability remains usable
+  → retry then converges both histories to one application: duplicate-suppressed when already delivered, applied when previously undelivered, followed by sender completion acknowledgement
+  → safe continuation therefore need not imply historical certainty; the next pressure moves to atomicity between recipient consequence and recipient dedup commit
+
 World Entity publication-only recovery profile
   → the original Entity controller may die while the exact QEMU/swtpm carrier remains live and durable state still says executing
   → predecessor owner PID/start-time remains historical provenance and is never rewritten to the fresh publisher
