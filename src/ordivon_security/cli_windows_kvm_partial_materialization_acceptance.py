@@ -321,8 +321,14 @@ def _supervisor(args: argparse.Namespace) -> None:
         and bool(cast(list[object], post_root_links["presentNames"]))
     )
     experiment_cleanup = _cleanup_root_links(expected_root_links)
+    results = reconciliation.get("results")
+    reconciled_item = (
+        results[0]
+        if isinstance(results, list) and len(results) == 1 and isinstance(results[0], dict)
+        else {}
+    )
 
-    gates = {
+    common_gates = {
         "ownerKilledAtPartialMaterializationGate": owner.returncode == -signal.SIGKILL
         and gate.get("faultPoint") == _FAULT_POINT,
         "effectIdentitySurvivedOwnerLoss": isinstance(binding, dict)
@@ -339,22 +345,44 @@ def _supervisor(args: argparse.Namespace) -> None:
         and process_truth.get("qemuAlive") is True
         and process_truth.get("swtpmAlive") is True
         and process_truth.get("captureAlive") is True,
-        "existingReconcilerReportedPassed": reconciliation.get("status") == "passed"
+        "reconcilerReportedPassed": reconciliation.get("status") == "passed"
         and reconciliation.get("reconciled") == 1
         and reconciliation.get("attentionRequired") == 0,
-        "existingReconcilerRemovedNamespaces": not cast(
+        "reconcilerRemovedNamespaces": not cast(
             list[object], post_namespace_truth.get("ownedNamespacesPresent", [])
         ),
-        "existingReconcilerLeftRootVethResidual": bool(
-            cast(list[object], post_root_links["presentNames"])
-        ),
-        "existingCleanClaimWasFalse": false_clean,
-        "experimentCleanupRemovedExactResidualLinks": experiment_cleanup.get("clean") is True,
     }
-    status = "falsifier-observed" if all(gates.values()) else "failed"
+    if args.expect_fixed_reconciler:
+        mode_gates = {
+            "reconcilerRemovedPartialRootVeth": not cast(
+                list[object], post_root_links["presentNames"]
+            ),
+            "reconcilerReceiptOwnsHostLinkClosure": set(
+                cast(list[str], reconciled_item.get("requestedHostLinks", []))
+            )
+            == set(expected_root_links)
+            and reconciled_item.get("residualHostLinks") == [],
+            "experimentCleanupFoundNoResidualWork": experiment_cleanup.get("clean") is True
+            and experiment_cleanup.get("requested") == [],
+        }
+        status = "accepted" if all({**common_gates, **mode_gates}.values()) else "failed"
+    else:
+        mode_gates = {
+            "existingReconcilerLeftRootVethResidual": bool(
+                cast(list[object], post_root_links["presentNames"])
+            ),
+            "existingCleanClaimWasFalse": false_clean,
+            "experimentCleanupRemovedExactResidualLinks": experiment_cleanup.get("clean") is True,
+        }
+        status = "falsifier-observed" if all({**common_gates, **mode_gates}.values()) else "failed"
+    gates = {**common_gates, **mode_gates}
     receipt: JsonObject = {
         "schemaVersion": 1,
-        "kind": "ordivon.security.partial-materialization-recovery-baseline",
+        "kind": (
+            "ordivon.security.partial-materialization-recovery-acceptance"
+            if args.expect_fixed_reconciler
+            else "ordivon.security.partial-materialization-recovery-baseline"
+        ),
         "status": status,
         "securityRevision": security_revision,
         "faultPoint": _FAULT_POINT,
@@ -382,13 +410,14 @@ def _supervisor(args: argparse.Namespace) -> None:
         "interpretation": {
             "partialMaterializationObserved": True,
             "stableTopologyPhaseSufficient": False,
-            "existingReconcilerCleanClaimReliable": not false_clean,
+            "reconcilerCleanClaimReliable": args.expect_fixed_reconciler and not false_clean,
             "automaticContinuationProved": False,
         },
     }
     _write_receipt(args.receipt, receipt)
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
-    if status != "falsifier-observed":
+    expected_status = "accepted" if args.expect_fixed_reconciler else "falsifier-observed"
+    if status != expected_status:
         raise SystemExit(1)
 
 
@@ -408,6 +437,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--vcpus", type=int, default=2)
     parser.add_argument("--max-runtime-seconds", type=int, default=360)
     parser.add_argument("--supervisor-timeout-seconds", type=float, default=150.0)
+    parser.add_argument("--expect-fixed-reconciler", action="store_true")
     return parser
 
 

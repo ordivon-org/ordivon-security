@@ -401,6 +401,9 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
         self.assertEqual(extra["topologyPhase"], "peer-b-present")
         self.assertEqual(extra["currentPeerAddress"], "10.253.70.4")
         self.assertEqual(len(extra["ownedNamespaceCandidates"]), 3)
+        self.assertEqual(len(extra["ownedHostLinkCandidates"]), 2)
+        self.assertTrue(extra["ownedHostLinkCandidates"][0].startswith("q"))
+        self.assertTrue(extra["ownedHostLinkCandidates"][1].startswith("w"))
 
 
 if __name__ == "__main__":
