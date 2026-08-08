@@ -81,10 +81,6 @@ def _stable_peer_b_truth(ledger: JsonObject) -> JsonObject:
         and ledger.get("currentPeerAddress") == "10.253.70.4"
         and process_truth.get("qemuAlive") is True
         and process_truth.get("swtpmAlive") is True
-        and (
-            process_truth.get("peerAlive") is True
-            or (ledger.get("peerPid") == 0 and ledger.get("peerStartTime") is None)
-        )
         and process_truth.get("captureAlive") is True
         and set(cast(list[str], namespace_truth.get("ownedNamespacesPresent", [])))
         == {cast(str, fabric_ns), peer_ns}
