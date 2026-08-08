@@ -11,6 +11,9 @@ from ordivon_security.range.windows_fabric_reconcile import (
     _remove_host_links,
     reconcile_windows_fabric_range_runs,
 )
+from ordivon_security.range.windows_fabric_recovery_ownership import (
+    acquire_windows_fabric_successor_claim,
+)
 
 
 class WindowsFabricRangeReconcileTests(unittest.TestCase):
@@ -129,6 +132,27 @@ class WindowsFabricRangeReconcileTests(unittest.TestCase):
         self.assertEqual(result["status"], "passed")
         self.assertEqual(result["skippedActive"], 1)
         self.assertTrue(ledger_path.exists())
+
+    def test_live_successor_claim_blocks_orphan_reconciliation(self) -> None:
+        ledger_path, _ = self._s6_ledger()
+        digest = "sha256:" + hashlib.sha256(ledger_path.read_bytes()).hexdigest()
+        claim = acquire_windows_fabric_successor_claim(
+            self.root,
+            ledger_path=ledger_path,
+            expected_ledger_digest=digest,
+            purpose="unit-test-successor",
+        )
+        self.assertIsNotNone(claim)
+        assert claim is not None
+        try:
+            result = reconcile_windows_fabric_range_runs(self.root)
+            self.assertEqual(result["status"], "passed")
+            self.assertEqual(result["reconciled"], 0)
+            self.assertEqual(result["skippedSuccessorActive"], 1)
+            self.assertEqual(result["results"][0]["decision"], "skipped-successor-active")
+            self.assertTrue(ledger_path.exists())
+        finally:
+            claim.release()
 
     def test_tampered_namespace_candidates_are_attention_required_not_deleted(self) -> None:
         ledger_path, _ = self._s6_ledger()
