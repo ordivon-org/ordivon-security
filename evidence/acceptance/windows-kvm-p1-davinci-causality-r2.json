@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-davinci-causality-reassessment",
+  "caseId": "case:davinci-resolve-studio-21.0.3.7",
+  "analysisSourceRevision": "git:1ee60a35064fc1e51caa986959d49fd5737f19bb",
+  "status": "accepted-static-causality-reassessment",
+  "sample": {
+    "byteLength": 7428655207,
+    "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+    "identityReverified": true,
+    "executedDuringReassessment": false
+  },
+  "componentIdentities": {
+    "wrapper": {
+      "byteLength": 4585876,
+      "digest": "sha256:ee98ffe8a4b681caa0958704816cba7426c46842298e042e4a8ce34ad2a1d40c"
+    },
+    "outerMsi": {
+      "byteLength": 2872387,
+      "digest": "sha256:44ae022b71782a8a4693abbc182f8fce59ef15200defd4088d7196595f64f6cf"
+    },
+    "nestedArchive": {
+      "byteLength": 1164591,
+      "digest": "sha256:3542239301dddc1ce5dbc951e799c5700956be2d29398f697e65c23eb0344647"
+    },
+    "nestedMsi": {
+      "byteLength": 4998144,
+      "digest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3"
+    },
+    "resolveExe": {
+      "byteLength": 580153816,
+      "digest": "sha256:77fd83a5a7cd5a9e50797b41e1d76addf9b372efff7d1a95fc7af77249cf7539"
+    },
+    "replacementIntlDll": {
+      "byteLength": 152576,
+      "digest": "sha256:737ba26966f648a4383ab28faae13a02a20b91f2d779a5e1ad24b4a4589e5f34",
+      "signatureStatus": "unsigned"
+    },
+    "patchesTxt": {
+      "byteLength": 4081,
+      "digest": "sha256:32f25947ef6f60529622a2a1a7ed6340b17ca92ba2d11e9cbaefb5a0436c2216"
+    }
+  },
+  "wrapperBootstrapper": {
+    "peOverlayOffset": 4273496,
+    "peOverlayByteLength": 312380,
+    "configuredPrerequisiteEntries": 1,
+    "configuredSetupFile": "DaVinci Resolve\\DaVinci.msi",
+    "configuredCommandLine": "/qr",
+    "nestedArchiveListedAsDistributedFile": true,
+    "nestedArchiveConfiguredAsSetupFile": false,
+    "nestedMsiConfiguredAsSetupFile": false
+  },
+  "outerMsi": {
+    "allDatabaseTablesScannedForLiteralReachability": true,
+    "nestedArchiveLiteralReferenceCount": 0,
+    "nestedMsiLiteralReferenceCount": 0,
+    "maliciousDownloaderLiteralReferenceCount": 0,
+    "installedCrackBindings": [
+      {
+        "file": "intl.dll",
+        "byteLength": 152576,
+        "component": "intl.dll",
+        "feature": "ResolveFeature",
+        "directory": "INSTALLATIONDIR",
+        "sequence": 4170
+      },
+      {
+        "file": "intl_original.dll",
+        "byteLength": 20848,
+        "component": "intl_original.dll",
+        "feature": "ResolveFeature",
+        "directory": "INSTALLATIONDIR",
+        "sequence": 4171
+      },
+      {
+        "file": "Patches.txt",
+        "byteLength": 4081,
+        "component": "AllOtherFiles",
+        "feature": "ResolveFeature",
+        "directory": "INSTALLATIONDIR",
+        "sequence": 4172
+      }
+    ]
+  },
+  "replacementIntlDll": {
+    "proxyIntlExportsObserved": true,
+    "referencesIntlOriginalDll": true,
+    "importsVirtualProtect": true,
+    "referencesPatchesTxt": true,
+    "referencesResolveExe": true,
+    "runtimePatchEngineStringsObserved": true,
+    "resolveExeDirectImportOfIntlDllObserved": false,
+    "networkCapabilityEstablished": false
+  },
+  "nestedMaliciousMsi": {
+    "manufacturerClaim": "GetintoWAY",
+    "firstInstallCondition": "NOT Installed AND NOT OLDPRODUCTS",
+    "dataSetterSequence": 6401,
+    "powershellSequence": 6402,
+    "downloadUrl": "https://corehubpro.com/d/windows",
+    "transports": [
+      "bitsadmin",
+      "System.Net.WebClient"
+    ],
+    "scheduledTaskPattern": "OneDriveStandaloneUpdate####",
+    "scheduledTaskRunLevel": "Highest",
+    "recursiveDownloadedExeLaunch": true
+  },
+  "causality": {
+    "primaryInstallationPath": {
+      "status": "statically-bound",
+      "steps": [
+        "wrapper bootstrapper selects outer DaVinci.msi with /qr",
+        "outer MSI binds replacement intl.dll, intl_original.dll, and Patches.txt to ResolveFeature under INSTALLATIONDIR",
+        "replacement intl.dll is an unsigned proxy-style runtime patch engine"
+      ]
+    },
+    "containedMaliciousBranch": {
+      "status": "contained-reachability-unproven",
+      "steps": [
+        "distribution contains DaVinci Resolve.7z",
+        "that archive contains exactly one nested GetintoWAY MSI",
+        "the nested MSI contains the first-install downloader and privileged scheduled-task chain"
+      ],
+      "missingEdge": "no static causal edge currently binds the ordinary wrapper/outer-MSI path to execution of the nested malicious MSI"
+    },
+    "chainComplete": false
+  },
+  "hostControlRevalidation": {
+    "priorBaseline": "windows-host-p1-davinci-free-baseline-r3.json",
+    "resolveExe": {
+      "byteLength": 574885744,
+      "digest": "sha256:3a35bca1214d7463803033e2a94742a30db470c125b420f4daa89ce126f409aa",
+      "signatureStatus": "Valid",
+      "matchesPriorBaseline": true
+    },
+    "intlDll": {
+      "byteLength": 20848,
+      "digest": "sha256:dec4671bdb1946562301c434bef589fbe52bf193b0c1aa9be47faf9661f87f2e",
+      "signatureStatus": "Valid",
+      "matchesPriorBaseline": true
+    },
+    "intlOriginalDllPresent": false,
+    "patchesTxtPresent": false,
+    "oneDriveStandaloneUpdateTaskMatches": 0,
+    "hostModifiedByReassessment": false
+  },
+  "historicalIsolatedDynamicEvidence": {
+    "currentMainCapability": false,
+    "candidateBranchRevision": "git:f19683d0e07adefc26bc2a381133d74ebc16af11",
+    "benignControllerCanary": {
+      "logicalName": "c2-d0-controller-canary-1f8137e15e/canary-receipt.json",
+      "byteLength": 4207,
+      "digest": "sha256:d2de72a4391aff9d5a82a14c91e67e475ff0ed73c19714e86e55618b82219d86",
+      "status": "accepted",
+      "controllerCompleted": true,
+      "runtimeArtifactCaptured": true,
+      "networkDeviceAbsent": true,
+      "residualClosureClean": true
+    },
+    "corehubExactBundleAttempts": {
+      "receiptCount": 10,
+      "acceptedCount": 0,
+      "controllerCompletedCount": 0,
+      "qmpNoNetworkDeviceCount": 7,
+      "residualClosureCleanCount": 10,
+      "liveC2ReconnectPerformedByReassessment": false
+    }
+  },
+  "decision": {
+    "ordinaryInstallationAdmission": "rejected",
+    "hostExecutionAuthorized": false,
+    "isolatedMaliciousExecutionPerformedByReassessment": false,
+    "reason": "The primary installation path is already bound to an unsigned replacement patch engine, while the package separately contains a malicious downloader MSI whose ordinary-path reachability remains unproven. Static rejection does not require inventing a causal edge between those branches."
+  },
+  "limitations": [
+    "Absence of a literal nested-MSI reference in the wrapper action fields and outer MSI tables does not prove that no dynamic or data-dependent path can ever invoke it.",
+    "Resolve.exe does not directly import intl.dll in the observed import table; the exact runtime module that loads the proxy DLL remains unproved by this reassessment.",
+    "Historical CoreHubPro D0 receipts prove failed isolated attempts and clean closure, not successful malicious stage-2 activation.",
+    "The historical stage-2 input bundle is no longer retained in the known Security state roots, so its acquisition provenance was not reconstructed in this reassessment."
+  ],
+  "nextResearchQuestions": [
+    "Does ordinary execution of the exact wrapper in a no-NIC disposable Guest ever invoke the nested GetintoWAY MSI?",
+    "Which product module loads the replacement intl.dll when the derived crack case is exercised under an isolated observation profile?"
+  ]
+}

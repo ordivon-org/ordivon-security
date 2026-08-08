@@ -122,6 +122,8 @@ P0.1 reconciliation receipts bind the scanned state root, each ledger decision, 
 
 The sanitized R4-A materializer-canary index is retained at [`acceptance/windows-kvm-p1-case-a-execution-media-canary-6c141b9.json`](acceptance/windows-kvm-p1-case-a-execution-media-canary-6c141b9.json). It binds a committed implementation revision, a private receipt digest, pre-extraction archive validation, a complete tree digest, `noexec` NTFS population, read-only remount verification, source immutability, and residual closure. The canary used only maintained benign data: it does not admit QEMU attachment, a Controller, Case A execution, or Case B.
 
+The DaVinci R2 static-causality index is retained at [`acceptance/windows-kvm-p1-davinci-causality-r2.json`](acceptance/windows-kvm-p1-davinci-causality-r2.json). It re-verifies the 7.4 GiB archive and selected component identities, separates the statically bound wrapper → outer-MSI → replacement-patch-engine path from the contained but reachability-unproven nested downloader MSI, records that the outer MSI has no literal reference to the nested archive/MSI/downloader chain, revalidates the unchanged signed host control, and keeps the historical C2-D0 controller canary distinct from current main capability. It does not claim that absence of a literal reference proves dynamic unreachability.
+
 ## Active Case Snapshot bundle
 
 An evolving local Case may be retained as:
