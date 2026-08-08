@@ -21,6 +21,18 @@ def _digest(path: Path) -> str:
 
 
 class WindowsKvmP1DerivedBaseTests(unittest.TestCase):
+    def test_shared_images_layout_remains_qemu_traversable(self) -> None:
+        source = (
+            Path(__file__).parents[2]
+            / "src"
+            / "ordivon_security"
+            / "evaluation"
+            / "windows_kvm_p1_derived_base.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn("images_root.chmod(0o710)", source)
+        self.assertIn('shutil.chown(images_root, user="root", group=config.run_group)', source)
+        self.assertNotIn("images_root.chmod(0o700)", source)
+
     def test_sealed_resource_slots_are_fixed_and_unique(self) -> None:
         sample = SampleIdentity.create(
             sha256="sha256:" + "1" * 64,
