@@ -1,0 +1,83 @@
+{
+  "acceptanceClaims": [
+    "two real successor processes observed the same exact dead-owner S6 ledger generation and exactly one acquired recovery authority while the loser remained non-mutating",
+    "the winning successor continued the admitted effect to peer-b-present and changed the durable ledger generation without changing semantic effect identity",
+    "after the winner was SIGKILLed, the losing successor re-read the newer ledger digest, acquired recovery authority against that exact current generation, and adopted the already-materialized effect without replay or physical mutation",
+    "the pre-fix overwrite-only current claim lost the first successor's recovery lineage even though physical mutual exclusion and retry were correct",
+    "the minimal fix archives exact predecessor claims and adds one-hop predecessorClaimId/predecessorClaimDigest to the new current claim without changing the kernel mutex",
+    "the final reconciler preserved the current successor claim and archived predecessor claim in its receipt before closing the world and deleting recovery metadata",
+    "persistent peer-B topology remained valid even after the one-shot challenge service naturally exited, separating persistent consequence from transient service liveness"
+  ],
+  "baselineFalsifier": {
+    "implementationRevision": "git:c9d98a1ca6bffb7058b2fbfe53b5aa57aace5d0a",
+    "privateReceiptByteLength": 26107,
+    "privateReceiptSha256": "sha256:5c0b109a0a0a5120f77d740b79ed9cae3ca267791fe376a136b503d64eeed82d",
+    "status": "lineage-falsifier-observed",
+    "onlyFailedGate": "firstSuccessorClaimLineagePreserved"
+  },
+  "implementationRevision": "git:511f08fc74ba4590941683b6d0e62fc7c45815c7",
+  "kind": "ordivon.security.c1f-multiple-successors-acceptance",
+  "limitations": [
+    "the physical experiment uses one Linux Host and does not prove distributed successor ownership or fencing",
+    "winner selection and fairness are intentionally unspecified",
+    "only two successor candidates were physically tested",
+    "successor death during the continuation suffix itself remains untested",
+    "generic exactly-once semantics, shared-resource concurrency and causal-DAG requirements remain unproved",
+    "the accepted Range remains structurally unrouted and does not authorize external or uncontrolled targets"
+  ],
+  "physicalAcceptance": {
+    "effectId": "range-effect:45c20a574a8942898da35c98",
+    "initialLedgerDigest": "sha256:af27ac84d9f52f953ca7c9114086020e15ea50fe88014140f7f67a571253749f",
+    "winner": {
+      "label": "B",
+      "claimId": "recovery-claim:55d73a44c2622606e159a539",
+      "claimantPid": 189091,
+      "claimantStartTime": 971749
+    },
+    "continuedLedgerDigest": "sha256:11cb6ae67e46496a42244787b5222c84f39f15a320e6c735ba215274a2866e71",
+    "retrySuccessor": {
+      "label": "A",
+      "claimId": "recovery-claim:e9646d7b13b85c16e0e19e04",
+      "claimantPid": 189090,
+      "claimantStartTime": 971749,
+      "predecessorClaimId": "recovery-claim:55d73a44c2622606e159a539",
+      "predecessorClaimDigest": "sha256:8c0b7bb69f234b1c9bdb7dcbc87545f5d0601b5c549ad515ef4f6767d7e2e64d",
+      "status": "adopted-existing-effect",
+      "wholeEffectReplayAttempted": false,
+      "physicalMutationAttempted": false
+    },
+    "finalReconciler": {
+      "privateReceiptByteLength": 2117,
+      "privateReceiptSha256": "sha256:261dcb69f151269bed11d357747395442cae2565640bcf5ac3a9851af93980ec",
+      "reconciled": 1,
+      "attentionRequired": 0,
+      "currentClaimIdObserved": "recovery-claim:e9646d7b13b85c16e0e19e04",
+      "archivedClaimIdsObserved": [
+        "recovery-claim:55d73a44c2622606e159a539"
+      ]
+    },
+    "gates": {
+      "bothSuccessorsObservedSameInitialGeneration": true,
+      "exactlyOneInitialSuccessorAcquiredAuthority": true,
+      "experimentCleanupFoundNoResidualWork": true,
+      "finalReconcilerClosedWorld": true,
+      "finalReconcilerPreservedSuccessorHistory": true,
+      "firstSuccessorClaimLineagePreserved": true,
+      "historyMetadataRemovedAfterClosure": true,
+      "loserAdoptedExistingEffectWithoutReplay": true,
+      "loserBecameNextRecoveryAuthority": true,
+      "loserRetriedAgainstCurrentGeneration": true,
+      "losingSuccessorDidNotMutateInitialWorld": true,
+      "ownerKilledAtPartialGate": true,
+      "retrySuccessorSigkillReleasedAuthority": true,
+      "winnerChangedLedgerGeneration": true,
+      "winnerContinuedEffect": true,
+      "winnerSigkillReleasedAuthority": true
+    },
+    "privateReceiptByteLength": 28687,
+    "privateReceiptSha256": "sha256:97f6b881f4acb1ed89b5e92ac8212e763af33ba2ab001b7b3448c29c62382049",
+    "status": "accepted"
+  },
+  "schemaVersion": 1,
+  "status": "accepted"
+}

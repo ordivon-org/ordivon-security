@@ -17,6 +17,7 @@ from ordivon_security.providers.windows_kvm import (
     _terminate_pid,
 )
 from ordivon_security.range.windows_fabric_recovery_ownership import (
+    clear_windows_fabric_recovery_claim_history,
     try_acquire_windows_fabric_recovery_gate,
 )
 
@@ -333,6 +334,7 @@ def reconcile_windows_fabric_range_runs(
             )
             continue
         observed_successor_claim = recovery_gate.read_claim()
+        observed_successor_claim_history = recovery_gate.read_claim_history()
         try:
             peer_closed = _terminate_from_ledger(
                 ledger,
@@ -405,10 +407,14 @@ def reconcile_windows_fabric_range_runs(
                         "ledgerRemoved": not ledger_path.exists(),
                         "canaryRemoved": canary_removed,
                         "successorClaimObserved": observed_successor_claim,
+                        "successorClaimHistoryObserved": cast(
+                            list[JsonValue], observed_successor_claim_history
+                        ),
                     }
                 )
                 if observed_successor_claim is not None:
                     recovery_gate.claim_path.unlink(missing_ok=True)
+                clear_windows_fabric_recovery_claim_history(state_root, run_token=token)
                 continue
 
             diagnostic = _write_diagnostic(
@@ -435,6 +441,9 @@ def reconcile_windows_fabric_range_runs(
                     "reason": "resource-identity-unresolved",
                     "diagnosticPath": str(diagnostic),
                     "successorClaimObserved": observed_successor_claim,
+                    "successorClaimHistoryObserved": cast(
+                        list[JsonValue], observed_successor_claim_history
+                    ),
                 }
             )
 
