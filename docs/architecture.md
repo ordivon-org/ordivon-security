@@ -180,6 +180,15 @@ C1-L compensation profile
   → crash-before-compensation remains at 2 and is repaired once; crash-after-compensation-before-ACK remains at 1 and performs no second decrement
   → compensation is a separate recovery primitive when repair progress remains observable; exactly-once compensation invocation is not required in this fault model
 
+C1-M compensation-information-loss profile
+  → the downstream balance remains durable but is private to the compensation authority; restricted callers can invoke the capability but cannot read repair truth
+  → naive compensated and uncompensated crash histories expose byte-identical sender ledgers and caller recovery views, so caller history remains UNKNOWN
+  → blind replay of subtract-one compensation overrepairs hidden balance 1 to 0 but correctly repairs hidden balance 2 to 1
+  → the repeat-safe candidate is a distinct effect identity/capability/effectType with retrySemantics=convergent-repair-duplicate
+  → under that contract the caller views remain equally UNKNOWN, while downstream private truth maps 1→already-repaired/no-op and 2→applied/1
+  → both hidden histories converge to repaired balance 1 without caller read authority, caller-visible compensation receipt, or shared transaction boundary
+  → private truth can remain authority-local; retry safety belongs to the effect boundary that owns and can verify the consequence
+
 World Entity publication-only recovery profile
   → the original Entity controller may die while the exact QEMU/swtpm carrier remains live and durable state still says executing
   → predecessor owner PID/start-time remains historical provenance and is never rewritten to the fresh publisher
