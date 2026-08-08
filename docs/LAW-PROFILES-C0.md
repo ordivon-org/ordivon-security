@@ -145,12 +145,13 @@ When a stronger experiment needs a currently closed capability, the first questi
 | exact identity, evidence digests, durable resource identity | **keep as constitutional infrastructure** |
 | Host / Runtime / Security authority separation | **keep as constitutional law** |
 | exact owner-loss reconciliation and `attention-required` on unresolved authority | **keep as autonomy-enabling recovery infrastructure** |
-| one recovery mutator per exact world generation | **constitutional recovery-authority law; C1-E proves predecessor provenance must remain distinct from current recovery ownership, and C1-F proves multiple candidates do not require simultaneous authority** |
-| recovery successor lineage | **keep as durable causal provenance; C1-F proves overwrite-only current claim is insufficient once recovery authority passes between successors** |
-| C1-E/F per-Run `flock` + current/archived claim records | **current single-host mechanism, not universal law; gate enforces exclusion while claim records bind exact generation and succession provenance** |
+| one recovery mutator per exact recoverable world lineage | **constitutional recovery-authority law; C1-E/F prove competing recovery actors require exclusion, while C1-G shows the durable ledger digest used by the claim is not itself a complete physical-world generation** |
+| post-acquisition world re-observation | **keep as constitutional recovery truth discipline for consequential continuation; C1-G proves an unchanged ledger digest can coexist with changed physical progress after a predecessor dies** |
+| recovery successor lineage | **keep as durable causal provenance; C1-F proves overwrite-only current claim is insufficient once recovery authority passes between successors, and C1-G preserves lineage even when consecutive claims bind the same durable ledger digest** |
+| C1-E/F/G per-Run `flock` + current/archived claim records | **current single-host mechanism, not universal law; gate enforces exclusion while claim records bind durable publication state and succession provenance; they do not replace Host world observation** |
 | persistent consequence vs transient helper liveness | **keep the distinction where a consumer depends on it; C1-F shows one-shot peer-service exit must not erase an already-materialized topology consequence** |
 | zone/capability `RangeAuthority` | **constitutional law; executable for one accepted C1 physical effect, not yet generic** |
-| `RangeEvent.causalParents` | **keep intent; C1-B through C1-F resolved interruption, partial materialization, continuation, recovery arbitration, and two-successor lineage without a generic DAG, so strengthen only when mid-succession partial effects, shared effects, compensation, or distributed causation creates genuine ambiguity** |
+| `RangeEvent.causalParents` | **keep intent; C1-B through C1-G resolved interruption, partial materialization, continuation, arbitration, lineage, and one mid-successor crash without a generic DAG, so strengthen only when unpublished/ephemeral consequences, shared effects, compensation, or distributed causation creates genuine ambiguity** |
 | Harness resource budgets | **keep as configurable resource grants** |
 | synchronous Contest tick/action rules | **retain as explicit profile, never generalize to RangeSession** |
 | CAGE two-plan model action surface | **retain only as P0 fixture** |

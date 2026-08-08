@@ -320,12 +320,6 @@ C1-F does not prove:
 
 ## Resulting pressure
 
-The strongest next experiment is not a third stable successor merely to lengthen the chain.
+C1-G has now executed this exact mid-successor crash. The first successor moved q/w into their target namespaces and attached w to the bridge, then died before stable topology publication. The durable ledger digest did not change, yet the physical world did. A second successor acquired recovery authority against that same durable digest, preserved predecessor-claim lineage, re-observed the new Host midpoint, and completed only the missing suffix without durable substep state or whole-effect replay. See [`MID-SUCCESSOR-RECOVERY-C1G.md`](MID-SUCCESSOR-RECOVERY-C1G.md).
 
-It is:
-
-> **Kill the winning successor during its own continuation, after it has changed the world but before it publishes the stable target generation; then require another successor to reconstruct the new partial world and continue from there.**
-
-That experiment would combine C1-C/D's world-state-as-progress result with C1-E/F's successor authority and lineage across **multiple recovery generations**.
-
-Do not add durable substep state first. Let a successor-to-successor mid-effect crash reveal whether world truth + exact resource identity + claim lineage still suffice.
+The next pressure should attack the assumption that relevant progress remains persistently observable: kill after the peer-B service/consequence has been consumed but before `peer-b-present` is durably published, then ask whether persistent topology plus independent consequence evidence is sufficient to reconstruct unpublished completion.
