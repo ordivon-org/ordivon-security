@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-production-orchestrator-acceptance",
+  "status": "accepted-maintained-production-orchestration-path",
+  "implementationRevision": "git:be4eae12953dd57e14fa578fabc7e0179e11b501",
+  "observerImplementationRevision": "git:ac3b998e801e7a8a03302b1c2cebf9f25d0170fe",
+  "environmentImageDigest": "sha256:199879a01188bf6489409e172e8a53f246e8327992562ef0256fdc6acef0b149",
+  "scope": {
+    "maintainedProbe": true,
+    "productionControllerPathExercised": true,
+    "productionOrchestratorPathExercised": true,
+    "prePostObserverPathExercised": true,
+    "selectiveExecutionControlExercised": true,
+    "thirdPartySample": false,
+    "thirdPartySampleExecuted": false,
+    "actualCaseAExecuted": false,
+    "caseAExecutionAuthorized": false,
+    "caseBAdmitted": false,
+    "nestedMsiReachabilityProved": false
+  },
+  "derivedBase": {
+    "manifestPathKind": "private-runtime-path",
+    "manifestDigest": "sha256:6e1a30b794053e8372dd004e519ae93a0af8d0b8c88ecf5a4ab3fba5ca84c6b6",
+    "overlayDigest": "sha256:c3b91d294af789de14a0ff15befe99ffabf847862ef78d545cd4b17c100e5b22",
+    "parentEnvironmentImageDigest": "sha256:8f68029953c4229d6dfd4ad81fcabe473a7dddb09c14dead5143d205503d1977",
+    "parentManifestDigest": "sha256:c0f27a56dfd12db0cad713f7e4195e7fbc93449eaeffd1db36db2016e51f6cd1",
+    "parentImageUnchanged": true,
+    "rwResidualClosed": true,
+    "roResidualClosed": true,
+    "thirdPartyExecutionAuthorized": false
+  },
+  "sealedResources": {
+    "genericController": {
+      "sha256": "sha256:eb7e9874f1dc568721c826ea30e1b77f325254244564ca70381d2556f3d4388a",
+      "byteLength": 25600,
+      "guestPath": "C:\\ProgramData\\Ordivon\\p1-controller.exe"
+    },
+    "executionControlCanary": {
+      "sha256": "sha256:d29becd1409bab42bbba885b3e6db5623cedaf61d83d6c3b01ed7111e347d655",
+      "byteLength": 27648,
+      "guestPath": "C:\\ProgramData\\Ordivon\\acceptance\\p1-execution-control-canary.exe"
+    },
+    "orchestrator": {
+      "sha256": "sha256:9f901eddccc3c0b510a39888d15d900748dccfe0c4516e94efad2798df3244e4",
+      "byteLength": 13224,
+      "guestPath": "C:\\ProgramData\\Ordivon\\p1-orchestrator.ps1"
+    },
+    "observer": {
+      "sha256": "sha256:f66834322288251407cf50dc1f8c0986cb7bb6228f139d69cc128aa8fb421399",
+      "byteLength": 14517,
+      "guestPath": "C:\\ProgramData\\Ordivon\\p1-observer.ps1",
+      "replaces": "sha256:e2aeb44c5a640b89ef95b86aebc4bfd0f97ef5eb01d3e09f39dbe77b8ff2c30f"
+    }
+  },
+  "observerDiagnosis": {
+    "supersededObserverDigest": "sha256:e2aeb44c5a640b89ef95b86aebc4bfd0f97ef5eb01d3e09f39dbe77b8ff2c30f",
+    "observedFailure": "full observer invocation exceeded both 120-second and 300-second diagnostic launcher bounds",
+    "channelIsolationFinding": "the files channel completed in 142 ms; the prior observer then stalled while materializing registry-startup values that included PowerShell provider metadata",
+    "correction": "bounded primitive projections, PS-provider metadata exclusion, bounded record/text counts, and shallower final JSON serialization",
+    "acceptedObserverDigest": "sha256:f66834322288251407cf50dc1f8c0986cb7bb6228f139d69cc128aa8fb421399"
+  },
+  "observerRuntimeValidation": {
+    "runId": "evaluation-run:dbaab2e1ab3ba37000b1630a",
+    "jobId": "job-019fe1af-b1ca-7e80-b25f-edd57d15ed35",
+    "attemptId": "attempt-019fe1af-b1ca-7e80-b25f-eded81f415fe",
+    "terminalReason": "benign-fixture-completed",
+    "disposition": "no-issue-observed",
+    "observerIdentityVerified": true,
+    "observerOutputPresent": true,
+    "observerOutputDigest": "sha256:947133033c1b37d565b01bb97cb7d5b6de5758354522e303f22cfc1c2202c360",
+    "observerOutputByteLength": 1119575,
+    "observerSchemaVerified": true,
+    "observerDegradedChannelCount": 2,
+    "maxFileEntries": 512,
+    "maxEventEntries": 128,
+    "guestFixtureDurationMs": 27642,
+    "networkDeviceCount": 0,
+    "residualClosed": true,
+    "recoveryRequired": false
+  },
+  "productionProbe": {
+    "runId": "evaluation-run:6cf810ebf6010e0d5bad74e9",
+    "jobId": "job-019fe1b1-dbb5-70d0-b7d0-ca45b71e498a",
+    "attemptId": "attempt-019fe1b1-dbb5-70d0-b7d0-ca5739117394",
+    "terminalReason": "benign-fixture-completed",
+    "disposition": "no-issue-observed",
+    "fixtureDigest": "sha256:403319be9138240ca7c5d39c1a6c486ad43dd0c62446275b12a933b932e4abf1",
+    "manifestDigest": "sha256:3a6aa7686e017ccbfa2ff40b98e143efe7e132d677d2206ac5bf78b1294fdaad",
+    "controllerResultDigest": "sha256:42503bef77ed2d226cf6192a8f0a1b5eef0a610a935d4bd19ecfbc67d1f7d240",
+    "orchestratorResultDigest": "sha256:39e8c588365f5c481925986077c53f98fe1bf4d4e3adbcfb70db8ca68cd649e7",
+    "guestFixtureDurationMs": 26451,
+    "networkDeviceCount": 0,
+    "residualClosed": true,
+    "recoveryRequired": false
+  },
+  "gates": {
+    "controllerStarted": true,
+    "controllerExitZero": true,
+    "controllerManifestDigestVerified": true,
+    "controllerTimedOutFalse": true,
+    "controllerProductionPathVerified": true,
+    "orchestratorBindingDigestVerified": true,
+    "orchestratorRunIdVerified": true,
+    "orchestratorSchemaVerified": true,
+    "orchestratorSystemIdentityVerified": true,
+    "orchestratorObserverIdentityVerified": true,
+    "orchestratorExecutionControlIdentityVerified": true,
+    "orchestratorAclApplied": true,
+    "orchestratorPreObserverCompleted": true,
+    "orchestratorAllowedChildCompleted": true,
+    "orchestratorPostObserverCompleted": true,
+    "orchestratorSelectiveExecutionControl": true,
+    "orchestratorObservationSequenceVerified": true,
+    "orchestratorCompleted": true,
+    "qmpNoNetworkDevice": true,
+    "providerErrorAbsent": true,
+    "residualClosure": true
+  },
+  "privateEvidence": {
+    "bundleManifestDigest": "sha256:364315fd4934d331e0f2207019c0f1d7a68ac70b339656197b8f1b94dc283f18",
+    "resultDigest": "sha256:44bfd220bb8bb30859cc98995315173809144797f59f16dbd4095e6db08e11d9",
+    "executionIdentityDigest": "sha256:ab5507ac9d3f0a396c7369896194e1642b6e5c3838c458aae6425eb1db69fa5e",
+    "fixtureResultDigest": "sha256:643c3d62e16c13af3a441c8e0597859b2acb6635be5da19de28e03b962972ad9",
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131",
+    "runtimeTerminalEvidenceDigest": "sha256:a82ea5319f2670c004c9c990f7cbd3244ff6b9ba4570bd8261afbfb4a3aef8fa"
+  },
+  "limitations": [
+    "the accepted path executes only an Ordivon-maintained control self-test and no third-party installer or malware sample",
+    "this acceptance proves the production Controller/orchestrator/Observer/control composition but not ordinary wrapper-to-nested-MSI reachability",
+    "the two fail-soft Observer degraded channels are retained as observation limitations and do not become management-plane authority",
+    "the NTFS staging execute deny remains a sample-specific environmental transformation rather than general malware containment",
+    "Case A remains unauthorized until a separate bounded dynamic-trial authority explicitly names the causal question to test",
+    "Case B remains blocked"
+  ]
+}

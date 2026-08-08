@@ -158,7 +158,7 @@ The host baseline can be reproduced with `ordivon-security-windows-host-p1-basel
 
 ## R4 architecture decision: one controller/orchestrator Runner
 
-**Status: selected; execution contract, read-only media materializer, generic Controller, selective staging execution control, and a layered sealed P1 base self-test are accepted; production orchestrator integration and Case execution remain pending.**
+**Status: selected; execution contract, read-only media materializer, generic Controller, selective staging execution control, layered sealed P1 base, bounded Observer, and maintained production orchestrator path are accepted; Case A execution remains pending.**
 
 P1 will use one Runner architecture:
 
@@ -253,6 +253,20 @@ A separate maintained probe committed at `5eaf2da` then booted that exact derive
 
 This accepts the **layered base and its sealed self-test resources**, not the production orchestration path. `C:\ProgramData\Ordivon\p1-orchestrator.ps1` is still absent from the accepted resource set, the generic Controller has not yet invoked it through a production manifest, and Case A remains unauthorized. The next gate is therefore to implement a narrow declarative orchestrator that owns the accepted staging transformation and observation sequence, seal that exact orchestrator into a later derived base, and exercise the Controller's production path with maintained inputs before reconsidering Case A.
 
+### R6-C: bounded Observer and production orchestration path
+
+The first sealed production-orchestrator probes exposed an Observer failure rather than a Controller failure. The original fail-soft Observer could enumerate every preflight channel individually, but a full invocation failed to return even after extending the diagnostic launcher from 120 to 300 seconds. A channel-by-channel materialization probe then isolated the first deterministic stall: the file channel completed hashing and JSON conversion in 142 ms, while the next `registry-startup` channel stalled after passing raw registry objects containing PowerShell Provider metadata into deep JSON serialization.
+
+The Observer was narrowed accordingly rather than given a larger timeout. Revision `ac3b998` converts each rich Windows object into a bounded primitive projection, excludes `PS*` provider metadata from registry startup values, caps general record counts and text lengths, bounds event messages, and reduces final JSON serialization depth. The exact 14,517-byte Observer has SHA-256 `f66834322288251407cf50dc1f8c0986cb7bb6228f139d69cc128aa8fb421399` and is retained in the root-only Vault.
+
+Revision `be4eae1` then changed the derived-base sealing contract from the superseded Observer `sha256:e2aeb44c5a640b89ef95b86aebc4bfd0f97ef5eb01d3e09f39dbe77b8ff2c30f` to that exact bounded Observer. The resulting derived environment `sha256:199879a01188bf6489409e172e8a53f246e8327992562ef0256fdc6acef0b149` preserved its parent image unchanged, closed both read-write and read-only NBD phases, and added no third-party execution authority.
+
+A maintained Observer runtime probe then restored the production observation budget of 512 file entries and 128 event entries and the original 120-second launcher bound. The bounded Observer completed in the Guest, produced a 1,119,575-byte schema-valid observation, retained two fail-soft degraded channels as limitations, used no network, and closed the disposable run cleanly. This falsifies the earlier hypothesis that P1 merely needed smaller observation budgets or a larger timeout; the structural issue was unbounded rich-object serialization.
+
+Finally, the maintained production probe exercised the exact sealed generic Controller against `C:\ProgramData\Ordivon\p1-orchestrator.ps1`. The Controller verified the manifest binding and completed without timeout. The orchestrator verified its run identity, SYSTEM execution identity, Observer and execution-control identities, applied the accepted staging ACL, completed the pre Observer, ran only the maintained control self-test, completed the post Observer, and verified the observation sequence and selective execution-control result. QMP independently reported zero network devices, the Provider reported no error, Runtime committed the terminal result without recovery, and residual closure was clean. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-production-orchestrator-be4eae1.json`](../evidence/acceptance/windows-kvm-p1-production-orchestrator-be4eae1.json).
+
+R6-C accepts the **maintained production Controller/orchestrator/Observer/control composition**. It does not execute a third-party installer, does not establish ordinary wrapper-to-nested-MSI reachability, and does not authorize Case A. The next gate is therefore no longer infrastructure construction: it is a separate authority decision for one bounded Case A causal trial whose sole question is whether the ordinary wrapper/outer-MSI path reaches the contained nested malicious MSI.
+
 ### Network boundary
 
 QEMU continues to expose no network-class device. Known destinations may be redirected inside the disposable Guest to a loopback-only, record-only TCP sink so connection attempts can be counted. The sink does not proxy traffic, decrypt TLS, emulate the remote service, or return executable content. QMP remains authoritative for absence of external network capability.
@@ -261,10 +275,10 @@ QEMU continues to expose no network-class device. Known destinations may be redi
 
 Implementation proceeds through separate gates:
 
-1. contracts and read-only execution-media materialization;
-2. native-controller and execution-control canary tests using maintained fixtures only;
-3. a newly sealed P1 controller base and independent acceptance;
-4. one bounded Case A dynamic Trial;
-5. repeated-run and injected-failure residual closure.
+1. contracts and read-only execution-media materialization — accepted;
+2. native Controller and selective execution-control tests using maintained fixtures only — accepted;
+3. layered P1 base plus maintained production Controller/orchestrator/Observer composition — accepted;
+4. one explicitly authorized bounded Case A causal Trial — pending;
+5. repeated-run and injected-failure residual closure for the Case path — pending.
 
-No Case A installer execution is authorized by this decision alone. Case B remains blocked until Case A has accepted dynamic evidence and residual closure.
+No Case A installer execution is authorized by the infrastructure acceptances alone. Case B remains blocked until Case A has accepted dynamic evidence and residual closure.

@@ -68,6 +68,43 @@ class WindowsKvmP1OrchestratorTests(unittest.TestCase):
         self.assertLess(pre, body)
         self.assertLess(body, post)
 
+    def test_public_production_orchestrator_acceptance_preserves_case_boundary(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "evidence"
+            / "acceptance"
+            / "windows-kvm-p1-production-orchestrator-be4eae1.json"
+        )
+        index = __import__("json").loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            index["status"],
+            "accepted-maintained-production-orchestration-path",
+        )
+        self.assertEqual(
+            index["implementationRevision"],
+            "git:be4eae12953dd57e14fa578fabc7e0179e11b501",
+        )
+        self.assertIs(index["scope"]["productionControllerPathExercised"], True)
+        self.assertIs(index["scope"]["productionOrchestratorPathExercised"], True)
+        self.assertIs(index["scope"]["prePostObserverPathExercised"], True)
+        self.assertIs(index["scope"]["selectiveExecutionControlExercised"], True)
+        self.assertIs(index["scope"]["thirdPartySampleExecuted"], False)
+        self.assertIs(index["scope"]["actualCaseAExecuted"], False)
+        self.assertIs(index["scope"]["caseAExecutionAuthorized"], False)
+        self.assertIs(index["scope"]["nestedMsiReachabilityProved"], False)
+        self.assertEqual(
+            index["sealedResources"]["observer"]["sha256"],
+            "sha256:f66834322288251407cf50dc1f8c0986cb7bb6228f139d69cc128aa8fb421399",
+        )
+        self.assertIs(index["gates"]["controllerProductionPathVerified"], True)
+        self.assertIs(index["gates"]["orchestratorPreObserverCompleted"], True)
+        self.assertIs(index["gates"]["orchestratorPostObserverCompleted"], True)
+        self.assertIs(index["gates"]["orchestratorSelectiveExecutionControl"], True)
+        self.assertIs(index["gates"]["orchestratorObservationSequenceVerified"], True)
+        self.assertIs(index["gates"]["qmpNoNetworkDevice"], True)
+        self.assertIs(index["gates"]["providerErrorAbsent"], True)
+        self.assertIs(index["gates"]["residualClosure"], True)
+
 
 if __name__ == "__main__":
     unittest.main()
