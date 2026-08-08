@@ -309,7 +309,11 @@ def _supervisor(args: argparse.Namespace) -> None:
         owner_out, owner_err = owner.communicate(timeout=15)
         raise TimeoutError("multiple-successor owner did not reach partial kill gate") from error
     if owner.returncode != -signal.SIGKILL:
-        raise RuntimeError(f"multiple-successor owner did not die by SIGKILL: {owner.returncode}")
+        raise RuntimeError(
+            "multiple-successor owner did not die by SIGKILL: "
+            f"returnCode={owner.returncode}; stdoutTail={owner_out[-3000:]!r}; "
+            f"stderrTail={owner_err[-6000:]!r}"
+        )
 
     ledger_path, inherited, inherited_bytes = _one_ledger(
         args.state_root, "multiple-successor supervisor"
