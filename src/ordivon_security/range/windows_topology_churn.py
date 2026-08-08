@@ -5,6 +5,7 @@ import json
 import subprocess
 import threading
 import time
+from copy import deepcopy
 from pathlib import Path
 from typing import cast
 
@@ -622,15 +623,15 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
         with run.lock:
             state = super().inspect(instance)
             state["topologyChurnCompleted"] = run.state.get("topologyChurnCompleted") is True
-            state["topologyHistory"] = run.state.get("topologyHistory")
-            state["topologyControllerError"] = run.state.get("topologyControllerError")
+            state["topologyHistory"] = deepcopy(run.state.get("topologyHistory"))
+            state["topologyControllerError"] = deepcopy(run.state.get("topologyControllerError"))
             state["replacementTrigger"] = self.replacement_trigger
             peer_a_exit = run.state.get("peerAExitCode")
             if peer_a_exit is None and run.state.get("topologyChurnCompleted") is not True:
                 peer_a_exit = run.peer_process.poll()
             state["peerAExitCode"] = peer_a_exit
-            state["actorReplacementRequest"] = run.state.get("actorReplacementRequest")
-            state["actorReplacementReceipt"] = run.state.get("actorReplacementReceipt")
+            state["actorReplacementRequest"] = deepcopy(run.state.get("actorReplacementRequest"))
+            state["actorReplacementReceipt"] = deepcopy(run.state.get("actorReplacementReceipt"))
             return state
 
     def create(self, spec: RangeSessionSpec) -> RangeSessionInstance:

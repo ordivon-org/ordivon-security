@@ -188,6 +188,19 @@ class _RangeIntentBridge:
         )
 
 
+def _peer_a_only_history(state: JsonObject | None) -> bool:
+    if state is None:
+        return False
+    history = state.get("topologyHistory")
+    return (
+        isinstance(history, list)
+        and len(history) == 1
+        and isinstance(history[0], dict)
+        and history[0].get("phase") == "peer-a-present"
+        and history[0].get("currentPeerAddress") == "10.253.70.3"
+    )
+
+
 def _visible_snapshot(state: JsonObject) -> JsonObject:
     truth = state.get("fabricTruth")
     if not isinstance(truth, dict):
@@ -644,12 +657,14 @@ def main() -> None:
         and pre_intent_state.get("peerAExitCode") == 0,
         "worldUnchangedBeforeModel": pre_intent_state is not None
         and _world_still_peer_a(pre_intent_state),
+        "preIntentSnapshotHistoryImmutable": _peer_a_only_history(pre_intent_state),
         "sameVisibleWorldForBothObjectives": same_observation,
         "sameModelHarnessAuthorityForBothObjectives": same_actor_stack,
         "controlObjectiveChoseHold": isinstance(control_decision, dict)
         and control_decision.get("decision") == "hold",
         "controlIntentDidNotMutateWorld": post_control_state is not None
         and _world_still_peer_a(post_control_state),
+        "postControlSnapshotHistoryImmutable": _peer_a_only_history(post_control_state),
         "effectObjectiveChoseRequest": isinstance(effect_decision, dict)
         and effect_decision.get("decision") == "request-effect",
         "modelCopiedExactEffectScopeWithoutCorrection": exact_model_scope,
