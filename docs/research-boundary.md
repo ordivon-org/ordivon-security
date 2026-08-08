@@ -35,6 +35,8 @@ Ordivon Security may run high-intensity autonomous offensive, defensive, decepti
 
 The declared Range must have an independent management plane capable of creating, freezing, observing, resetting, and destroying the world without relying on the evaluated actors. Outside that Range, reachability is not authority and undeclared effects invalidate the Trial.
 
+This is a **sovereignty rule**, not a universal no-network rule. A specific profile may use `deny-all`, no uplink, or `externalBoundary=denied` to prove a containment claim. A future Range may instead include an explicitly owned or delegated external scope. The constitutional requirement is that every consequential effect remains inside declared authority and can be distinguished from accidental third-party effects. See [`LAW-PROFILES-C0.md`](LAW-PROFILES-C0.md).
+
 ## Permitted internal intensity
 
 Inside a declared authorized Range, an experiment may grant:

@@ -46,6 +46,10 @@ Testing all layers as one opaque Agent would make failures and improvements
 unattributable. P0 therefore introduces the layers incrementally while keeping the
 Security workload fixed.
 
+### Rule scope
+
+P0 is a controlled **experiment profile**, not a general Agent law. Its one-tick workload, two-plan CAGE action catalog, mandatory `select_team_plan` call, fixed budgets, and fail-closed synchronous tick semantics exist to isolate Provider/Harness/Host/Runtime variables. They do not imply that persistent Security Actors must use action menus, choose exactly one plan, avoid inventing strategies, or stop when a peer fails. Constitutional authority and truth boundaries are defined separately in [`LAW-PROFILES-C0.md`](LAW-PROFILES-C0.md).
+
 ## Experimental variants
 
 | Variant | Provider | Harness | Host | Runtime | Purpose |

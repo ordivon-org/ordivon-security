@@ -30,6 +30,8 @@ related:
 
 P1 is a separate profile. It does not widen `execute-benign-fixture` and cannot reuse the P0 Authority.
 
+P1's closed execution fields are **stage-profile rules**, not a constitutional statement that unknown or high-risk software can never execute. The current stage proves preparation, identity, observation prerequisites, and authority separation while intentionally making third-party execution impossible. A later owned/authorized isolated research profile may admit execution when it preserves the constitutional authority, truth, causal, and recovery invariants described in [`LAW-PROFILES-C0.md`](LAW-PROFILES-C0.md).
+
 The first implemented gate is media preparation only:
 
 1. bind an exact Case, archive SHA-256, byte length, logical name, deny-all network mode, no-restart policy, and observation profile;
