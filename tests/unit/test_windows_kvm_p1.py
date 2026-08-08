@@ -191,6 +191,36 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(value["researchAdmission"]["sampleMediaReadOnly"], True)
         self.assertEqual(value["researchAdmission"]["networkMode"], "deny-all")
 
+    def test_public_p1_controller_canary_preserves_execution_boundary(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "evidence"
+            / "acceptance"
+            / "windows-kvm-p1-controller-canary-e011541.json"
+        )
+        index = __import__("json").loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(index["status"], "accepted-maintained-controller-canary")
+        self.assertEqual(
+            index["implementationRevision"],
+            "git:e01154192164a679b38ab5c56e1747f55ef1bf94",
+        )
+        self.assertIs(index["scope"]["maintainedCanary"], True)
+        self.assertIs(index["scope"]["thirdPartySample"], False)
+        self.assertIs(index["scope"]["actualCaseAExecuted"], False)
+        self.assertIs(index["scope"]["controllerSealedInP1Base"], False)
+        self.assertIs(index["scope"]["selectiveSecondaryBlocking"], False)
+        self.assertIs(index["scope"]["caseAExecutionAuthorized"], False)
+        self.assertIs(index["gates"]["jobObjectTreeOwned"], True)
+        self.assertIs(index["gates"]["killOnJobCloseRootTerminated"], True)
+        self.assertIs(index["gates"]["killOnJobCloseDescendantTerminated"], True)
+        self.assertIs(index["gates"]["activeProcessLimitBlockedSecondary"], True)
+        self.assertIs(index["gates"]["qmpNoNetworkDevice"], True)
+        self.assertIs(index["gates"]["providerErrorAbsent"], True)
+        self.assertIs(index["gates"]["residualClosure"], True)
+        self.assertIs(index["blockingObservation"]["selectiveSecondaryBlocking"], False)
+        self.assertEqual(index["execution"]["terminalReason"], "benign-fixture-completed")
+        self.assertIs(index["execution"]["residualClosed"], True)
+
     def test_profile_does_not_authorize_execution_by_default(self) -> None:
         value = self.profile.to_dict()
         self.assertEqual(value["permittedActions"], [_P1_PREPARE_ACTION])
