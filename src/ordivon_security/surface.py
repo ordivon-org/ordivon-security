@@ -48,6 +48,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "reusable-experimental",
     ),
     SecuritySurfaceEntry(
+        "RangeIntentContext / RangeIntentDecision",
+        "constitution",
+        "ordivon_security.actors.autonomous",
+        "Agent-first observation/objective/authority to zero-or-more effect-request contract.",
+        "candidate-reusable",
+    ),
+    SecuritySurfaceEntry(
         "EvidenceRecorder",
         "constitution",
         "ordivon_security.evidence",
@@ -81,6 +88,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "ordivon_security.actors",
         "Fresh-per-tick allowed-action team-plan control used by the current CAGE adapter.",
         "accepted-profile",
+    ),
+    SecuritySurfaceEntry(
+        "DeepSeek Range-intent driver",
+        "integration",
+        "ordivon_security.integrations",
+        "Harness-backed AF2 decision producer; cognition remains owned by Harness/Provider.",
+        "experimental-integration",
     ),
     SecuritySurfaceEntry(
         "Host/Runtime actor adapters",
