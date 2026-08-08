@@ -152,7 +152,16 @@ C1-I information-loss profile
   → a restricted UID-65534 blind resend proves the danger: delivered history reaches two pulses while undelivered history reaches one
   → recipient-owned durable effectId dedup remains unreadable to that restricted successor while the public delivery capability remains usable
   → retry then converges both histories to one application: duplicate-suppressed when already delivered, applied when previously undelivered, followed by sender completion acknowledgement
-  → safe continuation therefore need not imply historical certainty; the next pressure moves to atomicity between recipient consequence and recipient dedup commit
+  → safe continuation therefore need not imply historical certainty
+
+C1-J recipient-commit-gap profile
+  → effect-before-marker crash leaves one real pulse and no marker; same-effect retry creates a duplicate
+  → marker-before-effect crash leaves a marker and no pulse; same-effect retry is suppressed and the consequence is lost
+  → therefore changing the order of two independent writes selects a failure mode rather than creating atomicity
+  → an explicit recipient inbox phase `reserved` is then persisted before the effect in two histories: crash before pulse versus crash after pulse but before completion publication
+  → both histories leave byte-identical durable inbox state and byte-identical recipient recovery views while evaluator ground truth differs
+  → retry from reserved duplicates one history; suppress from reserved loses the other
+  → reservation honestly preserves uncertainty but does not resolve the commit gap; intrinsic idempotency or a genuinely shared atomic consequence/completion boundary is now pressured
 
 World Entity publication-only recovery profile
   → the original Entity controller may die while the exact QEMU/swtpm carrier remains live and durable state still says executing
