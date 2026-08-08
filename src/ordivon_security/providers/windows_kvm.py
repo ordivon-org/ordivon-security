@@ -236,9 +236,19 @@ class WindowsKvmBaseImage:
     firmware_code_digest: str
     guest_runner_digest: str
     windows_build: str
+    parent_manifest_path: Path | None = None
+    parent_environment_image_digest: str | None = None
+    sealed_resources: tuple[JsonObject, ...] = ()
 
     @classmethod
     def load(cls, manifest_path: Path) -> WindowsKvmBaseImage:
+        return cls._load(manifest_path, seen=set())
+
+    @classmethod
+    def _load(cls, manifest_path: Path, *, seen: set[Path]) -> WindowsKvmBaseImage:
+        marker = manifest_path.resolve(strict=False)
+        if marker in seen:
+            raise ValueError("Windows KVM base manifest parent chain contains a cycle")
         manifest = _load_object(manifest_path, "Windows KVM base manifest")
         if (
             manifest.get("schemaVersion") != 1
@@ -283,6 +293,73 @@ class WindowsKvmBaseImage:
             raise ValueError("Windows KVM base image digest differs")
         if actual_vars_digest != digests["baseVars"]:
             raise ValueError("Windows KVM base UEFI variables digest differs")
+
+        parent_manifest_path: Path | None = None
+        parent_environment_digest: str | None = None
+        parent = manifest.get("parent")
+        if parent is not None:
+            if not isinstance(parent, dict):
+                raise ValueError("Windows KVM base parent section is invalid")
+            parent_manifest_value = parent.get("manifestPath")
+            parent_manifest_digest = parent.get("manifestDigest")
+            parent_environment_digest = parent.get("environmentImageDigest")
+            parent_image_digest = parent.get("baseImageDigest")
+            parent_vars_digest = parent.get("baseVarsDigest")
+            backing_path = parent.get("backingBaseImagePath")
+            if not all(
+                isinstance(value, str) and value
+                for value in (
+                    parent_manifest_value,
+                    parent_manifest_digest,
+                    parent_environment_digest,
+                    parent_image_digest,
+                    parent_vars_digest,
+                    backing_path,
+                )
+            ):
+                raise ValueError("Windows KVM base parent identity is incomplete")
+            parent_manifest_path = Path(cast(str, parent_manifest_value))
+            parent_manifest_object = _load_object(
+                parent_manifest_path, "Windows KVM parent base manifest"
+            )
+            if canonical_digest(parent_manifest_object) != parent_manifest_digest:
+                raise ValueError("Windows KVM parent manifest digest differs")
+            parent_base = cls._load(parent_manifest_path, seen=seen | {marker})
+            if parent_base.environment_image_digest != parent_environment_digest:
+                raise ValueError("Windows KVM parent environment digest differs")
+            if parent_base.base_image_digest != parent_image_digest:
+                raise ValueError("Windows KVM parent base image digest differs")
+            if parent_base.base_vars_digest != parent_vars_digest:
+                raise ValueError("Windows KVM parent base vars digest differs")
+            if Path(cast(str, backing_path)).resolve() != parent_base.base_image_path.resolve():
+                raise ValueError("Windows KVM base backing path differs from parent")
+            if cast(str, digests["sourceIso"]) != parent_base.source_iso_digest:
+                raise ValueError("Windows KVM derived base source ISO differs from parent")
+            if cast(str, digests["baseVars"]) != parent_base.base_vars_digest:
+                raise ValueError("Windows KVM derived base vars differ from parent")
+            if cast(str, digests["firmwareCode"]) != parent_base.firmware_code_digest:
+                raise ValueError("Windows KVM derived base firmware differs from parent")
+            if cast(str, digests["guestRunner"]) != parent_base.guest_runner_digest:
+                raise ValueError("Windows KVM derived base guest runner differs from parent")
+            if windows_build != parent_base.windows_build:
+                raise ValueError("Windows KVM derived base Windows build differs from parent")
+
+        raw_resources = manifest.get("sealedResources", [])
+        if not isinstance(raw_resources, list):
+            raise ValueError("Windows KVM sealed resources must be a list")
+        sealed_resources: list[JsonObject] = []
+        for resource in raw_resources:
+            if not isinstance(resource, dict):
+                raise ValueError("Windows KVM sealed resource entry is invalid")
+            slot = resource.get("slot")
+            guest_path = resource.get("guestPath")
+            sample = resource.get("sample")
+            if not isinstance(slot, str) or not slot or not isinstance(guest_path, str):
+                raise ValueError("Windows KVM sealed resource identity is incomplete")
+            if not isinstance(sample, dict):
+                raise ValueError("Windows KVM sealed resource Sample identity is missing")
+            sealed_resources.append(cast(JsonObject, resource))
+
         return cls(
             manifest_path=manifest_path,
             base_image_path=image_path,
@@ -294,6 +371,9 @@ class WindowsKvmBaseImage:
             firmware_code_digest=cast(str, digests["firmwareCode"]),
             guest_runner_digest=cast(str, digests["guestRunner"]),
             windows_build=windows_build,
+            parent_manifest_path=parent_manifest_path,
+            parent_environment_image_digest=parent_environment_digest,
+            sealed_resources=tuple(sealed_resources),
         )
 
 
