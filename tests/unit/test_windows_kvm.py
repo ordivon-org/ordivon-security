@@ -894,6 +894,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "p1_controller_canary.c",
             "p1_execution_control_canary.ps1",
             "p1_execution_control_launcher.c",
+            "p1_orchestrator_probe.c",
             "p1_sealed_base_probe.c",
             "windows-host-caseb-baseline.ps1",
         }
@@ -904,6 +905,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "p1_controller.c",
             "p1_controller_canary.c",
             "p1_execution_control_launcher.c",
+            "p1_orchestrator_probe.c",
             "p1_sealed_base_probe.c",
         ):
             source = (resource_root / source_name).read_text(encoding="utf-8").lower()
