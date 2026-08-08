@@ -436,7 +436,10 @@ def seal_windows_kvm_p1_derived_base(
     images_root = config.state_root / "images"
     staging_root = config.state_root / "derived-base-staging"
     receipts_root = config.state_root / "receipts"
-    for path in (images_root, staging_root, receipts_root):
+    images_root.mkdir(parents=True, exist_ok=True)
+    images_root.chmod(0o710)
+    shutil.chown(images_root, user="root", group=config.run_group)
+    for path in (staging_root, receipts_root):
         path.mkdir(parents=True, exist_ok=True)
         path.chmod(0o700)
 
