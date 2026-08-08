@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-controller-canary-acceptance",
+  "status": "accepted-maintained-controller-canary",
+  "implementationRevision": "git:e01154192164a679b38ab5c56e1747f55ef1bf94",
+  "environmentImageDigest": "sha256:37ebebb36b0e05a9c3f1cd02e84f086d8c8c245553b4bf175539ce279f1e4cad",
+  "scope": {
+    "maintainedCanary": true,
+    "thirdPartySample": false,
+    "actualCaseAExecuted": false,
+    "controllerSealedInP1Base": false,
+    "selectiveSecondaryBlocking": false,
+    "caseAExecutionAuthorized": false
+  },
+  "fixture": {
+    "fixtureId": "ordivon-p1-controller-canary-v1",
+    "sourceDigest": "sha256:69566764a8200bcded441038d94411e0a9bb81d27e4baaa3689de8e15ffaa21f",
+    "executableDigest": "sha256:dd9cfd3ce5e45b90401b5aff9997e04f76d7255110243b5bb383dd396e62aff7",
+    "byteLength": 23040,
+    "compilerDigest": "sha256:72e858c616806ff2b230452c5ed2df0c45ec2a965e544b51d6e5188ec4971d1e",
+    "compilerVersion": "x86_64-w64-mingw32-gcc (GCC) 16.1.0",
+    "networkImportMatches": []
+  },
+  "execution": {
+    "runId": "evaluation-run:bbe9200cee486a618681d329",
+    "terminalReason": "benign-fixture-completed",
+    "disposition": "no-issue-observed",
+    "qemuExitCode": 0,
+    "providerError": false,
+    "networkDeviceCount": 0,
+    "residualClosed": true
+  },
+  "gates": {
+    "jobObjectTreeOwned": true,
+    "treeTotalProcesses": 4,
+    "killOnJobCloseRootTerminated": true,
+    "killOnJobCloseDescendantTerminated": true,
+    "killActiveProcessesBeforeClose": 4,
+    "activeProcessLimitBlockedSecondary": true,
+    "blockJobTotalProcesses": 2,
+    "qmpNoNetworkDevice": true,
+    "providerErrorAbsent": true,
+    "residualClosure": true
+  },
+  "blockingObservation": {
+    "policy": "job-active-process-limit-1",
+    "selectiveSecondaryBlocking": false,
+    "interpretation": "The active-process limit proves broad kernel-level blocking only; it is not the Case A selective execution-control policy because it also blocks legitimate additional descendants."
+  },
+  "privateEvidence": {
+    "semanticEvidenceDigest": "sha256:ebac574e8ccd998a3454b83b6efc078eccdb27091081f5d62f6f7022bdd5c0fc",
+    "operationalEvidenceDigest": "sha256:9d1fb42c35cc35613ed654a0efeb8dc0e008bc266f041f7939a3da3e89e70032",
+    "bundleManifestDigest": "sha256:185b391f1ff39329dcb0686660dcec0f8c4fa7d5e57098acfc4e03fdd2ca65ae",
+    "resultDigest": "sha256:4a0f4d906f569a0058c0613365bde99dbfc92c6632367ce47a962555bcbf612a",
+    "executionIdentityDigest": "sha256:b06fb89df0e9a153c715ccebf23a56787e464fc6c140663336ce5461563729f4",
+    "fixtureResultDigest": "sha256:08e4a11fd22cae050552bd0ac417fa5d189a7f76e62149cc41768608746059e7",
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131"
+  },
+  "runtime": {
+    "jobId": "job-019fe0cb-7402-7fa0-a920-817bc4eb6e63",
+    "attemptId": "attempt-019fe0cb-7402-7fa0-a920-8186dba6cdbc",
+    "terminalEvidenceDigest": "sha256:606e89b0dc0f04a8541b97f7286c48b18fc54aca09e712c6f9d029e1470bd0ab",
+    "executionDisposition": "succeeded",
+    "deliveryDisposition": "committed",
+    "recoveryRequired": false
+  },
+  "limitations": [
+    "the accepted executable is an Ordivon-maintained canary, not a third-party Sample or the retained DaVinci Case A",
+    "the canary proves Windows Job Object descendant ownership and kill-on-close behavior but does not prove production Controller orchestration",
+    "JOB_OBJECT_LIMIT_ACTIVE_PROCESS with limit one is deliberately non-selective and is not sufficient for the Case A block-unknown-secondary-executable-launch transformation",
+    "the native Controller is not yet sealed into a new accepted P1 base",
+    "Case A execution remains unauthorized and Case B remains blocked"
+  ]
+}
