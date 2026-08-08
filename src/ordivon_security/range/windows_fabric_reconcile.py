@@ -16,6 +16,9 @@ from ordivon_security.providers.windows_kvm import (
     _replace_private_json,
     _terminate_pid,
 )
+from ordivon_security.range.windows_fabric_recovery_ownership import (
+    try_acquire_windows_fabric_recovery_gate,
+)
 
 _SUPPORTED_RANGES = {
     "range:windows-isolated-fabric-s5": "s5",
@@ -318,105 +321,125 @@ def reconcile_windows_fabric_range_runs(
             )
             continue
 
-        peer_closed = _terminate_from_ledger(
-            ledger,
-            pid_key="peerPid",
-            start_key="peerStartTime",
-            expected_fragment="python",
-        )
-        capture_closed = _terminate_from_ledger(
-            ledger,
-            pid_key="capturePid",
-            start_key="captureStartTime",
-            expected_fragment="tcpdump",
-        )
-        qemu_closed = _terminate_from_ledger(
-            ledger,
-            pid_key="qemuPid",
-            start_key="qemuStartTime",
-            expected_fragment="qemu-system-x86_64",
-        )
-        swtpm_closed = _terminate_from_ledger(
-            ledger,
-            pid_key="swtpmPid",
-            start_key="swtpmStartTime",
-            expected_fragment="swtpm",
-        )
-        requested_namespaces: list[str] = []
-        residual_namespaces = list(namespace_candidates)
-        requested_host_links: list[str] = []
-        residual_host_links = list(host_link_candidates)
-        if peer_closed and capture_closed and qemu_closed and swtpm_closed:
-            requested_host_links, residual_host_links = _remove_host_links(
-                ip_path, host_link_candidates
-            )
-            requested_namespaces, residual_namespaces = _remove_namespaces(
-                ip_path, namespace_candidates
-            )
-            residual_host_links = sorted(_root_link_kinds(ip_path, host_link_candidates))
-
-        clean_processes = peer_closed and capture_closed and qemu_closed and swtpm_closed
-        clean_namespaces = not residual_namespaces
-        clean_host_links = not residual_host_links
-        if clean_processes and clean_namespaces and clean_host_links:
-            if run_path.exists():
-                shutil.rmtree(run_path)
-            ledger_path.unlink(missing_ok=True)
-            _fsync_directory(ledgers_root)
-            canary_removed = True
-            if canary_path is not None:
-                canary_path.unlink(missing_ok=True)
-                canary_removed = not canary_path.exists()
-                canaries_root = canary_path.parent
-                if canaries_root.exists() and not any(canaries_root.iterdir()):
-                    canaries_root.rmdir()
+        recovery_gate = try_acquire_windows_fabric_recovery_gate(state_root, run_token=token)
+        if recovery_gate is None:
             results.append(
                 {
                     "runToken": token,
-                    "decision": "reconciled",
-                    "rangeId": ledger.get("rangeId"),
+                    "decision": "skipped-successor-active",
                     "phase": ledger.get("phase"),
                     "topologyPhase": ledger.get("topologyPhase"),
+                }
+            )
+            continue
+        observed_successor_claim = recovery_gate.read_claim()
+        try:
+            peer_closed = _terminate_from_ledger(
+                ledger,
+                pid_key="peerPid",
+                start_key="peerStartTime",
+                expected_fragment="python",
+            )
+            capture_closed = _terminate_from_ledger(
+                ledger,
+                pid_key="capturePid",
+                start_key="captureStartTime",
+                expected_fragment="tcpdump",
+            )
+            qemu_closed = _terminate_from_ledger(
+                ledger,
+                pid_key="qemuPid",
+                start_key="qemuStartTime",
+                expected_fragment="qemu-system-x86_64",
+            )
+            swtpm_closed = _terminate_from_ledger(
+                ledger,
+                pid_key="swtpmPid",
+                start_key="swtpmStartTime",
+                expected_fragment="swtpm",
+            )
+            requested_namespaces: list[str] = []
+            residual_namespaces = list(namespace_candidates)
+            requested_host_links: list[str] = []
+            residual_host_links = list(host_link_candidates)
+            if peer_closed and capture_closed and qemu_closed and swtpm_closed:
+                requested_host_links, residual_host_links = _remove_host_links(
+                    ip_path, host_link_candidates
+                )
+                requested_namespaces, residual_namespaces = _remove_namespaces(
+                    ip_path, namespace_candidates
+                )
+                residual_host_links = sorted(_root_link_kinds(ip_path, host_link_candidates))
+
+            clean_processes = peer_closed and capture_closed and qemu_closed and swtpm_closed
+            clean_namespaces = not residual_namespaces
+            clean_host_links = not residual_host_links
+            if clean_processes and clean_namespaces and clean_host_links:
+                if run_path.exists():
+                    shutil.rmtree(run_path)
+                ledger_path.unlink(missing_ok=True)
+                _fsync_directory(ledgers_root)
+                canary_removed = True
+                if canary_path is not None:
+                    canary_path.unlink(missing_ok=True)
+                    canary_removed = not canary_path.exists()
+                    canaries_root = canary_path.parent
+                    if canaries_root.exists() and not any(canaries_root.iterdir()):
+                        canaries_root.rmdir()
+                results.append(
+                    {
+                        "runToken": token,
+                        "decision": "reconciled",
+                        "rangeId": ledger.get("rangeId"),
+                        "phase": ledger.get("phase"),
+                        "topologyPhase": ledger.get("topologyPhase"),
+                        "peerClosed": peer_closed,
+                        "captureClosed": capture_closed,
+                        "qemuClosed": qemu_closed,
+                        "swtpmClosed": swtpm_closed,
+                        "requestedNamespaces": cast(list[JsonValue], requested_namespaces),
+                        "residualNamespaces": cast(list[JsonValue], residual_namespaces),
+                        "requestedHostLinks": cast(list[JsonValue], requested_host_links),
+                        "residualHostLinks": cast(list[JsonValue], residual_host_links),
+                        "runDirectoryRemoved": not run_path.exists(),
+                        "ledgerRemoved": not ledger_path.exists(),
+                        "canaryRemoved": canary_removed,
+                        "successorClaimObserved": observed_successor_claim,
+                    }
+                )
+                if observed_successor_claim is not None:
+                    recovery_gate.claim_path.unlink(missing_ok=True)
+                continue
+
+            diagnostic = _write_diagnostic(
+                diagnostics,
+                token,
+                {
+                    "schemaVersion": 1,
+                    "kind": "ordivon.security.windows-fabric-reconciliation-diagnostic",
+                    "decision": "attention-required",
+                    "reason": "resource-identity-unresolved",
+                    "ledgerPath": str(ledger_path),
                     "peerClosed": peer_closed,
                     "captureClosed": capture_closed,
                     "qemuClosed": qemu_closed,
                     "swtpmClosed": swtpm_closed,
-                    "requestedNamespaces": cast(list[JsonValue], requested_namespaces),
                     "residualNamespaces": cast(list[JsonValue], residual_namespaces),
-                    "requestedHostLinks": cast(list[JsonValue], requested_host_links),
                     "residualHostLinks": cast(list[JsonValue], residual_host_links),
-                    "runDirectoryRemoved": not run_path.exists(),
-                    "ledgerRemoved": not ledger_path.exists(),
-                    "canaryRemoved": canary_removed,
+                },
+            )
+            results.append(
+                {
+                    "runToken": token,
+                    "decision": "attention-required",
+                    "reason": "resource-identity-unresolved",
+                    "diagnosticPath": str(diagnostic),
+                    "successorClaimObserved": observed_successor_claim,
                 }
             )
-            continue
 
-        diagnostic = _write_diagnostic(
-            diagnostics,
-            token,
-            {
-                "schemaVersion": 1,
-                "kind": "ordivon.security.windows-fabric-reconciliation-diagnostic",
-                "decision": "attention-required",
-                "reason": "resource-identity-unresolved",
-                "ledgerPath": str(ledger_path),
-                "peerClosed": peer_closed,
-                "captureClosed": capture_closed,
-                "qemuClosed": qemu_closed,
-                "swtpmClosed": swtpm_closed,
-                "residualNamespaces": cast(list[JsonValue], residual_namespaces),
-                "residualHostLinks": cast(list[JsonValue], residual_host_links),
-            },
-        )
-        results.append(
-            {
-                "runToken": token,
-                "decision": "attention-required",
-                "reason": "resource-identity-unresolved",
-                "diagnosticPath": str(diagnostic),
-            }
-        )
+        finally:
+            recovery_gate.release()
 
     for run_path in sorted(path for path in runs_root.iterdir() if path.is_dir()):
         if run_path.name in managed_tokens:
@@ -454,6 +477,9 @@ def reconcile_windows_fabric_range_runs(
         "results": cast(list[JsonValue], results),
         "reconciled": sum(item.get("decision") == "reconciled" for item in results),
         "skippedActive": sum(item.get("decision") == "skipped-active" for item in results),
+        "skippedSuccessorActive": sum(
+            item.get("decision") == "skipped-successor-active" for item in results
+        ),
         "attentionRequired": attention,
         "status": "passed" if attention == 0 else "attention-required",
     }
