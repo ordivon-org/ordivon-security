@@ -292,7 +292,9 @@ def _supervisor(args: argparse.Namespace) -> None:
     host_truth = _host_namespace_truth(ledger)
     process_truth = _process_truth(ledger)
     binding = _ledger_semantic_binding(ledger)
+    ledger_receipt = ledger.get("actorReplacementReceipt")
     gate_binding = gate.get("actorReplacementRequest")
+    gate_receipt = gate.get("actorReplacementReceipt")
 
     pre_reconcile: JsonObject = {
         "ownerReturnCode": owner.returncode,
@@ -304,6 +306,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         "ledgerByteLength": len(ledger_bytes),
         "ledger": ledger,
         "ledgerSemanticBinding": binding,
+        "ledgerSemanticReceipt": ledger_receipt,
         "hostTruth": host_truth,
         "processTruth": process_truth,
     }
@@ -322,7 +325,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         }
     )
 
-    gates = {
+    common_gates = {
         "ownerKilledAtExactInjectedGate": owner.returncode == -signal.SIGKILL
         and gate.get("faultPoint") == _FAULT_POINT,
         "inMemoryEffectBindingExistedBeforeKill": isinstance(gate_binding, dict)
@@ -331,7 +334,6 @@ def _supervisor(args: argparse.Namespace) -> None:
         and gate_binding.get("admissionDigest") is not None,
         "ledgerReachedIntermediatePhysicalPhase": ledger.get("topologyPhase") == "peer-a-removed"
         and ledger.get("currentPeerAddress") is None,
-        "durableLedgerLostSemanticEffectBinding": binding is None,
         "hostObservedFabricWithoutPeerNamespace": host_truth.get("fabricNamespacePresent") is True
         and len(cast(list[object], host_truth.get("ownedNamespacesPresent", []))) == 1,
         "ownerDeadChildrenStillRecoverable": process_truth.get("ownerAlive") is False
@@ -346,10 +348,37 @@ def _supervisor(args: argparse.Namespace) -> None:
         ),
         "ledgerRemovedAfterReconcile": not ledger_path.exists(),
     }
-    status = "falsifier-observed" if all(gates.values()) else "failed"
+    if args.expect_durable_binding:
+        semantic_gates = {
+            "durableLedgerPreservedSemanticEffectBinding": isinstance(binding, dict)
+            and binding == gate_binding,
+            "durableLedgerPreservedNonTruthReceipt": isinstance(ledger_receipt, dict)
+            and ledger_receipt == gate_receipt
+            and ledger_receipt.get("worldEffectVerified") is False,
+            "interruptedEffectIdentityReconstructed": isinstance(binding, dict)
+            and binding.get("actorId") == _ACTOR_ID
+            and binding.get("authorityId") == _AUTHORITY_ID
+            and binding.get("zoneRef") == _ZONE_REF
+            and binding.get("capability") == _CAPABILITY
+            and binding.get("effectType") == _EFFECT_TYPE
+            and binding.get("effectId") is not None
+            and binding.get("requestDigest") is not None
+            and binding.get("admissionDigest") is not None,
+        }
+        status = "accepted" if all({**common_gates, **semantic_gates}.values()) else "failed"
+    else:
+        semantic_gates = {"durableLedgerLostSemanticEffectBinding": binding is None}
+        status = (
+            "falsifier-observed" if all({**common_gates, **semantic_gates}.values()) else "failed"
+        )
+    gates = {**common_gates, **semantic_gates}
     receipt: JsonObject = {
         "schemaVersion": 1,
-        "kind": "ordivon.security.c1b-interrupted-consequence-baseline",
+        "kind": (
+            "ordivon.security.c1b-interrupted-consequence-acceptance"
+            if args.expect_durable_binding
+            else "ordivon.security.c1b-interrupted-consequence-baseline"
+        ),
         "status": status,
         "securityRevision": security_revision,
         "faultPoint": _FAULT_POINT,
@@ -367,12 +396,15 @@ def _supervisor(args: argparse.Namespace) -> None:
         "interpretation": {
             "physicalRecoveryAvailable": True,
             "semanticEffectReconstructionAvailable": binding is not None,
-            "safeBlindReplayJustified": False,
+            "interruptedWorldState": "peer-a-removed-before-peer-b",
+            "wholeEffectReplayJustified": False,
+            "automaticSuffixContinuationProved": False,
         },
     }
     _write_receipt(args.receipt, receipt)
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
-    if status != "falsifier-observed":
+    expected_status = "accepted" if args.expect_durable_binding else "falsifier-observed"
+    if status != expected_status:
         raise SystemExit(1)
 
 
@@ -388,6 +420,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--vcpus", type=int, default=2)
     parser.add_argument("--max-runtime-seconds", type=int, default=360)
     parser.add_argument("--supervisor-timeout-seconds", type=float, default=150.0)
+    parser.add_argument("--expect-durable-binding", action="store_true")
     return parser
 
 
