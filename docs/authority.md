@@ -43,6 +43,7 @@ related:
 - [`LAW-PROFILES-C0.md`](LAW-PROFILES-C0.md) owns the interpretation boundary between constitutional law, authority/resource grants, experiment profiles/fixtures, and evaluator judgments. Local profile restrictions cannot silently become universal Security doctrine.
 - [`architecture.md`](architecture.md) owns active contracts, data flow, CAGE composition, and cross-project ownership.
 - [`RANGE-SESSION-S0.md`](RANGE-SESSION-S0.md) owns the experimental persistent Range Session contracts, capability-envelope authority, asynchronous event semantics, and S0 acceptance boundary.
+- [`EXECUTABLE-AUTHORITY-C1.md`](EXECUTABLE-AUTHORITY-C1.md) owns the first executable zone/capability `RangeAuthority` path, one Actor-requested S6 physical effect, its negative authority cases, receipt-versus-world-truth boundary, and exact physical acceptance limitations.
 - [`SYNCHRONOUS-CONTEST-S1.md`](SYNCHRONOUS-CONTEST-S1.md) owns the S1 compatibility boundary between persistent Range Sessions and accepted synchronous Contest execution.
 - [`WINDOWS-KVM-SUBSTRATE-S2.md`](WINDOWS-KVM-SUBSTRATE-S2.md) owns the S2 machine-level Provider boundary, external topology/process truth, reusable lifecycle substrate, and separation from Evaluation admission.
 - [`SACRIFICIAL-NODE-S3.md`](SACRIFICIAL-NODE-S3.md) owns the S3 single-node challenge, management-plane acceptance gates, Guest-claim boundary, and the transition to out-of-band truth research.
