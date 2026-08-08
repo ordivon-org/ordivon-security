@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
+from ordivon_security.integrations import RangeIntentHarnessFailure
 from ordivon_security.range import RangeAuthority, RangeEffectRequest
 
 
@@ -115,6 +116,16 @@ class AutonomousRangeIntentTests(unittest.TestCase):
                     ),
                 )
             )
+
+    def test_harness_failure_retains_structured_evidence(self) -> None:
+        evidence = {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.af2-range-intent-harness-failure",
+            "stopCode": "harness_failed",
+        }
+        error = RangeIntentHarnessFailure("harness_failed", evidence)
+        self.assertEqual(error.stop_code, "harness_failed")
+        self.assertEqual(error.evidence, evidence)
 
     def test_context_rejects_interface_outside_authority(self) -> None:
         with self.assertRaises(ValueError):

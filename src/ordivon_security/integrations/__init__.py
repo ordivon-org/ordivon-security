@@ -10,11 +10,13 @@ from ordivon_security.actors.runtime_assigned import RuntimeBackedHostAssignedDe
 from .harness_range_intent import (
     DeepSeekRangeIntentConfig,
     DeepSeekRangeIntentDriver,
+    RangeIntentHarnessFailure,
 )
 
 __all__ = [
     "DeepSeekRangeIntentConfig",
     "DeepSeekRangeIntentDriver",
     "HostAssignedDeepSeekHarnessTurnDriver",
+    "RangeIntentHarnessFailure",
     "RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver",
 ]
