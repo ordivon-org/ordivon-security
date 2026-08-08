@@ -16,7 +16,7 @@ from ordivon_security.cli_compensation_information_loss_acceptance import (
 
 class CompensationInformationLossC1MTests(unittest.TestCase):
     def test_successor_view_without_private_truth_classifies_unknown(self) -> None:
-        view = _successor_view(_sender_ledger())
+        view = _successor_view(_sender_ledger("naive"))
         result = classify_successor_view(view)
         self.assertEqual(result["status"], "unknown")
         self.assertFalse(result["blindCompensationAuthorized"])

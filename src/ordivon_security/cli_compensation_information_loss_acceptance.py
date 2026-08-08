@@ -17,13 +17,17 @@ from ordivon_security.cli_windows_kvm_c1a_acceptance import _git_revision
 from ordivon_security.cli_windows_kvm_s3_acceptance import _write_receipt
 
 _ORIGINAL_EFFECT_ID = "range-effect:c1m-private-increment-v1"
-_COMPENSATION_EFFECT_ID = "range-effect:c1m-private-compensation-v1"
-_REQUEST_ID = "range-effect-request:c1m-private-compensation-v1"
+_NAIVE_COMPENSATION_EFFECT_ID = "range-effect:c1m-naive-private-compensation-v1"
+_IDEMPOTENT_COMPENSATION_EFFECT_ID = "range-effect:c1m-idempotent-private-compensation-v1"
+_NAIVE_REQUEST_ID = "range-effect-request:c1m-naive-private-compensation-v1"
+_IDEMPOTENT_REQUEST_ID = "range-effect-request:c1m-idempotent-private-compensation-v1"
 _AUTHORITY_ID = "range-authority:c1m-private-compensation"
 _ACTOR_ID = "actor:c1m-recovery-sender"
 _ZONE_REF = "zone:c1m-local-no-uplink"
-_CAPABILITY = "private-counter.compensate-duplicate"
-_EFFECT_TYPE = "private-counter.repair-duplicate"
+_NAIVE_CAPABILITY = "private-counter.subtract-one"
+_NAIVE_EFFECT_TYPE = "private-counter.subtract-one"
+_IDEMPOTENT_CAPABILITY = "private-counter.ensure-repaired"
+_IDEMPOTENT_EFFECT_TYPE = "private-counter.ensure-repaired"
 _INITIAL_BALANCE = 0
 _DESIRED_BALANCE = 1
 _DUPLICATE_BALANCE = 2
@@ -33,25 +37,47 @@ def _digest_bytes(value: bytes) -> str:
     return "sha256:" + hashlib.sha256(value).hexdigest()
 
 
-def _compensation_binding() -> JsonObject:
+def _protocol_identity(action: str) -> tuple[str, str, str, str, str]:
+    if action == "naive":
+        return (
+            _NAIVE_REQUEST_ID,
+            _NAIVE_COMPENSATION_EFFECT_ID,
+            _NAIVE_CAPABILITY,
+            _NAIVE_EFFECT_TYPE,
+            "non-idempotent-subtract-one",
+        )
+    if action == "idempotent":
+        return (
+            _IDEMPOTENT_REQUEST_ID,
+            _IDEMPOTENT_COMPENSATION_EFFECT_ID,
+            _IDEMPOTENT_CAPABILITY,
+            _IDEMPOTENT_EFFECT_TYPE,
+            "convergent-repair-duplicate",
+        )
+    raise ValueError(f"unsupported C1-M compensation protocol: {action}")
+
+
+def _compensation_binding(action: str) -> JsonObject:
+    request_id, effect_id, capability, effect_type, retry_semantics = _protocol_identity(action)
     request: JsonObject = {
         "schemaVersion": 1,
         "kind": "ordivon.security.c1m-compensation-request",
-        "requestId": _REQUEST_ID,
+        "requestId": request_id,
         "actorId": _ACTOR_ID,
         "authorityId": _AUTHORITY_ID,
         "zoneRef": _ZONE_REF,
-        "capability": _CAPABILITY,
-        "effectType": _EFFECT_TYPE,
+        "capability": capability,
+        "effectType": effect_type,
         "compensatesEffectId": _ORIGINAL_EFFECT_ID,
         "duplicateBalance": _DUPLICATE_BALANCE,
         "desiredBalance": _DESIRED_BALANCE,
+        "retrySemantics": retry_semantics,
     }
     request_digest = canonical_digest(request)
     admission: JsonObject = {
         "schemaVersion": 1,
         "kind": "ordivon.security.c1m-compensation-admission",
-        "requestId": _REQUEST_ID,
+        "requestId": request_id,
         "requestDigest": request_digest,
         "authorityId": _AUTHORITY_ID,
         "admitted": True,
@@ -60,25 +86,26 @@ def _compensation_binding() -> JsonObject:
         "actorId": _ACTOR_ID,
         "authorityId": _AUTHORITY_ID,
         "zoneRef": _ZONE_REF,
-        "capability": _CAPABILITY,
-        "effectType": _EFFECT_TYPE,
-        "requestId": _REQUEST_ID,
+        "capability": capability,
+        "effectType": effect_type,
+        "requestId": request_id,
         "requestDigest": request_digest,
         "admissionDigest": canonical_digest(admission),
-        "compensationEffectId": _COMPENSATION_EFFECT_ID,
+        "compensationEffectId": effect_id,
         "compensatesEffectId": _ORIGINAL_EFFECT_ID,
         "duplicateBalance": _DUPLICATE_BALANCE,
         "desiredBalance": _DESIRED_BALANCE,
+        "retrySemantics": retry_semantics,
     }
     validate_json(result)
     return result
 
 
-def _sender_ledger() -> JsonObject:
+def _sender_ledger(action: str) -> JsonObject:
     value: JsonObject = {
         "schemaVersion": 1,
         "kind": "ordivon.security.c1m-sender-ledger",
-        "compensationBinding": _compensation_binding(),
+        "compensationBinding": _compensation_binding(action),
         "state": "compensation-admitted-pending-acknowledgement",
         "completionPublished": False,
     }
@@ -170,7 +197,7 @@ def apply_naive_private_compensation(root: Path) -> JsonObject:
     result: JsonObject = {
         "schemaVersion": 1,
         "kind": "ordivon.security.c1m-naive-compensation-result",
-        "compensationEffectId": _COMPENSATION_EFFECT_ID,
+        "compensationEffectId": _NAIVE_COMPENSATION_EFFECT_ID,
         "status": status_value,
         "worldMutated": mutated,
         "privateBalanceBefore": before,
@@ -198,7 +225,7 @@ def apply_idempotent_private_compensation(root: Path) -> JsonObject:
     result: JsonObject = {
         "schemaVersion": 1,
         "kind": "ordivon.security.c1m-idempotent-compensation-result",
-        "compensationEffectId": _COMPENSATION_EFFECT_ID,
+        "compensationEffectId": _IDEMPOTENT_COMPENSATION_EFFECT_ID,
         "status": status_value,
         "worldMutated": mutated,
         "privateBalanceBefore": before,
@@ -303,7 +330,8 @@ def _recipient_main(args: argparse.Namespace) -> None:
         socket_path.chmod(0o777)
         payload, client = server.recvfrom(65536)
         message = json.loads(payload)
-        if not isinstance(message, dict) or message.get("effectId") != _COMPENSATION_EFFECT_ID:
+        _, effect_id, _, _, _ = _protocol_identity(args.action)
+        if not isinstance(message, dict) or message.get("effectId") != effect_id:
             raise ValueError("C1-M recipient received wrong compensation identity")
         _emit_oracle(
             args.oracle_fd,
@@ -313,7 +341,7 @@ def _recipient_main(args: argparse.Namespace) -> None:
                 "stage": "received",
                 "action": args.action,
                 "mode": args.mode,
-                "effectId": _COMPENSATION_EFFECT_ID,
+                "effectId": effect_id,
             },
         )
         if args.mode == "crash-before-apply":
@@ -333,7 +361,7 @@ def _recipient_main(args: argparse.Namespace) -> None:
                 "stage": "compensation-returned",
                 "action": args.action,
                 "mode": args.mode,
-                "effectId": _COMPENSATION_EFFECT_ID,
+                "effectId": effect_id,
                 "status": result.get("status"),
                 "worldMutated": result.get("worldMutated"),
                 "evaluatorOnlyPrivateBalanceAfter": result.get("privateBalanceAfter"),
@@ -344,7 +372,7 @@ def _recipient_main(args: argparse.Namespace) -> None:
             raise RuntimeError("C1-M post-apply recipient survived SIGKILL")
         ack: JsonObject = {
             "schemaVersion": 1,
-            "effectId": _COMPENSATION_EFFECT_ID,
+            "effectId": effect_id,
             "status": result.get("status"),
             "semanticRepairSatisfied": result.get("privateBalanceAfter") == _DESIRED_BALANCE,
         }
@@ -438,7 +466,7 @@ def _collect(
     return events, truth
 
 
-def _restricted_send(*, socket_path: Path, client_path: Path) -> JsonObject:
+def _restricted_send(*, socket_path: Path, client_path: Path, effect_id: str) -> JsonObject:
     script = r"""
 import json, os, socket, sys
 socket_path, client_path, effect_id = sys.argv[1:4]
@@ -473,7 +501,7 @@ finally:
             script,
             str(socket_path),
             str(client_path),
-            _COMPENSATION_EFFECT_ID,
+            effect_id,
         ],
         check=False,
         capture_output=True,
@@ -505,7 +533,8 @@ def _invoke(
         action=action,
         mode=mode,
     )
-    send = _restricted_send(socket_path=socket_path, client_path=client_path)
+    _, effect_id, _, _, _ = _protocol_identity(action)
+    send = _restricted_send(socket_path=socket_path, client_path=client_path, effect_id=effect_id)
     events, truth = _collect(process, read_fd, expected_sigkill=mode != "healthy")
     socket_path.unlink(missing_ok=True)
     result: JsonObject = {
@@ -524,7 +553,7 @@ def _prepare_history(
     base = root / phase / history
     private_root = root / "recipient-private" / phase / history
     setup = _initialize_private_world(private_root)
-    ledger = _sender_ledger()
+    ledger = _sender_ledger(action)
     ledger_bytes = canonical_bytes(ledger)
     ledger_path = base / "sender-ledger.json"
     ledger_path.parent.mkdir(parents=True, exist_ok=True)
@@ -728,6 +757,9 @@ def _supervisor(args: argparse.Namespace) -> None:
                     idem_retry_uncomp,
                 )
             ),
+            "protocolUpgradeUsesDistinctEffectIdentity": _NAIVE_COMPENSATION_EFFECT_ID
+            != _IDEMPOTENT_COMPENSATION_EFFECT_ID
+            and _compensation_binding("naive") != _compensation_binding("idempotent"),
             "allDeliveryAttemptsUsedRestrictedUid": all(
                 cast(dict[str, object], item["send"])["uid"] == 65534
                 for item in (
@@ -751,7 +783,10 @@ def _supervisor(args: argparse.Namespace) -> None:
             "kind": "ordivon.security.c1m-compensation-information-loss-acceptance",
             "status": "accepted" if passed else "failed",
             "securityRevision": revision,
-            "compensationBinding": _compensation_binding(),
+            "compensationBindings": {
+                "baselineNaive": _compensation_binding("naive"),
+                "idempotentCompensator": _compensation_binding("idempotent"),
+            },
             "baselineNaive": {
                 "compensated": baseline_compensated,
                 "uncompensated": baseline_uncompensated,
