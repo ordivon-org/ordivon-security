@@ -36,7 +36,7 @@ class WindowsKvmP1ObserverRuntimeProbeTests(unittest.TestCase):
             )
         ).read_text(encoding="utf-8")
         self.assertIn("p1-observer.ps1", source)
-        self.assertIn("e2aeb44c5a640b89ef95b86aebc4bfd0f97ef5eb01d3e09f39dbe77b8ff2c30f", source)
+        self.assertIn("f66834322288251407cf50dc1f8c0986cb7bb6228f139d69cc128aa8fb421399", source)
         self.assertIn("MaxFileEntries = 512", source)
         self.assertIn("MaxEventEntries = 128", source)
         self.assertIn("C:\\ProgramData\\Ordivon", source)

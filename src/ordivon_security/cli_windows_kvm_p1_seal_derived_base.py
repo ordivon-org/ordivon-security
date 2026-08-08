@@ -31,14 +31,14 @@ _ORCHESTRATOR = SampleIdentity.create(
     original_name="p1-orchestrator.ps1",
 )
 _PREVIOUS_OBSERVER = SampleIdentity.create(
-    sha256="sha256:efeb283d513bfa9f59b4869b1b3385dad881013d64cfe65d3344c864879753d0",
-    byte_length=5_527,
+    sha256="sha256:e2aeb44c5a640b89ef95b86aebc4bfd0f97ef5eb01d3e09f39dbe77b8ff2c30f",
+    byte_length=8_689,
     media_type="text/x-powershell",
     original_name="p1-observer.ps1",
 )
 _OBSERVER = SampleIdentity.create(
-    sha256="sha256:e2aeb44c5a640b89ef95b86aebc4bfd0f97ef5eb01d3e09f39dbe77b8ff2c30f",
-    byte_length=8_689,
+    sha256="sha256:f66834322288251407cf50dc1f8c0986cb7bb6228f139d69cc128aa8fb421399",
+    byte_length=14_517,
     media_type="text/x-powershell",
     original_name="p1-observer.ps1",
 )
