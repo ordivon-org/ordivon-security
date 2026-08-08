@@ -189,6 +189,15 @@ C1-M compensation-information-loss profile
   → both hidden histories converge to repaired balance 1 without caller read authority, caller-visible compensation receipt, or shared transaction boundary
   → private truth can remain authority-local; retry safety belongs to the effect boundary that owns and can verify the consequence
 
+C1-N downstream-truth-failure profile
+  → the owning compensation authority itself loses trustworthy predicate truth through exact missing, malformed, and fork-conflict states
+  → repaired and unrepaired pre-fault histories collapse to identical authority observations for each fault class
+  → the unchanged convergent ensure-repaired effect performs zero mutation and returns truth-unavailable/truth-conflict; idempotency does not reconstruct missing truth
+  → a distinct digest-bound state witness outside the private truth boundary restores the exact pre-fault state in this targeted single-host fault model
+  → restored balance 1 returns already-repaired; restored balance 2 returns applied and converges to 1
+  → tampered witness data is rejected with zero mutation
+  → witness integrity is demonstrated, but freshness, independent failure domain, and atomic consequence/witness publication are not
+
 World Entity publication-only recovery profile
   → the original Entity controller may die while the exact QEMU/swtpm carrier remains live and durable state still says executing
   → predecessor owner PID/start-time remains historical provenance and is never rewritten to the fresh publisher

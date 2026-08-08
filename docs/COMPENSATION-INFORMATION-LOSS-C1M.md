@@ -324,4 +324,6 @@ This suggests a more general Agent-first rule:
 
 > Do not demand global visibility of every truth. Put retry safety at the authority boundary that actually owns the consequence whenever that boundary can enforce it.
 
-The next useful pressure is **downstream truth failure**, not another caller-side receipt. Destroy or fork the callee-private state that makes `ensure-repaired` convergent, then test whether the protocol still has enough truth to act safely. Only if that local authority can no longer establish the repair invariant should durable external evidence, stronger atomicity, or distributed coordination become candidates.
+C1-N has now destroyed, corrupted, and forked the callee-private predicate truth. The unchanged `ensure-repaired` effect fails closed with zero mutation when even the owning authority cannot establish its predicate. A distinct digest-bound state witness outside that private boundary restores the exact state in the tested static faults, after which the original compensation semantics work again. See [`DOWNSTREAM-TRUTH-FAILURE-C1N.md`](DOWNSTREAM-TRUTH-FAILURE-C1N.md).
+
+The next pressure is witness freshness: fault the ordering between consequence-state changes and witness publication so a digest-valid witness can be stale. Only then can generation, atomic publication, or stronger coordination be justified.
