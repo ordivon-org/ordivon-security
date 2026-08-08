@@ -317,11 +317,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--state-root", type=Path, required=True)
     parser.add_argument("--receipt", type=Path, required=True)
-    parser.add_argument(
-        "--secret",
-        type=Path,
-        default=Path("/root/.config/ordivon/secrets/deepseek.json"),
-    )
+    parser.add_argument("--secret", type=Path, required=True)
     parser.add_argument(
         "--harness-source",
         type=Path,

@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "AF3 deception consumer",
+        "research-apparatus",
+        "ordivon_security.cli_agent_first_deception_acceptance",
+        "First higher-order AF2 consumer separating communicated claim from independent truth.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "Acceptance runners",
         "research-apparatus",
         "ordivon_security.cli_*_acceptance",

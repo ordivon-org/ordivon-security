@@ -11,7 +11,7 @@ owners: [ordivon-security]
 updated: 2026-08-08
 summary: Minimal reusable Range-intent surface graduating C1-A autonomy without Contest ticks, action menus, exactly-one-action rules, or ownership of the Agent cognition loop.
 evidence_status: verified
-readiness: CANDIDATE
+readiness: ACCEPTED
 related:
   - security.agent-first-structure-af1
   - security.autonomous-intent-c1a
@@ -40,3 +40,5 @@ The surface consists of `RangeEffectInterface`, `RangeIntentContext`, and `Range
 The optional `DeepSeekRangeIntentDriver` lives under `ordivon_security.integrations`, not in the core contract. It uses Ordivon Harness to produce zero or more requests and returns both the Security decision and provider/Harness evidence. Security does not own the model loop.
 
 AF2 intentionally does not define memory, planning, trust, delegation, communication, long-horizon continuity, retries, compensation, or effect execution. Higher-order experiments must force those semantics if they need them.
+
+AF3 has now physically consumed both branches of this surface through the current real Harness/DeepSeek path: one deceptive-claim case produced a zero-request hold, while one independently verified compromise produced one effect request that then passed separate Security admission. AF3 also exposed and corrected two integration assumptions (missing Harness bridge identity and historical positional `RunBudget` drift). See [`AGENT-FIRST-DECEPTION-AF3.md`](AGENT-FIRST-DECEPTION-AF3.md).
