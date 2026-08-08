@@ -126,6 +126,8 @@ The sanitized R4-A materializer-canary index is retained at [`acceptance/windows
 
 The DaVinci R2 static-causality index is retained at [`acceptance/windows-kvm-p1-davinci-causality-r2.json`](acceptance/windows-kvm-p1-davinci-causality-r2.json). It re-verifies the 7.4 GiB archive and selected component identities, separates the statically bound wrapper → outer-MSI → replacement-patch-engine path from the contained but reachability-unproven nested downloader MSI, records that the outer MSI has no literal reference to the nested archive/MSI/downloader chain, revalidates the unchanged signed host control, and keeps the historical C2-D0 controller canary distinct from current main capability. It does not claim that absence of a literal reference proves dynamic unreachability.
 
+The sanitized R5 selective-execution-control index is retained at [`acceptance/windows-kvm-p1-execution-control-canary-fe72177.json`](acceptance/windows-kvm-p1-execution-control-canary-fe72177.json). It binds the exact clean Security implementation revision, the maintained no-network canary, the SYSTEM execution identity, writable root and nested staging probes, inherited NTFS `ExecuteFile` deny evidence, a successful executable outside the staging tree, denied root and nested staging executables, QMP no-network authority, and clean residual closure. It also retains the AppLocker prototype as a rejected candidate for this exact SYSTEM surface. It does not execute Case A, prove nested-MSI reachability, seal the Controller into the P1 base, or authorize Case A or Case B.
+
 ## Active Case Snapshot bundle
 
 An evolving local Case may be retained as:

@@ -158,7 +158,7 @@ The host baseline can be reproduced with `ordivon-security-windows-host-p1-basel
 
 ## R4 architecture decision: one controller/orchestrator Runner
 
-**Status: selected; execution contract, read-only media materializer, and Controller canary implemented; sealed Controller, selective execution control, and Case execution remain pending.**
+**Status: selected; execution contract, read-only media materializer, Controller canary, and selective staging execution control are accepted; sealed Controller/base integration and Case execution remain pending.**
 
 P1 will use one Runner architecture:
 
@@ -229,7 +229,9 @@ An AppLocker blocklist prototype was physically rejected. After correcting the p
 
 The narrower candidate uses an NTFS deny ACE for `FileSystemRights.ExecuteFile`, scoped to the exact execution identity and configured with container/object inheritance plus `InheritOnly`. It deliberately does **not** deny write access. One working-tree physical trial against the accepted Windows Enterprise base then established all of the intended contrasts: root and nested text writes succeeded; newly copied PE files at both the staging root and a nested directory inherited the execute deny; the maintained PE outside the staging tree executed successfully and wrote its marker; both staging-tree PE launches were denied before their markers could be written; QMP reported zero network devices; and residual closure was clean.
 
-That working-tree result is development evidence only. R5 is not accepted until the implementation is committed and the same gates are reproduced from that exact clean Security revision. Even after acceptance, the NTFS rule remains a **sample-specific environmental transformation**, not a general malware sandbox: code with authority to rewrite its own ACLs, execute from another path, inject into an already-running process, or use another untested execution mechanism is outside this gate's claim.
+The implementation was committed at `fe72177` and reproduced from that exact clean Security revision. The accepted run used the same `NT AUTHORITY\\SYSTEM` (`S-1-5-18`) execution identity: root and nested writes remained available, PE files at both staging levels inherited the execute deny, the maintained executable outside the staging tree completed with exit code zero and wrote its marker, both staging-tree launches were denied before their markers could be written, QMP reported zero network devices, the Provider reported no error, and residual closure was clean. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-execution-control-canary-fe72177.json`](../evidence/acceptance/windows-kvm-p1-execution-control-canary-fe72177.json).
+
+R5 therefore accepts this **sample-specific environmental transformation**, not a general malware sandbox. Code with authority to rewrite its own ACLs, execute from another path, inject into an already-running process, or use another untested execution mechanism is outside this gate's claim. R5 also does not establish runtime reachability to the malicious nested MSI and does not authorize Case A; the next gate is to seal the generic Controller and this execution-control substrate into a newly accepted P1 base.
 
 ### Network boundary
 

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-execution-control-canary-acceptance",
+  "status": "accepted-maintained-selective-execution-control-canary",
+  "implementationRevision": "git:fe7217783af94b9879378cf96b8198c2ca3cd121",
+  "environmentImageDigest": "sha256:37ebebb36b0e05a9c3f1cd02e84f086d8c8c245553b4bf175539ce279f1e4cad",
+  "scope": {
+    "maintainedCanary": true,
+    "thirdPartySample": false,
+    "actualCaseAExecuted": false,
+    "controllerSealedInP1Base": false,
+    "selectiveExecutionControl": true,
+    "caseAExecutionAuthorized": false,
+    "caseBAdmitted": false
+  },
+  "attackSurface": {
+    "source": "retained-downloader-static-evidence",
+    "downloaderScriptDigest": "sha256:fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397",
+    "stagingRoot": "%TEMP%\\DaVinci Resolve",
+    "target": "%TEMP%\\DaVinci Resolve\\**\\PE",
+    "claim": "keep the exact staging tree writable while denying PE execution from the root and inherited descendants"
+  },
+  "control": {
+    "mechanism": "ntfs-inherited-execute-deny",
+    "identityName": "NT AUTHORITY\\SYSTEM",
+    "identitySid": "S-1-5-18",
+    "deniedRight": "FileSystemRights.ExecuteFile",
+    "inheritance": [
+      "ContainerInherit",
+      "ObjectInherit"
+    ],
+    "propagation": "InheritOnly",
+    "writeDenied": false
+  },
+  "fixture": {
+    "fixtureId": "ordivon-p1-execution-control-canary-v1",
+    "executableDigest": "sha256:d29becd1409bab42bbba885b3e6db5623cedaf61d83d6c3b01ed7111e347d655",
+    "byteLength": 27648,
+    "launcherSourceDigest": "sha256:33f4bd334bd60e4eb9571631c794a47b2ab9ee94420353fabcc24b1f0e7d1b54",
+    "policyScriptDigest": "sha256:aa6046a68064847b202f9207749804e00058715f2796bf70da37acfe3860b5d0",
+    "compilerDigest": "sha256:72e858c616806ff2b230452c5ed2df0c45ec2a965e544b51d6e5188ec4971d1e",
+    "compilerVersion": "x86_64-w64-mingw32-gcc (GCC) 16.1.0",
+    "networkImportMatches": []
+  },
+  "gates": {
+    "aclApplied": true,
+    "rootWriteProbeSucceeded": true,
+    "nestedWriteProbeSucceeded": true,
+    "blockedFileDenyObserved": true,
+    "nestedBlockedFileDenyObserved": true,
+    "allowedChildStarted": true,
+    "allowedChildCompleted": true,
+    "allowedChildExitCode": 0,
+    "allowedMarkerPresent": true,
+    "blockedChildStartDenied": true,
+    "blockedMarkerPresent": false,
+    "nestedBlockedChildStartDenied": true,
+    "nestedBlockedMarkerPresent": false,
+    "selectiveExecutionControl": true,
+    "qmpNoNetworkDevice": true,
+    "providerErrorAbsent": true,
+    "residualClosure": true
+  },
+  "execution": {
+    "runId": "evaluation-run:d2e57859040a9c7d8d677066",
+    "terminalReason": "benign-fixture-completed",
+    "disposition": "no-issue-observed",
+    "qemuExitCode": 0,
+    "providerError": false,
+    "networkDeviceCount": 0,
+    "residualClosed": true,
+    "durationMs": 170204
+  },
+  "rejectedCandidate": {
+    "mechanism": "applocker-path-deny",
+    "status": "physically-rejected-for-current-system-execution-surface",
+    "observedIdentity": "NT AUTHORITY\\SYSTEM",
+    "observedSid": "S-1-5-18",
+    "effectivePolicyPresent": true,
+    "allowedPolicyDecision": "AllowedByDefault",
+    "blockedPolicyDecision": "AllowedByDefault",
+    "blockedExecutableActuallyRan": true,
+    "blockedMarkerObserved": true,
+    "denyEventObserved": false,
+    "interpretation": "The AppLocker prototype is not an admitted Guardian for the current SYSTEM Guest Runner surface."
+  },
+  "privateEvidence": {
+    "bundleManifestDigest": "sha256:86c905c97b606fb6d7fb1c8365fa84f41a933e538414d0367e6a97cdd78c7120",
+    "resultDigest": "sha256:2d1a292310f1e59832ff1573ea82249962aa64dd908e2066f9ea70b053b180d5",
+    "executionIdentityDigest": "sha256:0db51fbd0fdc48e517e530f6c29f82d2f8b3815e364540d3f6d84e102d057afa",
+    "fixtureResultDigest": "sha256:f5a6bf121220f89e7751e2dbf89292a2c16895e18dea895c8d18f6c35248b0b3",
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131"
+  },
+  "runtime": {
+    "jobId": "job-019fe0f4-8050-7392-810d-9aa489a5abb5",
+    "attemptId": "attempt-019fe0f4-8050-7392-810d-9abf9cc3ab3f",
+    "terminalEvidenceDigest": "sha256:9e886b21a106f8a7f5c2d9b0a003f38e91e68ebd1eef0287d8cff17454f07953",
+    "executionDisposition": "succeeded",
+    "deliveryDisposition": "committed",
+    "recoveryRequired": false
+  },
+  "limitations": [
+    "the accepted executable is an Ordivon-maintained canary, not the DaVinci Case A package or another third-party Sample",
+    "the deny is an exact sample-specific environmental transformation for the observed %TEMP%\\DaVinci Resolve staging tree, not a general malware sandbox",
+    "code able to rewrite the ACL, execute from another path, inject into an existing process, or use another untested execution mechanism is outside this gate's claim",
+    "this acceptance does not establish runtime reachability from the ordinary wrapper or outer MSI to the contained malicious nested MSI",
+    "the generic Controller and execution-control resources are not yet sealed together into a newly accepted P1 base",
+    "Case A execution remains unauthorized and Case B remains blocked"
+  ]
+}

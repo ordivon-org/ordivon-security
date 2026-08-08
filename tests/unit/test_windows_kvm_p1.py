@@ -270,6 +270,50 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertEqual(index["execution"]["terminalReason"], "benign-fixture-completed")
         self.assertIs(index["execution"]["residualClosed"], True)
 
+    def test_public_p1_execution_control_canary_preserves_case_boundary(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "evidence"
+            / "acceptance"
+            / "windows-kvm-p1-execution-control-canary-fe72177.json"
+        )
+        index = __import__("json").loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            index["status"],
+            "accepted-maintained-selective-execution-control-canary",
+        )
+        self.assertEqual(
+            index["implementationRevision"],
+            "git:fe7217783af94b9879378cf96b8198c2ca3cd121",
+        )
+        self.assertIs(index["scope"]["maintainedCanary"], True)
+        self.assertIs(index["scope"]["thirdPartySample"], False)
+        self.assertIs(index["scope"]["actualCaseAExecuted"], False)
+        self.assertIs(index["scope"]["controllerSealedInP1Base"], False)
+        self.assertIs(index["scope"]["selectiveExecutionControl"], True)
+        self.assertIs(index["scope"]["caseAExecutionAuthorized"], False)
+        self.assertEqual(index["control"]["mechanism"], "ntfs-inherited-execute-deny")
+        self.assertEqual(index["control"]["identitySid"], "S-1-5-18")
+        self.assertIs(index["control"]["writeDenied"], False)
+        self.assertIs(index["gates"]["rootWriteProbeSucceeded"], True)
+        self.assertIs(index["gates"]["nestedWriteProbeSucceeded"], True)
+        self.assertIs(index["gates"]["blockedFileDenyObserved"], True)
+        self.assertIs(index["gates"]["nestedBlockedFileDenyObserved"], True)
+        self.assertIs(index["gates"]["allowedChildCompleted"], True)
+        self.assertEqual(index["gates"]["allowedChildExitCode"], 0)
+        self.assertIs(index["gates"]["allowedMarkerPresent"], True)
+        self.assertIs(index["gates"]["blockedChildStartDenied"], True)
+        self.assertIs(index["gates"]["blockedMarkerPresent"], False)
+        self.assertIs(index["gates"]["nestedBlockedChildStartDenied"], True)
+        self.assertIs(index["gates"]["nestedBlockedMarkerPresent"], False)
+        self.assertIs(index["gates"]["qmpNoNetworkDevice"], True)
+        self.assertIs(index["gates"]["providerErrorAbsent"], True)
+        self.assertIs(index["gates"]["residualClosure"], True)
+        self.assertEqual(index["execution"]["terminalReason"], "benign-fixture-completed")
+        self.assertIs(index["execution"]["residualClosed"], True)
+        self.assertEqual(index["rejectedCandidate"]["mechanism"], "applocker-path-deny")
+        self.assertIs(index["rejectedCandidate"]["blockedExecutableActuallyRan"], True)
+
     def test_profile_does_not_authorize_execution_by_default(self) -> None:
         value = self.profile.to_dict()
         self.assertEqual(value["permittedActions"], [_P1_PREPARE_ACTION])
