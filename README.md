@@ -45,7 +45,7 @@ Security does not own the Agent's generic cognitive loop or the machinery beneat
 - **Constitution / reusable substrate:** C0 law distinctions, `RangeSession`, exact `RangeAuthority` actor/zone/capability grants, separated evidence planes, independent world-truth verification, and the recovery laws repeatedly forced by C1 experiments. [`docs/AGENT-FIRST-STRUCTURE-AF1.md`](docs/AGENT-FIRST-STRUCTURE-AF1.md) records the current structural classification.
 - **Profiles:** `SynchronousContestProfile`, CAGE team-plan control, software Evaluation/SampleVault/Guardian, Windows KVM ranges, and World destination adapters. A profile may be accepted and useful without defining universal Agent behavior.
 - **Research apparatus:** S/C acceptance runners, P0/P1 probes, fault injectors, Host/Runtime integration variants, and physical receipts. Accepted evidence remains canonical history; the apparatus itself is not automatically a stable API.
-- **Open research:** persistent Agent-native intent beyond per-tick action menus; deception, trust, collusion, organization, infection and strategic conflict; effect-contract reuse beyond current experiments; witness freshness; and any stronger transaction/replication mechanism only if a real consumer forces it.
+- **Open research:** AF2 now provides a minimal zero-or-more Range-intent surface without Contest ticks; deception, trust, collusion, organization, infection and strategic conflict remain higher-order consumers; effect-contract reuse beyond current experiments, witness freshness, and stronger transaction/replication mechanisms remain open until a real consumer forces them. [`docs/AGENT-FIRST-INTENT-AF2.md`](docs/AGENT-FIRST-INTENT-AF2.md) records the AF2 boundary.
 
 ## Accepted capability and evidence inventory
 

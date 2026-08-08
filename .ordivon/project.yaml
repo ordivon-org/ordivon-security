@@ -21,6 +21,7 @@ managed_paths:
   - docs/RANGE-SESSION-S0.md
   - docs/SYNCHRONOUS-CONTEST-S1.md
   - docs/AGENT-FIRST-STRUCTURE-AF1.md
+  - docs/AGENT-FIRST-INTENT-AF2.md
   - docs/architecture.md
   - docs/authority.md
   - docs/MIGRATION-ROUND-1.md
