@@ -26,7 +26,7 @@ from ordivon_security.cli_world_entity_controller_loss_acceptance import (
     _source_revision,
     _write_json,
 )
-from ordivon_security.evaluation.world_entity import WorldEntityKvmConfig, WorldEntityKvmDestination
+from ordivon_security.world_boundary import WorldEntityKvmConfig, WorldEntityKvmDestination
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,

@@ -1,5 +1,6 @@
 """Ordivon Security public package."""
 
+from .surface import security_surface_manifest
 from .api import (
     AdversarialWindowsRange,
     ContestResult,
@@ -32,5 +33,6 @@ __all__ = [
     "ScenarioManifest",
     "WindowsKvmMachineConfig",
     "WindowsKvmMachineProvider",
+    "security_surface_manifest",
 ]
 __version__ = "0.8.0"

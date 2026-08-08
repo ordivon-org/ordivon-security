@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject
-from ordivon_security.evaluation.world_resource import (
+from ordivon_security.world_boundary import (
     WorldResourceInbox,
     WorldResourceRequestError,
     rejected_world_resource_response,

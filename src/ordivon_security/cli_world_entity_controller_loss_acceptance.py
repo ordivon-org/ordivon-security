@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_digest
-from ordivon_security.evaluation.world_entity import WorldEntityKvmConfig, WorldEntityKvmDestination
+from ordivon_security.world_boundary import WorldEntityKvmConfig, WorldEntityKvmDestination
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
