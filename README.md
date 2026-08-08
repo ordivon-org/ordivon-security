@@ -75,6 +75,7 @@ The active `0.8` core provides:
 - an accepted S6-R strengthening where topology progression no longer depends on `inspect()`, changing Range resources are durably bound, and an exact S5/S6 Range reconciler closes live peer/sensor/QEMU/swtpm state plus namespaces and files after owner SIGKILL;
 - an accepted C1 executable-authority profile where an S6 peer-replacement effect remains physically inert after peer A exits until one Actor request passes exact `RangeAuthority` actor/zone/capability admission; backend receipt remains non-truth and Host topology observation verifies the consequence independently;
 - an accepted C1-A autonomous-intent profile where the same DeepSeek Flash/Harness Actor, visible peer-A world, and capability envelope chooses `hold` or a real C1 effect according only to its objective; the experiment also hardens Range inspection into immutable JSON snapshots so later world evolution cannot rewrite retained past observations;
+- an accepted C1-B interrupted-consequence profile where owner SIGKILL at both an A-removed intermediate state and a B-materialized/response-lost state preserves exact Actor/request/admission/effect identity in the durable S6 ledger; independent Host truth classifies physical progress and prevents blind whole-effect replay while the existing reconciler still owns safe closure to zero;
 - a P0 Windows Evaluation adapter that remains restricted to the exact maintained benign fixture;
 - a DeepSeek Flash `NativeHarnessActorBackend` with exact Provider, Harness, Host, Runtime, Protocol, prompt, budget, and credential-scope identity;
 - a P0-A CAGE path where Harness is consumed while Host and Runtime non-consumption remain explicit experimental facts;
@@ -302,6 +303,9 @@ RangeSessionSpec
   → exact RangeAuthority admission remains Security-owned
   → backend receipt remains distinct from independently observed world consequence
   → inspect() returns retained JSON snapshots rather than live mutable references
+  → admitted S6 effects persist exact request/admission/effect identity with physical phase
+  → owner-loss recovery distinguishes semantic effect identity from physical cleanup
+  → independent Host truth prevents blind replay when consequence already materialized
   → checkpoint / terminate / destroy
 
 ScenarioManifest

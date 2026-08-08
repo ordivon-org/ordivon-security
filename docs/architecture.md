@@ -85,6 +85,15 @@ C1-A autonomous intent profile
   → Range inspect returns independent JSON snapshots so later world mutation cannot rewrite past reads
   → accepted effect still converges through Host world truth rather than model or Tool claims
 
+C1-B interrupted consequence profile
+  → exact admitted Actor effect binding is persisted beside S6 physical resource identity
+  → peer-a-removed + Host truth identifies a known interrupted effect before B materialization
+  → peer-b-present + Host truth identifies a materialized consequence even when completion event is lost
+  → persisted backend receipt remains non-truth (`worldEffectVerified=false`)
+  → whole-effect blind replay is never inferred from missing controller response
+  → existing S5/S6 reconciler still owns safe closure to zero, not automatic continuation
+  → no generic causal DAG or durable RangeSession is introduced by this evidence
+
 SynchronousContestProfile
   → records profile start in RangeSession management events
   → runs the existing ContestRunner unchanged

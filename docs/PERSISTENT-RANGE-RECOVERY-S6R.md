@@ -233,9 +233,7 @@ S6-R does not prove:
 
 ## Next pressure
 
-The persistent world itself is now strong enough for the next genuinely different consumer: a consequential effect deliberately requested by a contested Actor.
-
-That stage should start from one benign physical request and preserve:
+C1 and C1-A subsequently introduced the consequential Actor-requested effect while preserving:
 
 ```text
 Actor intent
@@ -245,4 +243,6 @@ Actor intent
   ≠ external world verification
 ```
 
-Only that consumer can tell us whether a persistent `RangeAction`/gateway abstraction is actually required. S6-R does not pre-create it.
+C1-B then killed the effect owner during the physical transition. That experiment showed the exact boundary S6-R left open: durable physical resource identity can close an orphaned world to zero, but it cannot by itself explain which admitted effect produced an intermediate topology. S6 now additionally persists the existing immutable Actor effect binding and non-truth receipt. See [`INTERRUPTED-CONSEQUENCE-C1B.md`](INTERRUPTED-CONSEQUENCE-C1B.md).
+
+The next unresolved pressure is partial materialization inside a physical effect substep, not a generic `RangeAction` gateway.
