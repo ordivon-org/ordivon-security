@@ -57,6 +57,7 @@ ordivon-security-windows-kvm-p1-generic-controller-canary = "ordivon_security.cl
 ordivon-security-windows-kvm-p1-seal-derived-base = "ordivon_security.cli_windows_kvm_p1_seal_derived_base:main"
 ordivon-security-windows-kvm-p1-sealed-base-probe = "ordivon_security.cli_windows_kvm_p1_sealed_base_probe:main"
 ordivon-security-windows-kvm-p1-orchestrator-probe = "ordivon_security.cli_windows_kvm_p1_orchestrator_probe:main"
+ordivon-security-windows-kvm-p1-observer-runtime-probe = "ordivon_security.cli_windows_kvm_p1_observer_runtime_probe:main"
 ordivon-security-windows-kvm-p1-execution-control-canary = "ordivon_security.cli_windows_kvm_p1_execution_control_canary:main"
 ordivon-security-windows-host-p1-baseline = "ordivon_security.cli_windows_host_p1_baseline:main"
 
