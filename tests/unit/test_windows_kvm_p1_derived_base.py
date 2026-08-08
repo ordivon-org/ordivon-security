@@ -117,6 +117,40 @@ class WindowsKvmP1DerivedBaseTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "base image digest differs"):
                 WindowsKvmBaseImage.load(child_manifest)
 
+    def test_public_derived_base_acceptance_preserves_production_boundary(self) -> None:
+        path = (
+            Path(__file__).parents[2]
+            / "evidence"
+            / "acceptance"
+            / "windows-kvm-p1-derived-base-5d4b9ca.json"
+        )
+        index = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(index["status"], "accepted-layered-p1-base-self-test")
+        self.assertEqual(
+            index["sealerImplementationRevision"],
+            "git:5d4b9caaf3786d3b001a111a163e6b4d72410016",
+        )
+        self.assertIs(index["scope"]["layeredBaseAccepted"], True)
+        self.assertIs(index["scope"]["genericControllerSealed"], True)
+        self.assertIs(index["scope"]["genericControllerSelfTestVerified"], True)
+        self.assertIs(index["scope"]["executionControlCanarySealed"], True)
+        self.assertIs(index["scope"]["executionControlSelfTestVerified"], True)
+        self.assertIs(index["scope"]["productionOrchestratorSealed"], False)
+        self.assertIs(index["scope"]["productionControllerPathExercised"], False)
+        self.assertIs(index["scope"]["thirdPartySampleExecuted"], False)
+        self.assertIs(index["scope"]["caseAExecutionAuthorized"], False)
+        self.assertIs(index["parent"]["parentImageUnchanged"], True)
+        self.assertIs(index["derivedBase"]["rwResidualClosed"], True)
+        self.assertIs(index["derivedBase"]["roResidualClosed"], True)
+        self.assertIs(index["derivedBase"]["imagesDirectoryQemuTraversable"], True)
+        self.assertIs(index["sealedProbe"]["controllerIdentityVerified"], True)
+        self.assertIs(index["sealedProbe"]["controllerSelfTestVerified"], True)
+        self.assertIs(index["sealedProbe"]["executionControlIdentityVerified"], True)
+        self.assertIs(index["sealedProbe"]["executionControlSelfTestVerified"], True)
+        self.assertIs(index["sealedProbe"]["thirdPartySampleExecuted"], False)
+        self.assertIs(index["qmp"]["networkDevicePresent"], False)
+        self.assertIs(index["execution"]["residualClosed"], True)
+
     def test_base_loader_rejects_parent_manifest_digest_drift(self) -> None:
         with tempfile.TemporaryDirectory() as raw_root:
             root = Path(raw_root)

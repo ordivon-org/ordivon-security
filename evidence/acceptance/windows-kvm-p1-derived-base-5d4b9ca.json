@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-derived-base-acceptance",
+  "status": "accepted-layered-p1-base-self-test",
+  "sealerImplementationRevision": "git:5d4b9caaf3786d3b001a111a163e6b4d72410016",
+  "probeImplementationRevision": "git:5eaf2da3094ab8a147e038195572ada0c7502d63",
+  "scope": {
+    "layeredBaseAccepted": true,
+    "genericControllerSealed": true,
+    "genericControllerSelfTestVerified": true,
+    "executionControlCanarySealed": true,
+    "executionControlSelfTestVerified": true,
+    "productionOrchestratorSealed": false,
+    "productionControllerPathExercised": false,
+    "thirdPartySampleExecuted": false,
+    "caseAExecutionAuthorized": false,
+    "caseBAdmitted": false
+  },
+  "parent": {
+    "environmentImageDigest": "sha256:37ebebb36b0e05a9c3f1cd02e84f086d8c8c245553b4bf175539ce279f1e4cad",
+    "baseImageDigest": "sha256:adc81b60a93a6c7e008a6384c69b9bfeb354c08e76db788b0b9e1c2022e9ea57",
+    "baseVarsDigest": "sha256:6603a9a7e70b7bb2b4bfb3dd6541317fc3c5fde38cc28e9080470ed4f230eb2a",
+    "manifestCanonicalDigest": "sha256:0a44fa90bf3ea64f0cf4c968892b95125360b434a73c52582ea0cef2d56decd7",
+    "parentImageUnchanged": true
+  },
+  "derivedBase": {
+    "environmentImageDigest": "sha256:1de50319824bce16d0442382c01a2623acc0b3309fcde51aa50dad938347f332",
+    "overlayDigest": "sha256:edb6ee626d0c1cf0463cb18dbc5d368e8c9ed5f1d53d652095755b1922d34dcc",
+    "overlayByteLength": 1048576,
+    "allocatedBytes": 987136,
+    "manifestCanonicalDigest": "sha256:cd5c3c9ba0237179ffd470cf1dc6d1c95af2fcd5ae51119c7d018809eb6c90a1",
+    "manifestFileDigest": "sha256:9f2fb36373a1515c4f9b80eeaea328b1dd61d8210b06884e03ca06e7b586a3c4",
+    "sealReceiptFileDigest": "sha256:8db9a24e44791925e455ea73a83d488312b25d0458dd5b0b711bd12422df4a0b",
+    "sealedResourcesDigest": "sha256:0090a564793a6dd1a45a580ca3b2b8b24379bbf9fbd531cefab45b738453ecea",
+    "layering": "qcow2-backing-overlay",
+    "backingChainLength": 2,
+    "rwResidualClosed": true,
+    "roResidualClosed": true,
+    "imagesDirectoryQemuTraversable": true,
+    "thirdPartyExecutionAuthorized": false
+  },
+  "sealedResources": [
+    {
+      "slot": "generic-controller",
+      "guestPath": "C:\\ProgramData\\Ordivon\\p1-controller.exe",
+      "digest": "sha256:eb7e9874f1dc568721c826ea30e1b77f325254244564ca70381d2556f3d4388a",
+      "byteLength": 25600,
+      "readOnlyVerifiedDuringSeal": true,
+      "identityVerifiedInBootedGuest": true,
+      "selfTestVerifiedInBootedGuest": true
+    },
+    {
+      "slot": "execution-control-canary",
+      "guestPath": "C:\\ProgramData\\Ordivon\\acceptance\\p1-execution-control-canary.exe",
+      "digest": "sha256:d29becd1409bab42bbba885b3e6db5623cedaf61d83d6c3b01ed7111e347d655",
+      "byteLength": 27648,
+      "readOnlyVerifiedDuringSeal": true,
+      "identityVerifiedInBootedGuest": true,
+      "selfTestVerifiedInBootedGuest": true
+    }
+  ],
+  "sealedProbe": {
+    "fixtureId": "ordivon-p1-sealed-base-probe-v1",
+    "sourceDigest": "sha256:0334e7fa73e01e7de3bd7264b3bb099fa68b0666f1e317fcd64c29b86d75f89f",
+    "fixtureDigest": "sha256:4f0277ee492e8fdeedcb2f624a2273642eaa860370e8f0bf106cfbe01025c7a3",
+    "fixtureByteLength": 23552,
+    "networkImportMatches": [],
+    "controllerIdentityVerified": true,
+    "controllerExitCode": 0,
+    "controllerSelfTestVerified": true,
+    "executionControlIdentityVerified": true,
+    "executionControlExitCode": 0,
+    "executionControlSelfTestVerified": true,
+    "networkRequested": false,
+    "thirdPartySampleExecuted": false,
+    "completed": true
+  },
+  "execution": {
+    "runId": "evaluation-run:84fa3ee7de9e3e6764dace56",
+    "terminalReason": "benign-fixture-completed",
+    "disposition": "no-issue-observed",
+    "qemuExitCode": 0,
+    "providerError": false,
+    "networkDeviceCount": 0,
+    "residualClosed": true
+  },
+  "qmp": {
+    "networkDevicePresent": false,
+    "providerErrorType": null,
+    "providerErrorMessage": null
+  },
+  "privateEvidence": {
+    "bundleManifestDigest": "sha256:2ac9f7098877ba02e61945257cc511af89fcfb36ec6ffd865c5a46c8830a2cc0",
+    "resultDigest": "sha256:2ba8922b70dd912a7022453f035a1e5dd556b14e9e68809ac2d38adb9102b160",
+    "executionIdentityDigest": "sha256:7741d13ba21021ddc545f0a0f15ec63e36ae30a99b436175a25b0d25908ae36b",
+    "sealedProbeResultDigest": "sha256:fc31aba3b97b610d1a7c74704a85de47c2e2bb924bfc1a61981aaef58d67d1e8",
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131"
+  },
+  "runtime": {
+    "sealJobId": "job-019fe13c-243d-76a2-bd54-548fe8c1a572",
+    "sealAttemptId": "attempt-019fe13c-243d-76a2-bd54-5497dc9cd65c",
+    "sealTerminalEvidenceDigest": "sha256:74e5b2ffdc34696b77a1ebca1d37b2f3ba2e8504cf709285c4f7a895ea4e1188",
+    "probeJobId": "job-019fe143-5143-71d0-9e45-50ad1dda2c13",
+    "probeAttemptId": "attempt-019fe143-5143-71d0-9e45-50bcc477f208",
+    "probeTerminalEvidenceDigest": "sha256:9d89ac276e18ae347177208f0dab16a5e83b9deba7b772126bab34893feaf1f1",
+    "probeExecutionDisposition": "succeeded",
+    "probeDeliveryDisposition": "committed",
+    "probeRecoveryRequired": false
+  },
+  "rejectedDevelopmentAttempt": {
+    "implementationRevision": "git:c4f295857c417a95dd02069c52d7b718ce2fedf3",
+    "reason": "the sealer incorrectly changed the shared images directory to mode 0700, preventing the qemu run user from traversing to the derived overlay",
+    "providerFailure": "qemu backing image permission denied",
+    "residualClosed": true,
+    "correction": "preserve the established provider layout authority: images is root:qemu mode 0710"
+  },
+  "limitations": [
+    "the accepted layered base seals the generic Controller and the accepted execution-control self-test canary, but not the production p1-orchestrator.ps1",
+    "the generic Controller production path has not yet executed against a sealed orchestrator manifest",
+    "the execution-control self-test proves the exact current staging transformation but is not itself the final production orchestrator",
+    "this acceptance does not execute any 目标产品B or other third-party Sample",
+    "this acceptance does not establish ordinary wrapper-to-nested-MSI runtime reachability",
+    "Case A remains unauthorized and Case B remains blocked"
+  ]
+}
