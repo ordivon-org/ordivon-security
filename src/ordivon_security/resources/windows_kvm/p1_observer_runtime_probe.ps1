@@ -25,11 +25,15 @@ $result = [ordered]@{
     fileRoots = @($stagingRoot, 'C:\ProgramData\Ordivon')
     maxFileEntries = 512
     maxEventEntries = 128
+    stage = 'created'
+    stageHistory = @('created')
+    preflightErrors = @()
     observerInvoked = $false
     observerOutputPresent = $false
     observerOutputDigest = $null
     observerOutputByteLength = $null
     observerSchemaVerified = $false
+    observerDegradedChannelCount = $null
     networkRequested = $false
     thirdPartySampleExecuted = $false
     completed = $false
@@ -43,7 +47,39 @@ function Get-Sha256 {
     return 'sha256:' + (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 
+function Write-ProbeState {
+    param([string]$Stage)
+    $result.stage = $Stage
+    $result.stageHistory = @($result.stageHistory) + $Stage
+    $json = $result | ConvertTo-Json -Depth 10 -Compress
+    [System.IO.File]::WriteAllText(
+        $ResultPath,
+        $json + "`n",
+        [System.Text.UTF8Encoding]::new($false)
+    )
+}
+
+function Invoke-Preflight {
+    param(
+        [Parameter(Mandatory = $true)][string]$Channel,
+        [Parameter(Mandatory = $true)][scriptblock]$Body
+    )
+    Write-ProbeState -Stage ("preflight-" + $Channel)
+    try {
+        & $Body | Out-Null
+    } catch {
+        $result.preflightErrors = @($result.preflightErrors) + [ordered]@{
+            channel = $Channel
+            errorType = $_.Exception.GetType().FullName
+            errorMessage = $_.Exception.Message
+            scriptStackTrace = $_.ScriptStackTrace
+        }
+    }
+    Write-ProbeState -Stage ("preflight-" + $Channel + "-complete")
+}
+
 try {
+    Write-ProbeState -Stage 'verifying-observer-identity'
     if (-not (Test-Path -LiteralPath $observerPath -PathType Leaf)) {
         throw 'Sealed P1 Observer is missing.'
     }
@@ -57,10 +93,74 @@ try {
         throw 'Sealed P1 Observer identity differs.'
     }
     $result.observerIdentityVerified = $true
+    Write-ProbeState -Stage 'observer-identity-verified'
 
     Remove-Item -LiteralPath $stagingRoot -Recurse -Force -ErrorAction SilentlyContinue
     New-Item -ItemType Directory -Path $nestedRoot -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $stagingRoot 'probe.txt') -Value 'observer-probe' -Encoding ASCII -Force
+
+    Invoke-Preflight -Channel 'files' -Body {
+        Get-ChildItem -LiteralPath $stagingRoot -Force -Recurse -File -ErrorAction Stop |
+            Select-Object -First 1 | ForEach-Object {
+                Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256 | Out-Null
+            }
+    }
+    Invoke-Preflight -Channel 'registry-uninstall' -Body {
+        Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*' `
+            -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'registry-startup' -Body {
+        Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run' `
+            -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'services' -Body {
+        Get-CimInstance Win32_Service -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'drivers' -Body {
+        Get-CimInstance Win32_SystemDriver -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'scheduled-tasks' -Body {
+        Get-ScheduledTask -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'bits' -Body {
+        Get-BitsTransfer -AllUsers -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'local-users' -Body {
+        Get-LocalUser -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'local-groups' -Body {
+        Get-LocalGroup -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'certificates' -Body {
+        Get-ChildItem Cert:\LocalMachine\Root -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'defender-status' -Body {
+        Get-MpComputerStatus -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'defender-threats' -Body {
+        Get-MpThreatDetection -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'network-adapters' -Body {
+        Get-NetAdapter -IncludeHidden -ErrorAction Stop | Select-Object -First 1 | Out-Null
+    }
+    Invoke-Preflight -Channel 'event-powershell' -Body {
+        Get-WinEvent -LogName 'Microsoft-Windows-PowerShell/Operational' -MaxEvents 1 `
+            -ErrorAction Stop | Out-Null
+    }
+    Invoke-Preflight -Channel 'event-task-scheduler' -Body {
+        Get-WinEvent -LogName 'Microsoft-Windows-TaskScheduler/Operational' -MaxEvents 1 `
+            -ErrorAction Stop | Out-Null
+    }
+    Invoke-Preflight -Channel 'event-defender' -Body {
+        Get-WinEvent -LogName 'Microsoft-Windows-Windows Defender/Operational' -MaxEvents 1 `
+            -ErrorAction Stop | Out-Null
+    }
+    Invoke-Preflight -Channel 'event-system' -Body {
+        Get-WinEvent -LogName 'System' -MaxEvents 1 -ErrorAction Stop | Out-Null
+    }
+    Invoke-Preflight -Channel 'event-application' -Body {
+        Get-WinEvent -LogName 'Application' -MaxEvents 1 -ErrorAction Stop | Out-Null
+    }
 
     $arguments = @{
         Phase = 'pre'
@@ -70,6 +170,7 @@ try {
         MaxEventEntries = 128
     }
     $result.observerInvoked = $true
+    Write-ProbeState -Stage 'observer-invoked'
     & $observerPath @arguments
 
     $result.observerOutputPresent = Test-Path -LiteralPath $observerOutput -PathType Leaf
@@ -86,21 +187,17 @@ try {
         $observation.phase -eq 'pre' -and
         $observation.readOnlyObserver -eq $true
     )
+    $result.observerDegradedChannelCount = [int]$observation.degradedChannelCount
     if (-not $result.observerSchemaVerified) {
         throw 'P1 Observer output schema is invalid.'
     }
     $result.completed = $true
+    Write-ProbeState -Stage 'completed'
 } catch {
     $result.errorType = $_.Exception.GetType().FullName
     $result.errorMessage = $_.Exception.Message
     $result.scriptStackTrace = $_.ScriptStackTrace
-} finally {
-    $json = $result | ConvertTo-Json -Depth 8 -Compress
-    [System.IO.File]::WriteAllText(
-        $ResultPath,
-        $json + "`n",
-        [System.Text.UTF8Encoding]::new($false)
-    )
+    Write-ProbeState -Stage 'error'
 }
 
 if (-not $result.completed) {
