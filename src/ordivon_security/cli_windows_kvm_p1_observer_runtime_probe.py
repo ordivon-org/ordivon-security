@@ -171,7 +171,7 @@ def _compile_observer_runtime_probe(output_path: Path) -> JsonObject:
         "compilerVersion": compiler_version,
         "networkImportMatches": [],
         "sealedObserverDigest": (
-            "sha256:efeb283d513bfa9f59b4869b1b3385dad881013d64cfe65d3344c864879753d0"
+            "sha256:e2aeb44c5a640b89ef95b86aebc4bfd0f97ef5eb01d3e09f39dbe77b8ff2c30f"
         ),
         "maxFileEntries": 512,
         "maxEventEntries": 128,
