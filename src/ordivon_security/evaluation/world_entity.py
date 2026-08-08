@@ -115,15 +115,15 @@ class WorldEntityKvmDestination:
     def execution_identity(self) -> JsonObject:
         return {
             "kind": "ordivon.security.world-entity-kvm-destination",
-            "revision": "3",
+            "revision": "4",
             "destinationWorldId": self.config.destination_world_id,
             "machineProvider": self.machine_provider.execution_identity,
             "materializationRole": "entity-continuity-carrier",
             "continuityTransport": "opaque-removable-fat-disk",
             "guestClaimAuthority": "not-used",
             "networkMode": "deny-all-no-nic",
-            "recoveryMode": "reobserve-and-publish-only-no-owner-rewrite",
-            "unpublishedNativeState": "unknown-unless-completion-reobserved",
+            "recoveryMode": "reobserve-publish-or-prebody-compensate-no-owner-rewrite",
+            "unpublishedNativeState": "unknown-unless-completion-or-safe-abandonment-observed",
             "sourceAuthorityAuthentication": "caller-trust-boundary",
         }
 
@@ -513,6 +513,78 @@ class WorldEntityKvmDestination:
         _set_owner(run_disk, user=self.config.machine.run_user, group=self.config.machine.run_group)
         state["migrationRunDiskPath"] = str(run_disk)
 
+    def _compensate_abandoned_prebody(
+        self,
+        state: JsonObject,
+        binding: JsonObject,
+        plan: JsonObject,
+        plan_digest: str,
+    ) -> JsonObject | None:
+        phase = state.get("phase")
+        if phase not in {"migration-staged", "swtpm-started"}:
+            return None
+        owner_pid = state.get("ownerPid")
+        owner_start_time = state.get("ownerStartTime")
+        if not isinstance(owner_pid, int) or not isinstance(owner_start_time, int):
+            return None
+        if _process_start_time(owner_pid) == owner_start_time:
+            return None
+
+        run_path = Path(str(state["runPath"]))
+        qemu_pid = state.get("qemuPid", 0)
+        qemu_start_time = state.get("qemuStartTime")
+        if qemu_pid not in {0, None} or qemu_start_time is not None:
+            return None
+        if any(
+            (run_path / name).exists()
+            for name in ("qemu.stdout.log", "qemu.stderr.log", "qmp.sock")
+        ):
+            return None
+
+        swtpm_pid = state.get("swtpmPid", 0)
+        swtpm_start_time = state.get("swtpmStartTime")
+        swtpm_evidence = any(
+            (run_path / name).exists()
+            for name in ("swtpm.pid", "swtpm.log", "swtpm.sock")
+        )
+        if phase == "migration-staged":
+            if swtpm_pid not in {0, None} or swtpm_start_time is not None or swtpm_evidence:
+                return None
+        else:
+            if not isinstance(swtpm_pid, int) or swtpm_pid < 1:
+                return None
+            if not isinstance(swtpm_start_time, int):
+                return None
+            current_swtpm_start = _process_start_time(swtpm_pid)
+            if current_swtpm_start is not None and current_swtpm_start != swtpm_start_time:
+                return None
+            if current_swtpm_start == swtpm_start_time:
+                arguments = _process_arguments(swtpm_pid, swtpm_start_time)
+                if str(self.config.machine.swtpm_path) not in arguments:
+                    return None
+
+        _, instance_id, _ = self._coordinates(plan)
+        closure = self.machine_provider.destroy_state(
+            instance_id=instance_id,
+            generation=self._generation(),
+            state=state,
+            ledger_extra=self._ledger_extra(binding),
+        )
+        if not closure.clean:
+            return self._unknown_response(plan, plan_digest, "prebody-compensation-incomplete")
+        return self._not_committed_response(
+            plan,
+            plan_digest,
+            {
+                "nativeRunAbsent": True,
+                "preBodyFenceRetained": False,
+                "abandonedPreBodyCompensated": True,
+                "abandonedPhase": phase,
+                "predecessorOwnerDead": True,
+                "zeroResidualsObserved": True,
+            },
+        )
+
     def _reconcile(self, plan: JsonObject, plan_digest: str) -> JsonObject:
         migration_id = _text(plan.get("migrationId"), "Entity Migration identity")
         with self._migration_lock(migration_id):
@@ -563,6 +635,15 @@ class WorldEntityKvmDestination:
                     )
                     receipt = self._build_receipt(observed, binding, plan_digest)
                     return self._materialized_response(self._commit_receipt(receipt))
+            if phase in {"migration-staged", "swtpm-started"}:
+                compensated = self._compensate_abandoned_prebody(
+                    observed,
+                    binding,
+                    plan,
+                    plan_digest,
+                )
+                if compensated is not None:
+                    return compensated
             unresolved = self._unresolved_launch_evidence(
                 Path(str(observed["runPath"])), observed
             )

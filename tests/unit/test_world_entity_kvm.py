@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -117,6 +118,8 @@ class _FakeMachineProvider:
         self.start_qemu_calls = 0
         self.inspect_calls = 0
         self.persist_calls = 0
+        self.destroy_calls = 0
+        self.destroy_clean = True
 
     @property
     def execution_identity(self):
@@ -212,6 +215,26 @@ class _FakeMachineProvider:
         assert command == "query-block"
         return [{"device": "migrationdisk"}]
 
+    def destroy_state(self, *, instance_id, generation, state, ledger_extra=None):
+        del instance_id, generation, ledger_extra
+        self.destroy_calls += 1
+        if not self.destroy_clean:
+            return SimpleNamespace(clean=False, details={"residualObjects": ["fixture-residual"]})
+        run_path = Path(state["runPath"])
+        ledger_path = Path(state["runStatePath"])
+        shutil.rmtree(run_path, ignore_errors=True)
+        ledger_path.unlink(missing_ok=True)
+        return SimpleNamespace(
+            clean=True,
+            details={
+                "qemuClosed": True,
+                "swtpmClosed": True,
+                "runDirectoryRemoved": True,
+                "ledgerRemoved": True,
+                "residualObjects": [],
+            },
+        )
+
 
 class WorldEntityKvmDestinationTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -265,14 +288,16 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         )
         return state, Path(state["runStatePath"])
 
-    def test_execution_identity_declares_publication_only_recovery(self) -> None:
+    def test_execution_identity_declares_publication_and_prebody_compensation(self) -> None:
         identity = self.destination.execution_identity
-        self.assertEqual(identity["revision"], "3")
+        self.assertEqual(identity["revision"], "4")
         self.assertEqual(
-            identity["recoveryMode"], "reobserve-and-publish-only-no-owner-rewrite"
+            identity["recoveryMode"],
+            "reobserve-publish-or-prebody-compensate-no-owner-rewrite",
         )
         self.assertEqual(
-            identity["unpublishedNativeState"], "unknown-unless-completion-reobserved"
+            identity["unpublishedNativeState"],
+            "unknown-unless-completion-or-safe-abandonment-observed",
         )
 
     def test_reconcile_without_run_proves_native_non_materialization(self) -> None:
@@ -283,16 +308,82 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         self.assertTrue(response["evidence"]["nativeRunAbsent"])
         self.assertTrue(response["evidence"]["exactOriginalRetrySafe"])
 
-    def test_staged_pre_body_fence_is_unknown_without_successor_authority(self) -> None:
+    def test_dead_owner_staged_prebody_is_compensated_to_not_committed(self) -> None:
+        prepared = plan()
+        state, ledger = self._stage_only(prepared)
+        run_path = Path(state["runPath"])
+        with patch(
+            "ordivon_security.evaluation.world_entity._process_start_time",
+            return_value=None,
+        ):
+            response = self.destination.handle(reconcile_request(prepared))
+        self.assertEqual(response["status"], "not_committed")
+        self.assertTrue(response["evidence"]["abandonedPreBodyCompensated"])
+        self.assertEqual(response["evidence"]["abandonedPhase"], "migration-staged")
+        self.assertTrue(response["evidence"]["predecessorOwnerDead"])
+        self.assertTrue(response["evidence"]["zeroResidualsObserved"])
+        self.assertTrue(response["evidence"]["exactOriginalRetrySafe"])
+        self.assertFalse(ledger.exists())
+        self.assertFalse(run_path.exists())
+        self.assertEqual(self.provider.destroy_calls, 1)
+
+    def test_live_owner_staged_prebody_remains_unknown_without_cleanup(self) -> None:
         prepared = plan()
         _, ledger = self._stage_only(prepared)
         before = ledger.read_bytes()
-        persist_calls = self.provider.persist_calls
-        response = self.destination.handle(reconcile_request(prepared))
+        with patch(
+            "ordivon_security.evaluation.world_entity._process_start_time",
+            return_value=1,
+        ):
+            response = self.destination.handle(reconcile_request(prepared))
         self.assertEqual(response["status"], "unknown")
         self.assertEqual(response["reason"], "unpublished-native-phase:migration-staged")
         self.assertEqual(ledger.read_bytes(), before)
-        self.assertEqual(self.provider.persist_calls, persist_calls)
+        self.assertEqual(self.provider.destroy_calls, 0)
+
+    def test_dead_owner_swtpm_only_prebody_is_compensated_to_not_committed(self) -> None:
+        prepared = plan()
+        state, ledger = self._stage_only(prepared)
+        binding = self.destination._binding(prepared, canonical_digest(prepared))
+        token, instance_id, _ = self.destination._coordinates(prepared)
+        del token
+        self.provider.start_swtpm(
+            instance_id=instance_id,
+            generation=self.destination._generation(),
+            state=state,
+            ledger_extra=self.destination._ledger_extra(binding),
+        )
+        with (
+            patch(
+                "ordivon_security.evaluation.world_entity._process_start_time",
+                side_effect=lambda pid: 1001 if pid == 111 else None,
+            ),
+            patch(
+                "ordivon_security.evaluation.world_entity._process_arguments",
+                return_value=("/usr/bin/swtpm", "socket"),
+            ),
+        ):
+            response = self.destination.handle(reconcile_request(prepared))
+        self.assertEqual(response["status"], "not_committed")
+        self.assertTrue(response["evidence"]["abandonedPreBodyCompensated"])
+        self.assertEqual(response["evidence"]["abandonedPhase"], "swtpm-started")
+        self.assertFalse(ledger.exists())
+        self.assertEqual(self.provider.destroy_calls, 1)
+        self.assertEqual(self.provider.start_qemu_calls, 0)
+
+    def test_incomplete_prebody_compensation_remains_unknown(self) -> None:
+        prepared = plan()
+        _, ledger = self._stage_only(prepared)
+        self.provider.destroy_clean = False
+        with patch(
+            "ordivon_security.evaluation.world_entity._process_start_time",
+            return_value=None,
+        ):
+            response = self.destination.handle(reconcile_request(prepared))
+        self.assertEqual(response["status"], "unknown")
+        self.assertEqual(response["reason"], "prebody-compensation-incomplete")
+        self.assertTrue(ledger.exists())
+        self.assertEqual(self.provider.destroy_calls, 1)
 
     def test_launch_evidence_without_persisted_body_never_returns_not_committed(self) -> None:
         prepared = plan()
