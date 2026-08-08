@@ -26,11 +26,33 @@ def payload(*, item_id: str = "research-core") -> dict[str, object]:
     }
 
 
-def evidence() -> dict[str, object]:
+def source_egress(
+    *,
+    transfer_id: str = "transfer:w2:research-core",
+    body: dict[str, object] | None = None,
+    source_world_id: str = SOURCE,
+    destination_world_id: str = DESTINATION,
+) -> dict[str, object]:
+    resource = payload() if body is None else body
+    occurrence = {
+        "factId": "fact:w2:item-extracted",
+        "recordDigest": "sha256:" + "1" * 64,
+    }
     return {
         "schemaVersion": 1,
-        "kind": "ordivon.w2.source-evidence",
-        "factId": "fact:w2:item-extracted",
+        "kind": "ordivon.world.resource-egress-receipt",
+        "transferId": transfer_id,
+        "sourceWorldId": source_world_id,
+        "destinationWorldId": destination_world_id,
+        "resourceKind": KIND,
+        "payloadDigest": canonical_digest(resource),
+        "sourceOccurrenceId": "resource-occurrence:w2:research-core",
+        "sourceOccurrenceDigest": canonical_digest(occurrence),
+        "authority": {
+            "authorityId": f"ordivon.game.station-zero-v3:{source_world_id}",
+            "mechanism": "station-zero-v3-retained-turn-replay.v1",
+            "evidence": occurrence,
+        },
     }
 
 
@@ -38,17 +60,24 @@ def plan(
     *,
     transfer_id: str = "transfer:w2:research-core",
     body: dict[str, object] | None = None,
+    source_world_id: str = SOURCE,
+    destination_world_id: str = DESTINATION,
 ) -> dict[str, object]:
     resource = payload() if body is None else body
-    source = evidence()
+    egress = source_egress(
+        transfer_id=transfer_id,
+        body=resource,
+        source_world_id=source_world_id,
+        destination_world_id=destination_world_id,
+    )
     return {
         "schemaVersion": 1,
         "kind": "ordivon.world.prepared-resource-transfer",
         "transferId": transfer_id,
-        "sourceWorldId": SOURCE,
-        "destinationWorldId": DESTINATION,
+        "sourceWorldId": source_world_id,
+        "destinationWorldId": destination_world_id,
         "resourceKind": KIND,
-        "sourceEvidenceDigest": canonical_digest(source),
+        "sourceEgressDigest": canonical_digest(egress),
         "payloadDigest": canonical_digest(resource),
     }
 
@@ -59,6 +88,7 @@ def materialize_request(
     body: dict[str, object] | None = None,
 ) -> dict[str, object]:
     resource = payload() if body is None else body
+    egress = source_egress(transfer_id=transfer_id, body=resource)
     prepared = plan(transfer_id=transfer_id, body=resource)
     return {
         "schemaVersion": 1,
@@ -66,7 +96,7 @@ def materialize_request(
         "operation": "materialize",
         "plan": prepared,
         "planDigest": canonical_digest(prepared),
-        "sourceEvidence": evidence(),
+        "sourceEgress": egress,
         "payload": resource,
     }
 
@@ -100,6 +130,15 @@ class WorldResourceInboxTests(unittest.TestCase):
             self.assertEqual(first["status"], "materialized")
             receipt = first["receipt"]
             self.assertTrue(receipt["destinationEvidence"]["transferSpecificAdmission"])
+            self.assertTrue(receipt["destinationEvidence"]["sourceEgressStructurallyBound"])
+            self.assertEqual(
+                receipt["destinationEvidence"]["sourceAuthorityAuthentication"],
+                "caller-trust-boundary",
+            )
+            self.assertEqual(
+                inbox.execution_identity["sourceAuthorityAuthentication"],
+                "caller-trust-boundary",
+            )
             self.assertFalse(receipt["destinationEvidence"]["currentPresenceImplied"])
             self.assertEqual(receipt["payloadDigest"], request["plan"]["payloadDigest"])
             self.assertEqual(len(list(inbox.transfers_root.glob("*.json"))), 1)
@@ -173,21 +212,48 @@ class WorldResourceInboxTests(unittest.TestCase):
             root = Path(directory)
             inbox = self.create_inbox(root)
             wrong_destination = materialize_request()
-            wrong_destination["plan"] = {
-                **wrong_destination["plan"],
-                "destinationWorldId": "security-world:other",
-            }
+            wrong_destination["plan"] = plan(destination_world_id="security-world:other")
+            wrong_destination["sourceEgress"] = source_egress(
+                destination_world_id="security-world:other"
+            )
             wrong_destination["planDigest"] = canonical_digest(wrong_destination["plan"])
             with self.assertRaises(WorldResourcePolicyRejected):
                 inbox.handle(wrong_destination)
             wrong_source = materialize_request()
-            wrong_source["plan"] = {
-                **wrong_source["plan"],
-                "sourceWorldId": "game-run:other",
-            }
+            wrong_source["plan"] = plan(source_world_id="game-run:other")
+            wrong_source["sourceEgress"] = source_egress(source_world_id="game-run:other")
             wrong_source["planDigest"] = canonical_digest(wrong_source["plan"])
             with self.assertRaises(WorldResourcePolicyRejected):
                 inbox.handle(wrong_source)
+            self.assertEqual(len(list(inbox.transfers_root.glob("*.json"))), 0)
+
+    def test_arbitrary_source_claim_is_rejected_before_destination_mutation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            inbox = self.create_inbox(Path(directory))
+            request = materialize_request()
+            request["sourceEgress"] = {"kind": "forged-source-claim"}
+            with self.assertRaisesRegex(Exception, "Resource Egress receipt schema is unsupported"):
+                inbox.handle(request)
+            self.assertEqual(len(list(inbox.transfers_root.glob("*.json"))), 0)
+            self.assertEqual(len(list(inbox.vault.objects_root.glob("*/*/sample.bin"))), 0)
+
+    def test_resource_egress_identity_must_match_exact_transfer_plan(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            inbox = self.create_inbox(Path(directory))
+            request = materialize_request()
+            request["sourceEgress"] = {
+                **request["sourceEgress"],
+                "destinationWorldId": "security-world:forged",
+            }
+            request["plan"] = {
+                **request["plan"],
+                "sourceEgressDigest": canonical_digest(request["sourceEgress"]),
+            }
+            request["planDigest"] = canonical_digest(request["plan"])
+            with self.assertRaisesRegex(
+                Exception, "destinationWorldId differs from Resource Transfer plan"
+            ):
+                inbox.handle(request)
             self.assertEqual(len(list(inbox.transfers_root.glob("*.json"))), 0)
 
     def test_cli_emits_wire_receipt_without_importing_ordivon_world(self) -> None:

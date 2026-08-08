@@ -106,9 +106,10 @@ class WorldResourceInbox:
     def execution_identity(self) -> JsonObject:
         return {
             "kind": "ordivon.security.world-resource-inbox",
-            "revision": "2",
+            "revision": "3",
             "destinationWorldId": self.destination_world_id,
             "admission": "per-transfer-exclusive-lock+transfer-specific-atomic-record",
+            "sourceAuthorityAuthentication": "caller-trust-boundary",
             "payloadStorage": cast(JsonValue, self.vault.execution_identity),
             "allowedSourceWorldIds": sorted(self.allowed_source_world_ids),
             "allowedResourceKinds": sorted(self.allowed_resource_kinds),
@@ -139,7 +140,7 @@ class WorldResourceInbox:
         source_world_id = _text(plan.get("sourceWorldId"), "Source World identity")
         destination_world_id = _text(plan.get("destinationWorldId"), "Destination World identity")
         resource_kind = _text(plan.get("resourceKind"), "Resource kind")
-        _digest(plan.get("sourceEvidenceDigest"), "Source evidence digest")
+        _digest(plan.get("sourceEgressDigest"), "Source Egress digest")
         _digest(plan.get("payloadDigest"), "Resource payload digest")
         if destination_world_id != self.destination_world_id:
             raise WorldResourcePolicyRejected("Resource transfer targets another destination World")
@@ -149,18 +150,51 @@ class WorldResourceInbox:
             raise WorldResourcePolicyRejected("Resource kind is not admitted by this destination")
         return operation, plan, plan_digest
 
+    def _source_egress(self, value: object, plan: JsonObject) -> JsonObject:
+        egress = _object(value, "Resource Egress receipt")
+        if (
+            egress.get("schemaVersion") != 1
+            or egress.get("kind") != "ordivon.world.resource-egress-receipt"
+        ):
+            raise WorldResourceRequestError("Resource Egress receipt schema is unsupported")
+        source_egress_digest = _digest(plan.get("sourceEgressDigest"), "Source Egress digest")
+        if canonical_digest(egress) != source_egress_digest:
+            raise WorldResourceRequestError(
+                "Resource Egress receipt digest does not match Resource Transfer plan"
+            )
+        expected = {
+            "transferId": plan.get("transferId"),
+            "sourceWorldId": plan.get("sourceWorldId"),
+            "destinationWorldId": plan.get("destinationWorldId"),
+            "resourceKind": plan.get("resourceKind"),
+            "payloadDigest": plan.get("payloadDigest"),
+        }
+        for field, expected_value in expected.items():
+            if egress.get(field) != expected_value:
+                raise WorldResourceRequestError(
+                    f"Resource Egress receipt {field} differs from Resource Transfer plan"
+                )
+        _text(egress.get("sourceOccurrenceId"), "Source Resource occurrence identity")
+        _digest(
+            egress.get("sourceOccurrenceDigest"),
+            "Source Resource occurrence digest",
+        )
+        authority = _object(egress.get("authority"), "Resource Egress authority")
+        _text(authority.get("authorityId"), "Resource Egress authority identity")
+        _text(authority.get("mechanism"), "Resource Egress authority mechanism")
+        _object(authority.get("evidence"), "Resource Egress authority evidence")
+        return egress
+
     def _materialize(
         self,
         request: JsonObject,
         plan: JsonObject,
         plan_digest: str,
     ) -> JsonObject:
-        source_evidence = cast(JsonValue, request.get("sourceEvidence"))
+        source_egress = self._source_egress(request.get("sourceEgress"), plan)
         payload = cast(JsonValue, request.get("payload"))
-        source_digest = _digest(plan.get("sourceEvidenceDigest"), "Source evidence digest")
+        source_egress_digest = _digest(plan.get("sourceEgressDigest"), "Source Egress digest")
         payload_digest = _digest(plan.get("payloadDigest"), "Resource payload digest")
-        if canonical_digest(source_evidence) != source_digest:
-            raise WorldResourceRequestError("Source evidence digest does not match request content")
         if canonical_digest(payload) != payload_digest:
             raise WorldResourceRequestError(
                 "Resource payload digest does not match request content"
@@ -193,7 +227,8 @@ class WorldResourceInbox:
                     plan.get("destinationWorldId"), "Destination World identity"
                 ),
                 "resourceKind": _text(plan.get("resourceKind"), "Resource kind"),
-                "sourceEvidenceDigest": source_digest,
+                "sourceEgressDigest": source_egress_digest,
+                "sourceEgress": cast(JsonValue, source_egress),
                 "payloadDigest": payload_digest,
                 "sample": cast(JsonValue, sample.to_dict()),
                 "receipt": cast(JsonValue, receipt),
@@ -252,6 +287,8 @@ class WorldResourceInbox:
                 "authority": "ordivon-security:sample-vault-resource-inbox",
                 "sample": sample.to_dict(),
                 "transferSpecificAdmission": True,
+                "sourceEgressStructurallyBound": True,
+                "sourceAuthorityAuthentication": "caller-trust-boundary",
                 "currentPresenceImplied": False,
                 "inboxExecutionIdentityDigest": canonical_digest(self.execution_identity),
             },
@@ -354,7 +391,7 @@ class WorldResourceInbox:
             "sourceWorldId": plan.get("sourceWorldId"),
             "destinationWorldId": plan.get("destinationWorldId"),
             "resourceKind": plan.get("resourceKind"),
-            "sourceEvidenceDigest": plan.get("sourceEvidenceDigest"),
+            "sourceEgressDigest": plan.get("sourceEgressDigest"),
             "payloadDigest": plan.get("payloadDigest"),
         }
         for field, value in expected.items():

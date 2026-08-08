@@ -18,7 +18,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Admit or reconcile one digest-bound Ordivon World Resource Transfer "
-            "against a Security-owned SampleVault destination. JSON request is read from stdin."
+            "against a Security-owned SampleVault destination. JSON request is read from stdin. "
+            "The CLI treats its local caller as the source-authority trust boundary; "
+            "untrusted-relay "
+            "deployments must verify Resource Egress authority independently before invocation."
         )
     )
     parser.add_argument("--root", type=Path, required=True)
