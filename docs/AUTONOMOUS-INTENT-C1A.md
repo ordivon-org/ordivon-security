@@ -214,15 +214,6 @@ The model was shown one known effect affordance. C1-A therefore tests **choice o
 
 The expected representation bottleneck did not appear first. The model used the narrow capability surface without Tool correction in the model-only probe and corrected physical run. Generalizing the action surface now would be speculative.
 
-The stronger next pressure is causal recovery around a real effect:
+C1-B has now exercised that pressure physically. Owner loss at both an intermediate `peer-a-removed` state and a `peer-b-present`/completion-lost state showed that physical resource recovery alone was not enough: the S6 ledger also needed the exact admitted effect binding. Persisting only that existing immutable request/admission/effect identity, together with durable physical phase and independent Host truth, was sufficient to classify both tested interruptions without blindly replaying the whole effect or introducing a generic causal DAG. See [`INTERRUPTED-CONSEQUENCE-C1B.md`](INTERRUPTED-CONSEQUENCE-C1B.md).
 
-```text
-intent
-→ admission
-→ request bound
-→ physical transition begins
-→ controller dies
-→ ?
-```
-
-A replacement controller must determine the actual world from durable identity and observation without blindly repeating the effect. That experiment can tell us whether durable effect state, stronger causal linkage, resumable `RangeSession`, or exactly-once semantics are truly unavoidable.
+The remaining pressure moves inside one physical substep: interrupt partial peer-B materialization before a stable `peer-b-present` phase exists and determine whether idempotent suffix continuation, compensation, finer substep identity, or stronger causality is actually required.

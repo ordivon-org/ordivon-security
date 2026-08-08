@@ -1,0 +1,121 @@
+{
+  "acceptanceClaims": [
+    "the pre-fix physical baseline proved that S6-R physical recovery could safely close an interrupted Range to zero while the durable ledger could not reconstruct the admitted Actor effect that caused the intermediate world",
+    "the minimal accepted production change persists only the exact existing Actor effect binding and non-truth backend receipt alongside the durable S6 physical phase rather than persisting the whole RangeSession",
+    "after owner SIGKILL at peer-a-removed before peer-B creation, a new process reconstructed the exact request, admission, authority, and effect identity while independent Host observation confirmed the intermediate physical world",
+    "after owner SIGKILL with peer-B physically present but before the normal completion event, the durable effect identity and independent Host world observation established that the consequence had already materialized and whole-effect replay was unjustified",
+    "the existing exact S5/S6 reconciler still closed both interrupted worlds to zero residuals without being promoted into an automatic continuation engine",
+    "the final ordinary Guest-driven S6 regression retained its A-present, A-removed, B-present topology sequence, Guest dual-peer success, packet-sensor dual-flow observation, and clean closure",
+    "this single-effect consumer did not require enforcing RangeEvent causalParents; exact durable effect identity plus durable physical phase plus independent Host truth was sufficient to classify the tested interruptions"
+  ],
+  "baselineFalsifier": {
+    "classification": "physical-recovery-without-semantic-effect-recovery",
+    "faultPoint": "after-peer-a-removed-before-peer-b",
+    "implementationRevision": "git:43517b01267711c60444b495bbcea7cbb03a8372",
+    "physicalRecoveryAvailable": true,
+    "privateReceiptByteLength": 7070,
+    "privateReceiptSha256": "sha256:6a3c76dc02c5b1d10dcbb6ebcdc4a650a2010db67496cbd433951fb6b10b124e",
+    "semanticEffectReconstructionAvailable": false,
+    "status": "falsifier-observed"
+  },
+  "implementationRevision": "git:dbd6b4c69379980389220001f96f2715de58ae83",
+  "kind": "ordivon.security.c1b-interrupted-consequence-acceptance",
+  "limitations": [
+    "C1-B does not prove automatic continuation from the peer-a-removed intermediate state to peer B",
+    "C1-B does not provide a generic exactly-once effect framework or durable RangeSession resurrection",
+    "the tested kill gates surround stable durable physical phases and do not cover every instruction inside peer-B namespace and veth materialization",
+    "the accepted causal conclusion is limited to one exact effect over deterministic exclusive S6 resources; concurrent or cross-Agent effects may still require stronger causal structure",
+    "RangeEvent causalParents remain descriptive and C1-B does not prove that causal graphs are unnecessary in general",
+    "the existing Range reconciler still closes orphaned resources to zero rather than resuming an admitted effect",
+    "the accepted world remains isolated and structurally unrouted with no external target authority"
+  ],
+  "midEffectAcceptance": {
+    "admissionDigest": "sha256:3fad59d554efa130c015d89c757a642ecb053a90526311cf73ce406d3d8867f5",
+    "authorityDigest": "sha256:922353b1e550dd7c4545faa3d48a6cb6575d39a1dcfdf9ab06e5f641b325ef48",
+    "effectId": "range-effect:11cb782c725dcb8b69fa75c9",
+    "faultPoint": "after-peer-a-removed-before-peer-b",
+    "gates": {
+      "durableLedgerPreservedNonTruthReceipt": true,
+      "durableLedgerPreservedSemanticEffectBinding": true,
+      "existingReconcilerClosedToZero": true,
+      "hostObservedFabricWithoutPeerNamespace": true,
+      "inMemoryEffectBindingExistedBeforeKill": true,
+      "interruptedEffectIdentityReconstructed": true,
+      "ledgerReachedIntermediatePhysicalPhase": true,
+      "ledgerRemovedAfterReconcile": true,
+      "ownerDeadChildrenStillRecoverable": true,
+      "ownerKilledAtExactInjectedGate": true,
+      "postReconcileNamespacesAbsent": true
+    },
+    "implementationRevision": "git:dbd6b4c69379980389220001f96f2715de58ae83",
+    "privateReceiptByteLength": 9361,
+    "privateReceiptSha256": "sha256:8d6b8242a2651424fb445e9394c7e4c33b1337436ca9d7660fb7901d794ad6dc",
+    "requestDigest": "sha256:11cb782c725dcb8b69fa75c9ae1563fcafbd0344a93fadbb8f10cce0734bb725",
+    "status": "accepted",
+    "topologyPhaseAtKill": "peer-a-removed"
+  },
+  "responseLostAcceptance": {
+    "admissionDigest": "sha256:257ac3b8191261c8184228cb562a6f70bf96c38340d05f9e063db100782cbf3c",
+    "authorityDigest": "sha256:922353b1e550dd7c4545faa3d48a6cb6575d39a1dcfdf9ab06e5f641b325ef48",
+    "effectId": "range-effect:caaa81df66390e00b4ccc3fe",
+    "faultPoint": "after-peer-b-persisted-before-completion-event",
+    "gates": {
+      "durableLedgerPreservedNonTruthReceipt": true,
+      "durableLedgerPreservedSemanticEffectBinding": true,
+      "existingReconcilerClosedToZero": true,
+      "hostObservedExpectedPhysicalWorld": true,
+      "inMemoryEffectBindingExistedBeforeKill": true,
+      "interruptedEffectIdentityReconstructed": true,
+      "ledgerReachedExpectedPhysicalPhase": true,
+      "ledgerRemovedAfterReconcile": true,
+      "ownerDeadChildrenStillRecoverable": true,
+      "ownerKilledAtExactInjectedGate": true,
+      "postReconcileNamespacesAbsent": true
+    },
+    "physicalEffectAlreadyMaterialized": true,
+    "privateReceiptByteLength": 9582,
+    "privateReceiptSha256": "sha256:d947f4590e905de26d3efef7a2d5a5fd68bb04298b98e2e1d0f844c34c5d7c3b",
+    "requestDigest": "sha256:caaa81df66390e00b4ccc3fea856aac3c7d2f6ea178ecda4fbf9431398033be7",
+    "status": "accepted",
+    "testRevision": "git:360673436f23554621cf46b8d7eb1c2ac4aeb743",
+    "topologyPhaseAtKill": "peer-b-present",
+    "wholeEffectReplayJustified": false
+  },
+  "normalS6Regression": {
+    "externalAcceptance": {
+      "bothChallengeFlowsObserved": true,
+      "currentTopologyIsPeerB": true,
+      "guestObservedBothPeers": true,
+      "peerARemovalObserved": true,
+      "peerBAdditionObserved": true,
+      "replacementCompleted": true,
+      "replacementStarted": true,
+      "residualClosureClean": true,
+      "singleNetworkDevicePresent": true,
+      "topologyChurnCompleted": true,
+      "topologyHistoryRetained": true
+    },
+    "fixtureResultDigest": "sha256:9f82b3b3660f5fb7e189ec7fef9a329261c040d1f30216f96e62664541cb517e",
+    "packetLineCount": 18,
+    "pcapDigest": "sha256:4d7c686947d96687acad92c6223d0271321b1710f462339ab9ef2d7c71eccd96",
+    "privateReceiptByteLength": 37249,
+    "privateReceiptSha256": "sha256:45da06d724ae59b496d0462157e324d17bd2a01018819f846fefd3930130afaf",
+    "securitySourceRevision": "git:360673436f23554621cf46b8d7eb1c2ac4aeb743",
+    "status": "accepted",
+    "topologyHistory": [
+      "peer-a-present",
+      "peer-a-removed",
+      "peer-b-present"
+    ]
+  },
+  "rangeEffect": {
+    "capability": "fabric.peer-replacement",
+    "effectType": "fabric.replace-peer-a-with-peer-b",
+    "receiptWorldEffectVerified": false,
+    "zoneRef": "zone:s6-fabric"
+  },
+  "rangeId": "range:windows-topology-churn-s6",
+  "schemaVersion": 1,
+  "status": "accepted",
+  "testRevision": "git:360673436f23554621cf46b8d7eb1c2ac4aeb743"
+}
