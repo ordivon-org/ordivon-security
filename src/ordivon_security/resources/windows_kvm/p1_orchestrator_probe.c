@@ -97,6 +97,12 @@ cleanup:
     return success;
 }
 
+static int file_exists(const wchar_t *path) {
+    DWORD attributes = GetFileAttributesW(path);
+    return attributes != INVALID_FILE_ATTRIBUTES &&
+           (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+}
+
 static int file_contains(const wchar_t *path, const char *needle) {
     HANDLE file;
     LARGE_INTEGER size;
@@ -182,12 +188,33 @@ static int production_probe(const wchar_t *result_path) {
     uint64_t ignored_length = 0;
     DWORD controller_exit = STILL_ACTIVE;
     int controller_started = 0;
+    int controller_result_present = 0;
+    int controller_manifest_verified = 0;
+    int controller_timed_out_false = 0;
+    int controller_orchestrator_exit_zero = 0;
+    int controller_orchestrator_exit_one = 0;
+    int controller_orchestrator_exit_seventy_one = 0;
+    int controller_completed = 0;
     int controller_verified = 0;
+    int orchestrator_result_present = 0;
+    int orchestrator_binding_verified = 0;
+    int orchestrator_run_id_verified = 0;
+    int orchestrator_schema_verified = 0;
+    int orchestrator_system_verified = 0;
+    int orchestrator_observer_verified = 0;
+    int orchestrator_control_verified = 0;
+    int orchestrator_acl_applied = 0;
+    int orchestrator_pre_observer_completed = 0;
+    int orchestrator_allowed_child_completed = 0;
+    int orchestrator_post_observer_completed = 0;
+    int orchestrator_selective_control = 0;
+    int orchestrator_sequence_verified = 0;
+    int orchestrator_completed = 0;
     int orchestrator_verified = 0;
     int completed = 0;
     char manifest[1024];
     int manifest_len;
-    char output[4096];
+    char output[8192];
     int output_len;
 
     if (!safe_path_arg(result_path)) return 20;
@@ -219,30 +246,66 @@ static int production_probe(const wchar_t *result_path) {
     controller_started = run_controller(
         manifest_path, manifest_digest, controller_result, &controller_exit
     );
-    controller_verified =
-        controller_started && controller_exit == 0 &&
-        file_contains(controller_result, "\"manifestDigestVerified\":true") &&
-        file_contains(controller_result, "\"timedOut\":false") &&
-        file_contains(controller_result, "\"orchestratorExitCode\":0") &&
-        file_contains(controller_result, "\"completed\":true");
-    orchestrator_verified =
-        file_contains(orchestrator_result, "\"bindingDigestVerified\":true") &&
-        file_contains(orchestrator_result, "\"manifestRunIdVerified\":true") &&
-        file_contains(orchestrator_result, "\"manifestSchemaVerified\":true") &&
-        file_contains(orchestrator_result, "\"systemIdentityVerified\":true") &&
-        file_contains(orchestrator_result, "\"observerIdentityVerified\":true") &&
-        file_contains(orchestrator_result, "\"executionControlIdentityVerified\":true") &&
-        file_contains(orchestrator_result, "\"selectiveExecutionControl\":true") &&
-        file_contains(orchestrator_result, "\"observationSequenceVerified\":true") &&
-        file_contains(orchestrator_result, "\"networkRequested\":false") &&
-        file_contains(orchestrator_result, "\"thirdPartySampleExecuted\":false") &&
-        file_contains(orchestrator_result, "\"completed\":true");
-    if (controller_verified) {
+    controller_result_present = file_exists(controller_result);
+    orchestrator_result_present = file_exists(orchestrator_result);
+    if (controller_result_present) {
         sha256_file(controller_result, controller_result_digest, &ignored_length);
+        controller_manifest_verified =
+            file_contains(controller_result, "\"manifestDigestVerified\":true");
+        controller_timed_out_false =
+            file_contains(controller_result, "\"timedOut\":false");
+        controller_orchestrator_exit_zero =
+            file_contains(controller_result, "\"orchestratorExitCode\":0");
+        controller_orchestrator_exit_one =
+            file_contains(controller_result, "\"orchestratorExitCode\":1");
+        controller_orchestrator_exit_seventy_one =
+            file_contains(controller_result, "\"orchestratorExitCode\":71");
+        controller_completed =
+            file_contains(controller_result, "\"completed\":true");
     }
-    if (orchestrator_verified) {
+    if (orchestrator_result_present) {
         sha256_file(orchestrator_result, orchestrator_result_digest, &ignored_length);
+        orchestrator_binding_verified =
+            file_contains(orchestrator_result, "\"bindingDigestVerified\":true");
+        orchestrator_run_id_verified =
+            file_contains(orchestrator_result, "\"manifestRunIdVerified\":true");
+        orchestrator_schema_verified =
+            file_contains(orchestrator_result, "\"manifestSchemaVerified\":true");
+        orchestrator_system_verified =
+            file_contains(orchestrator_result, "\"systemIdentityVerified\":true");
+        orchestrator_observer_verified =
+            file_contains(orchestrator_result, "\"observerIdentityVerified\":true");
+        orchestrator_control_verified =
+            file_contains(orchestrator_result, "\"executionControlIdentityVerified\":true");
+        orchestrator_acl_applied =
+            file_contains(orchestrator_result, "\"aclApplied\":true");
+        orchestrator_pre_observer_completed =
+            file_contains(orchestrator_result, "\"preObserverCompleted\":true");
+        orchestrator_allowed_child_completed =
+            file_contains(orchestrator_result, "\"allowedChildCompleted\":true");
+        orchestrator_post_observer_completed =
+            file_contains(orchestrator_result, "\"postObserverCompleted\":true");
+        orchestrator_selective_control =
+            file_contains(orchestrator_result, "\"selectiveExecutionControl\":true");
+        orchestrator_sequence_verified =
+            file_contains(orchestrator_result, "\"observationSequenceVerified\":true");
+        orchestrator_completed =
+            file_contains(orchestrator_result, "\"completed\":true");
     }
+    controller_verified =
+        controller_started && controller_exit == 0 && controller_result_present &&
+        controller_manifest_verified && controller_timed_out_false &&
+        controller_orchestrator_exit_zero && controller_completed;
+    orchestrator_verified =
+        orchestrator_result_present && orchestrator_binding_verified &&
+        orchestrator_run_id_verified && orchestrator_schema_verified &&
+        orchestrator_system_verified && orchestrator_observer_verified &&
+        orchestrator_control_verified && orchestrator_acl_applied &&
+        orchestrator_pre_observer_completed && orchestrator_allowed_child_completed &&
+        orchestrator_post_observer_completed && orchestrator_selective_control &&
+        orchestrator_sequence_verified && orchestrator_completed &&
+        file_contains(orchestrator_result, "\"networkRequested\":false") &&
+        file_contains(orchestrator_result, "\"thirdPartySampleExecuted\":false");
     completed = controller_verified && orchestrator_verified;
 
     output_len = snprintf(
@@ -252,15 +315,46 @@ static int production_probe(const wchar_t *result_path) {
         "\"runId\":\"%s\",\"manifestDigest\":\"sha256:%s\","
         "\"controllerPath\":\"C:\\\\ProgramData\\\\Ordivon\\\\p1-controller.exe\","
         "\"controllerStarted\":%s,\"controllerExitCode\":%lu,"
-        "\"controllerProductionPathVerified\":%s,"
+        "\"controllerResultPresent\":%s,\"controllerManifestDigestVerified\":%s,"
+        "\"controllerTimedOutFalse\":%s,\"controllerOrchestratorExitZero\":%s,"
+        "\"controllerOrchestratorExitOne\":%s,\"controllerOrchestratorExitSeventyOne\":%s,"
+        "\"controllerCompleted\":%s,\"controllerProductionPathVerified\":%s,"
         "\"controllerResultDigest\":\"sha256:%s\","
         "\"orchestratorPath\":\"C:\\\\ProgramData\\\\Ordivon\\\\p1-orchestrator.ps1\","
+        "\"orchestratorResultPresent\":%s,\"orchestratorBindingDigestVerified\":%s,"
+        "\"orchestratorRunIdVerified\":%s,\"orchestratorSchemaVerified\":%s,"
+        "\"orchestratorSystemIdentityVerified\":%s,\"orchestratorObserverIdentityVerified\":%s,"
+        "\"orchestratorExecutionControlIdentityVerified\":%s,\"orchestratorAclApplied\":%s,"
+        "\"orchestratorPreObserverCompleted\":%s,\"orchestratorAllowedChildCompleted\":%s,"
+        "\"orchestratorPostObserverCompleted\":%s,\"orchestratorSelectiveExecutionControl\":%s,"
+        "\"orchestratorObservationSequenceVerified\":%s,\"orchestratorCompleted\":%s,"
         "\"orchestratorResultVerified\":%s,\"orchestratorResultDigest\":\"sha256:%s\","
         "\"networkRequested\":false,\"thirdPartySampleExecuted\":false,"
         "\"completed\":%s}\n",
         RUN_ID_A, manifest_digest,
         controller_started ? "true" : "false", (unsigned long)controller_exit,
+        controller_result_present ? "true" : "false",
+        controller_manifest_verified ? "true" : "false",
+        controller_timed_out_false ? "true" : "false",
+        controller_orchestrator_exit_zero ? "true" : "false",
+        controller_orchestrator_exit_one ? "true" : "false",
+        controller_orchestrator_exit_seventy_one ? "true" : "false",
+        controller_completed ? "true" : "false",
         controller_verified ? "true" : "false", controller_result_digest,
+        orchestrator_result_present ? "true" : "false",
+        orchestrator_binding_verified ? "true" : "false",
+        orchestrator_run_id_verified ? "true" : "false",
+        orchestrator_schema_verified ? "true" : "false",
+        orchestrator_system_verified ? "true" : "false",
+        orchestrator_observer_verified ? "true" : "false",
+        orchestrator_control_verified ? "true" : "false",
+        orchestrator_acl_applied ? "true" : "false",
+        orchestrator_pre_observer_completed ? "true" : "false",
+        orchestrator_allowed_child_completed ? "true" : "false",
+        orchestrator_post_observer_completed ? "true" : "false",
+        orchestrator_selective_control ? "true" : "false",
+        orchestrator_sequence_verified ? "true" : "false",
+        orchestrator_completed ? "true" : "false",
         orchestrator_verified ? "true" : "false", orchestrator_result_digest,
         completed ? "true" : "false"
     );
