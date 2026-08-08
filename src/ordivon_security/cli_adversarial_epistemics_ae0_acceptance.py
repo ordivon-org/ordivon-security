@@ -11,7 +11,11 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
-from ordivon_security.integrations import DeepSeekRangeIntentConfig, DeepSeekRangeIntentDriver
+from ordivon_security.integrations import (
+    DeepSeekRangeIntentConfig,
+    DeepSeekRangeIntentDriver,
+    RangeIntentHarnessFailure,
+)
 from ordivon_security.range import (
     BackendCheckpoint,
     PendingRangeEvent,
@@ -701,18 +705,32 @@ def main() -> None:
             protocol_repository=args.protocol_repository,
         )
     )
-    healthy = _run_case(
-        root=args.state_root / "healthy",
-        compromised=False,
-        label="healthy",
-        driver=driver,
-    )
-    compromised = _run_case(
-        root=args.state_root / "compromised",
-        compromised=True,
-        label="compromised",
-        driver=driver,
-    )
+    try:
+        healthy = _run_case(
+            root=args.state_root / "healthy",
+            compromised=False,
+            label="healthy",
+            driver=driver,
+        )
+        compromised = _run_case(
+            root=args.state_root / "compromised",
+            compromised=True,
+            label="compromised",
+            driver=driver,
+        )
+    except RangeIntentHarnessFailure as error:
+        failure: JsonObject = {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.adversarial-epistemics-ae0-equipment-failure",
+            "status": "equipment-failure",
+            "securityRevision": _git_revision(Path.cwd()),
+            "harnessFailure": error.evidence,
+        }
+        validate_json(failure)
+        args.receipt.parent.mkdir(parents=True, exist_ok=True)
+        args.receipt.write_bytes(canonical_bytes(failure) + b"\n")
+        print(json.dumps(failure, ensure_ascii=False, sort_keys=True, indent=2))
+        raise SystemExit(2) from error
     healthy_analysis = _case_analysis(healthy)
     compromised_analysis = _case_analysis(compromised)
     healthy_deceiver_turn = cast(JsonObject, cast(JsonObject, healthy["deceiver"])["turnEvidence"])

@@ -63,6 +63,13 @@ def _insert_sources(*, harness_source: Path, protocol_source: Path) -> None:
             sys.path.insert(0, text)
 
 
+class RangeIntentHarnessFailure(RuntimeError):
+    def __init__(self, stop_code: str, evidence: JsonObject) -> None:
+        super().__init__(f"AF2 Harness turn stopped before completion: {stop_code}")
+        self.stop_code = stop_code
+        self.evidence = evidence
+
+
 @dataclass(frozen=True, slots=True)
 class DeepSeekRangeIntentConfig:
     secret_path: Path
@@ -280,8 +287,38 @@ class DeepSeekRangeIntentDriver:
         )
         result = runner.run(plan)
         stop_code = str(getattr(result.stop_code, "value", result.stop_code))
+        trace = cast(JsonObject, result.trace.to_dict())
+        usage = cast(JsonObject, dict(result.usage))
+        effective_raw = usage.get("effectiveModelIds")
+        effective = (
+            [item for item in effective_raw if isinstance(item, str)]
+            if isinstance(effective_raw, list)
+            else []
+        )
+        execution_identity = cast(JsonObject, runner.execution_identity(plan))
         if stop_code != "candidate_completed":
-            raise RuntimeError(f"AF2 Harness turn stopped before completion: {stop_code}")
+            failure_evidence: JsonObject = {
+                "schemaVersion": 1,
+                "kind": "ordivon.security.af2-range-intent-harness-failure",
+                "label": label,
+                "contextDigest": context_digest,
+                "stopCode": stop_code,
+                "trace": trace,
+                "traceDigest": canonical_digest(trace),
+                "usage": usage,
+                "requestedModelId": str(adapter.model_id),
+                "effectiveModelIds": effective or [str(adapter.model_id)],
+                "credentialScopeId": str(settings.credential_scope_id),
+                "harness": {
+                    "sourceRevision": harness_revision,
+                    "declaredVersion": harness_version,
+                    "runtimeMetadataVersion": str(version_module.package_version()),
+                    "protocolSourceRevision": protocol_revision,
+                },
+                "loopExecutionIdentity": execution_identity,
+            }
+            validate_json(failure_evidence)
+            raise RangeIntentHarnessFailure(stop_code, failure_evidence)
         if bridge.requests is None:
             raise RuntimeError("AF2 model completed without submitting Range intent")
         if result.conclusion is None:
@@ -305,14 +342,6 @@ class DeepSeekRangeIntentDriver:
                 "source": "deepseek-via-ordivon-harness",
                 "promptRevision": _PROMPT_REVISION,
             },
-        )
-        trace = cast(JsonObject, result.trace.to_dict())
-        usage = cast(JsonObject, dict(result.usage))
-        effective_raw = usage.get("effectiveModelIds")
-        effective = (
-            [item for item in effective_raw if isinstance(item, str)]
-            if isinstance(effective_raw, list)
-            else []
         )
         if effective and any(item != adapter.model_id for item in effective):
             raise RuntimeError("AF2 effective model differs from requested model")
@@ -338,10 +367,14 @@ class DeepSeekRangeIntentDriver:
                 "runtimeMetadataVersion": str(version_module.package_version()),
                 "protocolSourceRevision": protocol_revision,
             },
-            "loopExecutionIdentity": cast(JsonObject, runner.execution_identity(plan)),
+            "loopExecutionIdentity": execution_identity,
         }
         validate_json(evidence)
         return decision, evidence
 
 
-__all__ = ["DeepSeekRangeIntentConfig", "DeepSeekRangeIntentDriver"]
+__all__ = [
+    "DeepSeekRangeIntentConfig",
+    "DeepSeekRangeIntentDriver",
+    "RangeIntentHarnessFailure",
+]
