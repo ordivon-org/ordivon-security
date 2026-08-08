@@ -130,6 +130,8 @@ The DaVinci R2 static-causality index is retained at [`acceptance/windows-kvm-p1
 
 The sanitized R5 selective-execution-control index is retained at [`acceptance/windows-kvm-p1-execution-control-canary-fe72177.json`](acceptance/windows-kvm-p1-execution-control-canary-fe72177.json). It binds the exact clean Security implementation revision, the maintained no-network canary, the SYSTEM execution identity, writable root and nested staging probes, inherited NTFS `ExecuteFile` deny evidence, a successful executable outside the staging tree, denied root and nested staging executables, QMP no-network authority, and clean residual closure. It also retains the AppLocker prototype as a rejected candidate for this exact SYSTEM surface. It does not execute Case A, prove nested-MSI reachability, seal the Controller into the P1 base, or authorize Case A or Case B.
 
+The sanitized R6-A generic-Controller index is retained at [`acceptance/windows-kvm-p1-generic-controller-e352e86.json`](acceptance/windows-kvm-p1-generic-controller-e352e86.json). It binds a clean Security source revision, the exact accepted Controller PE retained in the root-only Vault, its fixed sealed-orchestrator production boundary, manifest SHA-256 verification, Job Object child ownership, bounded timeout termination, QMP no-network truth, and residual closure. The index explicitly rejects arbitrary executable targeting and does not treat recompilation as the accepted PE identity. It does not prove the production orchestrator path, seal the Controller into a P1 base, execute Case A, or authorize Case A or Case B.
+
 ## Active Case Snapshot bundle
 
 An evolving local Case may be retained as:

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-generic-controller-acceptance",
+  "status": "accepted-generic-controller-self-test",
+  "implementationRevision": "git:e352e86228b99669035a5d05593adc4a10a8d5f5",
+  "environmentImageDigest": "sha256:37ebebb36b0e05a9c3f1cd02e84f086d8c8c245553b4bf175539ce279f1e4cad",
+  "scope": {
+    "maintainedSelfTest": true,
+    "thirdPartySample": false,
+    "actualCaseAExecuted": false,
+    "arbitraryExecutableTarget": false,
+    "productionTarget": "sealed-p1-orchestrator-only",
+    "controllerSealedInP1Base": false,
+    "caseAExecutionAuthorized": false
+  },
+  "controller": {
+    "sourceDigest": "sha256:621292213105f195ac4b48d5faaadd0087d7dad3e744817a502850505c2cca6c",
+    "executableDigest": "sha256:eb7e9874f1dc568721c826ea30e1b77f325254244564ca70381d2556f3d4388a",
+    "byteLength": 25600,
+    "compilerDigest": "sha256:72e858c616806ff2b230452c5ed2df0c45ec2a965e544b51d6e5188ec4971d1e",
+    "compilerVersion": "x86_64-w64-mingw32-gcc (GCC) 16.1.0",
+    "networkImportMatches": [],
+    "vaultObjectVerified": true,
+    "rebuildByteIdentityAssumed": false,
+    "productionBindingInputs": [
+      "runId",
+      "manifestPath",
+      "manifestDigest",
+      "timeoutMs",
+      "resultPath"
+    ]
+  },
+  "execution": {
+    "runId": "evaluation-run:e75ab4ed8d25a432560fc3ba",
+    "terminalReason": "benign-fixture-completed",
+    "disposition": "no-issue-observed",
+    "guestFixtureDurationMs": 1347,
+    "residualClosed": true
+  },
+  "gates": {
+    "manifestDigestVerified": true,
+    "normalChildCompleted": true,
+    "normalMarkerObserved": true,
+    "timeoutObserved": true,
+    "timeoutChildTerminated": true,
+    "timeoutMarkerAbsent": true,
+    "jobTotalProcessesObserved": true,
+    "networkRequested": false,
+    "qmpNoNetworkDevice": true,
+    "providerErrorAbsent": true,
+    "residualClosure": true
+  },
+  "privateEvidence": {
+    "semanticEvidenceDigest": "sha256:0db40450a63a1df71ad3e6f00de7e1938efcd383079e0ddb69e2ac77c631c261",
+    "operationalEvidenceDigest": "sha256:b970e11bf445555f626bde04af3bc6e39ce871e43414a232e7b0dd94657a1908",
+    "bundleManifestDigest": "sha256:a509dac3a0bbd03451010cfa006152ab11858c6c005e334c3bc2be6323acf582",
+    "resultDigest": "sha256:483cc1f475111b2d408f584591d71024b198e96fadbc6397493515b08e7400f3",
+    "fixtureResultDigest": "sha256:a0bbdd7ab88d4e60d402baab366d5bece7cdb322b640775b8c659f0f665bab7e",
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131"
+  },
+  "runtime": {
+    "workspaceId": "security-malware-r6-generic-clean-20260808",
+    "jobId": "job-019fe10c-8281-72b0-860c-65f8f1da9519",
+    "attemptId": "attempt-019fe10c-8281-72b0-860c-66079a63bf76",
+    "terminalEvidenceDigest": "sha256:54abfa230cdb16ac8aea5f50fd7e682a3d0e5abd1621985ea8327313eb322ef8",
+    "executionDisposition": "succeeded",
+    "deliveryDisposition": "committed",
+    "recoveryRequired": false
+  },
+  "limitations": [
+    "the accepted run exercises only the Controller self-test path and does not invoke the production sealed PowerShell orchestrator path",
+    "the production interface binds an exact manifest digest and fixed orchestrator path but has not yet been exercised around an installer",
+    "the Controller binary is accepted by exact executable digest; recompiling the same source is not treated as reproducing that byte identity",
+    "the accepted Controller has not yet been sealed into a newly accepted P1 base",
+    "the selective staging execution-control resource has not yet been sealed together with this exact Controller binary",
+    "Case A execution remains unauthorized and Case B remains blocked"
+  ]
+}
