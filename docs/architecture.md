@@ -128,6 +128,15 @@ C1-F multiple-successor profile
   → before current-claim replacement, the exact prior claim is archived and the new claim records predecessorClaimId/digest
   → final reconciliation preserves current + archived recovery lineage in its receipt before clearing recovery metadata
 
+C1-G mid-successor recovery profile
+  → a successor may mutate physical placement and die before any new durable stable-state publication
+  → the ledger digest can remain unchanged while q/w move from Host root into peer/fabric namespaces and the bridge topology changes
+  → a later successor can claim that same durable ledger digest only after the previous process-scoped gate is released
+  → the new claim links to the archived predecessor claim, but the claim digest does not stand in for current physical progress
+  → post-acquisition Host observation classifies the actual midpoint and determines the missing suffix
+  → only link-up/address/service/stable-publication operations are executed; the whole effect is not replayed
+  → the same Guest completes A/B across original-owner and first-successor deaths, then final reconciliation preserves lineage and closes to zero
+
 SynchronousContestProfile
   → records profile start in RangeSession management events
   → runs the existing ContestRunner unchanged
