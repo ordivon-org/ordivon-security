@@ -67,7 +67,7 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
     def execution_identity(self) -> JsonObject:
         identity = super().execution_identity
         identity["kind"] = "ordivon.security.windows-topology-churn-range"
-        identity["implementationRevision"] = "5"
+        identity["implementationRevision"] = "6"
         identity["network"] = {
             "guestAddress": self.guest_address,
             "peerAAddress": self.peer_address,
@@ -97,10 +97,15 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
         token = hashlib.sha256(session_id.encode("utf-8")).hexdigest()[:8]
         return (f"s6f{token}", f"s6p{token}", f"s6q{token}")
 
+    def _owned_host_link_candidates(self, session_id: str) -> tuple[str, ...]:
+        token = hashlib.sha256(session_id.encode("utf-8")).hexdigest()[:8]
+        return (f"q{token}", f"w{token}")
+
     def _ledger_extra(self, spec: RangeSessionSpec, state: JsonObject) -> JsonObject:
         extra = super()._ledger_extra(spec, state)
         extra["topologyPhase"] = state.get("topologyPhase", "peer-a-present")
         extra["currentPeerAddress"] = state.get("currentPeerAddress", self.peer_address)
+        extra["ownedHostLinkCandidates"] = list(self._owned_host_link_candidates(spec.session_id))
         return extra
 
     def _run_ledger_extra(self, run: _FabricRun) -> JsonObject:
@@ -109,6 +114,9 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
         extra["currentPeerAddress"] = run.state.get("currentPeerAddress", self.peer_address)
         extra["actorReplacementRequest"] = deepcopy(run.state.get("actorReplacementRequest"))
         extra["actorReplacementReceipt"] = deepcopy(run.state.get("actorReplacementReceipt"))
+        extra["ownedHostLinkCandidates"] = list(
+            self._owned_host_link_candidates(run.instance.session_id)
+        )
         return extra
 
     def _initial_fabric_truth(self, state: JsonObject) -> JsonObject:

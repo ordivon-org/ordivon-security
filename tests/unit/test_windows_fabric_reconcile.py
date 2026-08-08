@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from ordivon_security.range.windows_fabric_reconcile import (
+    _remove_host_links,
     reconcile_windows_fabric_range_runs,
 )
 
@@ -42,6 +43,7 @@ class WindowsFabricRangeReconcileTests(unittest.TestCase):
         canary = self.root / "canaries" / f"ordivon-s6-{token}.exe"
         canary.write_bytes(b"canary")
         namespaces = [f"s6f{token}", f"s6p{token}", f"s6q{token}"]
+        host_links = [f"q{token}", f"w{token}"]
         ledger = {
             "schemaVersion": 1,
             "kind": "ordivon.security.windows-kvm-run-state",
@@ -71,6 +73,7 @@ class WindowsFabricRangeReconcileTests(unittest.TestCase):
             "fabricNamespace": namespaces[0],
             "peerNamespace": namespaces[2],
             "ownedNamespaceCandidates": namespaces,
+            "ownedHostLinkCandidates": host_links,
             "topologyPhase": "peer-b-present",
             "currentPeerAddress": "10.253.70.4",
             "canaryPath": str(canary),
@@ -96,6 +99,14 @@ class WindowsFabricRangeReconcileTests(unittest.TestCase):
                 "ordivon_security.range.windows_fabric_reconcile._terminate_from_ledger",
                 return_value=True,
             ),
+            patch(
+                "ordivon_security.range.windows_fabric_reconcile._remove_host_links",
+                return_value=(list(ledger["ownedHostLinkCandidates"]), []),
+            ),
+            patch(
+                "ordivon_security.range.windows_fabric_reconcile._root_link_kinds",
+                return_value={},
+            ),
         ):
             result = reconcile_windows_fabric_range_runs(self.root)
         self.assertEqual(result["status"], "passed")
@@ -106,6 +117,7 @@ class WindowsFabricRangeReconcileTests(unittest.TestCase):
         item = result["results"][0]
         self.assertEqual(item["topologyPhase"], "peer-b-present")
         self.assertEqual(item["residualNamespaces"], [])
+        self.assertEqual(item["residualHostLinks"], [])
 
     def test_active_exact_owner_is_skipped(self) -> None:
         ledger_path, _ = self._s6_ledger()
@@ -123,14 +135,38 @@ class WindowsFabricRangeReconcileTests(unittest.TestCase):
         ledger = json.loads(ledger_path.read_text())
         ledger["ownedNamespaceCandidates"][-1] = "default"
         ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
-        with patch(
-            "ordivon_security.range.windows_fabric_reconcile._remove_namespaces"
-        ) as remove:
+        with patch("ordivon_security.range.windows_fabric_reconcile._remove_namespaces") as remove:
             result = reconcile_windows_fabric_range_runs(self.root)
         self.assertEqual(result["status"], "attention-required")
         self.assertEqual(result["attentionRequired"], 1)
         remove.assert_not_called()
         self.assertTrue(ledger_path.exists())
+
+    def test_tampered_host_link_candidates_are_attention_required_not_deleted(self) -> None:
+        ledger_path, _ = self._s6_ledger()
+        ledger = json.loads(ledger_path.read_text())
+        ledger["ownedHostLinkCandidates"][-1] = "eth0"
+        ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
+        with patch("ordivon_security.range.windows_fabric_reconcile._remove_host_links") as remove:
+            result = reconcile_windows_fabric_range_runs(self.root)
+        self.assertEqual(result["status"], "attention-required")
+        self.assertEqual(result["attentionRequired"], 1)
+        remove.assert_not_called()
+        self.assertTrue(ledger_path.exists())
+
+    def test_host_link_cleanup_refuses_non_veth_name_collision(self) -> None:
+        names = ("q12345678", "w12345678")
+        with (
+            patch(
+                "ordivon_security.range.windows_fabric_reconcile._root_link_kinds",
+                return_value={"q12345678": "bridge"},
+            ),
+            patch("ordivon_security.range.windows_fabric_reconcile.subprocess.run") as run,
+        ):
+            requested, residual = _remove_host_links(Path("/usr/bin/ip"), names)
+        self.assertEqual(requested, [])
+        self.assertEqual(residual, ["q12345678"])
+        run.assert_not_called()
 
     def test_evaluation_ledger_is_outside_range_reconciler_authority(self) -> None:
         path = self.root / "run-ledgers" / "evaluation.json"

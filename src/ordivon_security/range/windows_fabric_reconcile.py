@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import shutil
 import subprocess
 import time
@@ -39,12 +40,18 @@ def _expected_namespaces(prefix: str, token: str) -> tuple[str, ...]:
     return (f"s6f{token}", f"s6p{token}", f"s6q{token}")
 
 
+def _expected_host_links(prefix: str, token: str) -> tuple[str, ...]:
+    if prefix == "s5":
+        return ()
+    return (f"q{token}", f"w{token}")
+
+
 def _validated_range_ledger(
     state_root: Path,
     runs_root: Path,
     ledger_path: Path,
     ledger: JsonObject,
-) -> tuple[Path, tuple[str, ...], Path | None] | None:
+) -> tuple[Path, tuple[str, ...], tuple[str, ...], Path | None] | None:
     if (
         ledger_path.is_symlink()
         or ledger.get("schemaVersion") != 1
@@ -99,6 +106,14 @@ def _validated_range_ledger(
     if peer_namespace is not None and peer_namespace not in expected_namespaces[1:]:
         return None
 
+    expected_host_links = _expected_host_links(prefix, token)
+    host_link_candidates = ledger.get("ownedHostLinkCandidates", [])
+    if (
+        not isinstance(host_link_candidates, list)
+        or tuple(host_link_candidates) != expected_host_links
+    ):
+        return None
+
     canary_path: Path | None = None
     raw_canary = ledger.get("canaryPath")
     if raw_canary is not None:
@@ -109,7 +124,7 @@ def _validated_range_ledger(
         if not candidate.is_absolute() or candidate.parent != canaries_root:
             return None
         canary_path = candidate
-    return run_path, expected_namespaces, canary_path
+    return run_path, expected_namespaces, expected_host_links, canary_path
 
 
 def _terminate_from_ledger(
@@ -156,6 +171,56 @@ def _remove_namespaces(ip_path: Path, names: tuple[str, ...]) -> tuple[list[str]
         )
     remaining = _listed_namespaces(ip_path)
     residual = [name for name in names if name in remaining]
+    return requested, residual
+
+
+def _root_link_kinds(ip_path: Path, names: tuple[str, ...]) -> dict[str, str | None]:
+    completed = subprocess.run(
+        [str(ip_path), "-d", "-j", "link", "show"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        check=False,
+        timeout=15,
+    )
+    if completed.returncode != 0:
+        return {name: None for name in names}
+    try:
+        data = json.loads(completed.stdout or "[]")
+    except ValueError:
+        return {name: None for name in names}
+    observed: dict[str, str | None] = {}
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        name = item.get("ifname")
+        if name not in names:
+            continue
+        linkinfo = item.get("linkinfo")
+        kind = linkinfo.get("info_kind") if isinstance(linkinfo, dict) else None
+        observed[cast(str, name)] = kind if isinstance(kind, str) else None
+    return observed
+
+
+def _remove_host_links(ip_path: Path, names: tuple[str, ...]) -> tuple[list[str], list[str]]:
+    before = _root_link_kinds(ip_path, names)
+    unsafe = [name for name, kind in before.items() if kind != "veth"]
+    if unsafe:
+        return [], sorted(before)
+    requested = sorted(before)
+    for name in names:
+        current = _root_link_kinds(ip_path, names)
+        if name not in current:
+            continue
+        subprocess.run(
+            [str(ip_path), "link", "del", name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            check=False,
+            timeout=15,
+        )
+    residual = sorted(_root_link_kinds(ip_path, names))
     return requested, residual
 
 
@@ -240,7 +305,7 @@ def reconcile_windows_fabric_range_runs(
             )
             continue
 
-        run_path, namespace_candidates, canary_path = validated
+        run_path, namespace_candidates, host_link_candidates, canary_path = validated
         managed_tokens.add(token)
         if _identity_alive(ledger.get("ownerPid"), ledger.get("ownerStartTime")):
             results.append(
@@ -279,14 +344,21 @@ def reconcile_windows_fabric_range_runs(
         )
         requested_namespaces: list[str] = []
         residual_namespaces = list(namespace_candidates)
+        requested_host_links: list[str] = []
+        residual_host_links = list(host_link_candidates)
         if peer_closed and capture_closed and qemu_closed and swtpm_closed:
+            requested_host_links, residual_host_links = _remove_host_links(
+                ip_path, host_link_candidates
+            )
             requested_namespaces, residual_namespaces = _remove_namespaces(
                 ip_path, namespace_candidates
             )
+            residual_host_links = sorted(_root_link_kinds(ip_path, host_link_candidates))
 
         clean_processes = peer_closed and capture_closed and qemu_closed and swtpm_closed
         clean_namespaces = not residual_namespaces
-        if clean_processes and clean_namespaces:
+        clean_host_links = not residual_host_links
+        if clean_processes and clean_namespaces and clean_host_links:
             if run_path.exists():
                 shutil.rmtree(run_path)
             ledger_path.unlink(missing_ok=True)
@@ -311,6 +383,8 @@ def reconcile_windows_fabric_range_runs(
                     "swtpmClosed": swtpm_closed,
                     "requestedNamespaces": cast(list[JsonValue], requested_namespaces),
                     "residualNamespaces": cast(list[JsonValue], residual_namespaces),
+                    "requestedHostLinks": cast(list[JsonValue], requested_host_links),
+                    "residualHostLinks": cast(list[JsonValue], residual_host_links),
                     "runDirectoryRemoved": not run_path.exists(),
                     "ledgerRemoved": not ledger_path.exists(),
                     "canaryRemoved": canary_removed,
@@ -332,6 +406,7 @@ def reconcile_windows_fabric_range_runs(
                 "qemuClosed": qemu_closed,
                 "swtpmClosed": swtpm_closed,
                 "residualNamespaces": cast(list[JsonValue], residual_namespaces),
+                "residualHostLinks": cast(list[JsonValue], residual_host_links),
             },
         )
         results.append(
