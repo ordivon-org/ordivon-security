@@ -67,7 +67,7 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
     def execution_identity(self) -> JsonObject:
         identity = super().execution_identity
         identity["kind"] = "ordivon.security.windows-topology-churn-range"
-        identity["implementationRevision"] = "4"
+        identity["implementationRevision"] = "5"
         identity["network"] = {
             "guestAddress": self.guest_address,
             "peerAAddress": self.peer_address,
@@ -107,6 +107,8 @@ class WindowsTopologyChurnRange(WindowsIsolatedFabricRange):
         extra = super()._run_ledger_extra(run)
         extra["topologyPhase"] = run.state.get("topologyPhase", "peer-a-present")
         extra["currentPeerAddress"] = run.state.get("currentPeerAddress", self.peer_address)
+        extra["actorReplacementRequest"] = deepcopy(run.state.get("actorReplacementRequest"))
+        extra["actorReplacementReceipt"] = deepcopy(run.state.get("actorReplacementReceipt"))
         return extra
 
     def _initial_fabric_truth(self, state: JsonObject) -> JsonObject:
