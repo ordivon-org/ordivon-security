@@ -307,4 +307,6 @@ UNKNOWN
 
 A transaction is not yet the universal answer.
 
-The next pressure should remove the property that made C1-L easy: **exact observability of compensation progress**. Construct two compensation histories whose post-crash admissible observations are identical while one has repaired the world and the other has not. If compensation progress itself becomes information-theoretically ambiguous, then test whether an idempotent compensator, durable compensation receipt, or shared atomic boundary is required.
+C1-M has now removed caller observability of compensation progress. Repaired and unrepaired downstream-private histories became byte-indistinguishable to the caller and therefore remained historically `UNKNOWN`; naive replay was unsound. A distinctly identified downstream `ensure-repaired` compensation contract nevertheless made retry converge safely in both hidden histories without caller read authority or a sidecar receipt. See [`COMPENSATION-INFORMATION-LOSS-C1M.md`](COMPENSATION-INFORMATION-LOSS-C1M.md).
+
+The next pressure moves inside the owning boundary: destroy, corrupt, fork, or otherwise invalidate the downstream private truth that makes the convergent repair decision possible. Only then should stronger external evidence, atomicity, or distributed coordination be considered.
