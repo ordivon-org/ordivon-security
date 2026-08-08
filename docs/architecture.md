@@ -137,6 +137,14 @@ C1-G mid-successor recovery profile
   → only link-up/address/service/stable-publication operations are executed; the whole effect is not replayed
   → the same Guest completes A/B across original-owner and first-successor deaths, then final reconciliation preserves lineage and closes to zero
 
+C1-H unpublished-completion profile
+  → peer B topology can be complete and consumed while durable state still says peer-a-removed
+  → the one-shot peer service and Guest may both exit before stable publication
+  → a successor re-observes persistent topology, extracts completed Guest evidence, and reads a point-in-time pcap snapshot without terminating the live capture
+  → persistent topology + Guest completion + independent peer-B sensor evidence classify completed-but-unpublished
+  → the successor does not restart the transient peer service and performs no Range-world replay; it repairs only durable peer-b-present publication with peerPid=0
+  → current + archived recovery claims remain distinct from completion evidence; final reconciler later closes the still-live sensor and remaining substrate
+
 SynchronousContestProfile
   → records profile start in RangeSession management events
   → runs the existing ContestRunner unchanged
