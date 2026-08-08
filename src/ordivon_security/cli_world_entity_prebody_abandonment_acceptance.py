@@ -16,6 +16,7 @@ from ordivon_security.cli_world_entity_controller_loss_acceptance import (
     DESTINATION_WORLD,
     MIGRATION_ID,
     SOURCE_WORLD,
+    _cleanup,
     _destination,
     _identity_alive,
     _machine_config,
@@ -31,7 +32,7 @@ from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineProvider,
 )
 
-_FAULT_PHASES = ("migration-staged", "swtpm-started")
+_FAULT_PHASES = ("migration-staged", "swtpm-started", "qemu-launch-evidence")
 
 
 class _PauseAfterPhaseProvider(WindowsKvmMachineProvider):
@@ -47,6 +48,29 @@ class _PauseAfterPhaseProvider(WindowsKvmMachineProvider):
             raise ValueError(f"unsupported pre-body fault phase: {fault_phase}")
         self.gate_path = gate_path
         self.fault_phase = fault_phase
+
+    def _pause(self, state: JsonObject) -> None:
+        ledger_path = Path(str(state["runStatePath"]))
+        ledger = _read_object(ledger_path, "Entity pre-body fault ledger")
+        _write_json(
+            self.gate_path,
+            {
+                "schemaVersion": 1,
+                "kind": "ordivon.security.world-entity-prebody-fault-gate",
+                "faultPhase": self.fault_phase,
+                "ledgerPhase": ledger.get("phase"),
+                "controllerPid": os.getpid(),
+                "ledgerDigest": canonical_digest(ledger),
+                "ownerPid": ledger.get("ownerPid"),
+                "ownerStartTime": ledger.get("ownerStartTime"),
+                "qemuPid": ledger.get("qemuPid"),
+                "qemuStartTime": ledger.get("qemuStartTime"),
+                "swtpmPid": ledger.get("swtpmPid"),
+                "swtpmStartTime": ledger.get("swtpmStartTime"),
+            },
+        )
+        while True:
+            time.sleep(1)
 
     def persist_state(
         self,
@@ -64,28 +88,41 @@ class _PauseAfterPhaseProvider(WindowsKvmMachineProvider):
             phase=phase,
             extra=extra,
         )
-        if phase != self.fault_phase:
-            return
-        ledger_path = Path(str(state["runStatePath"]))
-        ledger = _read_object(ledger_path, "Entity pre-body fault ledger")
-        _write_json(
-            self.gate_path,
-            {
-                "schemaVersion": 1,
-                "kind": "ordivon.security.world-entity-prebody-fault-gate",
-                "faultPhase": phase,
-                "controllerPid": os.getpid(),
-                "ledgerDigest": canonical_digest(ledger),
-                "ownerPid": ledger.get("ownerPid"),
-                "ownerStartTime": ledger.get("ownerStartTime"),
-                "qemuPid": ledger.get("qemuPid"),
-                "qemuStartTime": ledger.get("qemuStartTime"),
-                "swtpmPid": ledger.get("swtpmPid"),
-                "swtpmStartTime": ledger.get("swtpmStartTime"),
-            },
-        )
-        while True:
-            time.sleep(1)
+        if phase == self.fault_phase:
+            self._pause(state)
+
+    def start_qemu(
+        self,
+        *,
+        instance_id: str,
+        generation: str,
+        state: JsonObject,
+        arguments: list[str],
+        stdout_path: Path,
+        stderr_path: Path,
+        ledger_extra: JsonObject | None = None,
+        network_namespace: str | None = None,
+        ip_path: Path = Path("/usr/bin/ip"),
+    ) -> subprocess.Popen[bytes]:
+        if self.fault_phase != "qemu-launch-evidence":
+            return super().start_qemu(
+                instance_id=instance_id,
+                generation=generation,
+                state=state,
+                arguments=arguments,
+                stdout_path=stdout_path,
+                stderr_path=stderr_path,
+                ledger_extra=ledger_extra,
+                network_namespace=network_namespace,
+                ip_path=ip_path,
+            )
+        run_path = Path(str(state["runPath"]))
+        for path in (stdout_path, stderr_path):
+            if path.parent != run_path or path.exists() or path.is_symlink():
+                raise RuntimeError("invalid QEMU launch-evidence path")
+            path.touch(exist_ok=False)
+        self._pause(state)
+        raise AssertionError("unreachable after pre-body fault pause")
 
 
 def _child(args: argparse.Namespace) -> int:
@@ -178,31 +215,40 @@ def _run_case(
         ledger_before = ledger_path.read_bytes()
         ledger = _read_object(ledger_path, "pre-body pre-kill ledger")
         ledger_stable_before_kill = ledger_path.read_bytes() == ledger_before
-        if ledger.get("phase") != fault_phase:
-            raise RuntimeError("pre-body ledger phase differs from requested fault")
+        expected_ledger_phase = (
+            "swtpm-started" if fault_phase == "qemu-launch-evidence" else fault_phase
+        )
+        if gate.get("ledgerPhase") != expected_ledger_phase:
+            raise RuntimeError("pre-body gate ledger phase differs from expected fault state")
+        if ledger.get("phase") != expected_ledger_phase:
+            raise RuntimeError("pre-body ledger phase differs from expected fault state")
         if ledger.get("qemuPid") not in {0, None} or ledger.get("qemuStartTime") is not None:
             raise RuntimeError("QEMU body exists at a declared pre-body fault gate")
         run_path = Path(str(ledger["runPath"]))
-        if any(
+        qemu_launch_evidence = any(
             (run_path / name).exists()
             for name in ("qmp.sock", "qemu.stdout.log", "qemu.stderr.log")
-        ):
-            raise RuntimeError("QEMU launch evidence exists at a declared pre-body fault gate")
+        )
+        if fault_phase == "qemu-launch-evidence":
+            if not qemu_launch_evidence:
+                raise RuntimeError("ambiguous QEMU fault lacks launch evidence")
+        elif qemu_launch_evidence:
+            raise RuntimeError("QEMU launch evidence exists at a safe pre-body fault gate")
 
         swtpm_alive_before = _identity_alive(
             ledger.get("swtpmPid"), ledger.get("swtpmStartTime")
         )
         if fault_phase == "migration-staged" and swtpm_alive_before:
             raise RuntimeError("staged fault unexpectedly has a live swtpm process")
-        if fault_phase == "swtpm-started" and not swtpm_alive_before:
-            raise RuntimeError("TPM-only fault did not retain the exact swtpm process")
+        if fault_phase != "migration-staged" and not swtpm_alive_before:
+            raise RuntimeError("post-TPM fault did not retain the exact swtpm process")
 
         os.kill(process.pid, signal.SIGKILL)
         child_return_code = process.wait(timeout=10)
         swtpm_survived_controller = _identity_alive(
             ledger.get("swtpmPid"), ledger.get("swtpmStartTime")
         )
-        if fault_phase == "swtpm-started" and not swtpm_survived_controller:
+        if fault_phase != "migration-staged" and not swtpm_survived_controller:
             raise RuntimeError("swtpm did not survive controller SIGKILL")
 
         destination = _destination(state_root, base_manifest, memory_mib=memory_mib)
@@ -210,31 +256,46 @@ def _run_case(
         if identity.get("revision") != "4":
             raise RuntimeError("pre-body acceptance is not using Entity recovery revision 4")
         response = destination.handle(_reconcile_request(request))
-        if response.get("status") != "not_committed":
-            raise RuntimeError("pre-body reconcile did not prove NOT_COMMITTED")
-        evidence = response.get("evidence")
-        if not isinstance(evidence, dict):
-            raise RuntimeError("pre-body NOT_COMMITTED response lacks evidence")
-        if (
-            evidence.get("abandonedPreBodyCompensated") is not True
-            or evidence.get("abandonedPhase") != fault_phase
-            or evidence.get("predecessorOwnerDead") is not True
-            or evidence.get("zeroResidualsObserved") is not True
-            or evidence.get("exactOriginalRetrySafe") is not True
-        ):
-            raise RuntimeError("pre-body reconcile evidence does not justify exact retry")
+        receipt_absent = not destination._receipt_path(MIGRATION_ID).exists()
+
+        if fault_phase == "qemu-launch-evidence":
+            if response.get("status") != "unknown":
+                raise RuntimeError("ambiguous QEMU launch evidence was not kept UNKNOWN")
+            if response.get("reason") != "unresolved-native-materialization:qemu":
+                raise RuntimeError("ambiguous QEMU launch returned the wrong UNKNOWN reason")
+            if not run_path.exists() or not ledger_path.exists() or not receipt_absent:
+                raise RuntimeError("UNKNOWN pre-body state was mutated before explicit cleanup")
+            cleanup = _cleanup(destination, request)
+            if cleanup.get("clean") is not True:
+                raise RuntimeError("acceptance cleanup failed after the UNKNOWN proof")
+            response_evidence: dict[str, object] = {}
+        else:
+            if response.get("status") != "not_committed":
+                raise RuntimeError("safe pre-body reconcile did not prove NOT_COMMITTED")
+            raw_evidence = response.get("evidence")
+            if not isinstance(raw_evidence, dict):
+                raise RuntimeError("pre-body NOT_COMMITTED response lacks evidence")
+            response_evidence = raw_evidence
+            if (
+                response_evidence.get("abandonedPreBodyCompensated") is not True
+                or response_evidence.get("abandonedPhase") != fault_phase
+                or response_evidence.get("predecessorOwnerDead") is not True
+                or response_evidence.get("zeroResidualsObserved") is not True
+                or response_evidence.get("exactOriginalRetrySafe") is not True
+            ):
+                raise RuntimeError("pre-body reconcile evidence does not justify exact retry")
 
         run_removed = not run_path.exists()
         ledger_removed = not ledger_path.exists()
         swtpm_closed = not _identity_alive(
             ledger.get("swtpmPid"), ledger.get("swtpmStartTime")
         )
-        receipt_absent = not destination._receipt_path(MIGRATION_ID).exists()
         if not run_removed or not ledger_removed or not swtpm_closed or not receipt_absent:
-            raise RuntimeError("pre-body compensation did not converge to zero residuals")
+            raise RuntimeError("pre-body acceptance did not converge to zero residuals")
 
         return {
             "faultPhase": fault_phase,
+            "ledgerPhase": expected_ledger_phase,
             "controllerLoss": {
                 "signal": "SIGKILL",
                 "childReturnCode": child_return_code,
@@ -244,6 +305,7 @@ def _run_case(
             },
             "nativeBeforeKill": {
                 "qemuBodyAbsent": True,
+                "qemuLaunchEvidence": qemu_launch_evidence,
                 "swtpmAlive": swtpm_alive_before,
                 "ledgerDigest": canonical_digest(ledger),
                 "ledgerBytesStableUntilKill": ledger_stable_before_kill,
@@ -253,9 +315,12 @@ def _run_case(
             },
             "freshReconcile": {
                 "status": response.get("status"),
-                "exactOriginalRetrySafe": evidence.get("exactOriginalRetrySafe"),
-                "abandonedPreBodyCompensated": evidence.get("abandonedPreBodyCompensated"),
-                "zeroResidualsObserved": evidence.get("zeroResidualsObserved"),
+                "reason": response.get("reason"),
+                "exactOriginalRetrySafe": response_evidence.get("exactOriginalRetrySafe", False),
+                "abandonedPreBodyCompensated": response_evidence.get(
+                    "abandonedPreBodyCompensated", False
+                ),
+                "zeroResidualsObserved": response_evidence.get("zeroResidualsObserved", False),
                 "receiptAbsent": receipt_absent,
             },
             "closure": {
@@ -278,7 +343,11 @@ def _parent(args: argparse.Namespace) -> int:
     root = args.state_root_base
     root.parent.mkdir(parents=True, exist_ok=True)
     cases: list[JsonObject] = []
-    for suffix, fault_phase in (("staged", "migration-staged"), ("tpm", "swtpm-started")):
+    for suffix, fault_phase in (
+        ("staged", "migration-staged"),
+        ("tpm", "swtpm-started"),
+        ("qemu", "qemu-launch-evidence"),
+    ):
         state_root = root.with_name(f"{root.name}-{suffix}")
         cases.append(
             _run_case(
