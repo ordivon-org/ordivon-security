@@ -1,0 +1,68 @@
+{
+  "acceptanceClaims": [
+    "delivered and undelivered histories physically produced different evaluator ground truth but byte-identical durable sender ledgers and byte-identical post-crash successor views",
+    "both byte-identical successor views classified UNKNOWN and authorized neither blind resend nor completion publication",
+    "a restricted UID-65534 blind resend duplicated the delivered history to two total pulses while applying the undelivered history exactly once",
+    "recipient-side durable effect identity remained unreadable to the restricted successor while the same principal retained capability to resend the public exact effectId",
+    "with recipient duplicate suppression, delivered-history retry returned duplicate-suppressed and undelivered-history retry returned applied, while both recipient states converged to applicationCount=1",
+    "both idempotent-retry histories returned acknowledgement sufficient for sender completion and the public Unix-domain capability endpoint closed with zero residuals"
+  ],
+  "implementationRevision": "git:3241eb91e025dbb4770cf7e4b87cd743bf0157be",
+  "kind": "ordivon.security.c1i-information-loss-acceptance-index",
+  "limitations": [
+    "the accepted result is limited to one owned local no-uplink Unix-domain consequence and one recipient-private durable dedup store",
+    "the evaluator-only oracle establishes experimental ground truth but is intentionally outside successor authority and is not a recovery mechanism",
+    "atomicity between an irreversible downstream consequence and recipient dedup persistence is not proved",
+    "recipient-state loss, corruption, partitions, multiple recipients, shared resources and generic exactly-once semantics remain unproved",
+    "no external or uncontrolled target authority is admitted"
+  ],
+  "physicalAcceptance": {
+    "effectId": "range-effect:c1i-vanishing-pulse-v1",
+    "requestDigest": "sha256:c82056cc62c0f299fd9206bff1de037465ecbded878be94dfc65b3537a5891b9",
+    "admissionDigest": "sha256:4496e438ef20a3f98f5e4e61e9c64efab6d0c0f7b6c713c4b2f01716eb4d2f93",
+    "senderLedgerSha256": "sha256:208cb48c1c39f1267385f2245a536e4174f2a8c3c1fa707689d67ac3e30050d0",
+    "successorViewSha256": "sha256:7d2abd6480fc8d112b63f385d5257541d0c20a8ea6ec5b59271aabcce1d0b2cc",
+    "baseline": {
+      "deliveredInitialPulseCount": 1,
+      "undeliveredInitialPulseCount": 0,
+      "deliveredTotalAfterBlindReplay": 2,
+      "undeliveredTotalAfterBlindReplay": 1,
+      "restrictedReplayUid": 65534,
+      "classification": "unknown"
+    },
+    "recipientIdempotency": {
+      "restrictedSuccessorUid": 65534,
+      "privateStateReadSucceeded": false,
+      "deliveredRetryStatus": "duplicate-suppressed",
+      "undeliveredRetryStatus": "applied",
+      "deliveredFinalApplicationCount": 1,
+      "undeliveredFinalApplicationCount": 1,
+      "senderCompletionAcknowledgedBothHistories": true
+    },
+    "gates": {
+      "baselineBothClassifyUnknown": true,
+      "baselineDeliveredHistoryPhysicallyAppliedOnceBeforeCrash": true,
+      "baselineSenderLedgersByteEquivalent": true,
+      "baselineSuccessorViewsByteEquivalent": true,
+      "baselineUndeliveredHistoryPhysicallyAppliedZeroBeforeCrash": true,
+      "baselineUnknownRefusesBlindResend": true,
+      "counterfactualBlindResendAppliesUndeliveredHistoryOnce": true,
+      "counterfactualBlindResendDuplicatesDeliveredHistory": true,
+      "counterfactualBlindResendUsedRestrictedSuccessor": true,
+      "noNetworkOrExternalTargetConsumed": true,
+      "publicDeliveryEndpointClosedToZero": true,
+      "recipientIdempotencyConvergesBothToOneApplication": true,
+      "recipientIdempotencyDeliveredRetrySuppressed": true,
+      "recipientIdempotencyPrivateStateUnreadableByRestrictedSuccessor": true,
+      "recipientIdempotencyRetryUsedRestrictedSuccessor": true,
+      "recipientIdempotencySenderViewsRemainEquivalent": true,
+      "recipientIdempotencyUndeliveredRetryApplied": true,
+      "recoveryAckAllowsBothHistoriesToPublishCompletion": true
+    },
+    "privateReceiptByteLength": 15218,
+    "privateReceiptSha256": "sha256:9687ca643f37ef1b4b407e51028f215a330b38b06a1df7c10f2726c2ca1363a3",
+    "status": "accepted"
+  },
+  "schemaVersion": 1,
+  "status": "accepted"
+}
