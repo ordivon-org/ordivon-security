@@ -15,6 +15,7 @@ from ordivon_security._canonical import JsonObject, JsonValue, canonical_bytes, 
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
+    _process_start_time,
     _set_owner,
     windows_kvm_machine_base_arguments,
 )
@@ -74,6 +75,18 @@ def _digest(value: object, label: str) -> str:
     return text
 
 
+def _process_arguments(pid: object, start_time: object) -> tuple[str, ...]:
+    if not isinstance(pid, int) or pid < 1 or not isinstance(start_time, int):
+        return ()
+    if _process_start_time(pid) != start_time:
+        return ()
+    try:
+        raw = Path(f"/proc/{pid}/cmdline").read_bytes()
+    except OSError:
+        return ()
+    return tuple(part.decode("utf-8", errors="replace") for part in raw.split(b"\0") if part)
+
+
 class WorldEntityKvmDestination:
     """Security-owned destination for one source-departed Entity continuity carrier.
 
@@ -102,15 +115,15 @@ class WorldEntityKvmDestination:
     def execution_identity(self) -> JsonObject:
         return {
             "kind": "ordivon.security.world-entity-kvm-destination",
-            "revision": "2",
+            "revision": "3",
             "destinationWorldId": self.config.destination_world_id,
             "machineProvider": self.machine_provider.execution_identity,
             "materializationRole": "entity-continuity-carrier",
             "continuityTransport": "opaque-removable-fat-disk",
             "guestClaimAuthority": "not-used",
             "networkMode": "deny-all-no-nic",
-            "recoveryMode": "observe-only-no-owner-rewrite",
-            "unpublishedNativeState": "unknown",
+            "recoveryMode": "reobserve-and-publish-only-no-owner-rewrite",
+            "unpublishedNativeState": "unknown-unless-completion-reobserved",
             "sourceAuthorityAuthentication": "caller-trust-boundary",
         }
 
@@ -324,6 +337,53 @@ class WorldEntityKvmDestination:
         loaded["runStatePath"] = str(ledger_path)
         return cast(JsonObject, loaded)
 
+    def _completed_unpublished_observation(self, state: JsonObject) -> bool:
+        if state.get("phase") != "executing":
+            return False
+        qemu_pid = state.get("qemuPid")
+        qemu_start_time = state.get("qemuStartTime")
+        swtpm_pid = state.get("swtpmPid")
+        swtpm_start_time = state.get("swtpmStartTime")
+        if (
+            not isinstance(qemu_pid, int)
+            or not isinstance(qemu_start_time, int)
+            or _process_start_time(qemu_pid) != qemu_start_time
+        ):
+            return False
+        if (
+            not isinstance(swtpm_pid, int)
+            or not isinstance(swtpm_start_time, int)
+            or _process_start_time(swtpm_pid) != swtpm_start_time
+        ):
+            return False
+        run_path = Path(str(state["runPath"]))
+        run_disk = run_path / "ordivon-migration.img"
+        if run_disk.is_symlink() or not run_disk.is_file():
+            return False
+        arguments = _process_arguments(qemu_pid, qemu_start_time)
+        drive_argument = (
+            f"file={run_disk},if=none,format=raw,cache=none,aio=threads,id=migrationdisk"
+        )
+        device_argument = (
+            f"usb-storage,drive=migrationdisk,bus=xhci.0,removable=on,serial={_MIGRATION_DISK_LABEL}"
+        )
+        if (
+            str(self.config.machine.qemu_path) not in arguments
+            or drive_argument not in arguments
+            or device_argument not in arguments
+        ):
+            return False
+        topology = self.machine_provider.inspect_qmp(state)
+        status = topology.get("status")
+        if (
+            not isinstance(status, dict)
+            or status.get("running") is not True
+            or topology.get("networkDevicePresent") is not False
+        ):
+            return False
+        block = self.machine_provider.qmp_execute(state, "query-block")
+        return "migrationdisk" in json.dumps(block, sort_keys=True, separators=(",", ":"))
+
     def _continue_new_materialization(
         self,
         state: JsonObject,
@@ -483,6 +543,26 @@ class WorldEntityKvmDestination:
             if phase == "migration-running-contained":
                 receipt = self._build_receipt(observed, binding, plan_digest)
                 return self._materialized_response(self._commit_receipt(receipt))
+            if phase == "executing":
+                try:
+                    completed = self._completed_unpublished_observation(observed)
+                except Exception as error:
+                    return self._unknown_response(
+                        plan,
+                        plan_digest,
+                        f"unpublished-observation:{type(error).__name__}",
+                    )
+                if completed:
+                    _, instance_id, _ = self._coordinates(plan)
+                    self.machine_provider.persist_state(
+                        instance_id=instance_id,
+                        generation=self._generation(),
+                        state=observed,
+                        phase="migration-running-contained",
+                        extra=self._ledger_extra(binding),
+                    )
+                    receipt = self._build_receipt(observed, binding, plan_digest)
+                    return self._materialized_response(self._commit_receipt(receipt))
             unresolved = self._unresolved_launch_evidence(
                 Path(str(observed["runPath"])), observed
             )
