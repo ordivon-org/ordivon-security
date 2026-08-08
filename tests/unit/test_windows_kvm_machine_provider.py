@@ -5,6 +5,7 @@ import json
 import subprocess
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -46,7 +47,7 @@ class _FakeQmpClient:
 
 class WindowsKvmMachineProviderTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.temporary = tempfile.TemporaryDirectory()
+        self.temporary = tempfile.TemporaryDirectory(dir="/tmp")
         self.root = Path(self.temporary.name)
         tools = self.root / "tools"
         tools.mkdir()
@@ -123,6 +124,7 @@ class WindowsKvmMachineProviderTests(unittest.TestCase):
         encoded = json.dumps(identity, sort_keys=True)
         self.assertEqual(identity["kind"], "ordivon.security.windows-kvm-machine-provider")
         self.assertEqual(identity["providerId"], "provider:windows-kvm")
+        self.assertEqual(identity["implementationRevision"], "3")
         self.assertNotIn("admittedSampleDigest", encoded)
         self.assertNotIn("fixtureAttestationDigest", encoded)
         self.assertNotIn("admittedFixtureId", encoded)
@@ -130,6 +132,20 @@ class WindowsKvmMachineProviderTests(unittest.TestCase):
             identity["configuration"]["networkAuthority"],
             "caller-supplied-qemu-topology",
         )
+
+    def test_create_rejects_overlong_unix_socket_paths_before_run_creation(self) -> None:
+        long_state_root = self.root / ("socket-path-" + "x" * 96)
+        provider = WindowsKvmMachineProvider(
+            replace(self.config, state_root=long_state_root)
+        )
+        token = "socket-limit-node"
+        with self.assertRaisesRegex(ValueError, "Unix sockets require at most"):
+            provider.create_state(
+                token=token,
+                instance_id="range-machine:socket-limit-node",
+                generation="windows-kvm:test",
+            )
+        self.assertFalse((provider.runs_root / token).exists())
 
     def test_create_persist_and_destroy_are_independent_of_evaluation_spec(self) -> None:
         provider = WindowsKvmMachineProvider(self.config)

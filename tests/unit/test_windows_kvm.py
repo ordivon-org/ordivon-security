@@ -62,7 +62,7 @@ def _digest(path: Path) -> str:
 
 class WindowsKvmP0Tests(unittest.TestCase):
     def setUp(self) -> None:
-        self.temporary = tempfile.TemporaryDirectory()
+        self.temporary = tempfile.TemporaryDirectory(dir="/tmp")
         self.root = Path(self.temporary.name)
         self.tools = self.root / "tools"
         self.tools.mkdir()

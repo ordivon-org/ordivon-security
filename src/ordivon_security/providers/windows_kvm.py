@@ -25,6 +25,16 @@ from ordivon_security.identity import security_source_identity
 _CHUNK_BYTES = 4 * 1024 * 1024
 _NETWORK_PCI_CLASS_MIN = 0x0200
 _NETWORK_PCI_CLASS_MAX = 0x02FF
+_UNIX_SOCKET_PATH_MAX_BYTES = 107
+
+
+def _validate_unix_socket_path(path: Path, label: str) -> None:
+    byte_length = len(os.fsencode(path))
+    if byte_length > _UNIX_SOCKET_PATH_MAX_BYTES:
+        raise ValueError(
+            f"{label} path is {byte_length} bytes; Linux filesystem Unix sockets "
+            f"require at most {_UNIX_SOCKET_PATH_MAX_BYTES} bytes: {path}"
+        )
 
 
 def _digest_path(path: Path) -> tuple[str, int]:
@@ -635,7 +645,7 @@ class WindowsKvmMachineProvider:
         return {
             "kind": "ordivon.security.windows-kvm-machine-provider",
             "providerId": self.provider_id,
-            "implementationRevision": "2",
+            "implementationRevision": "3",
             "configurationDigest": canonical_digest(configuration),
             "configuration": configuration,
             "environmentImageDigest": self.base.environment_image_digest,
@@ -665,14 +675,16 @@ class WindowsKvmMachineProvider:
         if not token or token != token.strip() or "/" in token:
             raise ValueError("Windows KVM machine token is invalid")
         run_path = self.runs_root / token
+        qmp_path = run_path / "qmp.sock"
+        tpm_socket_path = run_path / "swtpm.sock"
+        _validate_unix_socket_path(qmp_path, "Windows KVM QMP socket")
+        _validate_unix_socket_path(tpm_socket_path, "Windows KVM swtpm socket")
         if run_path.exists():
             raise FileExistsError(f"Windows KVM Run already exists: {run_path}")
         run_path.mkdir(mode=0o700)
         _set_owner(run_path, user=self.config.run_user, group=self.config.run_group)
         overlay_path = run_path / "system-overlay.qcow2"
         vars_path = run_path / "OVMF_VARS.4m.fd"
-        qmp_path = run_path / "qmp.sock"
-        tpm_socket_path = run_path / "swtpm.sock"
         tpm_state_path = run_path / "tpm-state"
         tpm_state_path.mkdir(mode=0o700)
         _set_owner(tpm_state_path, user=self.config.run_user, group=self.config.run_group)
