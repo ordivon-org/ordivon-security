@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "AE0 adversarial epistemics consumer",
+        "research-apparatus",
+        "ordivon_security.cli_adversarial_epistemics_ae0_acceptance",
+        "Autonomous sender manipulation plus byte-identical partial receiver evidence and explicit information acquisition.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "AF3 deception consumer",
         "research-apparatus",
         "ordivon_security.cli_agent_first_deception_acceptance",
