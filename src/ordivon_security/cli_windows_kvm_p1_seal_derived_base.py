@@ -24,14 +24,20 @@ _EXECUTION_CONTROL_CANARY = SampleIdentity.create(
     media_type="application/vnd.microsoft.portable-executable",
     original_name="p1-execution-control-canary.exe",
 )
+_ORCHESTRATOR = SampleIdentity.create(
+    sha256="sha256:9f901eddccc3c0b510a39888d15d900748dccfe0c4516e94efad2798df3244e4",
+    byte_length=13_224,
+    media_type="text/x-powershell",
+    original_name="p1-orchestrator.ps1",
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Seal one layered P1 Windows base from the accepted parent and exact accepted "
-            "generic-Controller/execution-control canary Vault objects. This command does not "
-            "authorize or execute Case A."
+            "generic-Controller/execution-control/orchestrator Vault objects. This command "
+            "does not authorize or execute Case A."
         )
     )
     parser.add_argument("--parent-manifest", type=Path, required=True)
@@ -46,6 +52,7 @@ def main() -> None:
     resources = (
         WindowsKvmP1SealedResource("generic-controller", _GENERIC_CONTROLLER),
         WindowsKvmP1SealedResource("execution-control-canary", _EXECUTION_CONTROL_CANARY),
+        WindowsKvmP1SealedResource("orchestrator", _ORCHESTRATOR),
     )
     receipt = seal_windows_kvm_p1_derived_base(
         parent_manifest_path=args.parent_manifest,

@@ -45,6 +45,19 @@ class WindowsKvmP1OrchestratorTests(unittest.TestCase):
         self.assertIn("networkRequested = $false", self.source)
         self.assertIn("thirdPartySampleExecuted = $false", self.source)
 
+    def test_derived_base_cli_seals_exact_orchestrator_identity(self) -> None:
+        cli = (
+            Path(__file__).parents[2]
+            / "src"
+            / "ordivon_security"
+            / "cli_windows_kvm_p1_seal_derived_base.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "9f901eddccc3c0b510a39888d15d900748dccfe0c4516e94efad2798df3244e4",
+            cli,
+        )
+        self.assertIn('WindowsKvmP1SealedResource("orchestrator", _ORCHESTRATOR)', cli)
+
     def test_orchestrator_binds_manifest_and_observer_ordering(self) -> None:
         self.assertIn("actualManifestDigest", self.source)
         self.assertIn("bindingDigestVerified", self.source)
