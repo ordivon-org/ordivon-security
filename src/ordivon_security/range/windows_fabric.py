@@ -6,6 +6,7 @@ import os
 import subprocess
 import threading
 import time
+from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
@@ -888,10 +889,10 @@ class WindowsIsolatedFabricRange:
             "running": exit_code is None,
             "qemuExitCode": exit_code,
             "networkDevicePresent": run.state.get("networkDevicePresent"),
-            "fabricTruth": run.state.get("fabricTruth"),
-            "guestClaim": run.guest_claim,
-            "guestDiagnostic": run.state.get("guestDiagnostic"),
-            "sensorObservation": run.sensor_observation,
+            "fabricTruth": deepcopy(run.state.get("fabricTruth")),
+            "guestClaim": deepcopy(run.guest_claim),
+            "guestDiagnostic": deepcopy(run.state.get("guestDiagnostic")),
+            "sensorObservation": deepcopy(run.sensor_observation),
         }
 
     def events(

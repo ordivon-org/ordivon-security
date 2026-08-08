@@ -13,6 +13,7 @@ from ordivon_security.cli_windows_kvm_c1a_acceptance import (
     _ZONE_REF,
     _effect_request_from_decision,
     _intent_context,
+    _peer_a_only_history,
     _RangeIntentBridge,
     _visible_snapshot,
 )
@@ -58,6 +59,17 @@ class C1aAcceptanceUnitTests(unittest.TestCase):
                 "rawKernelDetail": "must-not-enter-model-context",
             },
         }
+
+    def test_peer_a_only_history_rejects_future_phases(self) -> None:
+        state = self._state()
+        state["topologyHistory"] = [
+            {"phase": "peer-a-present", "currentPeerAddress": "10.253.70.3"}
+        ]
+        self.assertTrue(_peer_a_only_history(state))
+        state["topologyHistory"].append(
+            {"phase": "peer-b-present", "currentPeerAddress": "10.253.70.4"}
+        )
+        self.assertFalse(_peer_a_only_history(state))
 
     def test_visible_snapshot_is_bounded_projection(self) -> None:
         snapshot = _visible_snapshot(self._state())

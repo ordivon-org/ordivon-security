@@ -93,6 +93,8 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
             peer_process=_Process(peer_exit),
             events=[],
             lock=threading.RLock(),
+            guest_claim={"claim": "peer-a"},
+            sensor_observation={"seen": "peer-a"},
         )
 
     def test_inspect_is_read_only_with_respect_to_topology_progression(self) -> None:
@@ -112,6 +114,43 @@ class WindowsTopologyChurnRangeTests(unittest.TestCase):
         self.assertIs(result["running"], True)
         self.assertIs(result["topologyChurnCompleted"], False)
         self.assertEqual(result["topologyHistory"][0]["phase"], "peer-a-present")
+
+    def test_inspect_snapshot_is_not_retroactively_mutated(self) -> None:
+        backend = self._backend()
+        run = self._run(peer_exit=0)
+        base = object.__new__(WindowsIsolatedFabricRange)
+        with (
+            patch.object(base, "_run_for", return_value=run),
+            patch.object(base, "_record_exit_if_needed", return_value=None),
+        ):
+            base_snapshot = WindowsIsolatedFabricRange.inspect(base, run.instance)
+        with (
+            patch.object(backend, "_run_for", return_value=run),
+            patch.object(
+                WindowsIsolatedFabricRange,
+                "inspect",
+                return_value={
+                    "instanceId": run.instance.instance_id,
+                    "running": True,
+                    "fabricTruth": run.state["fabricTruth"],
+                },
+            ),
+        ):
+            topology_snapshot = backend.inspect(run.instance)
+
+        run.state["fabricTruth"]["phase"] = "future-phase"
+        run.state["topologyHistory"].append(
+            {"phase": "peer-b-present", "currentPeerAddress": "10.253.70.4"}
+        )
+        run.state["actorReplacementRequest"] = {"requestId": "future-request"}
+        run.guest_claim["claim"] = "future-claim"
+        run.sensor_observation["seen"] = "future-sensor"
+
+        self.assertEqual(base_snapshot["fabricTruth"]["phase"], "peer-a-present")
+        self.assertEqual(base_snapshot["guestClaim"]["claim"], "peer-a")
+        self.assertEqual(base_snapshot["sensorObservation"]["seen"], "peer-a")
+        self.assertEqual(len(topology_snapshot["topologyHistory"]), 1)
+        self.assertIsNone(topology_snapshot["actorReplacementRequest"])
 
     def test_namespace_candidates_use_full_32_bit_session_hash(self) -> None:
         backend = self._backend()
