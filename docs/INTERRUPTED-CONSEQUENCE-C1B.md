@@ -286,15 +286,6 @@ This is evidence against prematurely enforcing parent existence/order/acyclicity
 
 ## Resulting pressure
 
-The next unresolved boundary is no longer “can we remember which effect this was?” It is **partial materialization inside one physical substep**.
+C1-C has now exercised partial materialization physically. Owner loss after peer-B namespace and root-veth creation exposed that the old reconciler could return `passed` while undeclared transient Host links remained. The missing mechanism was not a generic transaction log or causal DAG; it was complete exact resource ownership plus independent residual observation. S6 now persists deterministic Host-link candidates, and reconciliation verifies candidate identity/type and zero residuals before claiming clean. See [`PARTIAL-MATERIALIZATION-C1C.md`](PARTIAL-MATERIALIZATION-C1C.md).
 
-A stronger experiment would interrupt peer-B creation after only some owned resources exist—for example after namespace or veth creation but before the complete `peer-b-present` state is durably established. A replacement process must then decide from exact effect identity plus observed resources whether to:
-
-```text
-finish the suffix
-repair a partial materialization
-abort and compensate
-or close to zero
-```
-
-Only that pressure can tell us whether we need an idempotent effect-suffix protocol, finer durable substep identity, compensation semantics, or stronger causal structure. C1-B does not prebuild them.
+The remaining pressure is stronger than cleanup: a fresh controller should inherit the same admitted effect and partial physical world, then attempt an idempotent suffix that reaches `peer-b-present` without closing the Windows world to zero. That continuation experiment—not API completeness—should decide whether finer durable substep identity, repair/compensation semantics, or stronger causal ordering is unavoidable.

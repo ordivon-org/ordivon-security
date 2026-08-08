@@ -243,6 +243,6 @@ Actor intent
   ≠ external world verification
 ```
 
-C1-B then killed the effect owner during the physical transition. That experiment showed the exact boundary S6-R left open: durable physical resource identity can close an orphaned world to zero, but it cannot by itself explain which admitted effect produced an intermediate topology. S6 now additionally persists the existing immutable Actor effect binding and non-truth receipt. See [`INTERRUPTED-CONSEQUENCE-C1B.md`](INTERRUPTED-CONSEQUENCE-C1B.md).
+C1-B then killed the effect owner during the physical transition. That experiment showed one boundary S6-R left open: durable physical resource identity could close an orphaned world to zero but could not by itself explain which admitted effect produced an intermediate topology. S6 therefore additionally persists the existing immutable Actor effect binding and non-truth receipt. See [`INTERRUPTED-CONSEQUENCE-C1B.md`](INTERRUPTED-CONSEQUENCE-C1B.md).
 
-The next unresolved pressure is partial materialization inside a physical effect substep, not a generic `RangeAction` gateway.
+C1-C subsequently killed the owner inside peer-B materialization and exposed a second boundary: recovery could report `passed` after declared namespace/process closure while root q/w veth objects created before stable state publication still existed. S6 recovery now also owns deterministic transient Host-link candidates, validates present objects as veth links, and re-observes zero Host-link residuals before a clean claim. See [`PARTIAL-MATERIALIZATION-C1C.md`](PARTIAL-MATERIALIZATION-C1C.md). The next unresolved pressure is fresh-controller continuation/repair from a partial world, not a generic `RangeAction` gateway.

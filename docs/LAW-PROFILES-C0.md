@@ -60,9 +60,9 @@ These laws exist to make autonomous action intelligible and recoverable. They do
 C0 identified two constitutional mechanisms that were incomplete. C1 has now made one of them physically executable without generalizing it prematurely:
 
 - `RangeAuthority` zone/capability grants are consumed by `RangeSession.admit_effect()` and physically accepted for one exact S6 peer-replacement effect; this proves the law path, not a universal action framework;
-- `RangeEvent.causalParents` still records causal claims without validating parent existence, same-Session ownership, parent-before-child ordering, or acyclicity. C1-B deliberately tested an interrupted consequential effect and reconstructed the tested single-effect states from exact durable effect identity, durable physical phase, and independent Host truth without requiring a generic causal DAG.
+- `RangeEvent.causalParents` still records causal claims without validating parent existence, same-Session ownership, parent-before-child ordering, or acyclicity. C1-B reconstructed interrupted single-effect states from durable effect identity, physical phase, and Host truth; C1-C then interrupted peer-B *inside* materialization and still did not require a generic causal DAG. The C1-C falsifier instead exposed incomplete transient resource ownership: a stable `peer-a-removed` phase coexisted with already-created B namespace/veth resources, allowing the old reconciler to make a false clean claim.
 
-See [`EXECUTABLE-AUTHORITY-C1.md`](EXECUTABLE-AUTHORITY-C1.md), [`AUTONOMOUS-INTENT-C1A.md`](AUTONOMOUS-INTENT-C1A.md), and [`INTERRUPTED-CONSEQUENCE-C1B.md`](INTERRUPTED-CONSEQUENCE-C1B.md). Later experiments should strengthen causal structure only when concurrency, shared resources, partial materialization, cross-Agent causation, compensation, or another real consumer makes the simpler identity-plus-world-truth model ambiguous.
+See [`EXECUTABLE-AUTHORITY-C1.md`](EXECUTABLE-AUTHORITY-C1.md), [`AUTONOMOUS-INTENT-C1A.md`](AUTONOMOUS-INTENT-C1A.md), [`INTERRUPTED-CONSEQUENCE-C1B.md`](INTERRUPTED-CONSEQUENCE-C1B.md), and [`PARTIAL-MATERIALIZATION-C1C.md`](PARTIAL-MATERIALIZATION-C1C.md). Later experiments should strengthen causal structure only when concurrent/shared effects, continuation dependencies, compensation, or another real consumer cannot be resolved from exact semantic identity, exact resource ownership, and independent world observation.
 
 ## Authority and resource grants
 
@@ -146,7 +146,7 @@ When a stronger experiment needs a currently closed capability, the first questi
 | Host / Runtime / Security authority separation | **keep as constitutional law** |
 | exact owner-loss reconciliation and `attention-required` on unresolved authority | **keep as autonomy-enabling recovery infrastructure** |
 | zone/capability `RangeAuthority` | **constitutional law; executable for one accepted C1 physical effect, not yet generic** |
-| `RangeEvent.causalParents` | **keep intent; C1-B did not require a DAG for one exact interrupted effect, so strengthen only when a more ambiguous causal consumer actually forces it** |
+| `RangeEvent.causalParents` | **keep intent; C1-B and C1-C both resolved real interrupted/partial effects without a generic DAG, so strengthen only when continuation, concurrency, shared resources, or compensation creates genuine causal ambiguity** |
 | Harness resource budgets | **keep as configurable resource grants** |
 | synchronous Contest tick/action rules | **retain as explicit profile, never generalize to RangeSession** |
 | CAGE two-plan model action surface | **retain only as P0 fixture** |
