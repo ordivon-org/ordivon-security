@@ -170,7 +170,7 @@ def main() -> None:
             admitted_sample_digest=sample.sha256,
             fixture_attestation_digest=compilation_digest,
             admitted_fixture_id=_FIXTURE_ID,
-            fixture_runtime_ms=4 * 60 * 1000,
+            fixture_runtime_ms=2 * 60 * 1000,
             memory_mib=args.memory_mib,
             vcpu_count=args.vcpus,
         )
@@ -179,7 +179,7 @@ def main() -> None:
             policy_id="guardian-policy:windows-kvm-p1-orchestrator-production-probe",
             revision="1",
             network_mode="deny-all",
-            max_runtime_ms=7 * 60 * 1000,
+            max_runtime_ms=10 * 60 * 1000,
             max_memory_mib=args.memory_mib,
             max_processes=64,
             max_artifact_bytes=64 * 1024 * 1024,
