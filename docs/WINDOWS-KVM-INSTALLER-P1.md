@@ -221,6 +221,16 @@ The first physical working-tree trial exposed an over-strong canary assertion th
 
 Case A remains non-executable until a **selective** Windows execution-control canary can allow required installer/system subprocesses while denying the declared secondary staging surface, and until the Controller is sealed into a new P1 base.
 
+### R5 selective staging execution control
+
+The exact retained downloader script was re-read from the Case source and re-verified at 2,910 bytes with SHA-256 `fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397`. Its relevant runtime surface is concrete rather than hypothetical: it creates `%TEMP%\\DaVinci Resolve`, downloads `packagecache_x64_data.zip`, expands the archive into that directory, recursively enumerates `*.exe`, registers each discovered executable as a highest-privilege scheduled task, and starts it. R5 therefore tests only whether the disposable environment can keep that staging tree writable while preventing PE execution from the tree.
+
+An AppLocker blocklist prototype was physically rejected. After correcting the policy XML and adding stage-by-stage evidence, the canary ran as `NT AUTHORITY\\SYSTEM` (`S-1-5-18`), with `Everyone` and `BUILTIN\\Administrators` present in the token. The local policy appeared in the effective policy, but `Test-AppLockerPolicy` returned `AllowedByDefault` for both the allowed and staging-path executables; the staging executable then ran to exit code zero, wrote its marker, and produced no AppLocker deny event. The prototype is therefore not an admitted Guardian for this SYSTEM execution surface.
+
+The narrower candidate uses an NTFS deny ACE for `FileSystemRights.ExecuteFile`, scoped to the exact execution identity and configured with container/object inheritance plus `InheritOnly`. It deliberately does **not** deny write access. One working-tree physical trial against the accepted Windows Enterprise base then established all of the intended contrasts: root and nested text writes succeeded; newly copied PE files at both the staging root and a nested directory inherited the execute deny; the maintained PE outside the staging tree executed successfully and wrote its marker; both staging-tree PE launches were denied before their markers could be written; QMP reported zero network devices; and residual closure was clean.
+
+That working-tree result is development evidence only. R5 is not accepted until the implementation is committed and the same gates are reproduced from that exact clean Security revision. Even after acceptance, the NTFS rule remains a **sample-specific environmental transformation**, not a general malware sandbox: code with authority to rewrite its own ACLs, execute from another path, inject into an already-running process, or use another untested execution mechanism is outside this gate's claim.
+
 ### Network boundary
 
 QEMU continues to expose no network-class device. Known destinations may be redirected inside the disposable Guest to a loopback-only, record-only TCP sink so connection attempts can be counted. The sink does not proxy traffic, decrypt TLS, emulate the remote service, or return executable content. QMP remains authoritative for absence of external network capability.

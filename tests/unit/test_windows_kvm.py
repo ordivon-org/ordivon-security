@@ -890,6 +890,8 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "install-bootstrap.ps1",
             "p1-observer.ps1",
             "p1_controller_canary.c",
+            "p1_execution_control_canary.ps1",
+            "p1_execution_control_launcher.c",
             "windows-host-resolve-baseline.ps1",
         }
         self.assertEqual({path.name for path in resource_root.iterdir()}, expected)
@@ -897,10 +899,16 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "benign_fixture.c",
             "sacrificial_canary.c",
             "p1_controller_canary.c",
+            "p1_execution_control_launcher.c",
         ):
             source = (resource_root / source_name).read_text(encoding="utf-8").lower()
             for token in ("ws2_32", "wininet", "winhttp", "urlmon", "socket(", "connect("):
                 self.assertNotIn(token, source)
+        policy_source = (resource_root / "p1_execution_control_canary.ps1").read_text(
+            encoding="utf-8"
+        ).lower()
+        for token in ("invoke-webrequest", "webclient", "bitsadmin", "http://", "https://"):
+            self.assertNotIn(token, policy_source)
 
 
 if __name__ == "__main__":
