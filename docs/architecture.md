@@ -161,7 +161,16 @@ C1-J recipient-commit-gap profile
   → an explicit recipient inbox phase `reserved` is then persisted before the effect in two histories: crash before pulse versus crash after pulse but before completion publication
   → both histories leave byte-identical durable inbox state and byte-identical recipient recovery views while evaluator ground truth differs
   → retry from reserved duplicates one history; suppress from reserved loses the other
-  → reservation honestly preserves uncertainty but does not resolve the commit gap; intrinsic idempotency or a genuinely shared atomic consequence/completion boundary is now pressured
+  → reservation honestly preserves uncertainty but does not resolve the commit gap
+
+C1-K intrinsic-idempotency profile
+  → the consequence itself is an exact atomic ensure-symlink world state, not an adjacent dedup marker
+  → apply-then-SIGKILL-before-ACK followed by the same retry executes the recipient twice but mutates the world once and leaves one semantic consequence
+  → crash-before-apply uses the same retry and creates the missing exact consequence
+  → preexisting exact state returns already-satisfied with zero request-owned mutation
+  → exact type/value observation distinguishes already-satisfied from same-name conflict
+  → for this declarative effect, verified invariant satisfaction can establish semantic completion without proving one exact invocation caused the state
+  → exactly-once invocation is therefore not required for exactly-one semantic consequence
 
 World Entity publication-only recovery profile
   → the original Entity controller may die while the exact QEMU/swtpm carrier remains live and durable state still says executing
