@@ -172,6 +172,14 @@ C1-K intrinsic-idempotency profile
   → for this declarative effect, verified invariant satisfaction can establish semantic completion without proving one exact invocation caused the state
   → exactly-once invocation is therefore not required for exactly-one semantic consequence
 
+C1-L compensation profile
+  → the original local effect is non-idempotent balance += 1; ACK loss plus retry physically creates duplicate balance 2 instead of desired balance 1
+  → compensation has its own distinct effect identity and repairs 2 → 1 without rewriting the original duplicate history
+  → naive compensation is itself non-idempotent: apply-then-ACK-loss followed by blind retry drives 1 → 0 and overcompensates
+  → accepted recovery therefore re-observes current balance before any repair: exact 2 authorizes compensation, exact 1 proves already-repaired and authorizes publication-only closure
+  → crash-before-compensation remains at 2 and is repaired once; crash-after-compensation-before-ACK remains at 1 and performs no second decrement
+  → compensation is a separate recovery primitive when repair progress remains observable; exactly-once compensation invocation is not required in this fault model
+
 World Entity publication-only recovery profile
   → the original Entity controller may die while the exact QEMU/swtpm carrier remains live and durable state still says executing
   → predecessor owner PID/start-time remains historical provenance and is never rewritten to the fresh publisher

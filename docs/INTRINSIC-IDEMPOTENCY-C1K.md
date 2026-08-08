@@ -213,6 +213,6 @@ C1-I/J/K now divide consequence protocols into a clearer hierarchy:
    → UNKNOWN / transaction / compensation pressure
 ```
 
-The next experiment should therefore stop using synthetic state-setting effects and test a consequence that is genuinely **non-idempotent but compensable**. If compensation can restore a declared invariant after duplicate execution, it may solve a different class without demanding a universal transaction system.
+C1-L has now tested a genuinely non-idempotent but compensable local consequence. The original effect duplicated under ACK loss; a distinct compensation repaired the invariant, while blind compensation retry overcompensated. Re-observing the repair invariant safely distinguished compensation-not-yet-applied from compensation-already-applied. See [`COMPENSATION-C1L.md`](COMPENSATION-C1L.md).
 
-Only after compensation is physically faulted should Security decide whether a shared atomic transaction primitive is unavoidable for the remaining class.
+The next experiment should remove that surviving observability and ask what compensation requires when repaired and unrepaired histories become indistinguishable after crash.
