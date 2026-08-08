@@ -233,17 +233,16 @@ class DeepSeekRangeIntentDriver:
         )
         runner = domain_module.DomainToolLoopRunner(adapter, bridge)
         budget = domain_module.RunBudget(
-            3,
-            3,
-            2,
-            131_072,
-            180_000,
-            1_000_000,
-            1,
-            1,
-            1,
-            2,
-            262_144,
+            max_model_calls=3,
+            max_tool_calls=3,
+            max_observation_bytes=131_072,
+            max_wall_time_ms=180_000,
+            max_total_tokens=1_000_000,
+            max_model_retries=1,
+            max_tool_corrections=1,
+            max_observation_only_turns=1,
+            max_no_progress_turns=2,
+            max_model_observation_bytes=262_144,
         )
         context_value = context.to_dict()
         context_digest = context.digest
