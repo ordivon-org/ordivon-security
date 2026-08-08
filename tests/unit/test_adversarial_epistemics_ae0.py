@@ -27,7 +27,7 @@ class AdversarialEpistemicsAE0Tests(unittest.TestCase):
                 "sourceId": "actor:ae0-deceiver",
                 "claim": {"serviceCompromised": True},
                 "claimTruthStatus": "not-promoted",
-                "requestId": "range-effect-request:test",
+                "messageId": "message:ae0-deceiver-claim:1",
             },
             inspection_truth=None,
             phase="partial-truth",
@@ -36,6 +36,17 @@ class AdversarialEpistemicsAE0Tests(unittest.TestCase):
         self.assertEqual(observation["ambientSensor"]["serviceCompromiseStatus"], "UNKNOWN")
         self.assertIsNone(observation["independentInspectionTruth"])
         self.assertFalse(observation["rules"]["communicatedClaimPromotedToTruth"])
+
+    def test_hidden_world_does_not_enter_defender_context_when_claim_is_same(self) -> None:
+        claim = {
+            "messageId": "message:ae0-deceiver-claim:1",
+            "sourceId": "actor:ae0-deceiver",
+            "claim": {"serviceCompromised": True},
+            "claimTruthStatus": "not-promoted",
+        }
+        left = _defender_context(claim=claim, inspection_truth=None, phase="partial-truth")
+        right = _defender_context(claim=dict(claim), inspection_truth=None, phase="partial-truth")
+        self.assertEqual(left.digest, right.digest)
 
     def test_effect_interfaces_are_exactly_authorized(self) -> None:
         deceiver = _deceiver_authority()

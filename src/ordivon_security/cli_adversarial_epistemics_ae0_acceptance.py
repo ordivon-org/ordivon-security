@@ -213,10 +213,10 @@ class _AE0RangeBackend:
             raise ValueError("AE0 claim payload must be exactly serviceCompromised:Boolean")
         state = self.inspect(instance)
         claim: JsonObject = {
+            "messageId": "message:ae0-deceiver-claim:1",
             "sourceId": request.actor_id,
             "claim": {"serviceCompromised": request.payload["serviceCompromised"]},
             "claimTruthStatus": "not-promoted",
-            "requestId": request.request_id,
         }
         state["claim"] = claim
         _atomic_json(self.state_path, state)
@@ -763,6 +763,11 @@ def main() -> None:
             }
         )
         == 1,
+        "sameCommunicatedClaimAcrossHiddenWorlds": healthy.get("claim") == compromised.get("claim"),
+        "sameDefenderPartialContextAcrossHiddenWorlds": cast(JsonObject, healthy["defenderInitial"]).get(
+            "contextDigest"
+        )
+        == cast(JsonObject, compromised["defenderInitial"]).get("contextDigest"),
         "healthyDeceiverAutonomouslyPublishedClaim": healthy_analysis[
             "deceiverPublishedClaim"
         ]
@@ -844,6 +849,7 @@ def main() -> None:
             "trustPrimitiveForced": False if passed else None,
             "reputationPrimitiveForced": False if passed else None,
             "newCommunicationCoreForced": False,
+            "senderEffectIdentityExposedToReceiver": False,
             "nextPressureIfAccepted": "delay-or-conflict-independent-truth",
         },
     }
