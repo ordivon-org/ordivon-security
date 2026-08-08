@@ -6,6 +6,7 @@ import os
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import cast
@@ -29,7 +30,6 @@ from ordivon_security.cli_windows_kvm_fresh_controller_continuation_acceptance i
     _namespace_link_names,
     _peer_route_truth,
     _persist_continued_ledger,
-    _sensor_truth,
     _wait_identity_gone,
 )
 from ordivon_security.cli_windows_kvm_multiple_successors_acceptance import _one_ledger
@@ -107,6 +107,60 @@ def _persistent_peer_b_topology(ledger: JsonObject) -> JsonObject:
         "peerAddresses": addresses,
         "peerRoutes": routes,
         "rootLinkTruth": root_truth,
+    }
+    validate_json(truth)
+    return truth
+
+
+def _sensor_truth_read_only(
+    *,
+    run_path: Path,
+    capture_pid: int,
+    capture_start_time: int,
+    tcpdump_path: Path = Path("/usr/bin/tcpdump"),
+) -> JsonObject:
+    """Read a point-in-time packet snapshot without changing capture process state."""
+    time.sleep(0.5)
+    capture_alive_before = _identity_alive(capture_pid, capture_start_time)
+    pcap = run_path / "fabric.pcap"
+    lines: list[str] = []
+    digest: str | None = None
+    snapshot_bytes = b""
+    if pcap.is_file():
+        snapshot_bytes = pcap.read_bytes()
+        digest = _digest_bytes(snapshot_bytes)
+        with tempfile.NamedTemporaryFile(suffix=".pcap") as snapshot:
+            snapshot.write(snapshot_bytes)
+            snapshot.flush()
+            completed = subprocess.run(
+                [str(tcpdump_path), "-nn", "-r", snapshot.name],
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                timeout=30,
+            )
+        lines = [
+            line
+            for line in completed.stdout.splitlines()
+            if line.strip() and not line.startswith("reading from file ")
+        ]
+    capture_alive_after = _identity_alive(capture_pid, capture_start_time)
+    truth: JsonObject = {
+        "authority": "external-packet-sensor-read-only-observation-not-world-truth",
+        "captureAliveBefore": capture_alive_before,
+        "captureAliveAfter": capture_alive_after,
+        "captureMutationAttempted": False,
+        "pcapSnapshotByteLength": len(snapshot_bytes),
+        "pcapDigest": digest,
+        "packetLineCount": len(lines),
+        "peerATrafficObserved": any(
+            "10.253.70.2" in line and "10.253.70.3" in line for line in lines
+        ),
+        "peerBTrafficObserved": any(
+            "10.253.70.2" in line and "10.253.70.4" in line for line in lines
+        ),
+        "sampleLines": lines[:24],
     }
     validate_json(truth)
     return truth
@@ -306,7 +360,7 @@ def _second_successor(args: argparse.Namespace) -> None:
         capture_start = ledger.get("captureStartTime")
         if not isinstance(capture_pid, int) or not isinstance(capture_start, int):
             raise RuntimeError("C1-H second successor lacks exact packet-sensor identity")
-        sensor = _sensor_truth(
+        sensor = _sensor_truth_read_only(
             run_path=run_path,
             capture_pid=capture_pid,
             capture_start_time=capture_start,
@@ -561,7 +615,10 @@ def _supervisor(args: argparse.Namespace) -> None:
         and _guest_claim_passes(cast(JsonObject, guest_claim)),
         "secondSuccessorRecoveredIndependentPeerBSensorEvidence": isinstance(sensor, dict)
         and sensor.get("peerATrafficObserved") is True
-        and sensor.get("peerBTrafficObserved") is True,
+        and sensor.get("peerBTrafficObserved") is True
+        and sensor.get("captureAliveBefore") is True
+        and sensor.get("captureAliveAfter") is True
+        and sensor.get("captureMutationAttempted") is False,
         "secondSuccessorClassifiedCompletedButUnpublished": second_result.get("classification")
         == "completed-but-unpublished",
         "secondSuccessorDidNotRestartTransientPeerService": second_result.get(
