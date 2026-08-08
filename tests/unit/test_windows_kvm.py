@@ -889,6 +889,7 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "guest-runner.ps1",
             "install-bootstrap.ps1",
             "p1-observer.ps1",
+            "p1-orchestrator.ps1",
             "p1_controller.c",
             "p1_controller_canary.c",
             "p1_execution_control_canary.ps1",
