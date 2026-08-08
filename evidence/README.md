@@ -14,7 +14,7 @@ audience:
   - evaluator
   - maintainer
   - agent
-updated: 2026-08-07
+updated: 2026-08-08
 summary: Evidence contract for active Contest, CAGE, software Evaluation, static native-report Artifacts, Case Snapshots, P0-admitted benign-only Windows KVM Runs, and frozen Round 1 reports.
 evidence_status: verified
 readiness: READY
@@ -121,6 +121,8 @@ The C1-E successor-ownership acceptance index is retained at [`acceptance/c1e-su
 The C1-F multiple-successor acceptance index is retained at [`acceptance/c1f-multiple-successors-511f08f.json`](acceptance/c1f-multiple-successors-511f08f.json). It binds two candidates observing the same initial generation, exactly one initial recovery-authority winner, a non-mutating loser, winner continuation to a newer ledger generation, loser retry against that newer generation with `adopted-existing-effect` and no replay/mutation, the pre-fix overwrite-lineage falsifier, exact predecessor-claim archival plus predecessorClaimId/digest, final reconciler preservation of current and archived claim history, and zero-residual closure with recovery metadata removed.
 
 The C1-G mid-successor recovery acceptance index is retained at [`acceptance/c1g-mid-successor-recovery-38f6e52.json`](acceptance/c1g-mid-successor-recovery-38f6e52.json). It binds one successor's SIGKILL after q/w placement and bridge attachment but before stable publication, the unchanged-ledger/different-physical-world result, a second lineage-linked claim against the same durable digest, independent midpoint re-observation, missing-suffix-only continuation, the same Guest's A/B completion across two controller deaths, packet-sensor dual-flow evidence, and final zero-residual reconciliation with successor lineage preserved.
+
+The World Entity controller-loss acceptance index is retained at [`acceptance/world-entity-controller-loss-09a350c.json`](acceptance/world-entity-controller-loss-09a350c.json). It binds the exact `09a350c` observation-only Entity implementation, a real Windows KVM carrier stopped with controller `SIGKILL` after QMP confirmed no network device but before stable materialization publication, surviving QEMU/swtpm processes, fresh-process `UNKNOWN` reconciliation with byte-identical ledger and preserved predecessor owner identity, refusal to blind-resume the same unpublished migration, absence of a false materialization receipt, and final clean native closure. It proves non-overreach for that fault window, not successor continuation or completed-but-unpublished detection.
 
 P0.1 reconciliation receipts bind the scanned state root, each ledger decision, exact process-identity closure, Run-directory and ledger deletion, skipped active owners, and any attention-required diagnostics. They do not convert a crashed Run into valid Evaluation evidence. P1 media manifests bind the installer profile digest, exact source identity, NTFS image digest, embedded-file verification, and read-only attachment topology; they explicitly state `prepared-not-executable` and cannot establish runtime behavior.
 
