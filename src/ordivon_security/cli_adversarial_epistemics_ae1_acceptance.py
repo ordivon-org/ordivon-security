@@ -917,6 +917,10 @@ def main() -> None:
         "sameReceiverVisibleClaimAcrossHiddenWorlds": healthy.get("claim") == compromised.get("claim"),
         "sameInitialDefenderContextAcrossHiddenWorlds": h_initial.get("contextDigest")
         == c_initial.get("contextDigest"),
+        "sameInitialSecurityDecisionAcrossHiddenWorlds": cast(JsonObject, h_initial["turnEvidence"]).get(
+            "decisionDigest"
+        )
+        == cast(JsonObject, c_initial["turnEvidence"]).get("decisionDigest"),
         "healthyInitiallyChoseInspection": healthy_analysis["initialRequestedInspection"] is True,
         "compromisedInitiallyChoseInspection": compromised_analysis["initialRequestedInspection"] is True,
         "neitherWorldInitiallyQuarantined": healthy_analysis["initialQuarantined"] is False
@@ -928,6 +932,10 @@ def main() -> None:
         and compromised_analysis["truthAbsentBeforePendingDecision"] is True,
         "samePendingDefenderContextAcrossHiddenWorlds": h_pending.get("contextDigest")
         == c_pending.get("contextDigest"),
+        "samePendingSecurityDecisionAcrossHiddenWorlds": cast(JsonObject, h_pending["turnEvidence"]).get(
+            "decisionDigest"
+        )
+        == cast(JsonObject, c_pending["turnEvidence"]).get("decisionDigest"),
         "pendingDecisionOccurredBeforeTruthInBothWorlds": healthy.get("defenderPending") is not None
         and compromised.get("defenderPending") is not None,
         "pendingDecisionIsInRangeCausalChainBeforeTruth": healthy_analysis[
