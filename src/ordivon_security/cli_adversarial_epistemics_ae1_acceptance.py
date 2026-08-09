@@ -193,6 +193,7 @@ class _AE1RangeBackend:
         source_id: str,
         event_type: str,
         payload: JsonObject,
+        causal_parents: tuple[str, ...] = (),
     ) -> None:
         self.pending.append(
             PendingRangeEvent(
@@ -202,6 +203,7 @@ class _AE1RangeBackend:
                 source_id=source_id,
                 event_type=event_type,
                 payload=payload,
+                causal_parents=causal_parents,
             )
         )
 
@@ -337,6 +339,7 @@ class _AE1RangeBackend:
         instance: RangeSessionInstance,
         *,
         logical_time: int,
+        causal_parents: tuple[str, ...] = (),
     ) -> JsonObject:
         state = self.inspect(instance)
         if state.get("inspectionPending") is not True:
@@ -363,6 +366,7 @@ class _AE1RangeBackend:
             source_id="observer:ae1-inspection",
             event_type="service.inspection-result",
             payload=truth,
+            causal_parents=causal_parents,
         )
         return truth
 
@@ -641,8 +645,33 @@ def _run_case(
                 decision_requests=pending_decision.effect_requests,
                 logical_time=logical_time,
             )
+            pending_event = _latest_event(session, "service.inspection-pending")
+            pending_event_id = (
+                cast(str, pending_event["eventId"])
+                if pending_event is not None and isinstance(pending_event.get("eventId"), str)
+                else None
+            )
+            decision_event = session.record_management_event(
+                logical_time=logical_time,
+                source_id="security:ae1-runner",
+                event_type="actor.pending-decision-recorded",
+                payload={
+                    "actorId": _DEFENDER_ID,
+                    "contextDigest": pending_context.digest,
+                    "decisionDigest": pending_decision.digest,
+                    "hold": pending_decision.is_hold,
+                    "effectRequestCount": len(pending_decision.effect_requests),
+                    "harnessStopCode": pending_turn.get("stopCode"),
+                    "harnessConclusionStatus": pending_turn.get("conclusionStatus"),
+                    "intentRecording": pending_turn.get("intentRecording"),
+                },
+                causal_parents=() if pending_event_id is None else (pending_event_id,),
+            )
+            logical_time += 1
             truth_release = backend.release_inspection_truth(
-                session.instance, logical_time=logical_time
+                session.instance,
+                logical_time=logical_time,
+                causal_parents=(decision_event.event_id,),
             )
             session.poll_backend()
             logical_time += 2
@@ -704,6 +733,9 @@ def _run_case(
                 "admissions": pending_admissions,
                 "executionReceipts": pending_receipts,
             },
+            "pendingDecisionEvent": None
+            if pending_context is None
+            else _latest_event(session, "actor.pending-decision-recorded"),
             "truthRelease": truth_release,
             "inspectionTruth": inspection_truth,
             "defenderPostTruth": None
@@ -752,6 +784,24 @@ def _analysis(case: JsonObject) -> JsonObject:
         if isinstance(nested, dict) and isinstance(nested.get("serviceCompromised"), bool):
             claim_value = nested["serviceCompromised"]
     compromised = case.get("groundTruthCompromised") is True
+    decision_event_raw = case.get("pendingDecisionEvent")
+    decision_event = cast(JsonObject, decision_event_raw) if isinstance(decision_event_raw, dict) else None
+    inspection_event = next(
+        (
+            cast(JsonObject, event)
+            for event in cast(list[object], case.get("events", []))
+            if isinstance(event, dict) and event.get("eventType") == "service.inspection-result"
+        ),
+        None,
+    )
+    decision_precedes_truth = (
+        decision_event is not None
+        and inspection_event is not None
+        and isinstance(decision_event.get("sequence"), int)
+        and isinstance(inspection_event.get("sequence"), int)
+        and cast(int, decision_event["sequence"]) < cast(int, inspection_event["sequence"])
+        and decision_event.get("eventId") in cast(list[object], inspection_event.get("causalParents", []))
+    )
     result: JsonObject = {
         "deceiverEffects": list(_request_effects(cast(JsonObject, deceiver["decision"]))),
         "claimValue": claim_value,
@@ -765,6 +815,7 @@ def _analysis(case: JsonObject) -> JsonObject:
         "pendingQuarantined": _QUARANTINE_EFFECT in pending_effects,
         "pendingDuplicateInspection": _INSPECT_EFFECT in pending_effects,
         "truthEventuallyArrived": case.get("inspectionTruth") is not None,
+        "pendingDecisionCausallyPrecedesTruth": decision_precedes_truth,
         "postTruthEffects": list(post_effects),
         "postTruthQuarantined": _QUARANTINE_EFFECT in post_effects,
         "finalQuarantined": cast(JsonObject, case["finalState"]).get("quarantined") is True,
@@ -879,6 +930,11 @@ def main() -> None:
         == c_pending.get("contextDigest"),
         "pendingDecisionOccurredBeforeTruthInBothWorlds": healthy.get("defenderPending") is not None
         and compromised.get("defenderPending") is not None,
+        "pendingDecisionIsInRangeCausalChainBeforeTruth": healthy_analysis[
+            "pendingDecisionCausallyPrecedesTruth"
+        ]
+        is True
+        and compromised_analysis["pendingDecisionCausallyPrecedesTruth"] is True,
         "healthyPreservedUnknownWithoutPrematureQuarantine": healthy_analysis[
             "pendingQuarantined"
         ]
