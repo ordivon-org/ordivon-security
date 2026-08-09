@@ -161,6 +161,13 @@ class AutonomousRangeIntentTests(unittest.TestCase):
         self.assertEqual(bridge.requests, [])
         self.assertFalse(first.kwargs["structured_content"]["replacedPreviousIntent"])
         self.assertTrue(second.kwargs["structured_content"]["replacedPreviousIntent"])
+        self.assertTrue(
+            second.kwargs["structured_content"]["pendingIntentReplaceableBeforeAdmission"]
+        )
+        self.assertEqual(
+            second.kwargs["structured_content"]["replacementSemantics"],
+            "later-submit-range-intents-replaces-entire-pending-set",
+        )
         self.assertEqual(second.kwargs["structured_content"]["intentRevision"], 2)
         self.assertFalse(second.kwargs["structured_content"]["securityAdmissionPerformed"])
         self.assertFalse(second.kwargs["structured_content"]["effectExecuted"])
