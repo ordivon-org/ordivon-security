@@ -15,7 +15,7 @@ from ordivon_security.range import RangeEffectRequest
 
 _TOOL_NAME = "submit_range_intents"
 _DOMAIN_ID = "domain:security-agent-first-range-intent-af2"
-_PROMPT_REVISION = "security-agent-first-range-intent-af2-v2"
+_PROMPT_REVISION = "security-agent-first-range-intent-af2-v3"
 
 
 def _git_revision(path: Path, label: str) -> str:
@@ -158,8 +158,11 @@ class _RangeIntentBridge:
             status="observed",
             structured_content={
                 "intentRecorded": True,
+                "pendingIntentRecorded": True,
                 "intentRevision": len(self.intent_revisions),
                 "replacedPreviousIntent": previous_present,
+                "pendingIntentReplaceableBeforeAdmission": True,
+                "replacementSemantics": "later-submit-range-intents-replaces-entire-pending-set",
                 "requestCount": len(parsed),
                 "effectExecuted": False,
                 "securityAdmissionPerformed": False,
@@ -208,10 +211,11 @@ class DeepSeekRangeIntentDriver:
             _TOOL_NAME,
             (
                 "Record or replace the complete pending set of autonomous Security Range effect "
-                "requests for this bounded decision. The Tool does not perform Security admission "
-                "or execute any consequence. A later Tool call replaces the entire earlier pending "
-                "intent before admission. An empty requests list is a valid decision and can also "
-                "retract an earlier positive pending intent."
+                "requests for this bounded decision. This is replaceable pending intent, not a "
+                "commitment. The Tool does not perform Security admission or execute any consequence. "
+                "A later Tool call replaces the entire earlier pending intent before admission. An "
+                "empty requests list is a valid decision and can retract an earlier positive pending "
+                "intent."
             ),
             {
                 "type": "object",
@@ -294,12 +298,14 @@ class DeepSeekRangeIntentDriver:
                         "pending intent only; it does not admit, execute, or verify consequences. "
                         "Before Security admission you may call submit_range_intents again if you "
                         "change your mind; each later call completely replaces the earlier pending "
-                        "request set. To retract an earlier positive intent, submit an empty requests "
-                        "list. For a zero-effect decision with no earlier Tool intent, you may also "
-                        "conclude directly without a Tool call. After each Tool observation, check "
-                        "whether the recorded intent still matches your final decision. Do not claim "
-                        "that any requested effect happened. Conclude only after the latest Tool intent "
-                        "matches your decision. Use candidate_completed when this bounded decision is "
+                        "request set. Pending intent is not a commitment. To retract an earlier positive "
+                        "intent, submit an empty requests list. For a zero-effect decision with no "
+                        "earlier Tool intent, you may also conclude directly without a Tool call. After "
+                        "each Tool observation, check whether the pending intent still matches your "
+                        "final decision. If it does not, you MUST submit a complete replacement before "
+                        "concluding. Never knowingly conclude with a pending Tool intent that contradicts "
+                        "your stated final decision. Do not claim that any requested effect happened. "
+                        "Use candidate_completed when this bounded decision is "
                         "closed. Use needs_input when your complete current decision is to wait for "
                         "external information while preserving unresolved unknowns."
                     ),
