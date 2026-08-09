@@ -14,6 +14,7 @@ from ordivon_security.cli_autonomous_communication_ac0_acceptance import (
     _a_context,
     _b_context,
     _messages_for,
+    _normalize_b_context,
     _projection_without_private_signal,
 )
 from ordivon_security.range import RangeSession, RangeSessionSpec
@@ -61,13 +62,21 @@ class AutonomousCommunicationAC0Tests(unittest.TestCase):
                 }
             ]
         }
-        match = _b_context(state, signal_b=1, treatment="match").visible_observation
-        mismatch = _b_context(state, signal_b=0, treatment="mismatch").visible_observation
+        match = _b_context(state, signal_b=1).visible_observation
+        mismatch = _b_context(state, signal_b=0).visible_observation
         self.assertNotEqual(canonical_digest(match), canonical_digest(mismatch))
         self.assertEqual(
             canonical_digest(_projection_without_private_signal(match)),
             canonical_digest(_projection_without_private_signal(mismatch)),
         )
+        match_context = _b_context(state, signal_b=1).to_dict()
+        mismatch_context = _b_context(state, signal_b=0).to_dict()
+        self.assertEqual(
+            canonical_digest(_normalize_b_context(match_context)),
+            canonical_digest(_normalize_b_context(mismatch_context)),
+        )
+        self.assertNotIn("match", str(match_context["metadata"]).lower())
+        self.assertNotIn("mismatch", str(mismatch_context["metadata"]).lower())
 
     def test_evaluator_score_is_private_and_oracle_bound(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
