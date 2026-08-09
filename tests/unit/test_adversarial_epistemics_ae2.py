@@ -49,6 +49,17 @@ class AdversarialEpistemicsAE2Tests(unittest.TestCase):
         self.assertFalse(observation["rules"]["sourcePriorityProvided"])
         self.assertFalse(observation["rules"]["priorSourceHistoryProvided"])
 
+    def test_pretruth_context_does_not_prime_trust_confidence_or_reputation_vocabulary(self) -> None:
+        context = _defender_context(
+            phase="conflicting-independent-observations",
+            world_truth=None,
+        )
+        visible = str(context.visible_observation).lower()
+        objective = context.objective.lower()
+        for token in ("trust", "confidence", "reputation"):
+            self.assertNotIn(token, visible)
+            self.assertNotIn(token, objective)
+
     def test_post_truth_context_resolves_current_property_without_erasing_sensor_history(self) -> None:
         truth = {
             "inspectionId": "inspection:ae2-adjudication:1",
