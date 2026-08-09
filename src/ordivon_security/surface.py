@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "AE1 delayed-truth epistemics consumer",
+        "research-apparatus",
+        "ordivon_security.cli_adversarial_epistemics_ae1_acceptance",
+        "Counterfactual delayed-truth experiment with autonomous false claim, costly pending UNKNOWN, and shared pre-truth Agent policy.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "AE0 adversarial epistemics consumer",
         "research-apparatus",
         "ordivon_security.cli_adversarial_epistemics_ae0_acceptance",
