@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.autonomous-communication-ac0-falsifier-index",
+  "status": "falsified",
+  "apparatus": {
+    "initialRevision": "git:439bb3e41aac2c6f043bc10e96695001bd96c207",
+    "initialDisposition": "scientifically-rejected-treatment-label-leak",
+    "correctedRevision": "git:20e00e47cff187249ef9dfdac342a10ff0198f03"
+  },
+  "rejectedInitialRun": {
+    "receiptBytes": 83459,
+    "receiptSha256": "sha256:450611979e3c01cd5ae2331bf13b8caea7b287de63865318dd5d19701a209610",
+    "jobId": "job-019fe5a2-e164-7b91-b164-236f6ab82726",
+    "executionPlanDigest": "sha256:72c583c8ed6d44f3cc3240813ce1fe84146a6ec2e4659df2f0b6957c8a0c6938",
+    "workspaceSourceDigest": "sha256:c2ef5b42aa045cb079c19495939a667264d47c998e97aa8036ba9fbbef373f7c",
+    "reason": "match/mismatch treatment identifier was model-visible through RangeIntentContext.metadata"
+  },
+  "correctedPhysicalRun": {
+    "receiptBytes": 93951,
+    "receiptSha256": "sha256:3c269a616c7723c6c015077860f023cdadcab88c2967680b3615628a68bccaad",
+    "jobId": "job-019fe5a5-4b80-73a1-bebf-68dc453ec22b",
+    "executionPlanDigest": "sha256:85c3270ecedc2a5c75aae12f4c07e5feeec36e3443b7440a39d6e1ec61c4751f",
+    "workspaceSourceDigest": "sha256:df71bace268facbac80b98fbaaa9864728e743c0a73f85e71d1dea4d8df914d7",
+    "processExit": 2,
+    "providerModel": "deepseek-v4-flash",
+    "credentialScopeId": "credential-scope:deepseek:flash:0",
+    "harnessRevision": "git:b95c49393ad16a0f832fc5c258753908d0ef4166",
+    "harnessVersion": "0.6.0",
+    "protocolRevision": "git:d00b88c7016ee196f7a62c75d22afa801b346f9d"
+  },
+  "sourceA": {
+    "privateSignal": 1,
+    "contextDigest": "sha256:3a077d68e332dfe3a40aefc4d66e8a989f3e473328c360f31f1b86ab63e81cd8",
+    "decisionDigest": "sha256:a7113d04513a76ed618e15836601943c371eef75f79b534406872784e1601a82",
+    "message": {
+      "messageId": "message:ac0:ac0-a:1",
+      "sourceId": "actor:ac0-a",
+      "recipientId": "actor:ac0-b",
+      "content": {"signal": 1},
+      "claimTruthStatus": "not-promoted"
+    },
+    "sameDecisionAppliedAcrossCounterfactuals": true
+  },
+  "receiverControls": {
+    "treatmentMetadataRemoved": true,
+    "completeContextEqualAfterPrivateSignalNormalization": true,
+    "messageProjectionExcludesSenderExecutionProvenance": true,
+    "messagePromotedToWorldTruth": false,
+    "messagePromotedToRecipientBelief": false
+  },
+  "match": {
+    "privateSignalB": 1,
+    "contextDigest": "sha256:cef5d5914a30600faad1f7cc0a9df343f2cacb0208e490352306a07d59b061ad",
+    "effect": "shared.activate",
+    "activated": true,
+    "score": 10,
+    "oracleScore": 10,
+    "regret": 0
+  },
+  "mismatch": {
+    "privateSignalB": 0,
+    "contextDigest": "sha256:6e8b8003dd62d69dcd9142ac50b0410056f44174dfe58555f906ed934c28a77c",
+    "effect": "shared.activate",
+    "activated": true,
+    "score": -10,
+    "oracleScore": 0,
+    "regret": 10
+  },
+  "interpretation": {
+    "transportOrMailboxFailure": false,
+    "visibilityLeakObservedAfterCorrection": false,
+    "oneShotCheapTalkSufficientForZeroRegretCoordination": false,
+    "trustPrimitiveForced": false,
+    "reputationPrimitiveForced": false,
+    "rangeEventVisibilityOntologyForced": false,
+    "bidirectionalDialogueObserved": false,
+    "rawNoTrustOntologyGateWasMisdefined": true,
+    "rawNoTrustOntologyGateReason": "it scanned model-generated language rather than Agent input ontology",
+    "nextPressure": "public-incentive-alignment-and-common-knowledge"
+  }
+}

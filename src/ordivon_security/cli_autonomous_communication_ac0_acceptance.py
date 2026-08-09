@@ -653,8 +653,8 @@ def run_experiment(*, state_root: Path, driver: DeepSeekRangeIntentDriver) -> Js
     social_text = json.dumps(
         {
             "a": a_context.to_dict(),
-            "matchB": match_b,
-            "mismatchB": mismatch_b,
+            "matchB": cast(JsonObject, match_b["context"]),
+            "mismatchB": cast(JsonObject, mismatch_b["context"]),
         },
         sort_keys=True,
     ).lower()

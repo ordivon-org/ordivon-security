@@ -31,6 +31,7 @@ managed_paths:
   - docs/ADVERSARIAL-EPISTEMICS-AE3C.md
   - docs/EVIDENCE-COMPUTATION-EC0.md
   - docs/EVIDENCE-FRESHNESS-EC1.md
+  - docs/AUTONOMOUS-COMMUNICATION-AC0.md
   - docs/architecture.md
   - docs/authority.md
   - docs/MIGRATION-ROUND-1.md
