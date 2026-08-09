@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "AC2 verifiable disclosure / intent convergence falsifier",
+        "research-apparatus",
+        "ordivon_security.cli_verifiable_disclosure_ac2_acceptance",
+        "Selective authoritative disclosure resolves epistemic ambiguity but exposes non-convergence between final Agent reasoning and Tool-authoritative pending intent.",
+        "falsified-research",
+    ),
+    SecuritySurfaceEntry(
         "AC1 incentive communication falsifier",
         "research-apparatus",
         "ordivon_security.cli_incentive_communication_ac1_acceptance",

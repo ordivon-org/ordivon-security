@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.verifiable-disclosure-ac2-falsifier-index",
+  "status": "falsified",
+  "currentRevision": "git:41a126934514cf4a7d97a520d2d3116ab6fcd1eb",
+  "apparatusProgramSha256": "sha256:6f18f4dfc66cde4f2137884e6ac431c44d47b47b833b58722bd66644e00261c3",
+  "controls": {
+    "frozenAC0MessageRequestDigest": "sha256:b13b87e882c7c43a1524e77695b1d9c0e092b13e110b550bb560f7ed2dd4a148",
+    "frozenAC0ContextDigest": "sha256:3a077d68e332dfe3a40aefc4d66e8a989f3e473328c360f31f1b86ab63e81cd8",
+    "frozenAC0DecisionDigest": "sha256:a7113d04513a76ed618e15836601943c371eef75f79b534406872784e1601a82",
+    "senderModelResampled": false,
+    "disclosureChoiceAutonomous": false,
+    "disclosureRequestCarriesPrivateValue": false,
+    "verifiedDisclosureValue": 1,
+    "verifiedDisclosureAuthority": "owned-range-selective-disclosure",
+    "ordinaryMessagePromotedToTruth": false,
+    "worldTransportConsumed": false,
+    "matchContextDigest": "sha256:3e733f70ba98d961d6b3e181bc31cb838efb24b234b14f50811dded83b4c4dc8",
+    "mismatchContextDigest": "sha256:e9dd7c82c0f2f518aaf80ae5ca2e6adef5257e37027c5fae0e9b5b013741f8d5",
+    "fullContextDiffOnlyPrivateBSignal": true
+  },
+  "equipmentFailure": {
+    "apparatusRevision": "git:72b2f6429956b91f622940513c78c1219202e5c2",
+    "jobId": "job-019fe5b4-33c5-7841-bdff-8875227861e6",
+    "attemptId": "attempt-019fe5b4-33c5-7841-bdff-8887bcf65b43",
+    "executionPlanDigest": "sha256:48353458769c127c466869b86640b505fb947aa72730ba2be5954d3d7a502eae",
+    "workspaceSourceDigest": "sha256:d1b68cb5cd3d8426f4f3c83ae8734a974cdc1dfe4248def84dcee065592b9de0",
+    "stopCode": "provider_state_unknown",
+    "behavioralSample": false
+  },
+  "physicalRuns": {
+    "immutableIntentV1": {
+      "revision": "git:091ce511ce2a6875ec533a5dfcb2152c05559c82",
+      "receiptBytes": 64794,
+      "receiptSha256": "sha256:407d32cc0b0603873962b15b89a5041bed73297845da622c84e941bb007fb84b",
+      "jobId": "job-019fe5b6-57a6-71b3-9aaa-4ada3efb6cbd",
+      "attemptId": "attempt-019fe5b6-57a6-71b3-9aaa-4ae63d846f63",
+      "executionPlanDigest": "sha256:04e1746afefd082ca93e87f9c413c6a62e994a1a3b2bebcb7a35d9f0abe84b03",
+      "workspaceSourceDigest": "sha256:6206edfc7aea131258fbfb07d0e3fed73652101c4192395e9e978e405d5bdbd8",
+      "promptRevision": "security-agent-first-range-intent-af2-v1",
+      "matchRegret": 0,
+      "mismatchRegret": 10,
+      "mismatchFinalReasoningRejectsActivation": true,
+      "preAdmissionRevisionAvailable": false
+    },
+    "replaceableIntentV2": {
+      "revision": "git:768ae4e0176d7a5539ea65c6800254c53dd71c89",
+      "receiptBytes": 72561,
+      "receiptSha256": "sha256:be4a34da37d8e00d64f18e596a89f33ffbcac339b95d7ce9c1f566af8b5f5a5d",
+      "jobId": "job-019fe5b9-4a8c-7e03-88cb-8fe4ece816d9",
+      "attemptId": "attempt-019fe5b9-4a8c-7e03-88cb-8ff0203cf3ee",
+      "executionPlanDigest": "sha256:584467f75e288b3da981aa52202ff9f1bbc07afc9218a21e07d2583969c94b1a",
+      "workspaceSourceDigest": "sha256:0a0d6d482854b03473274e076c3db921285afc7ea410af563ff459c8e90e1a9c",
+      "promptRevision": "security-agent-first-range-intent-af2-v2",
+      "matchRegret": 0,
+      "mismatchRegret": 10,
+      "mismatchIntentRevisionCount": 1,
+      "preAdmissionRevisionAvailable": true,
+      "agentUsedRevision": false
+    },
+    "explicitPendingSemanticsV3": {
+      "revision": "git:41a126934514cf4a7d97a520d2d3116ab6fcd1eb",
+      "receiptBytes": 62479,
+      "receiptSha256": "sha256:5a410bcd7b854ee7d589b5fbc7e39043e6c4e19c3df056fb6b934daf79667e71",
+      "jobId": "job-019fe5ba-a10c-7392-a635-a3e4c8867142",
+      "attemptId": "attempt-019fe5ba-a10c-7392-a635-a3f9ec576d2f",
+      "executionPlanDigest": "sha256:75a2e401bbde4b3f270a767863e36420f3e74c1c4a7608aa1c35beaf0919af0a",
+      "workspaceSourceDigest": "sha256:a3b502ef375f4dc1ee91e3351dcf2f227119eef22955058e107d4b7ff7d4f876",
+      "promptRevision": "security-agent-first-range-intent-af2-v3",
+      "matchDecisionDigest": "sha256:4b1bf996eb0a1a015e32298854fa842fb16909aa48fcf12f8ef21924033170bd",
+      "mismatchDecisionDigest": "sha256:658d050b9200b508d4936aec0122f961fa6758acdd1911b393b91f69cca921da",
+      "matchRegret": 0,
+      "mismatchRegret": 10,
+      "mismatchIntentRevisionCount": 1,
+      "mismatchFinalReasoningRejectsActivation": true,
+      "mismatchFinalReasoningExplicitlyRequestsRetraction": true,
+      "agentUsedRevision": false
+    }
+  },
+  "interpretation": {
+    "verifiedEvidenceResolvedEpistemicAmbiguityInFinalReasoning": true,
+    "verifiedEvidenceGuaranteedCorrectToolIntent": false,
+    "preAdmissionIntentReplacementStructurallyValid": true,
+    "replacementAffordanceGuaranteedAgentRevision": false,
+    "naturalLanguageConclusionMayOverrideToolIntent": false,
+    "securityMayInferRetractionFromSummary": false,
+    "trustPrimitiveForced": false,
+    "reputationPrimitiveForced": false,
+    "nextPressure": "explicit-tool-level-pending-intent-finalization"
+  }
+}
