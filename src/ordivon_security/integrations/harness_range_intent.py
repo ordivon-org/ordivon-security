@@ -63,6 +63,19 @@ def _insert_sources(*, harness_source: Path, protocol_source: Path) -> None:
             sys.path.insert(0, text)
 
 
+def _resolve_recorded_range_intent(
+    requests: list[JsonObject] | None,
+    *,
+    stop_code: str,
+    tool_calls: int,
+) -> tuple[list[JsonObject], str]:
+    if requests is not None:
+        return requests, "submit-range-intents"
+    if stop_code == "needs_input" and tool_calls == 0:
+        return [], "implicit-zero-effect-needs-input"
+    raise RuntimeError("AF2 model completed without submitting Range intent")
+
+
 class RangeIntentHarnessFailure(RuntimeError):
     def __init__(self, stop_code: str, evidence: JsonObject) -> None:
         super().__init__(f"AF2 Harness turn stopped before completion: {stop_code}")
@@ -280,9 +293,11 @@ class DeepSeekRangeIntentDriver:
                         "Security Range. Authority is permission, not instruction. Use only "
                         "the visible observation, objective, authority snapshots, and declared "
                         "effect interfaces. You may request zero, one, or multiple effects. "
-                        "Call submit_range_intents exactly once. The Tool records intent only; "
-                        "it does not admit, execute, or verify consequences. Never claim that a "
-                        "requested effect happened. After the Tool observation, submit a "
+                        "For any positive effect request, call submit_range_intents exactly once. "
+                        "For a zero-effect wait on external information, you may either submit an "
+                        "empty requests list or directly conclude needs_input. The Tool records "
+                        "intent only; it does not admit, execute, or verify consequences. Never "
+                        "claim that a requested effect happened. After any Tool observation, submit a "
                         "concise Harness conclusion. Use candidate_completed when this bounded "
                         "decision is closed. Use needs_input when your complete current decision "
                         "is to wait for external information while preserving unresolved unknowns."
@@ -336,12 +351,15 @@ class DeepSeekRangeIntentDriver:
             }
             validate_json(failure_evidence)
             raise RangeIntentHarnessFailure(stop_code, failure_evidence)
-        if bridge.requests is None:
-            raise RuntimeError("AF2 model completed without submitting Range intent")
         if result.conclusion is None:
             raise RuntimeError("AF2 model completed without a conclusion")
+        recorded_requests, intent_recording = _resolve_recorded_range_intent(
+            bridge.requests,
+            stop_code=stop_code,
+            tool_calls=int(result.tool_calls),
+        )
         effect_requests: list[RangeEffectRequest] = []
-        for index, item in enumerate(bridge.requests):
+        for index, item in enumerate(recorded_requests):
             effect_requests.append(
                 RangeEffectRequest(
                     request_id=f"range-effect-request:af2-{token}-{index}",
@@ -360,6 +378,7 @@ class DeepSeekRangeIntentDriver:
                 "source": "deepseek-via-ordivon-harness",
                 "promptRevision": _PROMPT_REVISION,
                 "harnessConclusionStatus": conclusion_status,
+                "intentRecording": intent_recording,
             },
         )
         if effective and any(item != adapter.model_id for item in effective):
@@ -372,6 +391,7 @@ class DeepSeekRangeIntentDriver:
             "decisionDigest": decision.digest,
             "decision": decision.to_dict(),
             "modelRequestCount": len(effect_requests),
+            "intentRecording": intent_recording,
             "conclusionStatus": conclusion_status,
             "conclusionSummary": str(result.conclusion.summary),
             "stopCode": stop_code,

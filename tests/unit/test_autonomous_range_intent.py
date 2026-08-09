@@ -4,7 +4,10 @@ import unittest
 
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
 from ordivon_security.integrations import RangeIntentHarnessFailure
-from ordivon_security.integrations.harness_range_intent import _RangeIntentBridge
+from ordivon_security.integrations.harness_range_intent import (
+    _RangeIntentBridge,
+    _resolve_recorded_range_intent,
+)
 from ordivon_security.range import RangeAuthority, RangeEffectRequest
 
 
@@ -146,6 +149,19 @@ class AutonomousRangeIntentTests(unittest.TestCase):
             bridge.execute(FakeCall(), step_id="step:2")
         self.assertEqual(raised.exception.kind, "model_correctable")
         self.assertIn("already recorded", str(raised.exception))
+
+    def test_needs_input_without_tool_is_explicit_zero_effect_hold(self) -> None:
+        requests, recording = _resolve_recorded_range_intent(
+            None, stop_code="needs_input", tool_calls=0
+        )
+        self.assertEqual(requests, [])
+        self.assertEqual(recording, "implicit-zero-effect-needs-input")
+
+    def test_candidate_completed_without_tool_remains_invalid(self) -> None:
+        with self.assertRaises(RuntimeError):
+            _resolve_recorded_range_intent(
+                None, stop_code="candidate_completed", tool_calls=0
+            )
 
     def test_range_intent_driver_allows_needs_input_for_recorded_decision(self) -> None:
         from pathlib import Path
