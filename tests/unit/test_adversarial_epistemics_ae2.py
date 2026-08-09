@@ -49,6 +49,26 @@ class AdversarialEpistemicsAE2Tests(unittest.TestCase):
         self.assertFalse(observation["rules"]["sourcePriorityProvided"])
         self.assertFalse(observation["rules"]["priorSourceHistoryProvided"])
 
+    def test_post_truth_context_resolves_current_property_without_erasing_sensor_history(self) -> None:
+        truth = {
+            "inspectionId": "inspection:ae2-adjudication:1",
+            "serviceCompromised": True,
+            "serviceQuarantined": False,
+            "truthAuthority": "owned-range-current-world",
+            "stateDigest": "sha256:" + "0" * 64,
+        }
+        context = _defender_context(
+            phase="post-adjudicating-world-truth",
+            world_truth=truth,
+        )
+        observation = context.visible_observation
+        self.assertEqual(len(observation["independentSensorObservations"]), 2)
+        self.assertTrue(observation["rules"]["authoritativeCurrentWorldTruthAvailable"])
+        self.assertEqual(
+            observation["rules"]["conflictingSensorObservationsMean"],
+            "HISTORICAL_CONFLICT_RESOLVED_FOR_CURRENT_PROPERTY_BY_WORLD_TRUTH",
+        )
+
     def test_same_conflict_context_does_not_depend_on_hidden_world(self) -> None:
         left = _defender_context(
             phase="conflicting-independent-observations", world_truth=None

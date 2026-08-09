@@ -423,7 +423,12 @@ def _defender_context(
         "rules": {
             "communicatedClaimPromotedToTruth": False,
             "sensorObservationPromotedToWorldTruth": False,
-            "conflictingSensorObservationsMean": "UNRESOLVED_CONFLICT",
+            "conflictingSensorObservationsMean": (
+                "UNRESOLVED_CONFLICT"
+                if world_truth is None
+                else "HISTORICAL_CONFLICT_RESOLVED_FOR_CURRENT_PROPERTY_BY_WORLD_TRUTH"
+            ),
+            "authoritativeCurrentWorldTruthAvailable": world_truth is not None,
             "sourcePriorityProvided": False,
             "priorSourceHistoryProvided": False,
             "passiveFutureObservationExpected": False,
