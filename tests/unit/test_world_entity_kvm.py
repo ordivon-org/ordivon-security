@@ -290,7 +290,11 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
 
     def test_execution_identity_declares_publication_and_prebody_compensation(self) -> None:
         identity = self.destination.execution_identity
-        self.assertEqual(identity["revision"], "4")
+        self.assertEqual(identity["revision"], "5")
+        self.assertEqual(
+            identity["inspectionMode"],
+            "read-only-native-commitment-projection-v1",
+        )
         self.assertEqual(
             identity["recoveryMode"],
             "reobserve-publish-or-prebody-compensate-no-owner-rewrite",
@@ -532,6 +536,136 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         self.assertTrue(
             recovered["receipt"]["destinationEvidence"]["historicalMaterializationReceipt"]
         )
+
+    def test_inspection_absent_state_is_bounded_and_read_only(self) -> None:
+        prepared = plan("migration:inspection:absent")
+        before = (
+            self.provider.persist_calls,
+            self.provider.inspect_calls,
+            self.provider.destroy_calls,
+            self.provider.start_qemu_calls,
+            self.provider.start_swtpm_calls,
+        )
+        result = self.destination.inspect_commitment(prepared, canonical_digest(prepared))
+        self.assertEqual(result["state"], "not-started")
+        self.assertEqual(result["commitmentClass"], "not-yet-native")
+        self.assertEqual(result["nativePhase"], "absent")
+        self.assertEqual(result["nextOwnerOperation"], "materialize-exact-original-request")
+        self.assertEqual(result["authority"], "not-granted-by-inspection")
+        self.assertEqual(result["externalCurrentness"], "not-claimed")
+        self.assertTrue(result["evidence"]["nativeRunAbsent"])
+        self.assertEqual(list(self.destination.receipts_root.iterdir()), [])
+        self.assertEqual(list(self.provider.ledgers_root.iterdir()), [])
+        self.assertEqual(list(self.provider.runs_root.iterdir()), [])
+        self.assertEqual(
+            before,
+            (
+                self.provider.persist_calls,
+                self.provider.inspect_calls,
+                self.provider.destroy_calls,
+                self.provider.start_qemu_calls,
+                self.provider.start_swtpm_calls,
+            ),
+        )
+        encoded = json.dumps(result, sort_keys=True)
+        for forbidden in ("runPath", "qemuPid", "swtpmPid", "continuityPayload", "sourceDeparture"):
+            self.assertNotIn(forbidden, encoded)
+
+    def test_inspection_staged_ledger_is_native_outstanding_and_byte_preserving(self) -> None:
+        prepared = plan("migration:inspection:staged")
+        _, ledger = self._stage_only(prepared)
+        before_bytes = ledger.read_bytes()
+        before = (
+            self.provider.persist_calls,
+            self.provider.inspect_calls,
+            self.provider.destroy_calls,
+            self.provider.start_qemu_calls,
+            self.provider.start_swtpm_calls,
+        )
+        result = self.destination.inspect_commitment(prepared, canonical_digest(prepared))
+        self.assertEqual(result["state"], "native-outstanding")
+        self.assertEqual(result["commitmentClass"], "outstanding")
+        self.assertEqual(result["nativePhase"], "migration-staged")
+        self.assertEqual(result["nextOwnerOperation"], "reconcile-or-compensate-prebody")
+        self.assertTrue(str(result["evidence"]["ledgerDigest"]).startswith("sha256:"))
+        self.assertEqual(ledger.read_bytes(), before_bytes)
+        self.assertEqual(
+            before,
+            (
+                self.provider.persist_calls,
+                self.provider.inspect_calls,
+                self.provider.destroy_calls,
+                self.provider.start_qemu_calls,
+                self.provider.start_swtpm_calls,
+            ),
+        )
+        encoded = json.dumps(result, sort_keys=True)
+        for forbidden in ("runPath", "qemuPid", "swtpmPid", "continuityPayload", "sourceDeparture"):
+            self.assertNotIn(forbidden, encoded)
+
+    def test_inspection_materialized_receipt_survives_fresh_destination_without_native_actions(self) -> None:
+        request = materialize_request("migration:inspection:materialized")
+        with (
+            patch("ordivon_security.evaluation.world_entity._set_owner"),
+            patch(
+                "ordivon_security.evaluation.world_entity.windows_kvm_machine_base_arguments",
+                return_value=[],
+            ),
+        ):
+            response = self.destination.handle(request)
+        self.assertEqual(response["status"], "materialized")
+        migration_id = str(request["plan"]["migrationId"])
+        receipt_path = self.destination._receipt_path(migration_id)
+        token, _, _ = self.destination._coordinates(request["plan"])
+        ledger_path = self.provider.ledgers_root / f"{token}.json"
+        receipt_before = receipt_path.read_bytes()
+        ledger_before = ledger_path.read_bytes()
+        before = (
+            self.provider.persist_calls,
+            self.provider.inspect_calls,
+            self.provider.destroy_calls,
+            self.provider.start_qemu_calls,
+            self.provider.start_swtpm_calls,
+        )
+        fresh = WorldEntityKvmDestination(
+            self.destination.config,
+            machine_provider=self.provider,
+        )
+        result = fresh.inspect_commitment(request["plan"], request["planDigest"])
+        self.assertEqual(result["state"], "materialized")
+        self.assertEqual(result["commitmentClass"], "historical-terminal")
+        self.assertEqual(result["nativePhase"], "migration-running-contained")
+        self.assertIsNone(result["nextOwnerOperation"])
+        self.assertTrue(str(result["evidence"]["receiptDigest"]).startswith("sha256:"))
+        self.assertEqual(
+            result["evidence"]["materializationDigest"],
+            response["receipt"]["materializationDigest"],
+        )
+        self.assertEqual(receipt_path.read_bytes(), receipt_before)
+        self.assertEqual(ledger_path.read_bytes(), ledger_before)
+        self.assertEqual(
+            before,
+            (
+                self.provider.persist_calls,
+                self.provider.inspect_calls,
+                self.provider.destroy_calls,
+                self.provider.start_qemu_calls,
+                self.provider.start_swtpm_calls,
+            ),
+        )
+        encoded = json.dumps(result, sort_keys=True)
+        for forbidden in ("runPath", "qemuPid", "swtpmPid", "continuityPayload", "sourceDeparture"):
+            self.assertNotIn(forbidden, encoded)
+
+    def test_inspection_changed_plan_for_same_native_identity_fails_closed(self) -> None:
+        prepared = plan("migration:inspection:identity-conflict")
+        self._stage_only(prepared)
+        changed = plan(
+            "migration:inspection:identity-conflict",
+            continuity_value=continuity("inspection-changed"),
+        )
+        with self.assertRaises(WorldEntityMigrationIdentityConflict):
+            self.destination.inspect_commitment(changed, canonical_digest(changed))
 
     def test_changed_continuity_or_departure_fails_before_native_launch(self) -> None:
         request = materialize_request()
