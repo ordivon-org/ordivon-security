@@ -147,6 +147,16 @@ class AutonomousRangeIntentTests(unittest.TestCase):
         self.assertEqual(raised.exception.kind, "model_correctable")
         self.assertIn("already recorded", str(raised.exception))
 
+    def test_range_intent_driver_allows_needs_input_for_recorded_decision(self) -> None:
+        from pathlib import Path
+
+        source = Path("src/ordivon_security/integrations/harness_range_intent.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('{"candidate_completed", "needs_input"}', source)
+        self.assertIn('"harnessConclusionStatus": conclusion_status', source)
+        self.assertIn('"conclusionStatus": conclusion_status', source)
+
     def test_harness_failure_retains_structured_evidence(self) -> None:
         evidence = {
             "schemaVersion": 1,
