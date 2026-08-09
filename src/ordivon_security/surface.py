@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "AC0 autonomous communication falsifier",
+        "research-apparatus",
+        "ordivon_security.cli_autonomous_communication_ac0_acceptance",
+        "Two-Agent cheap-talk coordination falsifier with exact actor-specific message projection and no Trust/mailbox primitive.",
+        "falsified-research",
+    ),
+    SecuritySurfaceEntry(
         "EC1 derived-evidence applicability",
         "research-apparatus",
         "research/experiments/ec1-derived-evidence-freshness/applicability.py",
