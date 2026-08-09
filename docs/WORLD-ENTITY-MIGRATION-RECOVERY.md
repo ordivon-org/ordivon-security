@@ -51,10 +51,11 @@ The Entity integration question therefore became:
 
 Yes, for the exact single-host publication path tested here.
 
-The destination now uses execution identity revision `4`:
+The destination now uses execution identity revision `5`. Revision 5 retains the revision-4 recovery semantics and adds a bounded read-only native commitment projection:
 
 ```text
-recoveryMode = reobserve-publish-or-prebody-compensate-no-owner-rewrite
+recoveryMode   = reobserve-publish-or-prebody-compensate-no-owner-rewrite
+inspectionMode = read-only-native-commitment-projection-v1
 unpublishedNativeState = unknown-unless-completion-or-safe-abandonment-observed
 ```
 
@@ -263,6 +264,48 @@ provably body-free + compensable to zero residuals
 ambiguous launch evidence
 → UNKNOWN
 ```
+
+## Revision-5 read-only native commitment inspection
+
+A fresh controller now has a separate inspection path that does **not** call reconciliation. `WorldEntityKvmDestination.inspect_commitment()` validates the exact migration plan and reads only Security-owned receipt, ledger, and deterministic Run identity. It does not publish a receipt, compensate pre-body state, start or stop QEMU/swtpm, rewrite owner provenance, or advance a Range/Entity lifecycle.
+
+The bounded states are Security-native rather than copied from World:
+
+```text
+not-started
+  receipt absent + ledger absent + deterministic Run absent
+  → no native materialization has started
+
+native-outstanding
+  exact Security ledger exists
+  → native work/publication remains owner-local and unresolved
+
+unknown
+  Run exists without an exact ledger, or retained native state is unreadable
+  → do not infer absence, completion, or retry safety
+
+materialized
+  exact immutable Security receipt exists
+  → historical terminal evidence, not current Entity presence
+```
+
+The projection returns only migration/entity/destination identity, plan digest, bounded state/class, native phase, digest evidence, and the next **owner** recovery operation. It explicitly returns:
+
+```text
+authority           = not-granted-by-inspection
+externalCurrentness = not-claimed
+```
+
+and omits Run paths, process IDs, QMP topology, continuity payload bodies, and source-departure bodies.
+
+Deterministic tests prove four falsifiers:
+
+- an absent migration inspects as `not-started` without creating any receipt, ledger, Run, or Provider action;
+- a `migration-staged` ledger inspects as `native-outstanding` / `reconcile-or-compensate-prebody` while its bytes and all Provider action counters remain unchanged;
+- a materialized migration is inspectable from a fresh destination object using the retained receipt without native replay or file mutation;
+- the same migration identity with a changed plan still fails closed instead of being downgraded to `UNKNOWN`.
+
+This creates a materially different inspection consumer from World: World projects Host-retained owner state, while Security projects independently authoritative native KVM state. It still does not justify a shared Owner registry or generic inspection schema. A later Host integration should retain only a routing/commitment reference and then invoke this Security-native inspector; it must not copy the KVM ledger into Host.
 
 ## What remains valid from the earlier Entity work
 

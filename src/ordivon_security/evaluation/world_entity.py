@@ -115,7 +115,7 @@ class WorldEntityKvmDestination:
     def execution_identity(self) -> JsonObject:
         return {
             "kind": "ordivon.security.world-entity-kvm-destination",
-            "revision": "4",
+            "revision": "5",
             "destinationWorldId": self.config.destination_world_id,
             "machineProvider": self.machine_provider.execution_identity,
             "materializationRole": "entity-continuity-carrier",
@@ -125,6 +125,133 @@ class WorldEntityKvmDestination:
             "recoveryMode": "reobserve-publish-or-prebody-compensate-no-owner-rewrite",
             "unpublishedNativeState": "unknown-unless-completion-or-safe-abandonment-observed",
             "sourceAuthorityAuthentication": "caller-trust-boundary",
+            "inspectionMode": "read-only-native-commitment-projection-v1",
+        }
+
+    def inspect_commitment(self, plan: JsonObject, plan_digest: str) -> JsonObject:
+        """Project bounded Security-native evidence without reconciling or mutating it."""
+        _, validated_plan, validated_digest = self._validate_request(
+            {
+                "schemaVersion": 1,
+                "kind": _REQUEST_KIND,
+                "operation": "reconcile",
+                "plan": plan,
+                "planDigest": plan_digest,
+            }
+        )
+        migration_id = _text(validated_plan.get("migrationId"), "Entity Migration identity")
+        entity_id = _text(validated_plan.get("entityId"), "Entity identity")
+        destination_world_id = _text(
+            validated_plan.get("destinationWorldId"), "Destination World identity"
+        )
+        token, _, _ = self._coordinates(validated_plan)
+        ledger_path = self.machine_provider.ledgers_root / f"{token}.json"
+        run_path = self.machine_provider.runs_root / token
+
+        retained = self._load_receipt(migration_id)
+        if retained is not None:
+            receipt = self._receipt_for_exact_plan(
+                retained, validated_plan, validated_digest
+            )
+            return {
+                "schemaVersion": 1,
+                "kind": "ordivon.security.world-entity-commitment-inspection",
+                "migrationId": migration_id,
+                "entityId": entity_id,
+                "destinationWorldId": destination_world_id,
+                "planDigest": validated_digest,
+                "state": "materialized",
+                "commitmentClass": "historical-terminal",
+                "nativePhase": "migration-running-contained",
+                "evidence": {
+                    "receiptDigest": canonical_digest(receipt),
+                    "materializationDigest": _digest(
+                        receipt.get("materializationDigest"),
+                        "Entity Migration materialization digest",
+                    ),
+                },
+                "nextOwnerOperation": None,
+                "authority": "not-granted-by-inspection",
+                "externalCurrentness": "not-claimed",
+            }
+
+        if ledger_path.exists():
+            try:
+                observed = self._observe_existing_state(
+                    validated_plan, validated_digest
+                )
+            except RuntimeError as error:
+                return {
+                    "schemaVersion": 1,
+                    "kind": "ordivon.security.world-entity-commitment-inspection",
+                    "migrationId": migration_id,
+                    "entityId": entity_id,
+                    "destinationWorldId": destination_world_id,
+                    "planDigest": validated_digest,
+                    "state": "unknown",
+                    "commitmentClass": "outstanding",
+                    "nativePhase": "unreadable",
+                    "evidence": {"reason": f"existing-state:{type(error).__name__}"},
+                    "nextOwnerOperation": "reconcile-native-materialization",
+                    "authority": "not-granted-by-inspection",
+                    "externalCurrentness": "not-claimed",
+                }
+            persisted = dict(observed)
+            persisted.pop("runStatePath", None)
+            phase = str(observed.get("phase", "unknown"))
+            if phase == "migration-running-contained":
+                next_operation = "reconcile-publication"
+            elif phase in {"migration-staged", "swtpm-started"}:
+                next_operation = "reconcile-or-compensate-prebody"
+            else:
+                next_operation = "reconcile-native-materialization"
+            return {
+                "schemaVersion": 1,
+                "kind": "ordivon.security.world-entity-commitment-inspection",
+                "migrationId": migration_id,
+                "entityId": entity_id,
+                "destinationWorldId": destination_world_id,
+                "planDigest": validated_digest,
+                "state": "native-outstanding",
+                "commitmentClass": "outstanding",
+                "nativePhase": phase,
+                "evidence": {"ledgerDigest": canonical_digest(persisted)},
+                "nextOwnerOperation": next_operation,
+                "authority": "not-granted-by-inspection",
+                "externalCurrentness": "not-claimed",
+            }
+
+        if run_path.exists():
+            return {
+                "schemaVersion": 1,
+                "kind": "ordivon.security.world-entity-commitment-inspection",
+                "migrationId": migration_id,
+                "entityId": entity_id,
+                "destinationWorldId": destination_world_id,
+                "planDigest": validated_digest,
+                "state": "unknown",
+                "commitmentClass": "outstanding",
+                "nativePhase": "run-without-ledger",
+                "evidence": {"reason": "run-exists-without-ledger"},
+                "nextOwnerOperation": "reconcile-native-materialization",
+                "authority": "not-granted-by-inspection",
+                "externalCurrentness": "not-claimed",
+            }
+
+        return {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.world-entity-commitment-inspection",
+            "migrationId": migration_id,
+            "entityId": entity_id,
+            "destinationWorldId": destination_world_id,
+            "planDigest": validated_digest,
+            "state": "not-started",
+            "commitmentClass": "not-yet-native",
+            "nativePhase": "absent",
+            "evidence": {"nativeRunAbsent": True},
+            "nextOwnerOperation": "materialize-exact-original-request",
+            "authority": "not-granted-by-inspection",
+            "externalCurrentness": "not-claimed",
         }
 
     def handle(self, request: JsonObject) -> JsonObject:
