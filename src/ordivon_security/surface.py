@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "EC0 externalized evidence computation",
+        "research-apparatus",
+        "research/experiments/ec0-evidence-computation/reducer.py",
+        "Accepted standalone computation experiment reproducing AE3-C derived facts from exact Git-owned fixtures under Runtime source-state commitment.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "AE3-C verifiable evidence-reduction consumer",
         "research-apparatus",
         "ordivon_security.cli_adversarial_epistemics_ae3c_acceptance",

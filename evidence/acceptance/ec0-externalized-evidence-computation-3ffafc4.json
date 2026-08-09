@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.evidence-computation-ec0-acceptance-index",
+  "status": "accepted",
+  "apparatusRevision": "git:3ffafc4544f4fdda4d2d747a01006c415eef3b8f",
+  "workspaceBinding": {
+    "openingSourceRevision": "git:ad24160ab0a3eaec7656ffd8f530a6a86ba55b75",
+    "currentHeadRevision": "git:3ffafc4544f4fdda4d2d747a01006c415eef3b8f",
+    "workspaceSourceDigest": "sha256:8b864a17032bfcf291b113a7d4091b4d7563a93a473cbd02aa2a6146ae7c1145",
+    "cleanAtPhysicalRun": true
+  },
+  "program": {
+    "path": "research/experiments/ec0-evidence-computation/reducer.py",
+    "sha256": "sha256:1b90ae36c6489968f30ef45fe801ba57834922e0022c0031c4508b49097d4249",
+    "gitBlob": "f32759db0e74538388a347f7ce26bd505a45b3f8",
+    "importsOrdivonSecurity": false,
+    "implementationClass": "python-standard-library"
+  },
+  "inputs": {
+    "A": {
+      "path": "research/experiments/ec0-evidence-computation/a-history.json",
+      "fileSha256": "sha256:3400f9fc2590d0cb8c166370de7cc2c79492f0c98bdfc6a78bb42dce4abd16e7",
+      "gitBlob": "48bcbbe9e994f7d58cd5140f3b66189575593018",
+      "historyDigest": "sha256:b1d7f8a19666ec3a43c77c4cd3304586aa4d1c43c670a36160345bf699359635",
+      "sensorSetDigest": "sha256:56adf4cbd2a7fa0bb912f91fa0d44a182878506174c74638e332f0a02dfd2053"
+    },
+    "B": {
+      "path": "research/experiments/ec0-evidence-computation/b-history.json",
+      "fileSha256": "sha256:37a2998434f2a5a16ba66b963ca39aa37169b9eda14e5526cc1845f9dc14caee",
+      "gitBlob": "52a30b36a13c2ec41a2fb3d1cb83cf7818574051",
+      "historyDigest": "sha256:6e44c1d7430d77d6992bf1a2ce69c6e061bede1b33f811c91462ca1b5ca4fe83",
+      "sensorSetDigest": "sha256:56adf4cbd2a7fa0bb912f91fa0d44a182878506174c74638e332f0a02dfd2053"
+    }
+  },
+  "runtimeExecutions": {
+    "A": {
+      "jobId": "job-019fe533-b0a3-7ab1-8518-260bdf6435e2",
+      "attemptId": "attempt-019fe533-b0a3-7ab1-8518-2610af261aff",
+      "executionProfile": "contained_local",
+      "workspaceSourceDigest": "sha256:8b864a17032bfcf291b113a7d4091b4d7563a93a473cbd02aa2a6146ae7c1145",
+      "executionPlanDigest": "sha256:9ae446f4e9796e2614f8f8fc5528c53ca750e2fb192bee570d0ac75062f05712",
+      "stdoutArtifactSha256": "sha256:e72a7c67a942b304ba828549ff45c7b237f64ca44b786a87e52183397876d675",
+      "terminalEvidenceSha256": "sha256:dbcdb11d976a4835da970f71b7d41ef4ed0970c388d39a79456666a91d967912",
+      "resultArtifactSha256": "sha256:ea68ba3f2785dac44ff2a3903644c4b119e2a0c0034e9d01f1c3db6ab40c545f",
+      "projectionDigest": "sha256:2c174f54aec45bbe79c7c0de941c3a1417f7b47089e6759800ac5d9a8500cc5b",
+      "acceptedContextDigest": "sha256:f4dac35c52d2ac717587d0ec12116b07de650d5f5f92373854629b90fb1e3e16"
+    },
+    "B": {
+      "jobId": "job-019fe533-ff81-7aa1-817b-c0e21aef03ca",
+      "attemptId": "attempt-019fe533-ff81-7aa1-817b-c0fd86e77b8c",
+      "executionProfile": "contained_local",
+      "workspaceSourceDigest": "sha256:8b864a17032bfcf291b113a7d4091b4d7563a93a473cbd02aa2a6146ae7c1145",
+      "executionPlanDigest": "sha256:f9ea8a41d6288d1ab3d50169870444a08ddc9f34890adb88670266e6fb1b5699",
+      "stdoutArtifactSha256": "sha256:62e2557343b74695942f83c02231b74277c16ff26efb6d85b4929b284669c240",
+      "terminalEvidenceSha256": "sha256:b49684284377d466e5caa75a8b056ba0d3db2a8de8c1ad914ce614f5782ae7a5",
+      "resultArtifactSha256": "sha256:ffbeb31b452bcce5e506d0473d23727234f2e6d7d183021cf02f9ddfe7b34bb7",
+      "projectionDigest": "sha256:c394429dd58b224036912bdac053d7f474fd8f1cc34c673cd6e9cfed792109d1",
+      "acceptedContextDigest": "sha256:6a0bb809e9df65ef4609d04775043a569f3782a024a644251f5448d261e5a914"
+    }
+  },
+  "crossDomainAudit": {
+    "financeRevision": "git:ef3739d774037298af66a325f6a3314b92aefa8b",
+    "worldRevision": "git:2f9645113538b15e51ce4546f0942b45d10fda29",
+    "harnessRevision": "git:b622c8c055446175dca017425ad4ffa39b6be681",
+    "computingRevision": "git:cadc0154a2fee54504b8fe680cc6751107c9ae57",
+    "runtimeRepositoryRevision": "git:d90a6b8954dfbfe23a1b1b365987d75ae93aac3b"
+  },
+  "acceptedClaims": [
+    "a standalone program with no ordivon_security import reproduces the full accepted AE3-C A and B projections",
+    "those external projections reconstruct the exact accepted AE3-C Agent-visible context digests",
+    "both physical Runtime jobs execute under contained_local and bind the exact same Workspace source-state digest",
+    "Finance is an independent consumer of the lower-level exact-program-over-exact-input computation pattern",
+    "the common cross-domain requirement is exact computation identity rather than a universal EvidenceReducer ontology",
+    "no new Security reducer/Trust/Reputation/SourceHistory primitive or cross-project evidence library is forced"
+  ],
+  "runtimeObservationGap": {
+    "observed": true,
+    "fact": "terminal evidence projects opening sourceRevision but omits workspaceSourceDigest; exact executed Workspace source state required joining workspace.get with Registry execution-plan evidence",
+    "candidateRequirement": "project the committed Workspace source-state digest in portable terminal execution evidence or an equivalently exact public non-mutating Job projection"
+  },
+  "nextPressure": "integrity-valid-derived-evidence-after-source-advance"
+}
