@@ -166,6 +166,15 @@ class _FinalizedRangeIntentBridge:
         raise ValueError(f"IF0 received an unexpected Harness Tool: {name}")
 
 
+def _can_materialize_security_decision(
+    *,
+    stop_code: str,
+    conclusion_present: bool,
+    intent_finalized: bool,
+) -> bool:
+    return stop_code == "candidate_completed" and conclusion_present and intent_finalized
+
+
 class DeepSeekFinalizedRangeIntentDriver:
     """Experimental two-phase Harness integration for pending then finalized Range intent.
 
@@ -358,7 +367,11 @@ class DeepSeekFinalizedRangeIntentDriver:
             "finalizedRevision": bridge.finalized_revision,
         }
         valid_stop = stop_code == "candidate_completed"
-        if not valid_stop or result.conclusion is None or not bridge.finalized:
+        if not _can_materialize_security_decision(
+            stop_code=stop_code,
+            conclusion_present=result.conclusion is not None,
+            intent_finalized=bridge.finalized,
+        ):
             failure: JsonObject = {
                 **common_evidence,
                 "kind": "ordivon.security.if0-finalized-range-intent-harness-failure",
