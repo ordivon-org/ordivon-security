@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.adversarial-epistemics-ae2-acceptance-index",
+  "status": "accepted",
+  "implementationRevision": "git:990e71ff53dc3634e48c3612bc571603e338edb7",
+  "acceptanceClaims": [
+    "AE2 tests two conflicting independent sensor observations rather than claiming two conflicting world truths; both observations remain on the sensor plane",
+    "the exact accepted AE1 false receiver-visible claim is reused without resampling the Deceiver, preventing opponent-policy randomness from contaminating the treatment variable",
+    "sensor:ae2-a reports serviceCompromised=true and sensor:ae2-b reports serviceCompromised=false with distinct source identities, no declared source priority, and no prior source history",
+    "one shared DeepSeek/Harness Defender call receives the exact same conflict context in healthy and compromised hidden worlds and requests one adjudicating inspection without premature quarantine",
+    "the Agent-visible pre-truth context and objective do not prime Trust, Reputation, or confidence vocabulary",
+    "world truth is absent before the conflict decision and arrives only after separately admitted inspection execution",
+    "the world-truth result causally references both the Agent conflict-decision event and the physical adjudicating-inspection-executed event",
+    "after authoritative current world truth arrives, historical sensor disagreement remains evidence but no longer marks the current property as unresolved",
+    "healthy world truth produces zero further effects and preserves availability; compromised world truth produces quarantine and verified containment",
+    "this one-shot consumer does not require durable Trust, Reputation, confidence, source-history, freshness, or a new policy primitive"
+  ],
+  "physicalAcceptance": {
+    "modelId": "deepseek-v4-flash",
+    "harnessRevision": "git:98d295582dd9a5034413d87cc488089a1c75b138",
+    "harnessVersion": "0.6.0",
+    "protocolRevision": "git:5d3db4c72c8e6131ab407b9a772cd79647169245",
+    "credentialScopeId": "credential-scope:deepseek:flash:0",
+    "ae1ClaimDigest": "sha256:eb936e6f8fae8d2e8e187c84aaf50fa91e37f28933a1050aaa21f88aa8a5e439",
+    "sensorSetDigest": "sha256:56adf4cbd2a7fa0bb912f91fa0d44a182878506174c74638e332f0a02dfd2053",
+    "sharedConflictContextDigest": "sha256:c5740febe11af021e3dc5bedc0f95b06380598b297cec92b5a902d9a528cbe0a",
+    "sharedConflictDecisionDigest": "sha256:e8c87097a6fcad41133182fb252ba6fc5fddb924c00bdd073b3740997805b738",
+    "healthyPostTruthContextDigest": "sha256:18fd9a3d3cfe4ffed158207619fcc751ef6072158b8989d1eb0fd26071c259fc",
+    "healthyPostTruthDecisionDigest": "sha256:df9100cbdca7733c827476fd6c25344a07261e85e653ff99539703e83c590e8f",
+    "compromisedPostTruthContextDigest": "sha256:9a231cd4471f550241515e21f05a74c7f48be8aaa2a010e7d0a1e6ac3253026a",
+    "compromisedPostTruthDecisionDigest": "sha256:54f5bb904411fb8581de067cb3fdd4a21adc2858d5bf8004911a3137d3a7372f",
+    "privateReceiptByteLength": 81276,
+    "privateReceiptSha256": "sha256:40e23a55d75f0421a324e10988291bfc55862b77307c5c923fef4a25f6c0969c",
+    "gateCount": 27,
+    "status": "accepted"
+  },
+  "candidateLaws": [
+    "conflicting independently sourced observations plus no source ranking or history do not justify arbitrary source selection",
+    "provenance plus UNKNOWN can be sufficient to trigger explicit authoritative adjudication for a one-shot evidence conflict",
+    "historical sensor disagreement does not imply current truth remains unresolved after authoritative current world truth is acquired",
+    "a concept appearing in Agent reasoning does not itself force a durable Security primitive"
+  ],
+  "rejectedDesigns": [
+    "describing AE2 as two conflicting world truths rather than two conflicting sensor observations",
+    "priming the Agent with trust/confidence/reputation fields before testing whether such abstractions are forced",
+    "keeping UNRESOLVED_CONFLICT in the post-truth context after authoritative current world truth exists",
+    "an acceptance runner that crashes when the Agent does not follow the expected post-truth trajectory",
+    "publishing adjudicating world truth causally from intent alone without binding the physical inspection-executed event"
+  ],
+  "limitations": [
+    "authoritative adjudication is available and costs only 2",
+    "the two sensor sources have no repeated historical record",
+    "source identity and provenance are assumed intact",
+    "the experiment does not test collusion, common-mode failures, stale observations, or adversarial source compromise"
+  ]
+}

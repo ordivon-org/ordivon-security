@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "AE2 conflicting-observations epistemics consumer",
+        "research-apparatus",
+        "ordivon_security.cli_adversarial_epistemics_ae2_acceptance",
+        "Counterfactual evidence-conflict experiment separating independent sensor provenance from authoritative current world truth.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "AE1 delayed-truth epistemics consumer",
         "research-apparatus",
         "ordivon_security.cli_adversarial_epistemics_ae1_acceptance",
