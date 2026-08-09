@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "AC1 incentive communication falsifier",
+        "research-apparatus",
+        "ordivon_security.cli_incentive_communication_ac1_acceptance",
+        "Frozen-source cheap-talk experiment showing public common aligned incentives still do not guarantee strategic credibility; first B-to-A replies observed.",
+        "falsified-research",
+    ),
+    SecuritySurfaceEntry(
         "AC0 autonomous communication falsifier",
         "research-apparatus",
         "ordivon_security.cli_autonomous_communication_ac0_acceptance",
