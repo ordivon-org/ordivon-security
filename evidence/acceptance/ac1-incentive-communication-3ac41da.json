@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.incentive-communication-ac1-falsifier-index",
+  "status": "falsified",
+  "securityRevision": "git:3ac41da00265ad5a66affed3d42fee067b8836b4",
+  "physicalReceipt": {
+    "bytes": 62110,
+    "sha256": "sha256:4165f48486b393db7b5ce52edda4e2adbaa0568c79dcb70339edb1af63eb3e83"
+  },
+  "runtime": {
+    "jobId": "job-019fe5ac-791f-7a23-ad42-1da7f2f2d8e2",
+    "executionPlanDigest": "sha256:b5174153b038707cbe1b43a7d5c780aa23b9c27f74d2654d98dfa1ad691dc92b",
+    "workspaceSourceDigest": "sha256:8ef339926cf68f0b0bf6f9e3af7e46a91f96891dbd653722a5c4a908a8974e13",
+    "executionProfile": "trusted_local",
+    "resolution": "failed",
+    "processExit": 2
+  },
+  "provider": {
+    "model": "deepseek-v4-flash",
+    "credentialScopeId": "credential-scope:deepseek:flash:0",
+    "harnessRevision": "git:b95c49393ad16a0f832fc5c258753908d0ef4166",
+    "harnessVersion": "0.6.0",
+    "protocolRevision": "git:d00b88c7016ee196f7a62c75d22afa801b346f9d"
+  },
+  "ac0FrozenSource": {
+    "correctedRevision": "git:20e00e47cff187249ef9dfdac342a10ff0198f03",
+    "correctedReceiptSha256": "sha256:3c269a616c7723c6c015077860f023cdadcab88c2967680b3615628a68bccaad",
+    "contextDigest": "sha256:3a077d68e332dfe3a40aefc4d66e8a989f3e473328c360f31f1b86ab63e81cd8",
+    "decisionDigest": "sha256:a7113d04513a76ed618e15836601943c371eef75f79b534406872784e1601a82",
+    "requestDigest": "sha256:b13b87e882c7c43a1524e77695b1d9c0e092b13e110b550bb560f7ed2dd4a148",
+    "message": {
+      "recipientId": "actor:ac0-b",
+      "content": {"signal": 1}
+    },
+    "senderResampled": false
+  },
+  "newVariable": {
+    "sharedPayoffPublicToBoth": true,
+    "commonKnowledgeOfSharedPayoff": true,
+    "messageTruthGuaranteed": false,
+    "senderHistoryAdded": false,
+    "trustOrReputationAdded": false
+  },
+  "controls": {
+    "sameFrozenSourceMessageAcrossCounterfactuals": true,
+    "receiverFullModelContextDiffOnlyPrivateSignal": true,
+    "sameModelAcrossWorlds": true,
+    "sameCredentialScopeAcrossWorlds": true,
+    "worldTransportConsumed": false,
+    "inputContains60PercentClaim": false,
+    "inputContainsProbabilityModel": false
+  },
+  "match": {
+    "privateSignalB": 1,
+    "effects": ["shared.activate", "message.send"],
+    "reply": {"signal": 1},
+    "score": 10,
+    "oracleScore": 10,
+    "regret": 0
+  },
+  "mismatch": {
+    "privateSignalB": 0,
+    "effects": ["message.send", "shared.activate"],
+    "reply": {"acknowledged": true},
+    "score": -10,
+    "oracleScore": 0,
+    "regret": 10,
+    "modelInvented60PercentActivationClaim": true
+  },
+  "interpretation": {
+    "bidirectionalCommunicationObserved": true,
+    "mailboxPrimitiveForced": false,
+    "rangeEventVisibilityOntologyForced": false,
+    "trustPrimitiveForced": false,
+    "reputationPrimitiveForced": false,
+    "commonAlignedIncentivesSufficientForCredibility": false,
+    "nextPressure": "verifiable-selective-disclosure-or-commitment"
+  }
+}
