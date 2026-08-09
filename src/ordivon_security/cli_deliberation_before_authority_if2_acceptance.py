@@ -58,29 +58,14 @@ def _deliberate_without_effect_authority(
     if not settings.credential_scope_id.startswith("credential-scope:"):
         raise ValueError("IF2 deliberation requires explicit credentialScopeId")
     adapter = deepseek_module.DeepSeekTurnAdapter(settings)
-    budget = domain_module.RunBudget(
-        max_model_calls=1,
-        max_tool_calls=0,
-        max_observation_bytes=0,
-        max_wall_time_ms=120_000,
-        max_total_tokens=1_000_000,
-        max_model_retries=0,
-        max_tool_corrections=0,
-        max_observation_only_turns=0,
-        max_no_progress_turns=0,
-        max_model_observation_bytes=262_144,
-    )
-    remaining = budget.remaining(
-        model_calls=0,
-        tool_calls=0,
-        observation_bytes=0,
-        elapsed_ms=0,
-        total_tokens=0,
-        model_retries=0,
-        tool_corrections=0,
-        observation_only_turns=0,
-        no_progress_turns=0,
-    )
+    # Direct no-Tool AgentTurnRequest supports an explicit zero Tool budget. RunBudget is a
+    # multi-turn loop budget and intentionally requires positive primary maxima, so using it here
+    # would incorrectly make a no-effect-authority turn impossible.
+    remaining: JsonObject = {
+        "modelCalls": 1,
+        "toolCalls": 0,
+        "totalTokens": 1_000_000,
+    }
     context_value = context.to_dict()
     request = model_module.AgentTurnRequest(
         harness_run_id=f"harness-run:security-if2-deliberation-{label}",
