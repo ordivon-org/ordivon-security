@@ -34,7 +34,11 @@ from ordivon_security.cli_incentive_communication_ac1_acceptance import (
     _frozen_a_request,
     _public_incentive_structure,
 )
-from ordivon_security.integrations import DeepSeekRangeIntentConfig, DeepSeekRangeIntentDriver
+from ordivon_security.integrations import (
+    DeepSeekRangeIntentConfig,
+    DeepSeekRangeIntentDriver,
+    RangeIntentHarnessFailure,
+)
 from ordivon_security.range import (
     PendingRangeEvent,
     RangeAuthority,
@@ -512,7 +516,21 @@ def main() -> None:
             protocol_repository=args.protocol_repository,
         )
     )
-    receipt = run_experiment(state_root=args.state_root, driver=driver)
+    try:
+        receipt = run_experiment(state_root=args.state_root, driver=driver)
+    except RangeIntentHarnessFailure as error:
+        failure: JsonObject = {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.verifiable-disclosure-ac2-equipment-failure",
+            "status": "equipment-failure",
+            "securityRevision": _git_revision(Path.cwd()),
+            "harnessFailure": error.evidence,
+        }
+        validate_json(failure)
+        args.receipt.parent.mkdir(parents=True, exist_ok=True)
+        args.receipt.write_bytes(canonical_bytes(failure) + b"\n")
+        print(json.dumps(failure, ensure_ascii=False, sort_keys=True, indent=2))
+        raise SystemExit(3) from error
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
     args.receipt.write_bytes(canonical_bytes(receipt) + b"\n")
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
