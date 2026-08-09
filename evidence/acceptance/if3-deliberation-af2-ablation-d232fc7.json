@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.intent-ceremony-ablation-if3-index",
+  "status": "accepted",
+  "revision": "git:d232fc77c8ae33ee5302ee53b080c1289a4c86a1",
+  "exactContextDigest": "sha256:e9dd7c82c0f2f518aaf80ae5ca2e6adef5257e37027c5fae0e9b5b013741f8d5",
+  "receiptBytes": 27829,
+  "receiptSha256": "sha256:eca92f7745234fe695c1f13bbf2fba6066098dc9d66d81d125fa1cfd5b8e504d",
+  "runtime": {
+    "jobId": "job-019fe66e-77e7-7490-95d9-d7ee605c5f6a",
+    "executionPlanDigest": "sha256:a35d72574223a1a8e85c8a1d43a6f609d0323d07940a86782861e17826ea207b",
+    "workspaceSourceDigest": "sha256:7aacadde38a1c2acc0ed8717e4cdf1b78109294c699e637f43251075e0d82274",
+    "executionProfile": "trusted_local"
+  },
+  "provider": {
+    "requestedModelId": "deepseek-v4-flash",
+    "credentialScopeId": "credential-scope:deepseek:flash:0",
+    "harnessRevision": "git:ab1ff4d671aeff42081d8d5a3c773a0ef4c7cc8a",
+    "protocolRevision": "git:efc9caa0c7fb934a8d6b14af69edfb88254bbc56"
+  },
+  "deliberation": {
+    "domainEffectToolsAvailable": false,
+    "requestDigest": "sha256:7441bdb7b4f2fc27116ce595c995793d32a667eabf397bead3b0461d2349166f",
+    "resultDigest": "sha256:103b9cbb90516fdb019851bd361bc25fedae5a09126fdcfe9340531d91bbd622",
+    "summaryDigest": "sha256:9c7be4407e825bdd72c93ec7fb1ba50357ad93144ff0c03e3108580658e0901f"
+  },
+  "ordinaryAF2": {
+    "if1ReadbackToolAvailable": false,
+    "if1FinalizeToolAvailable": false,
+    "intentRecording": "submit-range-intents",
+    "intentRevisionCount": 2,
+    "firstRevisionEffectTypes": ["message.send"],
+    "finalRevision": [],
+    "finalEffectRequestCount": 0,
+    "decisionDigest": "sha256:cfe41e56cae2f27fe7bfcbc032f53523d619c34b37b254dc9238f46b50c3373f",
+    "traceDigest": "sha256:6caceb477b95fa4e12ff667e9a2ca6f4855f70d866ff009e89264b3f1d2293b0"
+  },
+  "harnessDriftAudit": {
+    "if2HarnessRevision": "git:6aa58e840e59d9db0d331d6cc046fa62ade6c563",
+    "if3HarnessRevision": "git:ab1ff4d671aeff42081d8d5a3c773a0ef4c7cc8a",
+    "changedRelevantConsumedPaths": [],
+    "changedOtherCodePaths": ["src/ordivon_harness/agent_run.py"],
+    "protocolRevisionChanged": false
+  },
+  "gatesPassed": 12,
+  "gatesTotal": 12,
+  "interpretation": {
+    "deliberationBeforeAuthoritySucceededWithOrdinaryAF2": true,
+    "if1ReadbackRequiredInExactConsumer": false,
+    "if1FinalizationRequiredInExactConsumer": false,
+    "preAdmissionRevisionStillUsed": true,
+    "naturalLanguageIsEffectAuthority": false,
+    "securityStrategyOverrideAdded": false,
+    "populationLevelCausalityEstablished": false,
+    "nextPressure": "independent-consumer-or-harness-native-deliberation-before-authority"
+  }
+}

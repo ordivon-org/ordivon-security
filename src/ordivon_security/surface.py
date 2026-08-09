@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "IF3 intent ceremony ablation",
+        "research-apparatus",
+        "ordivon_security.cli_deliberation_af2_ablation_if3_acceptance",
+        "Accepted subtraction experiment retaining no-effect deliberation while removing IF1 readback/finalization; ordinary AF2 revision converges to zero effects.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "IF0–IF2 intent convergence research",
         "research-apparatus",
         "ordivon_security.cli_deliberation_before_authority_if2_acceptance",

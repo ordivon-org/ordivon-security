@@ -306,3 +306,7 @@ no-effect deliberation
 using the same AC2 mismatch context, model and credential scope.
 
 If the ordinary AF2 Tool intent remains zero-effect after prior deliberation, the pressure is specifically `deliberation-before-authority`, and IF1's readback/finalize ceremony should not graduate by default. If activation returns, then finalization/readback still contributes causally in the tested consumer.
+
+## Follow-up
+
+IF3 performs the planned subtraction and is accepted: no-effect deliberation is retained, IF1 readback/finalization Tools are removed, and ordinary AF2 revision still converges to `[]`. See [`INTENT-CEREMONY-ABLATION-IF3.md`](INTENT-CEREMONY-ABLATION-IF3.md).
