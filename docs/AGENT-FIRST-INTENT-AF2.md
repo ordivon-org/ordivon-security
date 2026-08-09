@@ -63,3 +63,9 @@ complete world knowledge
 ```
 
 Harness conclusion status and whether a zero-effect decision used an empty Tool call are retained in turn evidence only. They are not part of `RangeIntentDecision` metadata and therefore do not redefine Security effect-intent identity. See [`ADVERSARIAL-EPISTEMICS-AE1.md`](ADVERSARIAL-EPISTEMICS-AE1.md).
+
+## Pre-admission intent revision forced by AC2
+
+AC2 exposed a real integration assumption that AF2 had never physically justified: the first `submit_range_intents` call was treated as immutable even though the Tool had performed neither Security admission nor effect execution. In the verified-disclosure mismatch world, the Agent's later conclusion correctly rejected activation after the first Tool call, but the integration had no legal revision path. The minimum correction keeps the core `RangeIntentDecision` unchanged and makes Harness-side intent explicitly pending before admission. A later `submit_range_intents` call completely replaces the earlier pending request set; an empty set may retract a positive pending intent; all revisions are retained in turn evidence; only the final set enters the Security decision. Prompt revision `security-agent-first-range-intent-af2-v3` additionally reports `pendingIntentReplaceableBeforeAdmission=true`.
+
+This does **not** make natural-language conclusion text authoritative. The final AC2 run still demonstrates why: the Agent explicitly says it must retract activation but emits no second Tool call. Security therefore correctly retains the latest Tool intent. AC2 leaves a new unresolved integration boundary: pending intent and finalized Agent intent need an explicit Tool-level distinction if practice continues to show post-Tool self-correction. No already-admitted or executed effect is revisable through this mechanism.
