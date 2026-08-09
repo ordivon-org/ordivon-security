@@ -121,34 +121,49 @@ class AutonomousRangeIntentTests(unittest.TestCase):
                 )
             )
 
-    def test_second_intent_submission_is_model_correctable_not_harness_failure(self) -> None:
-        class FakeError(RuntimeError):
-            def __init__(self, message: str, *, kind: str) -> None:
-                super().__init__(message)
-                self.kind = kind
-
+    def test_later_intent_submission_replaces_pending_intent_before_admission(self) -> None:
         class FakeObservation:
             def __init__(self, **kwargs: object) -> None:
                 self.kwargs = kwargs
 
-        class FakeCall:
+        class PositiveCall:
+            name = "submit_range_intents"
+            arguments = {
+                "requests": [
+                    {
+                        "authorityId": "range-authority:af2-red",
+                        "zoneRef": "zone:service",
+                        "capability": "service.quarantine",
+                        "effectType": "service.set-quarantined",
+                        "payload": {"quarantined": True},
+                    }
+                ]
+            }
+            tool_call_id = "call:positive"
+
+        class RetractCall:
             name = "submit_range_intents"
             arguments = {"requests": []}
-            tool_call_id = "call:test"
+            tool_call_id = "call:retract"
 
         bridge = _RangeIntentBridge(
             catalog=object(),
             observation_type=FakeObservation,
             max_effect_requests=8,
             bridge_identity={"kind": "test"},
-            tool_bridge_error_type=FakeError,
+            tool_bridge_error_type=RuntimeError,
             model_correctable_kind="model_correctable",
         )
-        bridge.execute(FakeCall(), step_id="step:1")
-        with self.assertRaises(FakeError) as raised:
-            bridge.execute(FakeCall(), step_id="step:2")
-        self.assertEqual(raised.exception.kind, "model_correctable")
-        self.assertIn("already recorded", str(raised.exception))
+        first = bridge.execute(PositiveCall(), step_id="step:1")
+        second = bridge.execute(RetractCall(), step_id="step:2")
+        self.assertEqual(len(bridge.intent_revisions), 2)
+        self.assertEqual(len(bridge.intent_revisions[0]), 1)
+        self.assertEqual(bridge.requests, [])
+        self.assertFalse(first.kwargs["structured_content"]["replacedPreviousIntent"])
+        self.assertTrue(second.kwargs["structured_content"]["replacedPreviousIntent"])
+        self.assertEqual(second.kwargs["structured_content"]["intentRevision"], 2)
+        self.assertFalse(second.kwargs["structured_content"]["securityAdmissionPerformed"])
+        self.assertFalse(second.kwargs["structured_content"]["effectExecuted"])
 
     def test_needs_input_without_tool_is_explicit_zero_effect_hold(self) -> None:
         requests, recording = _resolve_recorded_range_intent(
@@ -173,6 +188,8 @@ class AutonomousRangeIntentTests(unittest.TestCase):
         self.assertIn('{"candidate_completed", "needs_input"}', source)
         self.assertIn('"conclusionStatus": conclusion_status', source)
         self.assertIn('"intentRecording": intent_recording', source)
+        self.assertIn('"intentRevisionCount": len(bridge.intent_revisions)', source)
+        self.assertIn('"intentRevisions": bridge.intent_revisions', source)
         decision_block = source.split("decision = context.decision(", 1)[1].split("if effective", 1)[0]
         self.assertNotIn("harnessConclusionStatus", decision_block)
         self.assertNotIn("intentRecording", decision_block)
