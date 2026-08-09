@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "EC1 derived-evidence applicability",
+        "research-apparatus",
+        "research/experiments/ec1-derived-evidence-freshness/applicability.py",
+        "Accepted source-evolution experiment separating projection integrity from current exact-dependency applicability without clocks or TTL.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "EC0 externalized evidence computation",
         "research-apparatus",
         "research/experiments/ec0-evidence-computation/reducer.py",

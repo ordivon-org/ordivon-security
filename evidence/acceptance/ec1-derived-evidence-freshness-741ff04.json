@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.evidence-freshness-ec1-acceptance-index",
+  "status": "accepted",
+  "phaseRevisions": {
+    "initial": "git:7858ff6e0dd7ee3ce4540e0ba30312d2a38f6877",
+    "metadataAdvance": "git:257cfc12b77534e932afcbc6c399ac40aee8741d",
+    "semanticAdvance": "git:741ff041bb16168a338f7628663ebc481f004816"
+  },
+  "rule": {
+    "revision": "ec1-exact-derivation-dependency-applicability-v1",
+    "programSha256": "sha256:cbd1ae65bbbee726dad43c8e9b6b03f340354d0ef240ebd6c9b0392670eb0bcc",
+    "usesWallClock": false,
+    "usesTtl": false,
+    "usesGenerationForApplicability": false,
+    "usesWholeSourceEnvelopeForApplicability": false
+  },
+  "projections": {
+    "v1": {
+      "fileSha256": "sha256:e72a7c67a942b304ba828549ff45c7b237f64ca44b786a87e52183397876d675",
+      "projectionDigest": "sha256:2c174f54aec45bbe79c7c0de941c3a1417f7b47089e6759800ac5d9a8500cc5b",
+      "historyDigest": "sha256:b1d7f8a19666ec3a43c77c4cd3304586aa4d1c43c670a36160345bf699359635",
+      "sensorSetDigest": "sha256:56adf4cbd2a7fa0bb912f91fa0d44a182878506174c74638e332f0a02dfd2053",
+      "exactEc0RuntimeStdoutBytes": true
+    },
+    "v2": {
+      "fileSha256": "sha256:62e2557343b74695942f83c02231b74277c16ff26efb6d85b4929b284669c240",
+      "projectionDigest": "sha256:c394429dd58b224036912bdac053d7f474fd8f1cc34c673cd6e9cfed792109d1",
+      "historyDigest": "sha256:6e44c1d7430d77d6992bf1a2ce69c6e061bede1b33f811c91462ca1b5ca4fe83",
+      "sensorSetDigest": "sha256:56adf4cbd2a7fa0bb912f91fa0d44a182878506174c74638e332f0a02dfd2053",
+      "exactEc0RuntimeStdoutBytes": true
+    }
+  },
+  "sourceEvolution": {
+    "phase1": {
+      "generation": "generation:1",
+      "fileSha256": "sha256:323f85257f1ff2d7a1269b81000513a482a8c62f5e0987bd6211679e3def4346",
+      "envelopeDigest": "sha256:f3ba0ad8a09ac804ff0f692d471e099e067fc8ba226776c00fb903120cd73f0a",
+      "historyDigest": "sha256:b1d7f8a19666ec3a43c77c4cd3304586aa4d1c43c670a36160345bf699359635",
+      "sensorSetDigest": "sha256:56adf4cbd2a7fa0bb912f91fa0d44a182878506174c74638e332f0a02dfd2053",
+      "projectionV1Applicability": "APPLICABLE"
+    },
+    "phase2": {
+      "generation": "generation:2",
+      "fileSha256": "sha256:28f5f7e9b718e1016e515827d8fc16d686a93e24e726ce8d207b190d7f2acc6c",
+      "envelopeDigest": "sha256:5f4c073f74e416662cbb30afc4c9d51ed1fb640d1bf4a8c715b24349d677c726",
+      "historyDigest": "sha256:b1d7f8a19666ec3a43c77c4cd3304586aa4d1c43c670a36160345bf699359635",
+      "sensorSetDigest": "sha256:56adf4cbd2a7fa0bb912f91fa0d44a182878506174c74638e332f0a02dfd2053",
+      "semanticDependencyChange": false,
+      "projectionV1Applicability": "APPLICABLE"
+    },
+    "phase3": {
+      "generation": "generation:3",
+      "fileSha256": "sha256:ab830256caa2ffe4022addd43caa9b92ca28152a9a195499ceb075a95adfa923",
+      "envelopeDigest": "sha256:89d145954aee933493ec816389a318dd0a9369a0801b08da5487992211beaa9e",
+      "historyDigest": "sha256:6e44c1d7430d77d6992bf1a2ce69c6e061bede1b33f811c91462ca1b5ca4fe83",
+      "sensorSetDigest": "sha256:56adf4cbd2a7fa0bb912f91fa0d44a182878506174c74638e332f0a02dfd2053",
+      "semanticDependencyChange": true,
+      "projectionV1Integrity": "valid",
+      "projectionV1Applicability": "STALE_NOT_APPLICABLE",
+      "projectionV2Applicability": "APPLICABLE",
+      "authorityUnavailableApplicability": "UNKNOWN"
+    }
+  },
+  "runtimeJobs": {
+    "phase1Applicable": {
+      "jobId": "job-019fe56f-0f41-7bb3-a3dc-8e0216b5effc",
+      "attemptId": "attempt-019fe56f-0f41-7bb3-a3dc-8e178e02cd6d",
+      "workspaceSourceDigest": "sha256:f2d64e6a98bfd6a49e71160b9bd1dd6a8415aabb6db310a02b5e77d20a12f7df",
+      "executionPlanDigest": "sha256:18af45cf284829cad107298983111f5754ea887bd4a0dbf30a989a9f24256684",
+      "stdoutSha256": "sha256:116d3f09a7337c6cf05f231877cb40c957dc6c3635567818402c327c35006596",
+      "terminalEvidenceSha256": "sha256:e6d9a68f54cc149778fc3aa77822e871b1b5a72b1bac2a928b6f49e81031a895",
+      "resultSha256": "sha256:e081063537f64a6d609083b4b88a16c65dde3bab37926dd5fcb0a98451bc385c"
+    },
+    "phase2MetadataApplicable": {
+      "jobId": "job-019fe56f-e0d1-75b2-863e-e9a38617cae8",
+      "attemptId": "attempt-019fe56f-e0d1-75b2-863e-e9b0bb760297",
+      "workspaceSourceDigest": "sha256:087c72e828c239cf1f4a191eea85972eab90323980d9c6b382772e7ba5dcac64",
+      "executionPlanDigest": "sha256:91058c5ad16cf305c821cf85bc17e9ffb4f3d879351dae52eff6a70c041785a0",
+      "stdoutSha256": "sha256:62ab25cfaf3128a0534c64336abb1f4d891cd0e3ad9621969909c097eee09996",
+      "terminalEvidenceSha256": "sha256:a6d9566cb1fdb1fb20c9e1958fa0622cfac7cdcae361e5a451824147f3bb7f53",
+      "resultSha256": "sha256:fdcc5af372f1dae64c559340d3fe15d1c74894ef4779ecb5a3089f4496015f76"
+    },
+    "phase3OldStale": {
+      "jobId": "job-019fe571-0507-7b33-ac22-0cd346c34c07",
+      "attemptId": "attempt-019fe571-0507-7b33-ac22-0ce0cbcb0f4c",
+      "workspaceSourceDigest": "sha256:a59c17eb18d4fe706e3efbf0855e66136c3bf9213268d8ba00eeec7373049599",
+      "executionPlanDigest": "sha256:451fee88595edbcf799c96ae2dfa6769b73a23ccbf428ef0bcd450288c3bcb7a",
+      "stdoutSha256": "sha256:57ae6f2db2f8b18bcc88a6fdfee4c3255c415ac167976af3b6c70e6303d8e80b",
+      "terminalEvidenceSha256": "sha256:412e9c19e587977288d67660f4225b48c5308d0f479f06fbe444d4633a91dfe2",
+      "resultSha256": "sha256:b36ffcdfa36a485b71842bb59369b638b69cfa0dce08fc5ad1a9e0a463a171e1"
+    },
+    "phase3NewApplicable": {
+      "jobId": "job-019fe571-2f09-7dd2-8943-31686ecc8ad4",
+      "attemptId": "attempt-019fe571-2f09-7dd2-8943-317568d33ea8",
+      "workspaceSourceDigest": "sha256:a59c17eb18d4fe706e3efbf0855e66136c3bf9213268d8ba00eeec7373049599",
+      "executionPlanDigest": "sha256:81eb191627d28ec5902f19b628d208953f1061ee486432226ac93b81558e3c56",
+      "stdoutSha256": "sha256:5dd5091498fd15acbdd9d56982f2394893d53141ac36498f07924654de47b475",
+      "terminalEvidenceSha256": "sha256:81f7209f935cbdd868d46b130e7a2e8d48661613aca3d7f9b40312479e96bea2",
+      "resultSha256": "sha256:b7e4a2a5f0f010d22a7ce5c3d3065c65aebfba39270804dc413b7000e3509b0f"
+    },
+    "phase3AuthorityUnknown": {
+      "jobId": "job-019fe571-67d3-78a2-b1f9-28e6b7d3050a",
+      "attemptId": "attempt-019fe571-67d3-78a2-b1f9-28fa5913e802",
+      "workspaceSourceDigest": "sha256:a59c17eb18d4fe706e3efbf0855e66136c3bf9213268d8ba00eeec7373049599",
+      "executionPlanDigest": "sha256:2df37b6713c99d8898a186301e2d329d5b24151d7570cfc6b96acb094d689bc8",
+      "stdoutSha256": "sha256:cab79764272a8c026b22615663b1c507372c3ff7a5d8a0f37d8ee526070bbfdb",
+      "terminalEvidenceSha256": "sha256:08622b6d6acc8605a86ead2019eaa3023ed38fcfe1e43ddf006b895dd1615264",
+      "resultSha256": "sha256:4922b192f42e204ffa4376e58077dc46c42e9c162407422d2462359d285e8fb7"
+    },
+    "freshWorkspaceProof": {
+      "workspaceId": "security-ec1-fresh-recovery-20260809",
+      "sourceRevision": "git:741ff041bb16168a338f7628663ebc481f004816",
+      "workspaceSourceDigest": "sha256:5aa32919ad50b9d32228cf3ad8d918725a4087cdf98dcabf2674e60f47c1ca57",
+      "jobId": "job-019fe571-dcdf-7240-95de-ae65f7e5407e",
+      "attemptId": "attempt-019fe571-dcdf-7240-95de-ae7ae8044c84",
+      "executionPlanDigest": "sha256:5d66c6f153030db2c28cd7a5a28bfc57880d9f30702db9aa2f7f1575a843d1e9",
+      "stdoutSha256": "sha256:b2b498e2c6fd28ec5143bd746dc155e0fbb44ff3b0dc1b636c59763b64b010c9",
+      "terminalEvidenceSha256": "sha256:af757fa890a34f03915c778671df944dd5664ee8fbbac66fa97c0c652a71ecad",
+      "resultSha256": "sha256:e45a1faf0fe136ffc3aa142d7c010ec8f618348ef379663d05b8f4c313dea95d",
+      "oldProjection": "STALE_NOT_APPLICABLE",
+      "newProjection": "APPLICABLE",
+      "authorityUnavailable": "UNKNOWN"
+    }
+  },
+  "acceptedClaims": [
+    "projection integrity and current applicability are separate facts",
+    "metadata-only source generation/envelope advance does not stale a derivation when exact dependencies are unchanged",
+    "semantic history advance makes the exact retained old projection stale while preserving its integrity",
+    "a newly recomputed projection bound to current dependencies is applicable",
+    "unavailable current authority yields UNKNOWN rather than guessed freshness",
+    "fresh Workspace/process replacement reproduces the classification with no durable freshness state",
+    "no clock TTL lease Trust Reputation or generic Freshness service is forced by this consumer",
+    "Runtime physical Workspace source identity is execution evidence and is not the domain applicability identity"
+  ],
+  "limitations": [
+    "only exact enumerable history and current-sensor dependencies are tested",
+    "time-decaying facts where age is itself semantic are not tested",
+    "multi-authority partial orders and probabilistic evidence are not tested",
+    "C1-N private witness freshness remains a separate consumer if current predicate identity cannot be independently observed",
+    "source-change and derivation-publication atomicity is not tested"
+  ],
+  "nextPressure": "return-to-autonomous-multi-agent-communication-coordination-collusion"
+}
