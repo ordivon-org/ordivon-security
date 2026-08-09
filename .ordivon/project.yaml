@@ -25,6 +25,7 @@ managed_paths:
   - docs/AGENT-FIRST-DECEPTION-AF3.md
   - docs/ADVERSARIAL-EPISTEMICS-AE0.md
   - docs/ADVERSARIAL-EPISTEMICS-AE1.md
+  - docs/ADVERSARIAL-EPISTEMICS-AE2.md
   - docs/architecture.md
   - docs/authority.md
   - docs/MIGRATION-ROUND-1.md
