@@ -809,11 +809,21 @@ def main() -> None:
     compromised_analysis = _analysis(compromised)
     h_conflict = cast(JsonObject, healthy["defenderConflict"])
     c_conflict = cast(JsonObject, compromised["defenderConflict"])
-    h_post = cast(JsonObject, healthy["defenderPostTruth"])
-    c_post = cast(JsonObject, compromised["defenderPostTruth"])
+    h_post_raw = healthy.get("defenderPostTruth")
+    c_post_raw = compromised.get("defenderPostTruth")
+    h_post = cast(JsonObject, h_post_raw) if isinstance(h_post_raw, dict) else None
+    c_post = cast(JsonObject, c_post_raw) if isinstance(c_post_raw, dict) else None
     conflict_turn = cast(JsonObject, h_conflict["turnEvidence"])
-    h_post_turn = cast(JsonObject, h_post["turnEvidence"])
-    c_post_turn = cast(JsonObject, c_post["turnEvidence"])
+    h_post_turn = (
+        cast(JsonObject, h_post["turnEvidence"])
+        if h_post is not None and isinstance(h_post.get("turnEvidence"), dict)
+        else None
+    )
+    c_post_turn = (
+        cast(JsonObject, c_post["turnEvidence"])
+        if c_post is not None and isinstance(c_post.get("turnEvidence"), dict)
+        else None
+    )
     observations = _sensor_observations()
 
     gates = {
@@ -868,12 +878,20 @@ def main() -> None:
         ]
         is True
         and compromised_analysis["decisionCausallyPrecedesTruth"] is True,
-        "postTruthContextsDiverged": h_post.get("contextDigest") != c_post.get("contextDigest"),
+        "postTruthContextsDiverged": h_post is not None
+        and c_post is not None
+        and h_post.get("contextDigest") != c_post.get("contextDigest"),
         "healthyEndedAvailable": healthy_analysis["finalQuarantined"] is False,
         "compromisedEndedContained": compromised_analysis["finalQuarantined"] is True,
         "healthyPostTruthDidNotQuarantine": healthy_analysis["postTruthQuarantined"] is False,
         "compromisedPostTruthQuarantined": compromised_analysis["postTruthQuarantined"] is True,
-        "sameModelAcrossSharedAndPostTruthDecisions": len(
+        "postTruthDecisionsExistWhenTruthArrives": (
+            healthy_analysis["truthEventuallyArrived"] is False or h_post_turn is not None
+        )
+        and (compromised_analysis["truthEventuallyArrived"] is False or c_post_turn is not None),
+        "sameModelAcrossSharedAndPostTruthDecisions": h_post_turn is not None
+        and c_post_turn is not None
+        and len(
             {
                 conflict_turn.get("requestedModelId"),
                 h_post_turn.get("requestedModelId"),
@@ -881,7 +899,9 @@ def main() -> None:
             }
         )
         == 1,
-        "sameCredentialScopeAcrossSharedAndPostTruthDecisions": len(
+        "sameCredentialScopeAcrossSharedAndPostTruthDecisions": h_post_turn is not None
+        and c_post_turn is not None
+        and len(
             {
                 conflict_turn.get("credentialScopeId"),
                 h_post_turn.get("credentialScopeId"),

@@ -78,6 +78,13 @@ class AdversarialEpistemicsAE2Tests(unittest.TestCase):
         )
         self.assertEqual(left.digest, right.digest)
 
+    def test_runner_source_tolerates_missing_post_truth_branch(self) -> None:
+        source = Path(
+            "src/ordivon_security/cli_adversarial_epistemics_ae2_acceptance.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn('h_post = cast(JsonObject, h_post_raw) if isinstance(h_post_raw, dict) else None', source)
+        self.assertIn('c_post = cast(JsonObject, c_post_raw) if isinstance(c_post_raw, dict) else None', source)
+
     def test_local_range_emits_sensor_plane_not_world_truth(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw) / "world"
