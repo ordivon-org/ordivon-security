@@ -35,6 +35,7 @@ managed_paths:
   - docs/INCENTIVE-COMMUNICATION-AC1.md
   - docs/VERIFIABLE-DISCLOSURE-AC2.md
   - docs/INTENT-CONVERGENCE-IF0-IF2.md
+  - docs/INTENT-CEREMONY-ABLATION-IF3.md
   - docs/architecture.md
   - docs/authority.md
   - docs/MIGRATION-ROUND-1.md
