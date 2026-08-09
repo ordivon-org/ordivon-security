@@ -124,8 +124,9 @@ class _RangeIntentBridge:
             raise self.tool_bridge_error_type(
                 (
                     "Range intent is already recorded for this bounded decision. Do not call "
-                    "submit_range_intents again; submit candidate_completed using the Tool "
-                    "observation already returned."
+                    "submit_range_intents again; submit a Harness conclusion using the Tool "
+                    "observation already returned. Use needs_input when the bounded decision is "
+                    "to wait for external information; otherwise use candidate_completed."
                 ),
                 kind=self.model_correctable_kind,
             )
@@ -281,8 +282,10 @@ class DeepSeekRangeIntentDriver:
                         "effect interfaces. You may request zero, one, or multiple effects. "
                         "Call submit_range_intents exactly once. The Tool records intent only; "
                         "it does not admit, execute, or verify consequences. Never claim that a "
-                        "requested effect happened. After the Tool observation, submit "
-                        "candidate_completed with a concise decision summary."
+                        "requested effect happened. After the Tool observation, submit a "
+                        "concise Harness conclusion. Use candidate_completed when this bounded "
+                        "decision is closed. Use needs_input when your complete current decision "
+                        "is to wait for external information while preserving unresolved unknowns."
                     ),
                 },
                 {
@@ -309,7 +312,8 @@ class DeepSeekRangeIntentDriver:
             else []
         )
         execution_identity = cast(JsonObject, runner.execution_identity(plan))
-        if stop_code != "candidate_completed":
+        valid_decision_stop = stop_code in {"candidate_completed", "needs_input"}
+        if not valid_decision_stop:
             failure_evidence: JsonObject = {
                 "schemaVersion": 1,
                 "kind": "ordivon.security.af2-range-intent-harness-failure",
@@ -349,11 +353,13 @@ class DeepSeekRangeIntentDriver:
                     payload=cast(JsonObject, item["payload"]),
                 )
             )
+        conclusion_status = str(result.conclusion.status)
         decision = context.decision(
             tuple(effect_requests),
             metadata={
                 "source": "deepseek-via-ordivon-harness",
                 "promptRevision": _PROMPT_REVISION,
+                "harnessConclusionStatus": conclusion_status,
             },
         )
         if effective and any(item != adapter.model_id for item in effective):
@@ -366,6 +372,7 @@ class DeepSeekRangeIntentDriver:
             "decisionDigest": decision.digest,
             "decision": decision.to_dict(),
             "modelRequestCount": len(effect_requests),
+            "conclusionStatus": conclusion_status,
             "conclusionSummary": str(result.conclusion.summary),
             "stopCode": stop_code,
             "trace": trace,
