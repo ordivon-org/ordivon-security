@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "IF0–IF2 intent convergence research",
+        "research-apparatus",
+        "ordivon_security.cli_deliberation_before_authority_if2_acceptance",
+        "IF0/IF1 falsify finalization/readback as sufficient cognition-convergence mechanisms; IF2 accepts no-effect deliberation before authority in the exact AC2 mismatch consumer.",
+        "accepted-research-with-falsifiers",
+    ),
+    SecuritySurfaceEntry(
         "AC2 verifiable disclosure / intent convergence falsifier",
         "research-apparatus",
         "ordivon_security.cli_verifiable_disclosure_ac2_acceptance",
