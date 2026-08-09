@@ -171,8 +171,11 @@ class AutonomousRangeIntentTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn('{"candidate_completed", "needs_input"}', source)
-        self.assertIn('"harnessConclusionStatus": conclusion_status', source)
         self.assertIn('"conclusionStatus": conclusion_status', source)
+        self.assertIn('"intentRecording": intent_recording', source)
+        decision_block = source.split("decision = context.decision(", 1)[1].split("if effective", 1)[0]
+        self.assertNotIn("harnessConclusionStatus", decision_block)
+        self.assertNotIn("intentRecording", decision_block)
 
     def test_harness_failure_retains_structured_evidence(self) -> None:
         evidence = {

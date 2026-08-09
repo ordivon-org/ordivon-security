@@ -379,8 +379,6 @@ class DeepSeekRangeIntentDriver:
             metadata={
                 "source": "deepseek-via-ordivon-harness",
                 "promptRevision": _PROMPT_REVISION,
-                "harnessConclusionStatus": conclusion_status,
-                "intentRecording": intent_recording,
             },
         )
         if effective and any(item != adapter.model_id for item in effective):
