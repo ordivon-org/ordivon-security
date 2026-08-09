@@ -130,10 +130,12 @@ def main() -> None:
     try:
         receipt = run_experiment(driver=driver)
     except RangeIntentHarnessFailure as error:
+        equipment_stops = {"provider_state_unknown", "provider_rejected"}
+        failure_status = "equipment-failure" if error.stop_code in equipment_stops else "protocol-failure"
         failure: JsonObject = {
             "schemaVersion": 1,
-            "kind": "ordivon.security.intent-finalization-if0-equipment-or-protocol-failure",
-            "status": "protocol-failure",
+            "kind": "ordivon.security.intent-finalization-if0-harness-failure",
+            "status": failure_status,
             "securityRevision": _git_revision(Path.cwd()),
             "harnessFailure": error.evidence,
         }

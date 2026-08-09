@@ -4,6 +4,7 @@ import unittest
 
 from ordivon_security.integrations.harness_finalized_range_intent import (
     _FinalizedRangeIntentBridge,
+    _can_materialize_security_decision,
 )
 
 
@@ -26,6 +27,28 @@ class FinalizedRangeIntentIF0Tests(unittest.TestCase):
             bridge_identity={"kind": "test-if0"},
             tool_bridge_error_type=self.FakeError,
             model_correctable_kind="model_correctable",
+        )
+
+    def test_security_decision_requires_candidate_conclusion_and_tool_finalization(self) -> None:
+        self.assertFalse(
+            _can_materialize_security_decision(
+                stop_code="candidate_completed", conclusion_present=True, intent_finalized=False
+            )
+        )
+        self.assertFalse(
+            _can_materialize_security_decision(
+                stop_code="needs_input", conclusion_present=True, intent_finalized=True
+            )
+        )
+        self.assertFalse(
+            _can_materialize_security_decision(
+                stop_code="candidate_completed", conclusion_present=False, intent_finalized=True
+            )
+        )
+        self.assertTrue(
+            _can_materialize_security_decision(
+                stop_code="candidate_completed", conclusion_present=True, intent_finalized=True
+            )
         )
 
     def test_pending_revision_then_finalize_exact_revision(self) -> None:
