@@ -300,14 +300,15 @@ class DeliberationPrimedFinalizedRangeIntentDriver(DeepSeekFinalizedRangeIntentD
                     ),
                 },
                 {
-                    "role": "assistant",
-                    "content": "PRIOR_NON_AUTHORITATIVE_SELF_DELIBERATION\n" + deliberation_bytes,
-                },
-                {
                     "role": "user",
                     "content": (
-                        "Authority phase begins now. Use Tools only for the effect intent you currently "
-                        "endorse after considering the unchanged context and your prior deliberation."
+                        "PRIOR_NON_AUTHORITATIVE_SELF_DELIBERATION_RECORD\n"
+                        + deliberation_bytes
+                        + "\n\nAUTHORITY_PHASE_BEGINS_NOW\n"
+                        + "This record is your own prior cognition evidence, not an assistant-history "
+                        + "message, not world truth, and not effect authority. Use Tools only for the "
+                        + "effect intent you currently endorse after considering the unchanged context "
+                        + "and this exact prior deliberation."
                     ),
                 },
             ),
@@ -329,6 +330,7 @@ class DeliberationPrimedFinalizedRangeIntentDriver(DeepSeekFinalizedRangeIntentD
             "contextDigest": context.digest,
             "deliberationDigest": canonical_digest(original),
             "deliberationSummaryDigest": original["summaryDigest"],
+            "priorDeliberationRecord": original,
             "trace": trace,
             "traceDigest": canonical_digest(trace),
             "usage": usage,
