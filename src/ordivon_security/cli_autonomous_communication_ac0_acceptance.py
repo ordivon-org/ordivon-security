@@ -438,7 +438,7 @@ def _a_context() -> RangeIntentContext:
     )
 
 
-def _b_context(state: JsonObject, *, signal_b: int, treatment: str) -> RangeIntentContext:
+def _b_context(state: JsonObject, *, signal_b: int) -> RangeIntentContext:
     return RangeIntentContext(
         actor_id=_B_ID,
         objective=_B_OBJECTIVE,
@@ -453,7 +453,7 @@ def _b_context(state: JsonObject, *, signal_b: int, treatment: str) -> RangeInte
         },
         authorities=(_b_authority(),),
         effect_interfaces=(_message_interface(_B_ID), _activation_interface()),
-        metadata={"experiment": "AC0", "role": "B", "treatment": treatment},
+        metadata={"experiment": "AC0", "role": "B", "phase": "post-a-message"},
     )
 
 
@@ -533,7 +533,7 @@ def _run_world(
             logical_time += 3
 
         state_before_b = backend.inspect(session.instance)
-        b_context = _b_context(state_before_b, signal_b=signal_b, treatment=treatment)
+        b_context = _b_context(state_before_b, signal_b=signal_b)
         b_decision, b_turn = driver.decide(b_context, label=f"ac0-{treatment}-b")
         b_admissions: list[JsonObject] = []
         b_receipts: list[JsonObject] = []
@@ -565,6 +565,7 @@ def _run_world(
             },
             "receiverB": {
                 "contextDigest": b_context.digest,
+                "context": b_context.to_dict(),
                 "visibleObservation": b_context.visible_observation,
                 "decision": b_decision.to_dict(),
                 "turnEvidence": b_turn,
@@ -587,6 +588,15 @@ def _run_world(
 def _projection_without_private_signal(value: JsonObject) -> JsonObject:
     copied = deepcopy(value)
     copied["privateSignal"] = {"value": "COUNTERFACTUAL", "authority": "world-private-to-b"}
+    return copied
+
+
+def _normalize_b_context(value: JsonObject) -> JsonObject:
+    copied = deepcopy(value)
+    visible = copied.get("visibleObservation")
+    if not isinstance(visible, dict):
+        raise ValueError("AC0 B context lacks visibleObservation")
+    visible["privateSignal"] = {"value": "COUNTERFACTUAL", "authority": "world-private-to-b"}
     return copied
 
 
@@ -665,6 +675,10 @@ def run_experiment(*, state_root: Path, driver: DeepSeekRangeIntentDriver) -> Js
             _projection_without_private_signal(match_visible)
         )
         == canonical_digest(_projection_without_private_signal(mismatch_visible)),
+        "receiverFullModelContextDiffIsOnlyPrivateSignal": canonical_digest(
+            _normalize_b_context(cast(JsonObject, match_b["context"]))
+        )
+        == canonical_digest(_normalize_b_context(cast(JsonObject, mismatch_b["context"]))),
         "receiverMessageProjectionExcludesExecutionProvenance": message_projection_keys_ok,
         "messagesRemainUnverifiedClaims": all(
             isinstance(item, dict) and item.get("claimTruthStatus") == "not-promoted"
@@ -677,7 +691,7 @@ def run_experiment(*, state_root: Path, driver: DeepSeekRangeIntentDriver) -> Js
         "receiverCanReplyWithoutReplyBeingRequired": all(
             interface.effect_type in {_MESSAGE_EFFECT, _ACTIVATE_EFFECT}
             for interface in _b_context(
-                cast(JsonObject, match["finalState"]), signal_b=_MATCH_SIGNAL_B, treatment="probe"
+                cast(JsonObject, match["finalState"]), signal_b=_MATCH_SIGNAL_B
             ).effect_interfaces
         ),
         "noTrustReputationCoalitionOntologyInAgentSurface": all(
