@@ -34,6 +34,7 @@ managed_paths:
   - docs/AUTONOMOUS-COMMUNICATION-AC0.md
   - docs/INCENTIVE-COMMUNICATION-AC1.md
   - docs/VERIFIABLE-DISCLOSURE-AC2.md
+  - docs/INTENT-CONVERGENCE-IF0-IF2.md
   - docs/architecture.md
   - docs/authority.md
   - docs/MIGRATION-ROUND-1.md
