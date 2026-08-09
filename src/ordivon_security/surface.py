@@ -111,6 +111,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "experimental-integration",
     ),
     SecuritySurfaceEntry(
+        "AE3-C verifiable evidence-reduction consumer",
+        "research-apparatus",
+        "ordivon_security.cli_adversarial_epistemics_ae3c_acceptance",
+        "Accepted experiment using an exact reconstructable factual projection to remove raw-history aggregation friction without creating Trust or current truth.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "AE3-B raw-source-history epistemics falsifier",
         "research-apparatus",
         "ordivon_security.cli_adversarial_epistemics_ae3b_acceptance",
