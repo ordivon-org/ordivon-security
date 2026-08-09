@@ -36,7 +36,7 @@ def _classify(*, projection: Path = PROJECTION_V1, source: Path | None = CURRENT
     return value
 
 
-class EC1DerivedEvidenceFreshnessPhase1Tests(unittest.TestCase):
+class EC1DerivedEvidenceFreshnessMetadataAdvanceTests(unittest.TestCase):
     def test_old_projection_bytes_are_exact_ec0_runtime_output(self) -> None:
         self.assertEqual(_file_sha(PROJECTION_V1), PROJECTION_V1_FILE_SHA)
         projection = json.loads(PROJECTION_V1.read_text())
@@ -44,9 +44,10 @@ class EC1DerivedEvidenceFreshnessPhase1Tests(unittest.TestCase):
         self.assertEqual(projection["derivation"]["historyDigest"], A_HISTORY_DIGEST)
         self.assertEqual(projection["derivation"]["currentSensorSetDigest"], SENSOR_DIGEST)
 
-    def test_initial_authoritative_source_accepts_exact_projection_dependencies(self) -> None:
+    def test_metadata_advanced_authoritative_source_accepts_unchanged_projection_dependencies(self) -> None:
         source = json.loads(CURRENT.read_text())
-        self.assertEqual(source["generation"], "generation:1")
+        self.assertEqual(source["generation"], "generation:2")
+        self.assertFalse(source["metadata"]["semanticDependencyChange"])
         result = _classify()
         self.assertEqual(result["projectionIntegrity"], "valid")
         self.assertEqual(result["applicability"], "APPLICABLE")
