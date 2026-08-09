@@ -71,8 +71,8 @@ def _resolve_recorded_range_intent(
 ) -> tuple[list[JsonObject], str]:
     if requests is not None:
         return requests, "submit-range-intents"
-    if stop_code == "needs_input" and tool_calls == 0:
-        return [], "implicit-zero-effect-needs-input"
+    if stop_code in {"candidate_completed", "needs_input"} and tool_calls == 0:
+        return [], "implicit-zero-effect-conclusion"
     raise RuntimeError("AF2 model completed without submitting Range intent")
 
 
@@ -294,8 +294,10 @@ class DeepSeekRangeIntentDriver:
                         "the visible observation, objective, authority snapshots, and declared "
                         "effect interfaces. You may request zero, one, or multiple effects. "
                         "For any positive effect request, call submit_range_intents exactly once. "
-                        "For a zero-effect wait on external information, you may either submit an "
-                        "empty requests list or directly conclude needs_input. The Tool records "
+                        "For a zero-effect decision, you may either submit an empty requests list "
+                        "or conclude directly without a Tool call. Use needs_input when waiting on "
+                        "external information and candidate_completed when the zero-effect decision "
+                        "is otherwise closed. The Tool records "
                         "intent only; it does not admit, execute, or verify consequences. Never "
                         "claim that a requested effect happened. After any Tool observation, submit a "
                         "concise Harness conclusion. Use candidate_completed when this bounded "
