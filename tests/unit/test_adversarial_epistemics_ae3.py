@@ -13,6 +13,16 @@ class AdversarialEpistemicsAE3Tests(unittest.TestCase):
         context = _defender_context(); visible = str(context.visible_observation).lower(); self.assertTrue(all(token not in visible and token not in context.objective.lower() for token in ("trust", "confidence", "reputation")))
     def test_same_context_contains_no_hidden_truth(self):
         left, right = _defender_context(), _defender_context(); self.assertEqual(left.digest, right.digest); self.assertIsNone(left.visible_observation["authoritativeCurrentWorldTruth"]); self.assertEqual(left.visible_observation["rules"]["conflictingSensorObservationsMean"], "UNRESOLVED_CONFLICT")
+    def test_costs_do_not_determine_one_oracle_optimum_without_more_decision_basis(self):
+        self.assertEqual(_loss(compromised=False, strategy="hold"), 0)
+        self.assertEqual(_loss(compromised=False, strategy="quarantine"), 5)
+        self.assertEqual(_loss(compromised=True, strategy="hold"), 10)
+        self.assertEqual(_loss(compromised=True, strategy="quarantine"), 0)
+        self.assertNotEqual(
+            min(("hold", "quarantine"), key=lambda s: _loss(compromised=False, strategy=s)),
+            min(("hold", "quarantine"), key=lambda s: _loss(compromised=True, strategy=s)),
+        )
+
     def test_hold_and_quarantine_each_have_counterfactual_regret(self):
         self.assertEqual((_loss(compromised=False, strategy="hold"), _loss(compromised=True, strategy="hold")), (0, 10)); self.assertEqual((_loss(compromised=False, strategy="quarantine"), _loss(compromised=True, strategy="quarantine")), (5, 0)); self.assertEqual(sum(x > 0 for x in (0, 10)), 1); self.assertEqual(sum(x > 0 for x in (5, 0)), 1)
 if __name__ == "__main__": unittest.main()
