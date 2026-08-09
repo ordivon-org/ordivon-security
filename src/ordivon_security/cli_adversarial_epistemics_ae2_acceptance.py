@@ -600,10 +600,23 @@ def _run_counterfactual_pair(
             world["worldTruthBeforeDecision"] = None
 
             if _INSPECT_EFFECT in tuple(request.effect_type for request in decision.effect_requests):
+                inspection_event = _latest_event(
+                    session, "service.adjudicating-inspection-executed"
+                )
+                inspection_event_id = (
+                    cast(str, inspection_event["eventId"])
+                    if inspection_event is not None
+                    and isinstance(inspection_event.get("eventId"), str)
+                    else None
+                )
                 truth = backend.release_inspection_truth(
                     session.instance,
                     logical_time=logical_time,
-                    causal_parents=(decision_event.event_id,),
+                    causal_parents=(
+                        (decision_event.event_id,)
+                        if inspection_event_id is None
+                        else (decision_event.event_id, inspection_event_id)
+                    ),
                 )
                 session.poll_backend()
                 world["logicalTime"] = logical_time + 2
@@ -712,12 +725,30 @@ def _analysis(case: JsonObject) -> JsonObject:
         ),
         None,
     )
+    inspection_event = next(
+        (
+            cast(JsonObject, event)
+            for event in cast(list[object], case.get("events", []))
+            if isinstance(event, dict)
+            and event.get("eventType") == "service.adjudicating-inspection-executed"
+        ),
+        None,
+    )
     decision_precedes_truth = (
         truth_event is not None
         and isinstance(decision_event.get("sequence"), int)
         and isinstance(truth_event.get("sequence"), int)
         and cast(int, decision_event["sequence"]) < cast(int, truth_event["sequence"])
         and decision_event.get("eventId")
+        in cast(list[object], truth_event.get("causalParents", []))
+    )
+    inspection_precedes_truth = (
+        inspection_event is not None
+        and truth_event is not None
+        and isinstance(inspection_event.get("sequence"), int)
+        and isinstance(truth_event.get("sequence"), int)
+        and cast(int, inspection_event["sequence"]) < cast(int, truth_event["sequence"])
+        and inspection_event.get("eventId")
         in cast(list[object], truth_event.get("causalParents", []))
     )
     sensor_events = [
@@ -741,6 +772,7 @@ def _analysis(case: JsonObject) -> JsonObject:
         "worldTruthAbsentBeforeDecision": case.get("worldTruthBeforeDecision") is None,
         "truthEventuallyArrived": case.get("inspectionTruth") is not None,
         "decisionCausallyPrecedesTruth": decision_precedes_truth,
+        "inspectionExecutionCausallyPrecedesTruth": inspection_precedes_truth,
         "postTruthEffects": list(post_effects),
         "postTruthQuarantined": _QUARANTINE_EFFECT in post_effects,
         "finalQuarantined": cast(JsonObject, case["finalState"]).get("quarantined") is True,
@@ -878,6 +910,11 @@ def main() -> None:
         ]
         is True
         and compromised_analysis["decisionCausallyPrecedesTruth"] is True,
+        "inspectionExecutionCausallyPrecedesTruth": healthy_analysis[
+            "inspectionExecutionCausallyPrecedesTruth"
+        ]
+        is True
+        and compromised_analysis["inspectionExecutionCausallyPrecedesTruth"] is True,
         "postTruthContextsDiverged": h_post is not None
         and c_post is not None
         and h_post.get("contextDigest") != c_post.get("contextDigest"),
