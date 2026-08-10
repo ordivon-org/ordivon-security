@@ -10,8 +10,21 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
-from ordivon_security.integrations import DeepSeekRangeIntentConfig, DeepSeekRangeIntentDriver, RangeIntentHarnessFailure
-from ordivon_security.range import BackendCheckpoint, PendingRangeEvent, RangeAuthority, RangeEffectAdmission, RangeEffectRequest, RangeSession, RangeSessionInstance, RangeSessionSpec
+from ordivon_security.integrations import (
+    DeepSeekRangeIntentConfig,
+    DeepSeekRangeIntentDriver,
+    RangeIntentHarnessFailure,
+)
+from ordivon_security.range import (
+    BackendCheckpoint,
+    PendingRangeEvent,
+    RangeAuthority,
+    RangeEffectAdmission,
+    RangeEffectRequest,
+    RangeSession,
+    RangeSessionInstance,
+    RangeSessionSpec,
+)
 
 _RANGE_ID = "range:ae3-conflict-without-adjudication"
 _DEFENDER_ID = "actor:ae3-defender"

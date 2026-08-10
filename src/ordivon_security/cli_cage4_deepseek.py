@@ -13,11 +13,13 @@ from .actors.agent_stack import (
     DeepSeekHarnessTurnDriver,
     HarnessBudgetConfig,
 )
-from .integrations import HostAssignedDeepSeekHarnessTurnDriver
 from .actors.native_harness import NativeHarnessActorBackend
-from .integrations import RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver
 from .contest.model import ActorBinding, ScenarioManifest
 from .contest.runner import ContestRunner
+from .integrations import (
+    HostAssignedDeepSeekHarnessTurnDriver,
+    RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver,
+)
 from .ranges.cage4 import (
     CAGE4_PLANS,
     CAGE4_RANGE_ID,

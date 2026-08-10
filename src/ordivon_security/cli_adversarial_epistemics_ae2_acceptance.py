@@ -557,7 +557,7 @@ def _run_counterfactual_pair(
         context = contexts["healthy"]
         decision, turn = driver.decide(context, label="counterfactual-defender-conflict")
 
-        for label, world in worlds.items():
+        for _label, world in worlds.items():
             session = cast(RangeSession, world["session"])
             backend = cast(_AE2RangeBackend, world["backend"])
             logical_time = cast(int, world["logicalTime"])

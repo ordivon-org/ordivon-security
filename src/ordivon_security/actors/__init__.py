@@ -1,8 +1,3 @@
-from .autonomous import (
-    RangeEffectInterface,
-    RangeIntentContext,
-    RangeIntentDecision,
-)
 from .agent_stack import (
     AgentLayerBinding,
     AgentTurnDriver,
@@ -10,6 +5,11 @@ from .agent_stack import (
     AgentTurnEvidence,
     DeepSeekHarnessTurnDriver,
     HarnessBudgetConfig,
+)
+from .autonomous import (
+    RangeEffectInterface,
+    RangeIntentContext,
+    RangeIntentDecision,
 )
 from .host_assigned import HostAssignedDeepSeekHarnessTurnDriver
 from .native_harness import NativeHarnessActorBackend

@@ -5,7 +5,9 @@ Task continuity, or physical execution state machines. Historical imports remain
 """
 
 from ordivon_security.actors.host_assigned import HostAssignedDeepSeekHarnessTurnDriver
-from ordivon_security.actors.runtime_assigned import RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver
+from ordivon_security.actors.runtime_assigned import (
+    RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver,
+)
 
 from .harness_range_intent import (
     DeepSeekRangeIntentConfig,

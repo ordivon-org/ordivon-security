@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import unittest
 
-from ordivon_security.cli_intent_readback_if1_acceptance import _EXPECTED_CONTEXT_DIGEST
 from ordivon_security.cli_intent_finalization_if0_acceptance import _exact_ac2_mismatch_context
+from ordivon_security.cli_intent_readback_if1_acceptance import _EXPECTED_CONTEXT_DIGEST
 
 
 class IntentReadbackIF1AcceptanceTests(unittest.TestCase):

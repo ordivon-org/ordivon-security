@@ -6,9 +6,9 @@ from pathlib import Path
 
 from ordivon_security.cli_adversarial_epistemics_ae1_acceptance import (
     _AE1RangeBackend,
+    _deceiver_authority,
     _defender_authority,
     _defender_context,
-    _deceiver_authority,
     _inspect_interface,
     _quarantine_interface,
 )

@@ -1,7 +1,21 @@
 from __future__ import annotations
+
 import unittest
+
 from ordivon_security._canonical import canonical_digest
-from ordivon_security.cli_adversarial_epistemics_ae3b_acceptance import _AE1_CLAIM,_AE1_CLAIM_DIGEST,_AE2_SENSOR_DIGEST,_QUARANTINE_CAPABILITY,_authority,_context,_history,_history_digest,_sensor_digest
+from ordivon_security.cli_adversarial_epistemics_ae3b_acceptance import (
+ _AE1_CLAIM,
+ _AE1_CLAIM_DIGEST,
+ _AE2_SENSOR_DIGEST,
+ _QUARANTINE_CAPABILITY,
+ _authority,
+ _context,
+ _history,
+ _history_digest,
+ _sensor_digest,
+)
+
+
 class AE3BRawHistoryTests(unittest.TestCase):
  def test_accepted_fixtures_exact(self): self.assertEqual(canonical_digest(_AE1_CLAIM),_AE1_CLAIM_DIGEST); self.assertEqual(_sensor_digest(),_AE2_SENSOR_DIGEST)
  def test_histories_are_mirrored_with_same_truth_sequence(self):

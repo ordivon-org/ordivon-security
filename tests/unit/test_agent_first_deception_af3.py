@@ -5,9 +5,9 @@ import unittest
 from pathlib import Path
 
 from ordivon_security.cli_agent_first_deception_acceptance import (
-    _LocalServiceRange,
     _authority,
     _effect_interface,
+    _LocalServiceRange,
     _visible_observation,
 )
 from ordivon_security.range import RangeSession, RangeSessionSpec

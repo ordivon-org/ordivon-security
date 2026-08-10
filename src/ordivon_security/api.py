@@ -18,7 +18,6 @@ from .actors import (
     NativeHarnessActorBackend,
     SequenceActorBackend,
 )
-from .integrations import HostAssignedDeepSeekHarnessTurnDriver
 from .contest import (
     ActionAdmission,
     ActionProposal,
@@ -78,6 +77,7 @@ from .evidence import (
     verify_evidence_bundle,
     verify_operational_evidence,
 )
+from .integrations import HostAssignedDeepSeekHarnessTurnDriver
 from .providers import (
     WindowsKvmMachineClosure,
     WindowsKvmMachineConfig,

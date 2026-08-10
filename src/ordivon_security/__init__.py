@@ -1,6 +1,5 @@
 """Ordivon Security public package."""
 
-from .surface import security_surface_manifest
 from .api import (
     AdversarialWindowsRange,
     ContestResult,
@@ -17,6 +16,7 @@ from .api import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
 )
+from .surface import security_surface_manifest
 
 __all__ = [
     "AdversarialWindowsRange",

@@ -1,7 +1,22 @@
 from __future__ import annotations
+
 import unittest
+
 from ordivon_security._canonical import canonical_digest
-from ordivon_security.cli_adversarial_epistemics_ae3_acceptance import _AE1_FALSE_CLAIM, _AE1_SOURCE_CLAIM_DIGEST, _AE2_SENSOR_SET_DIGEST, _QUARANTINE_CAPABILITY, _QUARANTINE_EFFECT, _defender_authority, _defender_context, _loss, _sensor_observations, _sensor_set_digest
+from ordivon_security.cli_adversarial_epistemics_ae3_acceptance import (
+    _AE1_FALSE_CLAIM,
+    _AE1_SOURCE_CLAIM_DIGEST,
+    _AE2_SENSOR_SET_DIGEST,
+    _QUARANTINE_CAPABILITY,
+    _QUARANTINE_EFFECT,
+    _defender_authority,
+    _defender_context,
+    _loss,
+    _sensor_observations,
+    _sensor_set_digest,
+)
+
+
 class AdversarialEpistemicsAE3Tests(unittest.TestCase):
     def test_reuses_exact_accepted_fixtures(self):
         self.assertEqual(canonical_digest(_AE1_FALSE_CLAIM), _AE1_SOURCE_CLAIM_DIGEST); self.assertEqual(_sensor_set_digest(), _AE2_SENSOR_SET_DIGEST)

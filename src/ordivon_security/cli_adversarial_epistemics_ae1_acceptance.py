@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import shutil
@@ -702,7 +701,7 @@ def _run_counterfactual_pair(
         initial_decision, initial_turn = driver.decide(
             initial_context, label="counterfactual-defender-initial"
         )
-        for label, world in worlds.items():
+        for _label, world in worlds.items():
             session = cast(RangeSession, world["session"])
             backend = cast(_AE1RangeBackend, world["backend"])
             logical_time = cast(int, world["logicalTime"])
@@ -742,7 +741,7 @@ def _run_counterfactual_pair(
                 pending_context, label="counterfactual-defender-pending"
             )
             pending_decision = pending_decision_value
-            for label, world in worlds.items():
+            for _label, world in worlds.items():
                 session = cast(RangeSession, world["session"])
                 backend = cast(_AE1RangeBackend, world["backend"])
                 logical_time = cast(int, world["logicalTime"])

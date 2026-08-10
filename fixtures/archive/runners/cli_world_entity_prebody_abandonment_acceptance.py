@@ -26,11 +26,11 @@ from ordivon_security.cli_world_entity_controller_loss_acceptance import (
     _source_revision,
     _write_json,
 )
-from ordivon_security.world_boundary import WorldEntityKvmConfig, WorldEntityKvmDestination
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
 )
+from ordivon_security.world_boundary import WorldEntityKvmConfig, WorldEntityKvmDestination
 
 _FAULT_PHASES = ("migration-staged", "swtpm-started", "qemu-launch-evidence")
 

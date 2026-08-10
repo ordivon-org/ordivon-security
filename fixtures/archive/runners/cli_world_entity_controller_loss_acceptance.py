@@ -12,12 +12,12 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_digest
-from ordivon_security.world_boundary import WorldEntityKvmConfig, WorldEntityKvmDestination
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
     _process_start_time,
 )
+from ordivon_security.world_boundary import WorldEntityKvmConfig, WorldEntityKvmDestination
 
 SOURCE_WORLD = "run:world-entity-controller-loss:source"
 DESTINATION_WORLD = "security-world:world-entity-controller-loss:destination"
