@@ -20,6 +20,8 @@ from ordivon_security.integrations.harness_finalized_range_intent import (
 )
 from ordivon_security.integrations.harness_range_intent import (
     _git_revision as _integration_git_revision,
+)
+from ordivon_security.integrations.harness_range_intent import (
     _insert_sources,
     _project_version,
 )
@@ -47,7 +49,6 @@ def _deliberate_without_effect_authority(
     _insert_sources(harness_source=config.harness_source, protocol_source=config.protocol_source)
     deepseek_module = importlib.import_module("ordivon_harness.ordivon.deepseek")
     model_module = importlib.import_module("ordivon_harness.ordivon.model")
-    domain_module = importlib.import_module("ordivon_harness.domain_tools")
     version_module = importlib.import_module("ordivon_harness.version")
 
     settings = deepseek_module.DeepSeekSettings.from_secret_file(

@@ -3,7 +3,6 @@ from __future__ import annotations
 import importlib
 import json
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, cast
 
 from ordivon_security._canonical import JsonObject, canonical_digest, validate_json

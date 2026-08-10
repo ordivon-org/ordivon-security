@@ -16,15 +16,17 @@ from ordivon_security.cli_intent_finalization_if0_acceptance import (
     _exact_ac2_mismatch_context,
 )
 from ordivon_security.integrations.harness_range_intent import (
+    _PROMPT_REVISION,
+    _TOOL_NAME,
     DeepSeekRangeIntentConfig,
     RangeIntentHarnessFailure,
-    _PROMPT_REVISION,
-    _RangeIntentBridge,
-    _TOOL_NAME,
-    _git_revision as _integration_git_revision,
     _insert_sources,
     _project_version,
+    _RangeIntentBridge,
     _resolve_recorded_range_intent,
+)
+from ordivon_security.integrations.harness_range_intent import (
+    _git_revision as _integration_git_revision,
 )
 from ordivon_security.range import RangeEffectRequest
 

@@ -10,8 +10,21 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
-from ordivon_security.integrations import DeepSeekRangeIntentConfig, DeepSeekRangeIntentDriver, RangeIntentHarnessFailure
-from ordivon_security.range import BackendCheckpoint, PendingRangeEvent, RangeAuthority, RangeEffectAdmission, RangeEffectRequest, RangeSession, RangeSessionInstance, RangeSessionSpec
+from ordivon_security.integrations import (
+    DeepSeekRangeIntentConfig,
+    DeepSeekRangeIntentDriver,
+    RangeIntentHarnessFailure,
+)
+from ordivon_security.range import (
+    BackendCheckpoint,
+    PendingRangeEvent,
+    RangeAuthority,
+    RangeEffectAdmission,
+    RangeEffectRequest,
+    RangeSession,
+    RangeSessionInstance,
+    RangeSessionSpec,
+)
 
 _RANGE_ID = "range:ae3b-raw-source-history"
 _DEFENDER_ID = "actor:ae3b-defender"
@@ -104,7 +117,7 @@ class _Backend:
         self.root.mkdir(parents=True,mode=0o700); self.root.chmod(0o700); _atomic_json(self.state_path,{"schemaVersion":1,"kind":"ordivon.security.ae3b-local-world-state","compromised":self.compromised,"quarantined":False,"claim":None,"sensorObservations":[]})
         return RangeSessionInstance(instance_id=f"range-instance:ae3b-{self.root.name}",session_id=spec.session_id)
     def inspect(self,instance:RangeSessionInstance)->JsonObject:
-        del instance; value=json.loads(self.state_path.read_text());
+        del instance; value=json.loads(self.state_path.read_text())
         if not isinstance(value,dict): raise ValueError("AE3-B world state invalid")
         validate_json(value); return cast(JsonObject,value)
     def events(self,instance:RangeSessionInstance,*,after_cursor:int)->tuple[PendingRangeEvent,...]: del instance; return tuple(x for x in self.pending if x.cursor>after_cursor)
@@ -214,7 +227,7 @@ def main()->None:
     }
     passed=all(gates.values())
     receipt:JsonObject={"schemaVersion":1,"kind":"ordivon.security.adversarial-epistemics-ae3b-acceptance","status":"accepted" if passed else "falsified","securityRevision":_git_revision(Path.cwd()),"question":"Can raw independently adjudicated source episodes, without precomputed Trust/Reputation/reliability scores, causally and reproducibly change the Agent's current consequence strategy under the same unresolved sensor conflict?","treatmentA":treatment_a,"treatmentB":treatment_b,"gates":gates,"interpretation":{"rawVerifiedHistoryCausallyUsefulCandidate":True if passed else None,"durableSourceHistoryPrimitiveForced":False if passed else None,"trustPrimitiveForced":False if passed else None,"reputationPrimitiveForced":False if passed else None,"rawHistorySufficientAsCurrentEvidenceForThisConsumer":True if passed else None,"currentHistoryGuaranteesCurrentTruth":False,"nextPressureIfAccepted":"history-across-recovery-and-repeated-consumers-before-durable-source-history"}}
-    validate_json(receipt); args.receipt.parent.mkdir(parents=True,exist_ok=True); args.receipt.write_bytes(canonical_bytes(receipt)+b"\n"); print(json.dumps(receipt,ensure_ascii=False,sort_keys=True,indent=2));
+    validate_json(receipt); args.receipt.parent.mkdir(parents=True,exist_ok=True); args.receipt.write_bytes(canonical_bytes(receipt)+b"\n"); print(json.dumps(receipt,ensure_ascii=False,sort_keys=True,indent=2))
     if not passed: raise SystemExit(1)
 
 if __name__=="__main__": main()

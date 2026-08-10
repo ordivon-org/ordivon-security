@@ -3,8 +3,8 @@ from __future__ import annotations
 import unittest
 
 from ordivon_security.integrations.harness_finalized_range_intent import (
-    _FinalizedRangeIntentBridge,
     _can_materialize_security_decision,
+    _FinalizedRangeIntentBridge,
 )
 
 

@@ -1,13 +1,25 @@
 from __future__ import annotations
+
 import unittest
+
 from ordivon_security._canonical import canonical_digest
 from ordivon_security.cli_adversarial_epistemics_ae3c_acceptance import (
-    _AE1_CLAIM, _AE1_CLAIM_DIGEST, _AE2_SENSOR_DIGEST,
-    _AE3B_A_HISTORY_DIGEST, _AE3B_B_HISTORY_DIGEST,
-    _QUARANTINE_CAPABILITY, _REDUCER_REVISION, _authority,
-    _context, _history, _history_digest, _reduce_history, _sensor_digest,
+    _AE1_CLAIM,
+    _AE1_CLAIM_DIGEST,
+    _AE2_SENSOR_DIGEST,
+    _AE3B_A_HISTORY_DIGEST,
+    _AE3B_B_HISTORY_DIGEST,
+    _QUARANTINE_CAPABILITY,
+    _REDUCER_REVISION,
+    _authority,
+    _context,
+    _history,
+    _history_digest,
+    _reduce_history,
+    _sensor_digest,
     _verify_reduction,
 )
+
 
 class AE3CEvidenceReductionTests(unittest.TestCase):
     def test_exact_ae1_ae2_and_ae3b_inputs_reused(self):
