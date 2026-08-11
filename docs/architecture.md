@@ -14,8 +14,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-07
-summary: Canonical architecture for fail-closed Contest execution and authorized software Evaluation Trials with exact identity, separated authorities, residual closure, and sealed evidence.
+updated: 2026-08-12
+summary: Canonical architecture for authorized persistent Ranges, bounded Contests and software Evaluations, with exact identity, separated authorities, consequence verification, recovery, and sealed evidence.
 evidence_status: verified
 readiness: EXPERIMENTAL
 applies_to:
@@ -23,458 +23,265 @@ applies_to:
 related:
   - security.charter
   - security.research-boundary
+  - security.range-session-s0
   - security.evaluation-trial-p0
-  - security.static-evaluation-p0
-  - security.case-snapshot-p0
   - security.windows-kvm-p0
   - security.agent-experiment-p0
-  - security.migration.round2
-  - security.migration.round3-p0
   - security.authority
 ---
 # Architecture
 
 ## System boundary
 
-Ordivon Security is the adversarial domain layer. It defines who is contesting what, what each actor may know and attempt, how concurrent actions are admitted and resolved, which source owns world truth, and how evidence and outcomes are reconstructed.
+Ordivon Security is the **adversarial domain layer**. It owns the semantics required when autonomous principals contest a world: declared Range identity, Actor identity and authority, asymmetric information, adversarial intent admission, independent consequence evidence, recovery, and experiment/evaluation outcomes.
 
-It composes rather than replaces Host, Harness, Runtime, external ranges, model Providers, and classical security tools.
+It does not own generic Agent cognition, durable Task continuity, local process execution, hypervisor mechanics, or every source of external truth. Those remain with Harness, Host, Runtime, the native world/provider, and mature classical systems.
+
+The architectural test is causal: if a mechanism can be removed from Security and correctly remain with one of those owners without losing adversarial meaning, Security should not own a duplicate.
 
 ## Rule layers
 
-Architecture does not give every constraint constitutional scope. [`LAW-PROFILES-C0.md`](LAW-PROFILES-C0.md) is authoritative for the distinction:
+[`LAW-PROFILES-C0.md`](LAW-PROFILES-C0.md) is authoritative for rule scope:
 
-- constitutional laws preserve sovereignty, truth separation, causal accountability, exact identity, recovery, and subsystem authority;
-- authority/resource grants define what one Actor or experiment may control or spend;
-- profiles and fixtures deliberately narrow an experiment to isolate a variable;
-- evaluator judgments interpret evidence but do not become world truth or action authority.
+- **constitutional law** — sovereignty, truth separation, causal accountability, exact identity, honest uncertainty, recoverability, and subsystem authority;
+- **authority/resource grant** — what one principal may control or spend inside one declared scope;
+- **experiment profile/fixture** — a deliberate restriction used to isolate a research variable;
+- **evaluator judgment** — an interpretation over evidence, not world truth or action authority.
 
-Therefore current Contest tick barriers, CAGE action menus, benign-only Windows admission, no-network P0/P1 modes, and preparation-only execution gates describe their named profiles. They must not be generalized into persistent RangeSession law. Conversely, current `RangeAuthority` and `RangeEvent.causalParents` express constitutional intent that is not yet fully executable; later stages must strengthen them rather than compensate with generic risk vetoes.
+A current implementation may be narrower than the constitutional model. Unsupported behavior is not automatically constitutionally forbidden.
 
-## Active `0.8` flows
+## Authority and evidence planes
 
-Range Session S0 is a new parallel core for persistent contested worlds. It does not replace or reinterpret accepted Contest Trials.
+A high-fidelity experiment keeps these authorities separate even when one physical machine hosts several of them:
+
+```text
+management plane   create / freeze / reset / destroy / management truth
+actor plane        contested Agent/service state
+provider plane     model/Harness connectivity when used
+sensor plane       fallible observations available to defenders/evaluators
+world-truth plane  independent state used to verify the experiment's consequence
+```
+
+Security additionally records the semantic chain:
+
+```text
+Actor intent
+→ Security admission
+→ physical execution request
+→ execution receipt
+→ independent observed consequence
+→ Security/domain interpretation
+```
+
+No arrow is collapsed merely because the same process can inspect both sides.
+
+## Core execution shapes
+
+### Persistent `RangeSession`
+
+`RangeSession` represents Security's durable semantic relationship to a contested world. The physical world may outlive one Python object or controller process.
 
 ```text
 RangeSessionSpec
-  ├─ Actor identities
-  ├─ zone/capability Range authorities
-  └─ Range binding
+  ├─ Range identity/binding
+  ├─ ordered or named Actor identities
+  ├─ Actor objectives and information boundary
+  └─ zone/capability Range authority
         ↓
 RangeSession
-  → RangeSessionBackend lifecycle
-  → asynchronous backend/world events
-  → management + contested + sensor + world-truth RangeEvent stream
-  → RangeEffectRequest → exact Actor/authority/zone/capability admission
-  → admitted effects remain separate from backend execution and world truth
-  → checkpoint / terminate / destroy
+  ├─ asynchronous management / contested / sensor / world-truth events
+  ├─ inspect current independent state
+  ├─ admit typed RangeEffectRequest
+  ├─ checkpoint / terminate / destroy
+  └─ bind recovery/evidence to exact world lineage
+```
 
-C1 executable authority profile
-  → one Actor owns zone:s6-fabric + fabric.peer-replacement
-  → fake authority / wrong zone / wrong capability are rejected
-  → actor-authorized S6 waits even after peer A exits successfully
-  → admitted request binds one typed A→B replacement effect
-  → backend receipt explicitly does not claim world truth
-  → Host netlink independently verifies A removed and B present
+`RangeAuthority` says which Actor may request which capability in which zone. Capability is permission, not instruction: the Agent still chooses whether to request the effect.
 
-C1-A autonomous intent profile
-  → Harness DomainToolLoopRunner exposes one intent-only Tool
-  → same model + visible world + authority can choose hold or request-effect by objective
-  → Tool performs neither Security admission nor effect execution
-  → model effect scope is carried verbatim into C1 admission without correction
-  → Range inspect returns independent JSON snapshots so later world mutation cannot rewrite past reads
-  → accepted effect still converges through Host world truth rather than model or Tool claims
+The accepted executable-authority profile proves this path for one physical S6 peer replacement. It does not turn every future adversarial action into one universal Range effect schema.
 
-C1-B interrupted consequence profile
-  → exact admitted Actor effect binding is persisted beside S6 physical resource identity
-  → peer-a-removed + Host truth identifies a known interrupted effect before B materialization
-  → peer-b-present + Host truth identifies a materialized consequence even when completion event is lost
-  → persisted backend receipt remains non-truth (`worldEffectVerified=false`)
-  → whole-effect blind replay is never inferred from missing controller response
-  → existing S5/S6 reconciler still owns safe closure to zero, not automatic continuation
-  → no generic causal DAG or durable RangeSession is introduced by this evidence
+### Bounded synchronous Contest
 
-C1-C partial materialization profile
-  → transient peer-B resources may exist before the stable topology phase publishes them
-  → S6 persists deterministic `ownedHostLinkCandidates` beside effect and namespace identity
-  → reconciler independently derives exact q/w candidates from Range Session identity
-  → same-name Host objects are deleted only when Host netlink identifies them as veth links
-  → clean requires process closure + namespace closure + Host-link residual closure
-  → corrected partial owner-loss recovery needs no experiment cleanup
+Contest is a profile for controlled comparison:
 
-C1-D fresh-controller continuation profile
-  → the old controller dies while the Windows Guest and partial world remain live
-  → the successor reconstructs effect/resource identity from durable state and current Host placement
-  → no old `_FabricRun`, RangeSession event stream, or durable substep state is restored
-  → the successor completes only the missing peer-B suffix and independently verifies peer-b-present
-  → peer-B process identity is durably published for later closure while the backend receipt remains non-truth
-  → the same Guest completes B and the same packet sensor observes A and B across controller replacement
-
-C1-E successor ownership profile
-  → predecessor PID/start-time remains historical provenance and is not rewritten to the successor
-  → successor claim acquisition CAS-binds to one exact inherited ledger digest
-  → a per-Run kernel recovery gate is the single-host mutex; claim metadata is provenance, not the lock
-  → reconciler must acquire the same gate before orphan mutation and returns skipped-successor-active while a successor holds it
-  → successor may continue the partial world while holding recovery authority
-  → successor SIGKILL automatically releases the kernel gate while stale claim metadata remains inspectable
-  → a later reconciler can acquire the gate, preserve the stale claim in its receipt, and close to zero
-
-C1-F multiple-successor profile
-  → two candidates may observe the same exact dead-owner generation, but only one acquires the per-Run recovery gate
-  → the losing candidate is explicitly non-mutating
-  → the winner may advance physical world state and publish a new ledger generation without changing semantic effect identity
-  → after winner death, the loser re-observes and claims against the newer generation rather than its stale original observation
-  → an already-materialized persistent consequence can be adopted without whole-effect replay even if a transient challenge service has exited
-  → before current-claim replacement, the exact prior claim is archived and the new claim records predecessorClaimId/digest
-  → final reconciliation preserves current + archived recovery lineage in its receipt before clearing recovery metadata
-
-C1-G mid-successor recovery profile
-  → a successor may mutate physical placement and die before any new durable stable-state publication
-  → the ledger digest can remain unchanged while q/w move from Host root into peer/fabric namespaces and the bridge topology changes
-  → a later successor can claim that same durable ledger digest only after the previous process-scoped gate is released
-  → the new claim links to the archived predecessor claim, but the claim digest does not stand in for current physical progress
-  → post-acquisition Host observation classifies the actual midpoint and determines the missing suffix
-  → only link-up/address/service/stable-publication operations are executed; the whole effect is not replayed
-  → the same Guest completes A/B across original-owner and first-successor deaths, then final reconciliation preserves lineage and closes to zero
-
-C1-H unpublished-completion profile
-  → peer B topology can be complete and consumed while durable state still says peer-a-removed
-  → the one-shot peer service and Guest may both exit before stable publication
-  → a successor re-observes persistent topology, extracts completed Guest evidence, and reads a point-in-time pcap snapshot without terminating the live capture
-  → persistent topology + Guest completion + independent peer-B sensor evidence classify completed-but-unpublished
-  → the successor does not restart the transient peer service and performs no Range-world replay; it repairs only durable peer-b-present publication with peerPid=0
-  → current + archived recovery claims remain distinct from completion evidence; final reconciler later closes the still-live sensor and remaining substrate
-
-C1-I information-loss profile
-  → one local no-uplink effect emits a non-idempotent vanishing pulse under one exact effectId
-  → delivered and undelivered controller-SIGKILL histories are normalized until durable sender bytes and post-crash successor views are byte-identical
-  → evaluator-only ground truth differs, so the successor cannot infer history and must classify UNKNOWN rather than publish completion or authorize blind resend
-  → a restricted UID-65534 blind resend proves the danger: delivered history reaches two pulses while undelivered history reaches one
-  → recipient-owned durable effectId dedup remains unreadable to that restricted successor while the public delivery capability remains usable
-  → retry then converges both histories to one application: duplicate-suppressed when already delivered, applied when previously undelivered, followed by sender completion acknowledgement
-  → safe continuation therefore need not imply historical certainty
-
-C1-J recipient-commit-gap profile
-  → effect-before-marker crash leaves one real pulse and no marker; same-effect retry creates a duplicate
-  → marker-before-effect crash leaves a marker and no pulse; same-effect retry is suppressed and the consequence is lost
-  → therefore changing the order of two independent writes selects a failure mode rather than creating atomicity
-  → an explicit recipient inbox phase `reserved` is then persisted before the effect in two histories: crash before pulse versus crash after pulse but before completion publication
-  → both histories leave byte-identical durable inbox state and byte-identical recipient recovery views while evaluator ground truth differs
-  → retry from reserved duplicates one history; suppress from reserved loses the other
-  → reservation honestly preserves uncertainty but does not resolve the commit gap
-
-C1-K intrinsic-idempotency profile
-  → the consequence itself is an exact atomic ensure-symlink world state, not an adjacent dedup marker
-  → apply-then-SIGKILL-before-ACK followed by the same retry executes the recipient twice but mutates the world once and leaves one semantic consequence
-  → crash-before-apply uses the same retry and creates the missing exact consequence
-  → preexisting exact state returns already-satisfied with zero request-owned mutation
-  → exact type/value observation distinguishes already-satisfied from same-name conflict
-  → for this declarative effect, verified invariant satisfaction can establish semantic completion without proving one exact invocation caused the state
-  → exactly-once invocation is therefore not required for exactly-one semantic consequence
-
-C1-L compensation profile
-  → the original local effect is non-idempotent balance += 1; ACK loss plus retry physically creates duplicate balance 2 instead of desired balance 1
-  → compensation has its own distinct effect identity and repairs 2 → 1 without rewriting the original duplicate history
-  → naive compensation is itself non-idempotent: apply-then-ACK-loss followed by blind retry drives 1 → 0 and overcompensates
-  → accepted recovery therefore re-observes current balance before any repair: exact 2 authorizes compensation, exact 1 proves already-repaired and authorizes publication-only closure
-  → crash-before-compensation remains at 2 and is repaired once; crash-after-compensation-before-ACK remains at 1 and performs no second decrement
-  → compensation is a separate recovery primitive when repair progress remains observable; exactly-once compensation invocation is not required in this fault model
-
-C1-M compensation-information-loss profile
-  → the downstream balance remains durable but is private to the compensation authority; restricted callers can invoke the capability but cannot read repair truth
-  → naive compensated and uncompensated crash histories expose byte-identical sender ledgers and caller recovery views, so caller history remains UNKNOWN
-  → blind replay of subtract-one compensation overrepairs hidden balance 1 to 0 but correctly repairs hidden balance 2 to 1
-  → the repeat-safe candidate is a distinct effect identity/capability/effectType with retrySemantics=convergent-repair-duplicate
-  → under that contract the caller views remain equally UNKNOWN, while downstream private truth maps 1→already-repaired/no-op and 2→applied/1
-  → both hidden histories converge to repaired balance 1 without caller read authority, caller-visible compensation receipt, or shared transaction boundary
-  → private truth can remain authority-local; retry safety belongs to the effect boundary that owns and can verify the consequence
-
-C1-N downstream-truth-failure profile
-  → the owning compensation authority itself loses trustworthy predicate truth through exact missing, malformed, and fork-conflict states
-  → repaired and unrepaired pre-fault histories collapse to identical authority observations for each fault class
-  → the unchanged convergent ensure-repaired effect performs zero mutation and returns truth-unavailable/truth-conflict; idempotency does not reconstruct missing truth
-  → a distinct digest-bound state witness outside the private truth boundary restores the exact pre-fault state in this targeted single-host fault model
-  → restored balance 1 returns already-repaired; restored balance 2 returns applied and converges to 1
-  → tampered witness data is rejected with zero mutation
-  → witness integrity is demonstrated, but freshness, independent failure domain, and atomic consequence/witness publication are not
-
-World Entity publication-only recovery profile
-  → the original Entity controller may die while the exact QEMU/swtpm carrier remains live and durable state still says executing
-  → predecessor owner PID/start-time remains historical provenance and is never rewritten to the fresh publisher
-  → a fresh publisher independently re-observes exact process identity, QEMU command binding, QMP running/no-NIC truth, continuity disk presence, and QMP block binding
-  → only an independently complete carrier may advance to migration-running-contained; insufficient evidence remains UNKNOWN
-  → the per-migration process-scoped flock serializes publication only; it grants no continuation/body mutation authority
-  → competing publishers converge on one publication and one receipt without physical body replay
-  → publisher SIGKILL after stable-ledger write but before receipt commit is recovered by reconstructing the receipt from stable publication without changing ledger or carrier identity
-  → C1-H completion/publication/executor separation is shared law; Range successor lineage is not copied into this narrower consumer unless a later recovery action actually needs continuation authority
-
-SynchronousContestProfile
-  → records profile start in RangeSession management events
-  → runs the existing ContestRunner unchanged
-  → binds sealed Contest evidence digests on completion
-  → leaves the persistent RangeSession running
-  → does not claim the Contest Range and persistent Range are one physical world
-
+```text
 ScenarioManifest
-  ├─ Range binding and exact revision
-  ├─ ordered Actor bindings
-  ├─ backend implementation and configuration digests
-  ├─ objectives and Action grants
-  ├─ limits
-  └─ metadata
-        ↓
-ContestRunner
-  1. create authoritative Range instance
-  2. start one backend session per Actor
-  3. collect actor-specific observations
-  4. collect one proposal per Actor
-  5. admit every proposal against Range and Actor grants
-  6. invalidate the tick without world mutation if any Actor fails or proposal is rejected
-  7. otherwise resolve all admitted proposals simultaneously
-  8. return Actor results
-  9. record sensor telemetry and hidden truth independently
- 10. repeat until Range terminal or tick limit
- 11. seal semantic and operational evidence independently
+→ create RangeBackend
+→ start ActorBackend sessions
+→ collect actor-specific observations
+→ collect proposals
+→ admit every proposal against Actor/Range grants
+→ if any required proposal fails, resolve no side for that tick
+→ otherwise resolve admitted proposals simultaneously
+→ return Actor results
+→ record sensor and hidden truth independently
+→ repeat to terminal/tick limit
+→ seal semantic and operational evidence
+```
 
-WindowsKvmMachineProvider
-  → sealed base identity + disposable overlay / UEFI / TPM
-  → root-owned machine lifecycle ledger
-  → QMP status and PCI topology truth
-  → process-identity-aware terminate / destroy + reusable recovery primitives
-  → no Sample or fixture admission of its own
+This tick barrier is profile law, not persistent-Range law.
 
-AdversarialWindowsRange (S3)
-  → one disposable sacrificial Windows Guest
-  → no emulated network device; QMP owns topology truth
-  → maintained canary may kill Guest-side observer/bootstrap assumptions and reboot
-  → QMP/process/ledger/provider closure remain management authority
-  → Guest canary result is contested trial-completeness evidence, not world truth
+`Cage4RangeBackend` pins a specific CAGE Challenge 4 revision and expands admitted Security team plans into concrete CAGE actions. Security owns the adapter mapping, action admission, scheduling, and evidence; CAGE owns the simulator behavior at the pinned revision.
 
-S4 out-of-band disk truth
-  → wait for the disposable Guest machine to stop
-  → attach the qcow2 backing-chain view through read-only qemu-nbd
-  → read selected NTFS objects from the Host and bind exact presence / digest / absence facts
-  → emit those observations on the Range world-truth plane
-  → detach NBD before normal provider residual closure
+### Software Evaluation
 
-WindowsIsolatedFabricRange (S5)
-  → one Windows KVM Guest + one lightweight Linux peer
-  → QEMU TAP and peer veth inside an isolated network-namespace bridge
-  → no fabric L3 address, no fabric route, no peer default route, no uplink
-  → QMP management + netlink world-truth + tcpdump sensor + Guest contested claim
-  → machine, ledger, Run directory, and network-namespace residual closure
+Evaluation is a separate Security path for an authorized software Sample. A Sample is not a Contest Actor.
 
-WindowsTopologyChurnRange (S6)
-  → keep the same Windows QEMU Guest alive
-  → Guest reaches lightweight peer A
-  → backend-local controller removes A; Host truth converges to only the Guest TAP
-  → controller adds lightweight peer B; Host truth updates current topology
-  → inspect reads current topology rather than initiating the replacement
-  → Guest reaches B; tcpdump observes both flows
-  → ordered historical truth + correct current truth + complete residual closure
-
-S5/S6 Range reconciliation (S6-R)
-  → durable Range ledger binds current namespace + peer/sensor process identities
-  → exact owner loss does not erase current peer-B resource authority
-  → Range reconciler closes peer/tcpdump/QEMU/swtpm by PID + start time + command identity
-  → delete only deterministic Range namespaces, run directory, ledger, and maintained canary
-  → separate policy consumer from the Evaluation reconciler
-
+```text
 EvaluationSpec
-  1. validate Sample, Authority, Environment, Guardian, Observation plan, and actions
-  2. verify Sample bytes from the local content-addressed Vault
-  3. create one exact backend instance
-  4. stage the Sample without exposing bytes to evidence
-  5. collect Observer records, Guardian decisions, facts, metrics, and Artifact identities
-  6. destroy the instance and require residual closure
-  7. derive evidence-bound Findings and a conservative disposition
-  8. seal semantic and operational evidence independently
-
-Case root
-  1. audit permission, link, executable, and special-file drift without mutation
-  2. declare static, external-uncontrolled, or controlled execution status
-  3. hash every regular file and bind every relative path and mode
-  4. fail closed if the tree changes during capture
-  5. write a private atomic Case Snapshot outside the Case root
+→ verify exact Sample bytes from SampleVault
+→ create one backend environment
+→ stage Sample under declared authority
+→ collect Observer records / Guardian decisions / independent facts
+→ destroy environment and prove residual closure
+→ derive bounded Findings and disposition
+→ seal semantic + operational evidence
 ```
 
-The ordered Actor list is part of the Scenario identity. Trial identity additionally binds the Security implementation, evidence schema revision, Range adapter and substrate, and each Actor implementation identity. Actor invocation is sequential in the current process, but all proposals are collected before any world mutation; therefore the semantic tick is simultaneous.
+Observer and Guardian remain separate. An Observer reports; it does not mutate the environment. Guardian enforces the declared environment/resource boundary; it does not become a universal strategy judge.
 
-## Core contracts
+Static Evaluation deliberately does not execute Sample code. Case Snapshot is a separate metadata path for evolving analysis directories and cannot inherit stronger Evaluation claims from unrelated stdout, scripts, or human reports.
 
-### `ScenarioManifest`
+### Windows KVM substrate and contested worlds
 
-Binds Scenario revision, Range identity, ordered Actors, backend identities and configuration digests, objectives, allowed actions, tick limit, and experiment metadata. Its canonical digest participates in Trial identity.
+`WindowsKvmMachineProvider` supplies reusable machine mechanics:
 
-### `ActorBackend`
+- sealed base identity;
+- disposable overlay / UEFI / TPM state;
+- process-identity-aware lifecycle ledger;
+- QMP management truth;
+- recovery and residual closure primitives.
 
-Starts an Actor session, receives only that Actor's observation, returns an `ActionProposal`, receives the resolved result, and produces a stop receipt.
+Security consumers add their own admission and semantics.
 
-Active implementations:
+Current accepted profiles include:
 
-- scripted sequence baseline;
-- `NativeHarnessActorBackend`, using DeepSeek Flash through the bounded Harness domain loop;
-- `HostAssignedDeepSeekHarnessTurnDriver`, adding the durable Host Task, compiled Context, external Assignment, Run receipt, CompletionProposal, and CompletionDecision while keeping Runtime unconsumed;
-- `RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver`, preserving that Host lifecycle while binding physical Harness execution to one recoverable Runtime Job/Attempt and verified Artifacts.
+- disposable no-network Windows Evaluation for the exact maintained benign fixture;
+- out-of-band stopped-Guest NTFS truth inspection;
+- isolated Windows + Linux peer fabric with no uplink;
+- live peer A → peer B topology churn while the same Windows Guest remains alive;
+- Range-specific owner-loss reconciliation and continuation experiments.
 
-The first model-backed variant is P0-A: Provider and Harness are consumed, while exact Host and Runtime revisions plus explicit non-consumption modes remain in Actor identity. P0-B is accepted as the first Host-assigned baseline. P0-C is accepted as the first Runtime-executed baseline: Runtime owns physical execution and recovery facts, Host owns semantic completion, and Security owns action admission and Range truth. See [`AGENT-EXPERIMENT-P0.md`](AGENT-EXPERIMENT-P0.md).
+Guest reports remain contested/Observer evidence. Host QMP/netlink or other declared management/world-truth sources own only the facts they directly establish.
 
-Planned implementations:
+## Agent-backed Actors
 
-- delegated Codex/Hermes Harness backend;
-- PettingZoo/RL policy adapter.
+`ActorBackend` is the boundary between Security Actor semantics and the generic Agent execution mechanism.
 
-### `RangeBackend`
+Active shapes include:
 
-Creates and destroys an authorized world, emits actor-specific observations, admits proposals, resolves simultaneous actions, exposes independent truth, exports raw metrics, and declares terminal state.
+- scripted baselines;
+- Harness-backed DeepSeek Actors;
+- Host-assigned Harness variants;
+- Runtime-backed Host/Harness variants.
 
-Active Ranges:
-
-- `MicroContestRange` — local deterministic semantic contract fixture;
-- `Cage4RangeBackend` — pinned CAGE Challenge 4 Enterprise simulation.
-
-Active fidelity now spans deterministic Contest simulation, the accepted S3 single-node disposable Windows/KVM Range, S4 Host-only post-run NTFS world truth, the accepted S5 isolated fabric with heterogeneous materialization, and S6 live topology churn while the same Windows Guest remains alive. S6-R strengthens that path: topology progression is backend-owned rather than triggered by `inspect()`, changing Range resources are durably identified, and an exact S5/S6 policy consumer can reconcile the S6 world after owner loss. This remains an evidence-bounded composition rule, not a generic node, topology, mutation, fidelity, or recovery framework.
-
-## Evaluation Trial P0
-
-Evaluation Trial is a separate Security execution path for authorized software assessment. It does not reuse the Contest state machine and does not model a software Sample as an Actor.
-
-The active local contracts are `SampleIdentity`, `SampleVault`, `AuthorityManifest`, `GuardianPolicy`, `ObservationPlan`, `EnvironmentIdentity`, `EvaluationSpec`, `EvaluationRangeBackend`, `Finding`, `EvaluationDisposition`, and `EvaluationResult`.
-
-The `FixtureEvaluationBackend` verifies staged bytes and emits configured records but declares `sampleExecution: false` and never invokes Sample code. It proves admission, identity, failure handling, destruction, residual closure, and evidence before a disposable-machine provider is admitted.
-
-The `LocalStaticEvaluationBackend` invokes admitted classical analyzers without loading or invoking Sample code. SampleVault revision 2 streams large imports through private staging and supports quotas and recovery. Native analyzer reports are staged before backend destruction and sealed as verified Artifacts in Evaluation Evidence schema revision 2. Current analyzers cover file identity, 7-Zip inventory, ClamAV, and imported native reports; they remain Observers rather than truth or Guardian authorities.
-
-Observer and Guardian are separate authorities. Observer records may support a Finding but cannot alter the environment. Guardian decisions represent hard boundary enforcement and may terminate a Run without inventing a Finding. A Run is invalid when Sample verification, backend execution, or residual closure is incomplete.
-
-Current Runtime `contained_local` remains outside dynamic Sample execution because it does not provide hostile-code isolation, management-plane egress control, or disposable-machine semantics. Static Evaluation runs locally but permits only declared non-executing analyzers. S2 extracts the reusable `WindowsKvmMachineProvider` beneath Evaluation; machine lifecycle and QMP topology are Provider facts, while `WindowsKvmEvaluationBackend` retains exact Sample/fixture admission and Guardian semantics. The admitted Evaluation path remains restricted to the exact Ordivon benign fixture. See [`EVALUATION-TRIAL-P0.md`](EVALUATION-TRIAL-P0.md), [`STATIC-EVALUATION-P0.md`](STATIC-EVALUATION-P0.md), and [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
-
-## Case Snapshot P0
-
-Case Snapshot is a separate metadata path for analysis directories that evolve after a sealed Evaluation. It does not reuse Evaluation truth, Findings, Guardian authority, or residual closure. A read-only quarantine audit records permission and executable drift. A snapshot binds relative paths, modes, byte lengths, complete file digests, execution status, limitations, linked Evaluation Run identities, and exact Security source identity.
-
-A local Wine fuzz run of one retained component occurred outside an admitted disposable-machine backend. Its stdout and stderr remain historical material under `external-uncontrolled-execution`; they do not prove the stronger behavioral conclusions later written into a human report. See [`CASE-SNAPSHOT-P0.md`](CASE-SNAPSHOT-P0.md).
-
-## Windows KVM Provider P0
-
-The P0-admitted Provider uses QEMU/KVM from WSL because the actual Windows 11 Home host lacks Windows Sandbox and the complete Hyper-V VM management stack while exposing a functional `/dev/kvm`. The base builder seals an exact Windows 11 Enterprise Evaluation image. Each Run creates a qcow2 overlay, UEFI variables copy, TPM state, FAT Run disk, and QMP socket, then removes the complete Run directory after execution.
-
-No network device is configured. QMP `query-pci` is the management-plane authority and terminates the Run if a network-class PCI device appears. The Guest report remains an Observer. P0 binds the exact compiled benign Sample digest and compilation-attestation digest into Provider execution identity; relabelling another PE is insufficient. Unknown Samples remain prohibited until a later explicit gate. See [`WINDOWS-KVM-P0.md`](WINDOWS-KVM-P0.md).
-
-P0.1 separates recoverable Evaluation lifecycle identity from the disposable VM directory. Each active Evaluation Run atomically updates a root-owned ledger under `run-ledgers/`, binding the owner PID/start time, exact QEMU and swtpm identities, resource paths, Evaluation Spec digest, environment digest, and phase. Its explicit Evaluation reconciler skips a live exact owner, removes only a proven orphan, and emits attention-required diagnostics for missing or unsafe authority. S6-R later reuses the Provider-level process/ledger primitives through a separate exact Range reconciler rather than broadening this Evaluation policy. See [`WINDOWS-KVM-RECOVERY-P0.1.md`](WINDOWS-KVM-RECOVERY-P0.1.md) and [`PERSISTENT-RANGE-RECOVERY-S6R.md`](PERSISTENT-RANGE-RECOVERY-S6R.md).
-
-P1 is not an extension of the benign action. Its first gate binds an exact Case and archive identity, copies the archive into NTFS, streams the embedded bytes back for verification, rechecks the source, and records a QEMU `readonly=on` removable input disk. The current DaVinci profile authorizes preparation only and cannot enter Guest execution. See [`WINDOWS-KVM-INSTALLER-P1.md`](WINDOWS-KVM-INSTALLER-P1.md).
-
-### Action path
+Their ownership remains explicit:
 
 ```text
-ActionProposal
-  → ActionAdmission
-  → Range-specific intent or Runtime Job
-  → ActorActionResult / EffectReceipt
-  → independent world verification
+Harness   bounded cognition / Provider / Tool Run structure
+Host      semantic Task continuity when the profile uses it
+Runtime   exact local physical execution when used
+Security  Actor proposal admission + Range semantics + experiment truth relationship
 ```
 
-A model-generated command is never automatically authoritative. Structured actions and open tools share this path. If one Actor fails to propose or any proposal is rejected, no side is resolved for that tick; peers receive `not-executed` and the Trial ends with an explicit failure reason.
+A model-generated command or Tool call never mutates Security world state merely by existing. It must cross the experiment's admitted action/effect boundary.
 
-## CAGE 4 Range
+## Recovery architecture
 
-The active adapter binds:
+Security recovery is deliberately consequence-first rather than controller-object-first.
 
-```text
-repository: cage-challenge/cage-challenge-4
-revision: 8c3c50ca54b176c2de199847944e8dcc035497e3
-```
+### Durable identity is necessary but not sufficient
 
-A CAGE Contest has two Security Actors:
+Effect IDs, Range IDs, process identity, exact resource identities, receipts, and durable publication are required to make recovery attributable. They are not guaranteed snapshots of current physical progress.
 
-```text
-actor:red  → red_agent_0
-actor:blue → blue_agent_0 ... blue_agent_4
-```
+C1-G physically showed that the durable ledger digest could remain unchanged while namespace/link placement changed after a successor died. Therefore a recovery claim or ledger generation cannot substitute for fresh world observation.
 
-Each Security Actor currently chooses one team plan per tick:
+### One current recovery mutator, then re-observe
 
-```text
-cage.team.native-policy
-cage.team.sleep
-```
+The accepted single-host Range recovery profiles use a per-Run kernel gate so one successor/reconciler mutates a lineage at a time. Claim records preserve provenance and succession; the kernel gate supplies exclusion. This is a current mechanism, not a universal distributed-lock law.
 
-The Range expands the plan into concrete CAGE actions and supplies every Red and Blue action explicitly to `parallel_step(actions=...)`. Green agents remain CAGE-controlled environmental actors. Missing Red/Blue plans are rejected rather than silently delegated to CAGE defaults.
+After acquiring recovery authority, the successor re-observes current world state and performs only the missing suffix or publication repair that the evidence supports.
 
-The native plan is a transitional bridge: it proves that Security controls scheduling, admission, information, evidence, and comparison while reusing mature CAGE policies. It does not yet expose arbitrary parameterized CAGE actions to a model.
+### Completion, publication and liveness are separate
 
-CAGE source integrity is enforced by:
+A consequence may already be complete while the durable ledger is stale and the transient executor/service is gone. Recovery may therefore repair publication without replaying the body.
 
-- exact Git revision;
-- clean checkout;
-- import provenance from the configured checkout;
-- semantic config digest excluding machine-local source path;
-- explicit external action counts;
-- raw native action names and world-truth summaries.
+### `UNKNOWN` is a valid terminal epistemic state
 
-Pinned CAGE terminates at `step_count >= steps - 1`; the adapter adds one internal episode step so Security's `max_ticks` remains the exact number of executable Contest ticks.
+When delivered and undelivered histories are observationally identical to the recovering authority, no amount of controller confidence reconstructs the missing bit. Security records `UNKNOWN` and asks whether the effect contract itself supports a safe retry/reconciliation protocol.
+
+### Retry semantics belong to the effect
+
+- Non-idempotent resend after ACK loss may duplicate the consequence.
+- A separate dedup marker does not become atomic merely by moving before or after the effect.
+- A durable `reserved` marker can represent uncertainty without proving completion.
+- An exact declarative ensure-state effect can be repeat-safe when the world invariant itself is the effect and is independently observable.
+- Compensation is a distinct effect with its own identity; blind compensation retry can overrepair.
+- A downstream authority may safely converge private consequence state without making that predicate globally readable.
+- If the authority that owns the predicate loses trustworthy truth, even an idempotent recovery contract must fail closed until truth is restored or independently re-established.
+
+These are effect-contract laws, not one universal transaction/compensation framework.
 
 ## Evidence authority
 
-Every active Trial produces four hash-chained streams:
+Active Trials separate semantic and operational evidence. Depending on the profile, streams may include:
 
-| Channel | Owns |
-|---|---|
-| Actor | observations, proposals, returned action results |
-| Range management | lifecycle, admissions, resolutions, backend receipts |
-| Sensor | fallible and potentially manipulable telemetry |
-| World truth | management-plane state unavailable to evaluated actors |
+- Actor intent/response evidence;
+- Range management events;
+- sensor observations;
+- independent world-truth observations;
+- Provider/Runtime/Host operational facts;
+- exact Sample/Artifact identity;
+- residual-closure receipts;
+- Findings/evaluator judgments.
 
-The semantic bundle additionally contains the exact Scenario manifest, Trial execution identity, raw metrics, result summary, per-channel file digests, and chain heads. Wall-clock timestamps remain absent from the deterministic core; logical time is authoritative. A separately chained operational stream records durations and operating facts and binds back to the semantic evidence digest without changing it.
+An evaluator may consume these sources, but evaluator output does not replace them.
 
-For CAGE, actor events contain each side's admitted observations and team plan. Management events contain the concrete CAGE actions submitted. Sensor events contain reward, mission phase, foothold, and action-count telemetry. Truth events independently summarize native CAGE state.
+For exact ownership of each current experiment and evidence family, use [`authority.md`](authority.md). For evidence admission and retained bundles, use [`../evidence/README.md`](../evidence/README.md).
 
-## Current Micro Range
+## Current versus research-only structure
 
-The synthetic Red/Blue Range remains a fast contract fixture. It proves simultaneous conflict rules, hidden truth separation, and evidence tamper rejection without an external dependency.
+Current reusable architecture is intentionally smaller than the research corpus:
 
-Its deletion condition is not merely the existence of CAGE: it can be removed only when another fixture covers the same deterministic unit tests with lower maintenance cost.
+**Retained:** Range/Actor identity, scoped authority, separated evidence planes, typed effect admission, consequence verification, honest UNKNOWN, exact recovery identity, re-observation, and consumer-specific recovery/evaluation profiles.
 
-## Cross-project composition
+**Not promoted:** universal causal DAG, global Truth/Freshness/Trust services, shared EvidenceReducer service, generic compensation engine, mailbox/event-visibility ontology, mandatory intent-finalization ceremony, generic Campaign/coalition/organization schema, or a second generic control plane duplicating Host/Harness/Runtime.
 
-| Responsibility | Owner |
-|---|---|
-| Goal, durable Task, commitment, final outcome | Host |
-| Native Agent loop, Provider turns, Tool recovery, external Harness drivers | Harness |
-| Workspace, Job, Attempt, process, artifact, physical recovery | Runtime |
-| external provider/private operator adapters when needed | World |
-| disposable Windows machine lifecycle and QMP topology | `WindowsKvmMachineProvider` integrated by Security; network admission remains caller/Range policy; hypervisor mechanics remain QEMU/KVM |
-| Scenario, Contest, Campaign, organization, Range semantics, scoring | Security |
-| promoted cross-domain protocols | Computing |
+The AF/AE/EC/AC/IF and C1-A→N documents remain canonical research evidence for the exact claims they test. Their chronology is not the architecture's default reading order.
 
-Security may request a Harness or Runtime change but must not copy their state machines.
+## Primary contracts
 
-## Next integration sequence
+| Contract / owner | Role |
+| --- | --- |
+| `RangeSessionSpec` / `RangeSession` | persistent contested-world semantic identity/lifecycle |
+| `RangeAuthority` / `RangeEffectRequest` | scoped Actor effect permission and typed intent admission |
+| `ScenarioManifest` / `ContestRunner` | bounded synchronous multi-Actor comparison |
+| `ActorBackend` | Actor-specific proposal loop boundary |
+| `RangeBackend` | contested world adapter for one profile |
+| `EvaluationSpec` / Evaluation backend | authorized software-assessment lifecycle |
+| `SampleVault` / `SampleIdentity` | exact private Sample admission/provenance |
+| `GuardianPolicy` / Observer records | environment/resource enforcement versus fallible observation |
+| `WindowsKvmMachineProvider` | machine lifecycle/QMP substrate without owning Sample admission |
+| evidence bundles / receipts | exact scoped proof bound to one run/revision |
 
-1. retain the implemented Security CAGE team-plan catalog, Domain Tool Bridge, Native Harness Actor, and fail-closed Provider mapping;
-2. retain the accepted DeepSeek Flash Red/Blue P0-A Contest;
-3. retain the accepted controlled P0-B Host baseline and its historical predecessors;
-4. retain the accepted P0-C Runtime-executed baseline and its fail-closed diagnostic predecessors;
-5. expand from team-plan control to typed parameterized CAGE Action Proposals while preserving the P0-C authority boundary;
-6. add Campaign and organization state only when multi-Actor experiments consume it;
-7. retain the accepted S6 live-churn Range plus S6-R read/effect and owner-loss recovery strengthening; extend the fabric only when a new node/materialization, Actor-requested effect, or richer telemetry is demanded; evaluate containerlab or Zeek then rather than making them prerequisites;
-8. add CALDERA as a TTP execution adapter, not as Campaign authority;
-9. connect Codex and Hermes as delegated Harness baselines in planner-only, Tool-proxy, and black-box modes.
+Exact source and tests outrank this summary for field names and transitions.
 
-Evaluation integration proceeds independently:
+## Cross-project ownership
 
-1. retain P0 local contracts, streaming Vault, static backend, report Artifacts, quarantine audits, and Case Snapshots;
-2. preserve external uncontrolled executions as limited historical Case material rather than Evaluation truth;
-3. retain the exact sealed Windows KVM base image and its build receipt;
-4. retain the benign-only P0 admission proving management-plane no-network topology, bounded execution, evidence export, destruction, and residual closure;
-5. complete P0.1 hard-failure recovery acceptance while preserving the exact benign-only admission;
-6. retain P1 large-Sample media preparation as non-executing until an exact installer path, observation protocol, and separate execution gate exist;
-7. add Guest and network Observers without giving them Guardian authority;
-8. require a separate explicit gate before any unknown Sample;
-9. add mature static analyzers only when an observed evidence gap justifies the adapter;
-10. connect Harness only to structured evidence summaries, never raw Sample bytes.
+- **Security:** adversarial Scenario/Range semantics, domain authority, information asymmetry, consequence/evaluation relationships, consumer-specific recovery meaning.
+- **Harness:** generic bounded Agent Run/cognition/Provider/Tool mechanics.
+- **Host:** durable semantic work continuity where used.
+- **Runtime:** physical local execution/recovery facts where used.
+- **World/native provider:** external occurrence/current truth that only that owner can establish.
+- **classical tools:** hypervisor/network/scanner/analyzer mechanics and their native reports.
 
-## Explicit non-goals
+No adapter inherits the semantics of the owner it transports.
 
-The repository will not implement its own hypervisor, container runtime, topology engine, C2 framework, exploit database, scanner, EDR/SIEM, generic model router, generic Job system, policy language, RL trainer, or signing infrastructure unless a measured domain gap survives mature alternatives.
+## Reading paths
+
+- Start with [`../README.md`](../README.md) for the causal project boundary.
+- Use [`research-boundary.md`](research-boundary.md) for sovereignty and external-effect rules.
+- Use [`LAW-PROFILES-C0.md`](LAW-PROFILES-C0.md) for constitutional/profile/evaluator classification.
+- Use [`authority.md`](authority.md) to locate exact current and research authority.
+- Use [`research-agenda.md`](research-agenda.md) for open falsifiers.
+- Read a C1/AF/AE/EC/AC/IF document only when you need the exact experiment that supports or challenges one retained law.
