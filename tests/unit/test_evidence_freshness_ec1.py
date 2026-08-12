@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import hashlib
 import json
 import subprocess
@@ -30,7 +31,7 @@ def _file_sha(path: Path) -> str:
 
 
 def _classify(*, projection: Path, source: Path | None = CURRENT) -> dict[str, object]:
-    args = ["/usr/bin/python3", str(CHECKER), "--projection", str(projection)]
+    args = [sys.executable, str(CHECKER), "--projection", str(projection)]
     if source is None:
         args.append("--source-unavailable")
     else:

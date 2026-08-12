@@ -240,14 +240,48 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
+        tools = self.root / "tools"
+        tools.mkdir()
+        tool_paths: dict[str, Path] = {}
+        for name in ("qemu-system-x86_64", "qemu-img", "swtpm", "setpriv"):
+            path = tools / name
+            path.write_bytes(b"tool")
+            path.chmod(0o755)
+            tool_paths[name] = path
+
+        mkfs_fat = tools / "mkfs.fat"
+        mkfs_fat.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+        mkfs_fat.chmod(0o755)
+        mcopy = tools / "mcopy"
+        mcopy.write_text(
+            "#!/usr/bin/env python3\n"
+            "from pathlib import Path\n"
+            "import shutil, sys\n"
+            "args = sys.argv[1:]\n"
+            "image = Path(args[args.index('-i') + 1])\n"
+            "source, destination = args[-2], args[-1]\n"
+            "store = Path(str(image) + '.mcopy')\n"
+            "store.mkdir(exist_ok=True)\n"
+            "if source.startswith('::/'):\n"
+            "    shutil.copyfile(store / Path(source).name, destination)\n"
+            "else:\n"
+            "    shutil.copyfile(source, store / Path(destination).name)\n",
+            encoding="utf-8",
+        )
+        mcopy.chmod(0o755)
+
+        manifest = self.root / "base.manifest.json"
+        manifest.write_text("{}", encoding="utf-8")
+        firmware = self.root / "OVMF_CODE.fd"
+        firmware.write_bytes(b"firmware")
         machine = WindowsKvmMachineConfig(
             state_root=self.root,
-            base_manifest_path=BASE_MANIFEST,
-            qemu_path=Path("/usr/bin/qemu-system-x86_64"),
-            qemu_img_path=Path("/usr/bin/qemu-img"),
-            swtpm_path=Path("/usr/bin/swtpm"),
-            setpriv_path=Path("/usr/bin/setpriv"),
-            firmware_code_path=Path("/usr/share/edk2/x64/OVMF_CODE.4m.fd"),
+            base_manifest_path=manifest,
+            qemu_path=tool_paths["qemu-system-x86_64"],
+            qemu_img_path=tool_paths["qemu-img"],
+            swtpm_path=tool_paths["swtpm"],
+            setpriv_path=tool_paths["setpriv"],
+            firmware_code_path=firmware,
             run_user="qemu",
             run_group="qemu",
             memory_mib=512,
@@ -261,6 +295,8 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
                 machine=machine,
                 destination_world_id=DESTINATION,
                 allowed_source_world_ids=(SOURCE,),
+                mkfs_fat_path=mkfs_fat,
+                mcopy_path=mcopy,
             ),
             machine_provider=self.provider,
         )
@@ -364,7 +400,7 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
             ),
             patch(
                 "ordivon_security.evaluation.world_entity._process_arguments",
-                return_value=("/usr/bin/swtpm", "socket"),
+                return_value=(str(self.destination.config.machine.swtpm_path), "socket"),
             ),
         ):
             response = self.destination.handle(reconcile_request(prepared))
@@ -448,7 +484,7 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         )
         ledger.write_text(json.dumps(value, sort_keys=True), encoding="utf-8")
         qemu_arguments = (
-            "/usr/bin/qemu-system-x86_64",
+            str(self.destination.config.machine.qemu_path),
             f"file={run_disk},if=none,format=raw,cache=none,aio=threads,id=migrationdisk",
             "usb-storage,drive=migrationdisk,bus=xhci.0,removable=on,serial=ORDIVON_MIG",
         )

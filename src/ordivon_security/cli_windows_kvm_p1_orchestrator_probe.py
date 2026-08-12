@@ -80,8 +80,8 @@ def _compile_orchestrator_probe(output_path: Path) -> JsonObject:
         "resources", "windows_kvm", "p1_orchestrator_probe.c"
     )
     source_path = Path(str(source_resource))
-    compiler = Path("/usr/bin/x86_64-w64-mingw32-gcc")
-    objdump = Path("/usr/bin/x86_64-w64-mingw32-objdump")
+    compiler = Path("/usr/bin/x86_64-w64-mingw32-gcc").resolve()
+    objdump = Path("/usr/bin/x86_64-w64-mingw32-objdump").resolve()
     for path in (source_path, compiler, objdump):
         if path.is_symlink() or not path.is_file():
             raise ValueError(f"P1 orchestrator probe dependency is missing or unsafe: {path}")

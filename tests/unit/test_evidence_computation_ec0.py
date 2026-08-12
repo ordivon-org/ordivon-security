@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import hashlib
 import json
 import subprocess
@@ -43,7 +44,7 @@ def _load_bundle(path: Path) -> JsonObject:
 
 def _run_external(path: Path) -> JsonObject:
     completed = subprocess.run(
-        ["/usr/bin/python3", str(PROGRAM), "--input", str(path)],
+        [sys.executable, str(PROGRAM), "--input", str(path)],
         check=True,
         capture_output=True,
         timeout=10,
@@ -136,7 +137,7 @@ class EC0ExternalizedEvidenceComputationTests(unittest.TestCase):
         temp.write_bytes(canonical_bytes(value) + b"\n")
         try:
             completed = subprocess.run(
-                ["/usr/bin/python3", str(PROGRAM), "--input", str(temp)],
+                [sys.executable, str(PROGRAM), "--input", str(temp)],
                 check=False,
                 capture_output=True,
                 timeout=10,
