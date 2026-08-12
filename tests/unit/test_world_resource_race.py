@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import json
 import os
 import subprocess
@@ -80,7 +81,7 @@ print(json.dumps(inbox.handle(req),sort_keys=True,separators=(',',':')))
 def cli(root: Path, value: dict[str, object]) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
-            "/usr/bin/python",
+            sys.executable,
             "-m",
             "ordivon_security.cli_world_resource",
             "--root",
@@ -110,7 +111,7 @@ class WorldResourceRaceTests(unittest.TestCase):
             release = root / "release-materializer"
             materializer = subprocess.Popen(
                 [
-                    "/usr/bin/python",
+                    sys.executable,
                     "-c",
                     _MATERIALIZER,
                     str(root),
@@ -139,7 +140,7 @@ class WorldResourceRaceTests(unittest.TestCase):
 
             reconciler = subprocess.Popen(
                 [
-                    "/usr/bin/python",
+                    sys.executable,
                     "-m",
                     "ordivon_security.cli_world_resource",
                     "--root",
