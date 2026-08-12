@@ -47,7 +47,7 @@ def _deliberate_without_effect_authority(
     label: str,
 ) -> JsonObject:
     _insert_sources(harness_source=config.harness_source, protocol_source=config.protocol_source)
-    deepseek_module = importlib.import_module("ordivon_harness.ordivon.deepseek")
+    deepseek_module = importlib.import_module("ordivon_harness.api")
     model_module = importlib.import_module("ordivon_harness.ordivon.model")
     version_module = importlib.import_module("ordivon_harness.version")
 
@@ -170,8 +170,8 @@ class DeliberationPrimedFinalizedRangeIntentDriver(DeepSeekFinalizedRangeIntentD
 
         base = self.config.base
         _insert_sources(harness_source=base.harness_source, protocol_source=base.protocol_source)
-        domain_module = importlib.import_module("ordivon_harness.domain_tools")
-        deepseek_module = importlib.import_module("ordivon_harness.ordivon.deepseek")
+        domain_module = importlib.import_module("ordivon_harness.api")
+        deepseek_module = importlib.import_module("ordivon_harness.api")
         version_module = importlib.import_module("ordivon_harness.version")
         harness_revision = _integration_git_revision(base.harness_source, "Harness")
         protocol_revision = _integration_git_revision(base.protocol_repository, "Computing protocol")
