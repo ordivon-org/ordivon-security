@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import stat
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -239,7 +240,7 @@ class StaticEvaluationP0Tests(unittest.TestCase):
     def test_archive_inventory_detects_unsafe_paths_without_execution(self) -> None:
         fake_7z = self.root / "fake-7z"
         fake_7z.write_text(
-            "#!/usr/bin/python3\n"
+            f"#!{sys.executable}\n"
             "import sys\n"
             "if len(sys.argv) == 1:\n"
             "    print('7-Zip fake 1.0')\n"

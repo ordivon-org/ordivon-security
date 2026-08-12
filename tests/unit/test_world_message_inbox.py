@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import concurrent.futures
 import json
 import subprocess
@@ -232,7 +233,7 @@ class WorldMessageInboxTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             process = subprocess.run(
                 [
-                    "/usr/bin/python",
+                    sys.executable,
                     "-m",
                     "ordivon_security.cli_world_message",
                     "--root",

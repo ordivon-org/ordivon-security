@@ -15,6 +15,11 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: >-
+          apt-get update &&
+          apt-get install -y --no-install-recommends
+          gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64 &&
+          rm -rf /var/lib/apt/lists/*
       - run: python -m pip install --no-cache-dir uv==0.11.7
       - run: uv sync --locked
       - run: uv run ruff check --select E9,F src tests
@@ -32,7 +37,7 @@ jobs:
       - run: apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
       - run: python -m pip install --no-cache-dir uv==0.11.7
       - run: scripts/bootstrap_cage4.sh
-      - run: ORDIVON_CAGE4_SOURCE=.cache/cage4 uv run --extra cage python -m unittest discover -s tests -v
+      - run: ORDIVON_CAGE4_SOURCE=.cache/cage4 uv run --extra cage python -m unittest discover -s tests/integration -v
       - run: >-
           uv run --extra cage ordivon-security-cage4
           --source .cache/cage4

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import json
 import subprocess
 import tempfile
@@ -261,7 +262,7 @@ class WorldResourceInboxTests(unittest.TestCase):
             request = materialize_request()
             process = subprocess.run(
                 [
-                    "/usr/bin/python",
+                    sys.executable,
                     "-m",
                     "ordivon_security.cli_world_resource",
                     "--root",
