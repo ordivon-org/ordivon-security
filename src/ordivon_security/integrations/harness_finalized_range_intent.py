@@ -257,8 +257,8 @@ class DeepSeekFinalizedRangeIntentDriver:
             raise ValueError("IF0 turn label must be non-empty and trimmed")
         base = self.config.base
         _insert_sources(harness_source=base.harness_source, protocol_source=base.protocol_source)
-        domain_module = importlib.import_module("ordivon_harness.domain_tools")
-        deepseek_module = importlib.import_module("ordivon_harness.ordivon.deepseek")
+        domain_module = importlib.import_module("ordivon_harness.api")
+        deepseek_module = importlib.import_module("ordivon_harness.api")
         version_module = importlib.import_module("ordivon_harness.version")
         harness_revision = _git_revision(base.harness_source, "Harness")
         protocol_revision = _git_revision(base.protocol_repository, "Computing protocol")

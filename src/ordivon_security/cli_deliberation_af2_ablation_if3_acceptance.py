@@ -58,8 +58,8 @@ class DeliberationPrimedAF2Driver:
             harness_source=self.config.harness_source,
             protocol_source=self.config.protocol_source,
         )
-        domain_module = importlib.import_module("ordivon_harness.domain_tools")
-        deepseek_module = importlib.import_module("ordivon_harness.ordivon.deepseek")
+        domain_module = importlib.import_module("ordivon_harness.api")
+        deepseek_module = importlib.import_module("ordivon_harness.api")
         version_module = importlib.import_module("ordivon_harness.version")
         harness_revision = _integration_git_revision(self.config.harness_source, "Harness")
         protocol_revision = _integration_git_revision(
