@@ -293,8 +293,8 @@ def _run_intent_turn(
     harness_version: str,
     protocol_revision: str,
 ) -> JsonObject:
-    domain_module = importlib.import_module("ordivon_harness.domain_tools")
-    deepseek_module = importlib.import_module("ordivon_harness.ordivon.deepseek")
+    domain_module = importlib.import_module("ordivon_harness.api")
+    deepseek_module = importlib.import_module("ordivon_harness.api")
     version_module = importlib.import_module("ordivon_harness.version")
     settings = deepseek_module.DeepSeekSettings.from_secret_file(
         secret_path,
