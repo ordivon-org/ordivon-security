@@ -121,9 +121,10 @@ class SacrificialWindowsRangeTests(unittest.TestCase):
         self.tools = self.root / "tools"
         self.tools.mkdir()
         tool_paths = {}
-        for name in ("qemu", "qemu-img", "swtpm", "setpriv"):
+        for name in ("qemu", "qemu-img", "swtpm", "setpriv", "mkfs.fat", "mcopy"):
             path = self.tools / name
-            path.write_bytes(b"tool")
+            exit_code = 1 if name == "mcopy" else 0
+            path.write_text(f"#!/bin/sh\nexit {exit_code}\n", encoding="utf-8")
             path.chmod(0o755)
             tool_paths[name] = path
         self.firmware = self.root / "OVMF_CODE.fd"
@@ -154,8 +155,8 @@ class SacrificialWindowsRangeTests(unittest.TestCase):
             machine=self.machine,
             canary_path=self.canary,
             canary_digest=self.canary_digest,
-            mkfs_fat_path=Path("/usr/bin/mkfs.fat"),
-            mcopy_path=Path("/usr/bin/mcopy"),
+            mkfs_fat_path=tool_paths["mkfs.fat"],
+            mcopy_path=tool_paths["mcopy"],
             run_disk_mib=1,
             max_runtime_seconds=30,
         )
