@@ -248,6 +248,28 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
             path.write_bytes(b"tool")
             path.chmod(0o755)
             tool_paths[name] = path
+
+        mkfs_fat = tools / "mkfs.fat"
+        mkfs_fat.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+        mkfs_fat.chmod(0o755)
+        mcopy = tools / "mcopy"
+        mcopy.write_text(
+            "#!/usr/bin/env python3\n"
+            "from pathlib import Path\n"
+            "import shutil, sys\n"
+            "args = sys.argv[1:]\n"
+            "image = Path(args[args.index('-i') + 1])\n"
+            "source, destination = args[-2], args[-1]\n"
+            "store = Path(str(image) + '.mcopy')\n"
+            "store.mkdir(exist_ok=True)\n"
+            "if source.startswith('::/'):\n"
+            "    shutil.copyfile(store / Path(source).name, destination)\n"
+            "else:\n"
+            "    shutil.copyfile(source, store / Path(destination).name)\n",
+            encoding="utf-8",
+        )
+        mcopy.chmod(0o755)
+
         manifest = self.root / "base.manifest.json"
         manifest.write_text("{}", encoding="utf-8")
         firmware = self.root / "OVMF_CODE.fd"
@@ -273,6 +295,8 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
                 machine=machine,
                 destination_world_id=DESTINATION,
                 allowed_source_world_ids=(SOURCE,),
+                mkfs_fat_path=mkfs_fat,
+                mcopy_path=mcopy,
             ),
             machine_provider=self.provider,
         )
