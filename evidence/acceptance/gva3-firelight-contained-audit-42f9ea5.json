@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.gva3-contained-audit-result",
+  "target": {
+    "competition": "Immunefi Firelight Audit Competition",
+    "revision": "42f9ea5e43d88b35197b901acc2a8c24b314fa62",
+    "repositoryArchiveSha256": "cdfefe2932992829fee4da54131dd5899a679b41c5b62ffdf549df92dfc81b15",
+    "competitionPageSha256": "03b257f1ed48f2212af90938459b6c84e588d21cc237ee7bd5a01b894b05b30f",
+    "priorAuditPageSha256": "9ebf7de22df9ad59890ff1ae4808d4041aab09bd66cb10a0e75a2e99016816ce",
+    "publishedScopeFileCount": 14,
+    "publishedScopeFilesPresent": 14
+  },
+  "case": {
+    "caseId": "case:gva3-firelight-42f9ea5e",
+    "manifestDigest": "sha256:9fd9a833688bbb81a4173c4d2fac300898056e71a2f568d6dd365a14444318ce",
+    "entryCount": 152,
+    "quarantineAuditPassed": true
+  },
+  "dependencyMaterialization": {
+    "canonicalCaseModified": false,
+    "disposableExecutionCopyUsed": true,
+    "exactGitDependencies": [
+      {
+        "name": "flare-smart-contracts",
+        "commit": "03ae9c741e364bb5582afdb0dc49726b149c18f7",
+        "archiveSha256": "542a156c29c10bb11ccee91a8ecfcd3ede1a45254c68440c20121b7dcabdb60e"
+      },
+      {
+        "name": "flare-smart-contracts-v2",
+        "commit": "0b9038144bdebbbe081c649389a8d8fa4a801875",
+        "archiveSha256": "42ce390b908ec7977b9abfabbc592128132fac823b3c8593866d8cc0d18a783b"
+      }
+    ]
+  },
+  "execution": {
+    "networkDuringCompileAndTests": false,
+    "compiledSolidityFiles": 133,
+    "upstreamHardhatTestsPassed": 448,
+    "upstreamHardhatTestsFailed": 0,
+    "solhintExploitCandidateCount": 0,
+    "legacyToV2ValidateUpgradePassed": true,
+    "legacyToV2DynamicStatePreservationPassed": true,
+    "randomizedInvariantTestsPassed": 2,
+    "randomizedOperationCount": 180
+  },
+  "duplicateControl": {
+    "priorMacroAuditMaterialized": true,
+    "currentScopeFilesByteIdenticalToMacro": 7,
+    "currentScopeFilesDifferentFromMacro": 7,
+    "batchSettlementAtomicityCandidateRejectedAsLikelyDuplicate": true,
+    "publishedKnownIssuesExcluded": true
+  },
+  "outcome": {
+    "newNonDuplicateInScopeFindingCount": 0,
+    "externalReportSubmitted": false,
+    "submissionFeeIncurred": false,
+    "mainnetOrPublicTestnetTouched": false,
+    "thirdPartySystemTouched": false,
+    "payoutClaimed": false,
+    "classification": "negative-audit-result"
+  },
+  "limitations": [
+    "Negative result does not prove absence of vulnerabilities.",
+    "No participant/account/KYC/payment submission path was exercised because no reportable finding survived.",
+    "Randomized invariants cover selected accounting/state-machine properties, not the full semantic space."
+  ]
+}
