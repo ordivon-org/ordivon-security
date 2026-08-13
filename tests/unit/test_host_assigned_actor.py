@@ -10,6 +10,7 @@ from pathlib import Path
 from ordivon_security._canonical import JsonObject, canonical_digest
 from ordivon_security.actors.agent_stack import AgentTurnEvidence
 from ordivon_security.actors.host_assigned import (
+    _harness_completion_conclusion,
     _host_json_value,
     _model_context_from_compiled,
 )
@@ -101,6 +102,7 @@ class _HostDriver:
             requested_model_id=self.requested_model_id,
             effective_model_ids=(self.requested_model_id,),
             credential_scope_id=self.credential_scope_id,
+            unresolved_unknowns=("Remote host role is not yet observed.",),
             host_task_id="task:security-host:red:tick-0:test",
             host_task_revision=5,
             host_task_contract_digest=_DIGESTS[0],
@@ -203,6 +205,27 @@ class HostAssignedActorTests(unittest.TestCase):
         self.assertEqual(turns[0]["hostLifecycle"], host)
         self.assertTrue(backend.execution_identity["agentStack"]["host"]["consumed"])
         self.assertFalse(backend.execution_identity["agentStack"]["runtime"]["consumed"])
+
+    def test_structured_unknowns_survive_agent_and_host_completion_evidence(self) -> None:
+        evidence = _HostDriver().run_turn(
+            actor_id="actor:red",
+            side="red",
+            objective="Select one plan.",
+            observation=ActorObservation("actor:red", 0, {"bounded": True}, _ACTIONS),
+            prior_results=(),
+        )
+        self.assertEqual(
+            evidence.to_dict(include_trace=False)["unresolvedUnknowns"],
+            ["Remote host role is not yet observed."],
+        )
+        self.assertEqual(
+            _harness_completion_conclusion(evidence),
+            {
+                "status": "candidate_completed",
+                "summary": "Host accepted the bounded team-plan decision.",
+                "unresolved_unknowns": ["Remote host role is not yet observed."],
+            },
+        )
 
     def test_partial_host_lifecycle_is_rejected(self) -> None:
         trace: JsonObject = {
