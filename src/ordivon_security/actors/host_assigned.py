@@ -378,7 +378,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                     "Finite CAGE floating-point values are represented as canonical-float "
                     "objects whose decimal field preserves the source value. Never infer "
                     "hidden world truth. Call select_team_plan exactly once, then submit a "
-                    "then submit a candidate_completed conclusion explaining the decision. "
+                    "candidate_completed conclusion explaining the decision. "
                     "The model proposes completion; Host independently decides durable "
                     "Task completion. Record genuine residual uncertainty honestly in "
                     "unresolved_unknowns; never manufacture certainty. Leave it empty only "

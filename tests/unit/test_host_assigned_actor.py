@@ -290,6 +290,33 @@ class HostAssignedActorTests(unittest.TestCase):
             _candidate_completed_conclusion(evidence)["unresolved_unknowns"], []
         )
 
+    def test_agent_turn_evidence_serializes_unresolved_unknowns(self) -> None:
+        trace: JsonObject = {
+            "schemaVersion": 1,
+            "kind": "ordivon.harness-trace",
+            "harnessRunId": "harness-run:serialize",
+            "events": [],
+        }
+        evidence = AgentTurnEvidence(
+            harness_run_id="harness-run:serialize",
+            assignment_id="assignment:serialize",
+            context_digest=_DIGESTS[0],
+            selected_action="cage.team.sleep",
+            rationale="decision with unknowns",
+            stop_code="candidate_completed",
+            trace=trace,
+            trace_digest=canonical_digest(trace),
+            usage={},
+            requested_model_id="deepseek-v4-flash",
+            effective_model_ids=("deepseek-v4-flash",),
+            credential_scope_id="credential-scope:deepseek:flash:0",
+            unresolved_unknowns=("exact input bytes were not re-observed",),
+        )
+        self.assertEqual(
+            evidence.to_dict(include_trace=False)["unresolvedUnknowns"],
+            ["exact input bytes were not re-observed"],
+        )
+
     def test_float_normalization_is_deterministic_and_finite_only(self) -> None:
         self.assertEqual(
             _host_json_value(0.0),
