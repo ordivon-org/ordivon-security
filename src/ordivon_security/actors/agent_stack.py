@@ -331,6 +331,7 @@ class AgentTurnEvidence:
             "requestedModelId": self.requested_model_id,
             "effectiveModelIds": list(self.effective_model_ids),
             "credentialScopeId": self.credential_scope_id,
+            "unresolvedUnknowns": list(self.unresolved_unknowns),
         }
         if include_trace:
             value["trace"] = self.trace
