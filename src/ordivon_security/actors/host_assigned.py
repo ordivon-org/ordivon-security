@@ -73,6 +73,16 @@ def _host_json_object(value: JsonObject) -> JsonObject:
     return normalized
 
 
+def _harness_completion_conclusion(evidence: AgentTurnEvidence) -> JsonObject:
+    conclusion: JsonObject = {
+        "status": "candidate_completed",
+        "summary": evidence.rationale,
+        "unresolved_unknowns": list(evidence.unresolved_unknowns),
+    }
+    validate_json(conclusion)
+    return conclusion
+
+
 def _model_context_from_compiled(
     compiled_context: Any,
     *,
@@ -364,10 +374,10 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                     "Finite CAGE floating-point values are represented as canonical-float "
                     "objects whose decimal field preserves the source value. Never infer "
                     "hidden world truth. Call select_team_plan exactly once, then submit a "
-                    "then submit a candidate_completed conclusion explaining the decision. "
+                    "candidate_completed conclusion explaining the decision. "
                     "The model proposes completion; Host independently decides durable "
-                    "Task completion. For candidate_completed, unresolved_unknowns MUST be "
-                    "an empty array; describe uncertainty as caveats in the summary."
+                    "Task completion. Candidate completion does not imply world certainty: "
+                    "preserve concrete material uncertainty in unresolved_unknowns."
                 ),
             },
             {
@@ -473,6 +483,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
             requested_model_id=self.requested_model_id,
             effective_model_ids=effective_models,
             credential_scope_id=self.credential_scope_id,
+            unresolved_unknowns=tuple(str(item) for item in result.conclusion.unresolved_unknowns),
         )
 
     def run_turn(
@@ -682,11 +693,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                     assignment,
                     run_receipt,
                     trace=evidence.trace,
-                    conclusion={
-                        "status": "candidate_completed",
-                        "summary": evidence.rationale,
-                        "unresolved_unknowns": [],
-                    },
+                    conclusion=_harness_completion_conclusion(evidence),
                 )
                 proposed = lifecycle.propose_completion(
                     recorded,

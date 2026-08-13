@@ -147,6 +147,7 @@ class AgentTurnEvidence:
     requested_model_id: str
     effective_model_ids: tuple[str, ...]
     credential_scope_id: str
+    unresolved_unknowns: tuple[str, ...] = ()
     host_task_id: str | None = None
     host_task_revision: int | None = None
     host_task_contract_digest: str | None = None
@@ -180,6 +181,8 @@ class AgentTurnEvidence:
         validate_json(self.usage)
         _text(self.requested_model_id, "requested model identity")
         _text(self.credential_scope_id, "credential scope identity", prefix="credential-scope")
+        for unknown in self.unresolved_unknowns:
+            _text(unknown, "Agent unresolved unknown", max_bytes=8_000)
         if not self.effective_model_ids:
             raise ValueError("Agent turn requires an effective model identity")
         for model_id in self.effective_model_ids:
@@ -326,6 +329,7 @@ class AgentTurnEvidence:
             "requestedModelId": self.requested_model_id,
             "effectiveModelIds": list(self.effective_model_ids),
             "credentialScopeId": self.credential_scope_id,
+            "unresolvedUnknowns": list(self.unresolved_unknowns),
         }
         if include_trace:
             value["trace"] = self.trace
@@ -749,9 +753,9 @@ class DeepSeekHarnessTurnDriver:
                     "Use only the actor-specific visible observation. Never infer hidden "
                     "world truth. Call select_team_plan exactly once, then submit a "
                     "candidate_completed conclusion explaining the decision. This assignment "
-                    "is complete when one granted plan is selected. For candidate_completed, "
-                    "unresolved_unknowns MUST be an empty array; describe world uncertainty "
-                    "as caveats in the summary instead."
+                    "is complete when one granted plan is selected. Candidate completion does "
+                    "not imply world certainty: preserve concrete material uncertainty in "
+                    "unresolved_unknowns instead of flattening it into the summary."
                 ),
             },
             {
@@ -856,6 +860,7 @@ class DeepSeekHarnessTurnDriver:
             requested_model_id=self.requested_model_id,
             effective_model_ids=effective_models,
             credential_scope_id=self.credential_scope_id,
+            unresolved_unknowns=tuple(str(item) for item in result.conclusion.unresolved_unknowns),
         )
 
 
