@@ -150,6 +150,20 @@ def _model_context_from_compiled(
     return model_context
 
 
+def _candidate_completed_conclusion(evidence: AgentTurnEvidence) -> JsonObject:
+    """Retain Harness structured unknowns instead of flattening them to an empty array.
+
+    Completion-with-unknowns is epistemically distinct from completion-with-no-
+    unknowns; discarding ``unresolved_unknowns`` would manufacture certainty and
+    violate the Security constitutional rule to preserve epistemic uncertainty.
+    """
+    return {
+        "status": "candidate_completed",
+        "summary": evidence.rationale,
+        "unresolved_unknowns": list(evidence.unresolved_unknowns),
+    }
+
+
 class HostAssignedDeepSeekHarnessTurnDriver:
     """P0-B: Host owns the durable lifecycle around one bounded DeepSeek Harness turn."""
 
@@ -366,8 +380,9 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                     "hidden world truth. Call select_team_plan exactly once, then submit a "
                     "then submit a candidate_completed conclusion explaining the decision. "
                     "The model proposes completion; Host independently decides durable "
-                    "Task completion. For candidate_completed, unresolved_unknowns MUST be "
-                    "an empty array; describe uncertainty as caveats in the summary."
+                    "Task completion. Record genuine residual uncertainty honestly in "
+                    "unresolved_unknowns; never manufacture certainty. Leave it empty only "
+                    "when the decision is fully determined."
                 ),
             },
             {
@@ -473,6 +488,9 @@ class HostAssignedDeepSeekHarnessTurnDriver:
             requested_model_id=self.requested_model_id,
             effective_model_ids=effective_models,
             credential_scope_id=self.credential_scope_id,
+            unresolved_unknowns=tuple(
+                str(item) for item in result.conclusion.unresolved_unknowns
+            ),
         )
 
     def run_turn(
@@ -682,11 +700,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
                     assignment,
                     run_receipt,
                     trace=evidence.trace,
-                    conclusion={
-                        "status": "candidate_completed",
-                        "summary": evidence.rationale,
-                        "unresolved_unknowns": [],
-                    },
+                    conclusion=_candidate_completed_conclusion(evidence),
                 )
                 proposed = lifecycle.propose_completion(
                     recorded,
