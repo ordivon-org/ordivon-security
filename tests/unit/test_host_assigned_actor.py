@@ -10,6 +10,7 @@ from pathlib import Path
 from ordivon_security._canonical import JsonObject, canonical_digest
 from ordivon_security.actors.agent_stack import AgentTurnEvidence
 from ordivon_security.actors.host_assigned import (
+    _candidate_completed_conclusion,
     _host_json_value,
     _model_context_from_compiled,
 )
@@ -227,6 +228,67 @@ class HostAssignedActorTests(unittest.TestCase):
                 credential_scope_id="credential-scope:deepseek:flash:0",
                 host_task_id="task:partial",
             )
+
+    def test_candidate_completed_conclusion_retains_structured_unknowns(self) -> None:
+        trace: JsonObject = {
+            "schemaVersion": 1,
+            "kind": "ordivon.harness-trace",
+            "harnessRunId": "harness-run:unknowns",
+            "events": [],
+        }
+        evidence = AgentTurnEvidence(
+            harness_run_id="harness-run:unknowns",
+            assignment_id="assignment:unknowns",
+            context_digest=_DIGESTS[0],
+            selected_action="cage.team.sleep",
+            rationale="decision with residual unknowns",
+            stop_code="candidate_completed",
+            trace=trace,
+            trace_digest=canonical_digest(trace),
+            usage={},
+            requested_model_id="deepseek-v4-flash",
+            effective_model_ids=("deepseek-v4-flash",),
+            credential_scope_id="credential-scope:deepseek:flash:0",
+            unresolved_unknowns=(
+                "exact input bytes were not re-observed",
+                "provider receipt identity not yet reconciled",
+            ),
+        )
+        conclusion = _candidate_completed_conclusion(evidence)
+        self.assertEqual(conclusion["status"], "candidate_completed")
+        self.assertEqual(conclusion["summary"], "decision with residual unknowns")
+        self.assertEqual(
+            conclusion["unresolved_unknowns"],
+            [
+                "exact input bytes were not re-observed",
+                "provider receipt identity not yet reconciled",
+            ],
+        )
+
+    def test_candidate_completed_conclusion_defaults_to_no_unknowns(self) -> None:
+        trace: JsonObject = {
+            "schemaVersion": 1,
+            "kind": "ordivon.harness-trace",
+            "harnessRunId": "harness-run:empty",
+            "events": [],
+        }
+        evidence = AgentTurnEvidence(
+            harness_run_id="harness-run:empty",
+            assignment_id="assignment:empty",
+            context_digest=_DIGESTS[1],
+            selected_action="cage.team.native-policy",
+            rationale="fully determined decision",
+            stop_code="candidate_completed",
+            trace=trace,
+            trace_digest=canonical_digest(trace),
+            usage={},
+            requested_model_id="deepseek-v4-flash",
+            effective_model_ids=("deepseek-v4-flash",),
+            credential_scope_id="credential-scope:deepseek:flash:0",
+        )
+        self.assertEqual(
+            _candidate_completed_conclusion(evidence)["unresolved_unknowns"], []
+        )
 
     def test_float_normalization_is_deterministic_and_finite_only(self) -> None:
         self.assertEqual(

@@ -17,7 +17,7 @@ from ordivon_security.identity import security_source_identity
 
 from .protocol import ActorProposalFailureCode
 
-PROMPT_REVISION = "security-cage-team-plan-v2"
+PROMPT_REVISION = "security-cage-team-plan-v3"
 CONTEXT_PROJECTION_REVISION = "cage-team-plan-summary-v1"
 BACKEND_ID = "backend:native-harness-deepseek-v1"
 DOMAIN_ID = "domain:ordivon-security-cage-team-plan"
@@ -147,6 +147,7 @@ class AgentTurnEvidence:
     requested_model_id: str
     effective_model_ids: tuple[str, ...]
     credential_scope_id: str
+    unresolved_unknowns: tuple[str, ...] = ()
     host_task_id: str | None = None
     host_task_revision: int | None = None
     host_task_contract_digest: str | None = None
@@ -175,6 +176,10 @@ class AgentTurnEvidence:
         _text(self.selected_action, "Agent selected action")
         _text(self.rationale, "Agent rationale", max_bytes=8_000)
         _text(self.stop_code, "Harness stop code")
+        for unknown in self.unresolved_unknowns:
+            _text(unknown, "Agent turn unresolved UNKNOWN")
+        if len(self.unresolved_unknowns) != len(set(self.unresolved_unknowns)):
+            raise ValueError("Agent turn unresolved UNKNOWN values must be unique")
         validate_json(self.trace)
         _digest(self.trace_digest, "Harness Trace digest")
         validate_json(self.usage)
@@ -749,9 +754,10 @@ class DeepSeekHarnessTurnDriver:
                     "Use only the actor-specific visible observation. Never infer hidden "
                     "world truth. Call select_team_plan exactly once, then submit a "
                     "candidate_completed conclusion explaining the decision. This assignment "
-                    "is complete when one granted plan is selected. For candidate_completed, "
-                    "unresolved_unknowns MUST be an empty array; describe world uncertainty "
-                    "as caveats in the summary instead."
+                    "is complete when one granted plan is selected. Record genuine residual "
+                    "uncertainty honestly in unresolved_unknowns; never manufacture certainty. "
+                    "Leave unresolved_unknowns empty only when the selected plan fully "
+                    "determines the decision."
                 ),
             },
             {
@@ -856,6 +862,9 @@ class DeepSeekHarnessTurnDriver:
             requested_model_id=self.requested_model_id,
             effective_model_ids=effective_models,
             credential_scope_id=self.credential_scope_id,
+            unresolved_unknowns=tuple(
+                str(item) for item in result.conclusion.unresolved_unknowns
+            ),
         )
 
 
