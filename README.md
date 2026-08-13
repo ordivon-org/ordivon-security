@@ -196,8 +196,9 @@ This is a research system, not a production attack platform. `readiness: EXPERIM
 
 ## Start according to your job
 
-| Need | Read |
+| Need | Read / invoke |
 | --- | --- |
+| classify the exposed Security surface as constitution, profile, integration, or research apparatus | `uv run ordivon-security-surface` — read-only projection; it runs no experiment and grants no authority |
 | understand why Security exists and where experiments may act | this README + [`docs/research-boundary.md`](docs/research-boundary.md) |
 | understand constitutional law versus profiles/fixtures | [`docs/LAW-PROFILES-C0.md`](docs/LAW-PROFILES-C0.md) |
 | understand current components and data flow | [`docs/architecture.md`](docs/architecture.md) |

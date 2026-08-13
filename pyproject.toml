@@ -31,6 +31,7 @@ dev = [
 ]
 
 [project.scripts]
+ordivon-security-surface = "ordivon_security.cli_surface:main"
 ordivon-security-micro = "ordivon_security.cli:main"
 ordivon-security-cage4 = "ordivon_security.cli_cage4:main"
 ordivon-security-cage4-deepseek = "ordivon_security.cli_cage4_deepseek:main"

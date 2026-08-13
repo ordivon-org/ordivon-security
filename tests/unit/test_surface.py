@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import contextlib
+import io
+import json
 import unittest
 
 import ordivon_security
+from ordivon_security.cli_surface import main as surface_cli_main
 from ordivon_security.integrations import (
     HostAssignedDeepSeekHarnessTurnDriver,
     RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver,
@@ -23,6 +27,15 @@ class SecuritySurfaceTests(unittest.TestCase):
             {"constitution", "profile", "integration", "research-apparatus"},
         )
         self.assertEqual(value["compatibilityFacade"]["maturity"], "mixed")
+
+    def test_surface_cli_projects_manifest_without_experiment(self) -> None:
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            status = surface_cli_main([])
+        self.assertEqual(status, 0)
+        value = json.loads(stdout.getvalue())
+        self.assertEqual(value, ordivon_security.security_surface_manifest())
+        self.assertEqual(value["kind"], "ordivon.security.agent-first-surface")
 
     def test_canonical_integration_imports_are_available(self) -> None:
         self.assertTrue(HostAssignedDeepSeekHarnessTurnDriver.__name__)
