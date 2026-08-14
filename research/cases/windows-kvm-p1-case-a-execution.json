@@ -84,5 +84,11 @@
     "differential": "identical crash (0xC0000005 at GPU init) in both runs; the crack does not alter startup-path behavior",
     "kvm_limit": "TD dies at GPU init before the license state becomes observable; the license-bypass verdict requires stage-2 (real GPU on the Windows host)",
     "media_attachments": "readonly USB NTFS auto-mount quirk (diagnosed; writable attach used with pre/post digest integrity)"
+  },
+  "staticEvidence": {
+    "installer": "official Derivative-signed (fd70741d...), no malicious content",
+    "官方核心库": "286de2f7... 137,441,560B, signature valid",
+    "cracked核心库": "9990aabba2... 135,628,632B, tampered-but-signed (digest mismatch + PE checksum invalid), March-2026 build vs installer July-2026",
+    "patchLocus": "not in entry surfaces (licenseResponse/runMain/intact); likely in key-verification layer; no original March binary for byte diff"
   }
 }
