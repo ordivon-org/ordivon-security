@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.authority-lifecycle-engineering-acceptance",
+  "status": "accepted",
+  "implementationRevision": "1b49f14baeac3f7ffafc98729498c1eaa999083b",
+  "baseRevision": "3f35f08131c64f30393d906ef19df0825197073d",
+  "runtimeJobId": "job-01a00184-b0d6-7910-9c90-2e1c680f8cc4",
+  "executionResultDigest": "sha256:ffc4b71514fc918271bc573c71b930b6f4036d7f9bb2dc7c2cb24ea49d0c0a5e",
+  "stdoutDigest": "sha256:6ad777ed5947f15c9885886d6fee612a806db983cce8951d5b3a5ab9a9e2fde0",
+  "gates": {
+    "targetedAuthorityEvidenceTests": "7/7",
+    "unitTests": "423 passed; 4 skipped",
+    "repositoryFatalLintE9F": "pass",
+    "compileall": "pass",
+    "consoleEntrypoints": "35/35 resolvable",
+    "publicAllContracts": "pass",
+    "canonicalLocalDocLinks": "pass",
+    "ordinarySurfaceEntries": [
+      "EvidenceRecorder",
+      "RangeSession",
+      "ResearchCorpus",
+      "Software Evaluation"
+    ],
+    "ordinarySurfaceExpanded": false,
+    "caLicPublicationAudit": "pass",
+    "windowsOrKvmPathsChanged": []
+  },
+  "engineeringDisposition": {
+    "rangeAuthority": [
+      "RangeSessionSpec remains an exact frozen grant snapshot for one session object.",
+      "RangeSession.inspect exposes authorityId, revision and exact authorityDigest.",
+      "RangeEffectAdmission retains the exact authorityDigest that decided the request.",
+      "requestDigest and authorityDigest now require canonical lowercase SHA-256 identities."
+    ],
+    "evaluationAuthority": [
+      "EvaluationSpec continues to embed one exact AuthorityManifest and is not converted into a live lease.",
+      "Later authority changes are prospective and must not rewrite historical Evaluation evidence."
+    ],
+    "evidence": [
+      "Contest and Evaluation verifier-owned reads require relative regular files contained under the exact bundle root.",
+      "Absolute paths, parent traversal, symlink traversal and symlink bundle/output roots fail closed.",
+      "Fixed manifest/result/identity files are subject to the same containment policy as manifest-declared channel and Artifact paths."
+    ],
+    "researchCorpus": [
+      "ResearchCorpus denied-by-default Sample execution and exact revision identity already satisfy the relevant CA-LIC boundary; no new subsystem was required."
+    ]
+  },
+  "researchToEngineeringRules": [
+    "admission binds an exact authority snapshot",
+    "authority change is prospective rather than retroactive",
+    "offline locally verifiable authority spends revocation freshness and is not introduced without a consumer",
+    "external authorization carrier is not external capability execution",
+    "external signed authority would require producer/key/version identity continuity",
+    "already delivered information, receipts and historical admissions are not erased by future revocation"
+  ],
+  "explicitNonPromotions": [
+    "dynamic RangeAuthority mutation",
+    "central revocation registry",
+    "Security-owned lease or TTL service",
+    "remote entitlement polling",
+    "generic hardware attestation layer",
+    "generic capability proxy",
+    "Security key-rotation service",
+    "generic licensing or DRM subsystem"
+  ],
+  "auditNotes": [
+    "A full all-rule Ruff run still reports pre-existing style debt in historical research-apparatus files, especially adversarial epistemics acceptance scripts. That debt is not introduced by this revision and was deliberately not reformatted into this engineering change.",
+    "All Python lines added by this engineering revision were checked to remain within the configured 100-character line length, and changed Python files pass all non-E501 Ruff rules used in the pre-commit gate.",
+    "Windows/KVM implementation files were not changed in this round."
+  ],
+  "disposition": "Promote the CA-LIC results as Security authority/evidence engineering constraints, not as a new entitlement product surface. Reopen dynamic authority only when a real owned consumer requires it."
+}

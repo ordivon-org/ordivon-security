@@ -116,3 +116,5 @@ Reopen authority-lifecycle engineering only when at least one real Security cons
 5. externally signed Security results require key/provider migration while old evidence remains independently verifiable.
 
 Until then, exact immutable grant snapshots plus digest-bound historical admission are the smaller and safer engineering model.
+
+Exact acceptance evidence: [`../evidence/acceptance/security-authority-lifecycle-engineering-1b49f14.json`](../evidence/acceptance/security-authority-lifecycle-engineering-1b49f14.json).
