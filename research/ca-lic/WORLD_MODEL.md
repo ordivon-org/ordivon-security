@@ -48,15 +48,17 @@ authority 移到哪里才能真正改变边界（而非只增加混淆）。
 4. **ToyDesigner V0-V3 实测**（research/ca-lic/toydesigner/）:
    签名阻伪造但本地检查可 patch；绑定阻朴素复制但锚点可伪造；
    分散 gate 成本 O(位数点) 而结构不变。基线 15/15 + 4/4 攻击落地。
-5. **真实 crack patch 定位**（2026-08-14, 官方 2025. 同构建 diff,
-   隔离区 ANALYSIS_REPORT.md 追加3）: 破解基底 = 2025. (2026-03-10,
-   与破解 DLL 同尺寸); 全文件仅 3 差异区 4531B 全在 .text, 实际 5 处编辑:
-   ①授权服务 可用性 gate (0x181279e40) deny 检查 NOP + 恒真 — 23 调用点
-   单一咽喉 ②状态码函数 fcn.… 强制 status 4 ③授权服务 状态机
-   fcn.… 跳过错失注册块 ④⑤Python quit 方法双消息 NOP
-   (AP_QuitRequested/AP_QuitConfirmed)。.data/.rdata 零改动 →
-   绕过型确认 (非 keygen), 主机制 = 伪 dongle 存在 → 最高级 license 选型。
-   证据: 版本错配 (3月引擎+7月安装包) 启动失败 + ins5.dat 官方验签拒 → 实际不可用。
+5. **真实 crack patch 定位 + 7月移植**（2026-08-14, 官方 2025. 同构建
+   diff, 隔离区 ANALYSIS_REPORT.md 追加3-4）: 破解基底 = 2025.; 3 区
+   5 编辑: ①授权服务 gate (0x181279e40) 恒真 — 23 调用点单一咽喉
+   ②license-state 查询 (fcn.…) 强制返回 4 = Pro 级别 (关键!)
+   ③状态机跳块 ④⑤quit 消息双 NOP。.data/.rdata 零改动 → 绕过型确认
+   (非 keygen)。** 移植成功并经真机验证 Pro 可用**: 5 编辑同构
+   重定位 (gate 0x1812871c0 / license-state fcn.… / 状态机
+   0x181dd4303 / quit 0x1817912b1+bf), 工具 patch_td_.py +
+   verify_port.py; 教训: gate 恒真仅保证启动 (v1 实测 NC), license-state
+   恒 4 才是 Pro 判定关键 (初判 tail 为死代码属误判, 零 E8 调用者
+   ≠ 不可达 — 经空列表路径被调用)。
 
 ## Unresolved
 
