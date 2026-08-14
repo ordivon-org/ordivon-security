@@ -2,15 +2,23 @@
 
 Case: research/cases/windows-kvm-p1-目标产品-case-a-execution.json
 
-## 目标
+## 目标 (双重)
 
-A/B 判定破解 核心库.dll 是否真的解锁 Pro：
-- 对照组: 官方树 + 无 key → 记录 license 状态 (期望 NC/free)
-- 实验组: 换破解 核心库.dll → 记录 license 状态 + Pro 功能探针
-- 差值 = 破解真实行为 (Pro 解锁 / NC 会话限制 / 无效)
+1. **判定破解是否有效**: A/B (对照官方无 key / 实验破解 DLL) → license 状态差值
+2. **动态定位效验点**: 插桩调用栈 → 效验函数 RVA 列表 + A/B 行为分叉点 +
+   license 全局地址 → 静态 xref 收尾成完整效验点地图 (反转"先静态后动态"
+   顺序 — 静态已因无锚点卡住, 动态给的 RVA 就是新锚点)
 
 ## 探针信号 (按优先级)
 
+0. **插桩层 (双重目标的关键)** — Procmon + API Monitor, 命令行模式
+   (headless 兼容, 日志到文件):
+   - 追踪: CreateFile(ins*.dat/密钥文件.txt), RegOpenKeyEx/RegQueryValueEx,
+     LoadLibrary(授权服务/厂商), GetSystemTimeAsFileTime, VirtualProtect
+   - **每个 license 相关调用点捕获调用栈** → 栈内返回地址 = 效验函数 RVA
+     (动态定位, 绕过静态字符串零引用墙)
+   - A/B 两轮同插桩 → 行为首次分叉点 = patch 生效位置
+   - 输出 = 效验点地图 (RVA 列表) → 静态 xref 收尾成完整调用图
 1. **TD Python API (主信号)** — 探针 .toe + execute DAT:
    - app.product ("目标产品 Pro" / "Commercial" / "Non-Commercial")
    - td.licenses: 每个 license 的 type / status / systemCode / version
