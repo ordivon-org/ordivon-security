@@ -882,6 +882,8 @@ class WindowsKvmP0Tests(unittest.TestCase):
             "SetupComplete.cmd",
             "base-finalize.ps1",
             "benign_fixture.c",
+            "ca1_carrier_probe.c",
+            "ca1_effect_payload.c",
             "fabric_canary.c",
             "topology_churn_canary.c",
             "readonly_media_fixture.c.in",
@@ -903,6 +905,8 @@ class WindowsKvmP0Tests(unittest.TestCase):
         self.assertEqual({path.name for path in resource_root.iterdir()}, expected)
         for source_name in (
             "benign_fixture.c",
+            "ca1_carrier_probe.c",
+            "ca1_effect_payload.c",
             "sacrificial_canary.c",
             "p1_controller.c",
             "p1_controller_canary.c",
