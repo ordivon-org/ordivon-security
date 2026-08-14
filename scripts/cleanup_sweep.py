@@ -27,7 +27,7 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import DefaultDict, Iterable, Sequence
+from typing import DefaultDict, Sequence
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PKG = "ordivon_security"
