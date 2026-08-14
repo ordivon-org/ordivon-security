@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca0-classical-capability-cases",
+  "researchQuestion": "Which decomposition preserves decision-relevant distinctions across classical and Agent-native cyber cases without turning tools, tactics, malware labels, or provider products into the world model?",
+  "openingSecurityRevision": "f76911743ac2bc86a985eab540f8626bd529fda6",
+  "models": {
+    "A_tactic_lifecycle_tree": {
+      "hypothesis": "Tactical goals and lifecycle stages are sufficient as the primary capability basis.",
+      "expectedFailure": "Goal, mechanism, carrier, opportunity, control mode, defensive semantics, and evidence become entangled."
+    },
+    "B_tool_artifact_tree": {
+      "hypothesis": "Concrete tools, carriers, resources, and security-product families are sufficient as the primary capability basis.",
+      "expectedFailure": "Peer categories mix implementation, resource, mechanism, observation, and semantic effect; transfer requires endless new leaves."
+    },
+    "C_pure_relation_graph": {
+      "hypothesis": "World relation transitions alone are sufficient as the complete capability basis.",
+      "expectedFailure": "Decision-relevant mechanism, carrier, provider, exposure, evidence, fidelity, and cleanup differences disappear."
+    },
+    "D_orthogonal_capability_contract": {
+      "hypothesis": "Semantic relation transition plus orthogonal opportunity, mechanism, carrier, provider, control-mode, authority, evidence, cost/exposure, recovery, and fidelity coordinates is the smallest useful basis.",
+      "expectedFailure": "A later consumer finds two materially different capabilities that the coordinates cannot distinguish without adding a new top-level special case."
+    }
+  },
+  "criteria": [
+    "separates_goal_effect_from_mechanism",
+    "separates_mechanism_from_carrier",
+    "separates_opportunity_from_action_and_consequence",
+    "represents_multi_action_dependency_and_composition",
+    "preserves_red_blue_role_neutral_transition_semantics_when_possible",
+    "preserves_provider_replacement_and_cross_fidelity_transfer",
+    "represents_delegated_or_self_propagating_control_mode",
+    "separates_observation_detection_claim_receipt_and_truth",
+    "retains_decision_relevant_cost_exposure_reversibility_and_cleanup"
+  ],
+  "cases": [
+    {
+      "id": "shell-script-execution",
+      "case": "The same bounded host-state goal is realized through a shell/script interpreter rather than interactive/native execution.",
+      "effectDomains": ["CONTROL", "ASSET"],
+      "opportunity": "Interpreter and target functionality are available under the admitted authority.",
+      "mechanism": "Use executable functionality through an interpreter.",
+      "carrier": "shell/script",
+      "controlMode": "one-shot or controller-directed",
+      "decisionRelevantDifference": "Interpreter policy, provenance, logging, host process, quoting/encoding, and exposure can change while semantic effect remains the same.",
+      "falsifies": ["script as a complete semantic capability identity"]
+    },
+    {
+      "id": "document-macro-execution",
+      "case": "A document/application host conditionally executes embedded automation code.",
+      "effectDomains": ["CONTROL", "ASSET"],
+      "opportunity": "Document provenance, application policy, trust state, user/application opening path, and macro capability permit execution.",
+      "mechanism": "Induce or use a document host to execute embedded behavior.",
+      "carrier": "document/macro",
+      "controlMode": "one-shot or controller-directed",
+      "decisionRelevantDifference": "The carrier introduces provenance, trust, application-policy, user-interaction, and telemetry gates absent from an equivalent direct command.",
+      "falsifies": ["macro as payload objective", "carrier-free pure relation graph as complete contract"]
+    },
+    {
+      "id": "installer-custom-action",
+      "case": "An installer/package sequence realizes bounded process/file/service effects through package-defined actions.",
+      "effectDomains": ["CONTROL", "ASSET", "CONTINUITY"],
+      "opportunity": "Package admission and installer execution context permit the action sequence.",
+      "mechanism": "Use package/installer execution semantics.",
+      "carrier": "package/installer",
+      "controlMode": "controller-directed",
+      "decisionRelevantDifference": "Installer identity, sequencing, privilege context, rollback behavior, and artifacts differ from script/native realization of similar effects.",
+      "falsifies": ["installer as unique semantic effect", "目标产品B sample as general attack ontology"]
+    },
+    {
+      "id": "vulnerability-discovery",
+      "case": "A scanner, static analyzer, or fuzzer produces evidence that a target may admit an unintended transition.",
+      "effectDomains": ["KNOWLEDGE", "OPPORTUNITY"],
+      "opportunity": "A target revision and reachable analysis surface exist.",
+      "mechanism": "Probe, analyze, or generate inputs to discover or validate a weakness condition.",
+      "carrier": "provider-specific analysis/probe input",
+      "controlMode": "controller-directed",
+      "decisionRelevantDifference": "Finding, crash, exploitability proof, and verified consequence have different truth strength and should not collapse.",
+      "falsifies": ["vulnerability record as successful attack", "scanner finding as world truth"]
+    },
+    {
+      "id": "valid-credential-remote-control",
+      "case": "An actor establishes remote control by exercising an already-valid synthetic credential in an owned Range.",
+      "effectDomains": ["AUTHORITY", "CONTROL", "REACHABILITY"],
+      "opportunity": "Credential validity, service reachability, and policy permit the authenticated operation.",
+      "mechanism": "Use granted or leaked authority rather than exploit a software weakness.",
+      "carrier": "credential/token plus protocol/API",
+      "controlMode": "controller-directed",
+      "decisionRelevantDifference": "Revocation, provenance, detection surface, and preconditions differ from exploit-based movement despite similar final control state.",
+      "falsifies": ["lateral movement as one mechanism", "pure control-state result as complete capability description"]
+    },
+    {
+      "id": "exploit-based-remote-control",
+      "case": "An actor establishes remote control by consuming a target-specific weakness opportunity in an owned test target.",
+      "effectDomains": ["OPPORTUNITY", "CONTROL", "REACHABILITY"],
+      "opportunity": "Exact vulnerable target revision plus required reachability/preconditions.",
+      "mechanism": "Exploit weakness to cross the intended control boundary.",
+      "carrier": "provider/target-specific input or protocol",
+      "controlMode": "controller-directed",
+      "decisionRelevantDifference": "Applicability is revision-bound; proof and consequence differ; cleanup and defender countermeasure differ from valid-credential movement.",
+      "falsifies": ["CVE presence as exploit success", "movement tactic as complete capability contract"]
+    },
+    {
+      "id": "persistence-artifact-vs-control",
+      "case": "A durable startup/service/file artifact survives disruption but may or may not yield usable controller control afterward.",
+      "effectDomains": ["CONTINUITY", "CONTROL"],
+      "opportunity": "The target permits a durable state change and later reactivation/control path.",
+      "mechanism": "Persist behavior or authority across a disruption boundary.",
+      "carrier": "service/task/startup/configuration/package/provider-specific",
+      "controlMode": "persistent",
+      "decisionRelevantDifference": "Persistent bytes or configuration are evidence of state, not proof of persistent usable control.",
+      "falsifies": ["persistence artifact equals persistent control"]
+    },
+    {
+      "id": "host-attached-virus",
+      "case": "Code attaches to or transforms another program so execution can reproduce the same infectious capability.",
+      "effectDomains": ["CONTINUITY", "ASSET"],
+      "opportunity": "A writable/transformable host program and execution path exist.",
+      "mechanism": "Replicate through host-program infection or attachment.",
+      "carrier": "host executable/program artifact",
+      "controlMode": "self-propagating or autonomously continuing",
+      "decisionRelevantDifference": "Replication architecture is separable from whatever payload effect the replicated code performs.",
+      "falsifies": ["virus as payload-effect category"]
+    },
+    {
+      "id": "network-worm",
+      "case": "A compromised entity autonomously discovers or reaches additional owned entities, obtains execution/control, and continues propagation.",
+      "effectDomains": ["OPPORTUNITY", "CONTROL", "REACHABILITY", "CONTINUITY"],
+      "opportunity": "Remote targets expose a usable trust/weakness/reachability path.",
+      "mechanism": "Exploit/abuse plus remote transfer and delegated continuation.",
+      "carrier": "network/protocol plus executable/data realization",
+      "controlMode": "self-propagating or delegated continuation",
+      "decisionRelevantDifference": "Propagation is a composite architecture across multiple transitions, not one atomic semantic effect.",
+      "falsifies": ["worm as one effect", "atomic technique equals attack"]
+    },
+    {
+      "id": "indirect-prompt-injection",
+      "case": "Attacker-controlled external data induces a tool-using Agent to exercise authority not justified by the user's intended task.",
+      "effectDomains": ["OBSERVABILITY", "CONTROL", "AUTHORITY", "ASSET"],
+      "opportunity": "The Agent consumes untrusted content in a decision path and has consequential Tool authority.",
+      "mechanism": "Induce another principal/Agent to act through adversarially interpreted data.",
+      "carrier": "prompt/tool-result/external data",
+      "controlMode": "one-shot or controller-directed",
+      "decisionRelevantDifference": "The carrier is novel, while induced-principal action and delegated victim authority are classical structural invariants.",
+      "falsifies": ["new carrier requires new top-level world relation"]
+    },
+    {
+      "id": "self-replicating-agent-prompt",
+      "case": "Adversarial content induces downstream Agent applications to reproduce the content and trigger further affected applications.",
+      "effectDomains": ["OBSERVABILITY", "CONTROL", "REACHABILITY", "CONTINUITY"],
+      "opportunity": "Connected Agent applications consume and forward attacker-influenced content.",
+      "mechanism": "Induced-principal behavior plus replicated/delegated continuation.",
+      "carrier": "prompt/RAG/tool data",
+      "controlMode": "self-propagating or delegated continuation",
+      "decisionRelevantDifference": "Worm-like propagation survives a radical carrier change from executable code to Agent data/control context.",
+      "falsifies": ["worm identity bound to binary/network-code carrier", "tool tree as transfer-stable basis"]
+    },
+    {
+      "id": "network-observation",
+      "case": "A passive network observer emits structured evidence about connections, protocols, files, or application activity.",
+      "effectDomains": ["KNOWLEDGE", "OBSERVABILITY"],
+      "opportunity": "Sensor has admitted visibility into the relevant network path.",
+      "mechanism": "Observe and parse traffic/events.",
+      "carrier": "network telemetry",
+      "controlMode": "persistent sensor",
+      "decisionRelevantDifference": "Detailed observation can exist without a maliciousness verdict or authoritative world-truth promotion.",
+      "falsifies": ["telemetry equals detection", "sensor equals truth"]
+    },
+    {
+      "id": "rule-based-detection",
+      "case": "A rule/signature engine maps observed event/traffic/artifact evidence to a derived detection or classification.",
+      "effectDomains": ["KNOWLEDGE", "OBSERVABILITY"],
+      "opportunity": "Required evidence fields/artifacts are available to the detector and the rule is applicable.",
+      "mechanism": "Pattern/rule/correlation matching over evidence.",
+      "carrier": "log event, network event, or file/artifact evidence",
+      "controlMode": "controller-directed or persistent detector",
+      "decisionRelevantDifference": "A match is derived evidence with provider/rule applicability, not independent target truth and not a response action.",
+      "falsifies": ["generic DETECT primitive", "alert equals consequence truth"]
+    },
+    {
+      "id": "executable-capability-analysis",
+      "case": "Static/dynamic analysis derives candidate behaviors that an executable appears capable of performing.",
+      "effectDomains": ["KNOWLEDGE"],
+      "opportunity": "Executable or sandbox-report evidence is available and analyzable.",
+      "mechanism": "Feature/rule-based capability inference.",
+      "carrier": "binary/module/shellcode/sandbox report",
+      "controlMode": "one-shot analysis",
+      "decisionRelevantDifference": "Inferred code capability helps select later inspection/execution but is neither runtime consequence nor malware-family identity.",
+      "falsifies": ["static capability inference equals executed behavior"]
+    },
+    {
+      "id": "defensive-revocation-isolation-restoration",
+      "case": "A Blue actor removes synthetic authority, restricts reachability/control, or restores an owned target after verified adversarial effects.",
+      "effectDomains": ["AUTHORITY", "CONTROL", "REACHABILITY", "CONTINUITY", "ASSET", "OPPORTUNITY"],
+      "opportunity": "Blue has explicit response authority and current evidence sufficient for the chosen intervention.",
+      "mechanism": "Revoke, isolate, eradicate, patch/harden, or restore through provider-owned mechanisms.",
+      "carrier": "identity/network/endpoint/recovery provider",
+      "controlMode": "controller-directed",
+      "decisionRelevantDifference": "The same relation domains can describe Red and Blue transitions while objective, direction, authority, provider, and recovery obligations differ.",
+      "falsifies": ["separate Red/Blue physics required by default"]
+    }
+  ],
+  "acceptedCandidate": {
+    "model": "D_orthogonal_capability_contract",
+    "status": "research-coordinate-only",
+    "notAuthorizedAs": [
+      "public enum",
+      "universal attack ontology",
+      "RangeActionGateway schema",
+      "provider registry",
+      "execution authority"
+    ],
+    "nextFalsifiers": [
+      "CA1 carrier substitution across script/document/installer-like cases",
+      "CA2 opportunity/discovery/exploitability provider comparison",
+      "CA3 control/authority/continuity/reachability and propagation comparison",
+      "CA4 observation/detection/adjudication/response provider comparison"
+    ]
+  }
+}

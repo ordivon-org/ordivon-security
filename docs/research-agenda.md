@@ -14,7 +14,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-07
+updated: 2026-08-14
 summary: Canonical experiment sequence from reproducible Contests and CAGE transfer through adaptive Campaigns, organizations, evaluator attacks, coevolution, and cross-fidelity transfer.
 evidence_status: not_applicable
 readiness: READY
@@ -139,11 +139,13 @@ Deploy a small isolated containerlab Range with Red workspace, Blue workspace, t
 
 Falsifier: the Range cannot reset and destroy reliably, world truth depends on evaluated actors, or container fidelity does not change the research result.
 
-## R7 — Open tools and classical capability reuse
+## R7 — Classical capability assimilation
 
-Use CALDERA, ATT&CK mappings, shell tools, and defensive mechanisms through a Security `RangeActionGateway`. Compare structured actions, Ordivon Tool-proxy execution, and black-box Harness operation.
+CA0 is now accepted in [`CLASSICAL-CAPABILITY-BASIS-CA0.md`](CLASSICAL-CAPABILITY-BASIS-CA0.md). It rejects an ATT&CK clone, a tool/product tree, malware-family identity, a pure state-transition graph, and a prebuilt `RangeActionGateway` as the classical capability world model. The retained research candidate is a conditional, authority-bound semantic relation transition with orthogonal opportunity, mechanism, carrier, provider, control-mode, applicability, evidence, cost/exposure, recovery, and fidelity coordinates. The machine-readable cross-case falsifier set is retained in `research/ca0/classical-capability-cases.json`.
 
-Falsifier: open tools bypass action authority or produce effects that cannot be independently reconciled.
+The next sequence is deliberately provider-first rather than gateway-first: vary execution carriers in CA1; vulnerability discovery/exploitability providers in CA2; post-compromise control/authority/continuity/reachability and propagation in CA3; and classical Blue observation/detection/adjudication/response in CA4. Only repeated binding friction across those materially different consumers may admit a shared Security provider seam in CA5. Existing `RangeEffectRequest`, Harness Tool composition, Runtime execution, and provider-specific adapters remain the simpler baseline.
+
+Falsifiers: CA1-CA4 expose a material capability distinction that CA0's orthogonal coordinates cannot express without a top-level special case; or provider-specific adapters plus existing Ordivon owner contracts preserve the required semantics/evidence with no repeated friction, in which case no shared gateway is earned.
 
 ## R8 — Adversarial evaluation
 

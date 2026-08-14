@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca0-competing-model-assessment",
+  "ratingVocabulary": {
+    "preserved": "The model represents the distinction directly enough for the tested consumer class.",
+    "partial": "The distinction can be reconstructed or mapped, but is not a stable first-class separation.",
+    "collapsed": "The model merges materially different concepts or forces them into peer categories.",
+    "omitted": "The model intentionally does not represent the distinction and therefore cannot be the complete practical contract.",
+    "candidate": "The model represents the distinction, but CA1-CA4 physical/provider experiments are still required to validate it."
+  },
+  "models": [
+    "A_tactic_lifecycle_tree",
+    "B_tool_artifact_tree",
+    "C_pure_relation_graph",
+    "D_orthogonal_capability_contract"
+  ],
+  "criteria": {
+    "separates_goal_effect_from_mechanism": {
+      "A_tactic_lifecycle_tree": {"rating": "partial", "reason": "ATT&CK tactics and techniques explicitly separate why/how, but one technique can serve multiple tactics and the structure is an observed-behavior coordinate rather than a bound capability contract."},
+      "B_tool_artifact_tree": {"rating": "collapsed", "reason": "Tools, carriers, resources, and mechanisms are peers, so semantic effect must be inferred from implementation identity."},
+      "C_pure_relation_graph": {"rating": "omitted", "reason": "Semantic effects are explicit but mechanism is intentionally absent."},
+      "D_orthogonal_capability_contract": {"rating": "preserved", "reason": "Semantic transition and mechanism are distinct coordinates."}
+    },
+    "separates_mechanism_from_carrier": {
+      "A_tactic_lifecycle_tree": {"rating": "partial", "reason": "Technique/sub-technique detail can mention carrier but does not make carrier orthogonal to mechanism."},
+      "B_tool_artifact_tree": {"rating": "collapsed", "reason": "PowerShell, macro, installer, exploit, credential, worm, and C2-like categories mix carrier, mechanism, resource, and architecture."},
+      "C_pure_relation_graph": {"rating": "omitted", "reason": "Neither mechanism nor carrier is represented."},
+      "D_orthogonal_capability_contract": {"rating": "preserved", "reason": "Mechanism and carrier remain separate and exact provider realization is another coordinate."}
+    },
+    "separates_opportunity_from_action_and_consequence": {
+      "A_tactic_lifecycle_tree": {"rating": "partial", "reason": "Reconnaissance/vulnerability-scanning and exploitation behaviors can be mapped, but target-specific opportunity, attempt, receipt, and consequence are not the primary ontology boundary."},
+      "B_tool_artifact_tree": {"rating": "collapsed", "reason": "Scanner/exploit/tool identity tends to stand in for opportunity and action status."},
+      "C_pure_relation_graph": {"rating": "partial", "reason": "Opportunity and consequence can be world relations, but provider attempt/receipt semantics are absent."},
+      "D_orthogonal_capability_contract": {"rating": "preserved", "reason": "Opportunity/preconditions, action binding, provider receipt, observations, and independent consequence are separate."}
+    },
+    "represents_multi_action_dependency_and_composition": {
+      "A_tactic_lifecycle_tree": {"rating": "partial", "reason": "Tactic order suggests progression but does not itself encode causal precondition dependency; Attack Flow is a separate project for this reason."},
+      "B_tool_artifact_tree": {"rating": "collapsed", "reason": "A tool inventory does not encode why one action enables another."},
+      "C_pure_relation_graph": {"rating": "preserved", "reason": "A transition can create world preconditions consumed by a later transition."},
+      "D_orthogonal_capability_contract": {"rating": "preserved", "reason": "Relation transitions plus explicit preconditions compose naturally while keeping operational realization."}
+    },
+    "preserves_red_blue_role_neutral_transition_semantics_when_possible": {
+      "A_tactic_lifecycle_tree": {"rating": "collapsed", "reason": "Offensive ATT&CK and defensive D3FEND are separate knowledge structures even when they alter opposite directions of the same world relation."},
+      "B_tool_artifact_tree": {"rating": "collapsed", "reason": "Red and Blue product/tool families become different top-level categories."},
+      "C_pure_relation_graph": {"rating": "preserved", "reason": "Acquire/revoke authority, expand/isolate reachability, persist/eradicate continuity, and exploit/harden opportunity are naturally opposite relation changes."},
+      "D_orthogonal_capability_contract": {"rating": "candidate", "reason": "The same relation grammar is retained while objective, authority, provider, and direction differ; CA3/CA4 must physically falsify this."}
+    },
+    "preserves_provider_replacement_and_cross_fidelity_transfer": {
+      "A_tactic_lifecycle_tree": {"rating": "partial", "reason": "Techniques can map across implementations, but exact provider/fidelity applicability is external metadata."},
+      "B_tool_artifact_tree": {"rating": "collapsed", "reason": "Replacing provider/carrier changes the apparent capability identity even when semantics remain stable."},
+      "C_pure_relation_graph": {"rating": "preserved", "reason": "World semantics are provider-independent, but this is also why fidelity and mechanism distinctions disappear."},
+      "D_orthogonal_capability_contract": {"rating": "preserved", "reason": "Semantic identity can survive provider replacement while provider and fidelity remain exact evidence coordinates."}
+    },
+    "represents_delegated_or_self_propagating_control_mode": {
+      "A_tactic_lifecycle_tree": {"rating": "partial", "reason": "Propagation can be expressed as sequences of techniques but autonomy/delegation is not a stable orthogonal property."},
+      "B_tool_artifact_tree": {"rating": "partial", "reason": "Virus/worm labels capture some propagation architecture but bind it to malware categories and carriers."},
+      "C_pure_relation_graph": {"rating": "partial", "reason": "Repeated relation changes can be represented but controller-directed versus delegated/autonomous continuation is easy to erase."},
+      "D_orthogonal_capability_contract": {"rating": "candidate", "reason": "Control mode is explicit; CA3 must test whether self-propagation adds value beyond repeated controller-issued movement."}
+    },
+    "separates_observation_detection_claim_receipt_and_truth": {
+      "A_tactic_lifecycle_tree": {"rating": "omitted", "reason": "ATT&CK describes adversary behavior and detection knowledge but is not a truth-authority protocol."},
+      "B_tool_artifact_tree": {"rating": "collapsed", "reason": "Sensor, detector, SIEM/EDR, analysis tool, and responder are easily grouped together as defensive tools."},
+      "C_pure_relation_graph": {"rating": "partial", "reason": "Knowledge/observability relations exist but derivation provenance and provider receipts are not sufficient by themselves."},
+      "D_orthogonal_capability_contract": {"rating": "preserved", "reason": "Native evidence, fallible observations/detections, provider receipt, and independent consequence remain distinct coordinates/planes."}
+    },
+    "retains_decision_relevant_cost_exposure_reversibility_and_cleanup": {
+      "A_tactic_lifecycle_tree": {"rating": "partial", "reason": "Technique metadata and operational knowledge may imply these properties but they are not the semantic identity boundary."},
+      "B_tool_artifact_tree": {"rating": "partial", "reason": "Tool identity may predict these properties but makes portability and comparison difficult."},
+      "C_pure_relation_graph": {"rating": "omitted", "reason": "Equivalent final state transitions can have radically different exposure, latency, rollback, and cleanup."},
+      "D_orthogonal_capability_contract": {"rating": "candidate", "reason": "The properties are explicit optional coordinates; later experiments must show which ones deserve Agent-visible projection versus evidence-only retention."}
+    }
+  },
+  "decision": {
+    "retainedModel": "D_orthogonal_capability_contract",
+    "reason": "It is the only candidate that preserves the semantic transition spine while retaining operational distinctions required by materially different carriers/providers and by Security's existing authority/evidence laws.",
+    "scope": "CA0 research coordinate only; not a production schema or public enum.",
+    "nextPressure": "CA1-CA4 must try to break the retained model with physical/provider consumers before CA5 may promote any shared binding."
+  }
+}
