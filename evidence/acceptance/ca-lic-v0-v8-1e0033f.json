@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca-lic-v0-v8-acceptance",
+  "status": "accepted",
+  "implementationRevision": "1e0033fc8a3f048655bbb7e90a2ecbba8949d3fe",
+  "runtimeJobId": "job-01a0014d-97f6-7ea2-8dd1-df231c3e0c95",
+  "executionResultDigest": "sha256:8e7c6af502d4bdf80f792b18542738557ca9add785ae578e7af0c3473219d5b5",
+  "stdoutDigest": "sha256:90b301e445206f874b36832512912576fe044d5e1dc5165248031d308263e143",
+  "gates": {
+    "legacyFeatureBaseline": "15/15",
+    "legacyForgedTierRejected": true,
+    "advancedDefenseBaseline": "10/10",
+    "unitTests": "416 passed; 4 skipped",
+    "srcTestsRuffE9F": "pass",
+    "caLicRuffE9F": "pass",
+    "publicationAudit": "pass",
+    "windowsFrozen": true,
+    "windowsOrKvmPathsTouched": []
+  },
+  "measurements": {
+    "V4": {
+      "integrityDetection": "effective",
+      "localEnforcementPatchSites": 1,
+      "boundaryChanged": false
+    },
+    "V5": {
+      "freeLocalVerifierPatch": "blocked-by-absent-key",
+      "authorizedKeyExtraction": "succeeds",
+      "boundaryChanged": "partial"
+    },
+    "V6": {
+      "signedRemoteDecision": "effective",
+      "nonceBound": true,
+      "localEnforcementPatchSites": 1,
+      "boundaryChangedForCapabilityProtection": false
+    },
+    "V7": {
+      "localFakeIndependentVerification": "rejected",
+      "externalPrivateStateRequired": true,
+      "boundaryChanged": true,
+      "physicalHardwareProof": false
+    },
+    "V8": {
+      "protectedImplementationShipped": false,
+      "localFakeIndependentVerification": "rejected",
+      "externalServiceRequired": true,
+      "boundaryChanged": true
+    }
+  },
+  "hypotheses": {
+    "H1_sameArtifactExposure": "supported-with-V5/V8-boundary-qualification",
+    "H2_localAuthorityCollapse": "supported",
+    "H3_externalizedAuthority": "semantically-supported-physical-proof-pending",
+    "H4_remoteNotSolved": "supported-by-V6-vs-V8",
+    "H5_securityIsEconomic": "supported-as-multidimensional-model"
+  },
+  "limitations": [
+    "ToyDesigner is self-owned Python research code; patch LOC does not estimate real binary reverse-engineering effort.",
+    "The V7 external-authority process is hardware-shaped semantic simulation, not physical TPM/dongle/TEE hostile-host proof.",
+    "V8 uses an owned local process to execute the remote-capability contract without network access; it proves contract/topology semantics, not cloud operational security.",
+    "No Windows/KVM path, unknown third-party binary, or third-party installer was executed or modified in this round.",
+    "Current-tree publication redaction does not erase historical Git objects; repository history was not rewritten."
+  ],
+  "disposition": "Retain CA-LIC as accepted research apparatus in the full Security surface; exclude it from ordinary Security navigation and do not promote a DRM SDK, entitlement gateway, anti-tamper framework, dongle abstraction, or third-party bypass capability."
+}

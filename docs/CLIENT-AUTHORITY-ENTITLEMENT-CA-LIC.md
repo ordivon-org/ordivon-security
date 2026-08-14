@@ -76,6 +76,8 @@ The second ladder changes one structural variable at a time. Its clean defense b
 | V7 | external authority performs a required signed primitive | a local fake cannot produce an independently verifiable ticket; entitled external primitive succeeds | changed for that primitive |
 | V8 | protected premium capability executes externally | a local fake can imitate UI/result shape but cannot produce a valid service-authoritative result | changed |
 
+Exact acceptance evidence: [`../evidence/acceptance/ca-lic-v0-v8-1e0033f.json`](../evidence/acceptance/ca-lic-v0-v8-1e0033f.json).
+
 The V6/V8 contrast is the strongest result of this round:
 
 ```text
