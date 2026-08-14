@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "kind": "ordivon.security.windows-kvm-isolated-research-admission",
-  "admissionId": "admission:windows-kvm-p1:caseb-studio-isolated-research",
+  "admissionId": "admission:windows-kvm-p1:目标产品B--isolated-research",
   "revision": "1",
-  "caseId": "case:caseb-studio",
-  "sourceDecision": "decision:windows-kvm-p1:caseb-studio-static-entry",
+  "caseId": "case:目标产品B-",
+  "sourceDecision": "decision:windows-kvm-p1:目标产品B--static-entry",
   "productAdmission": {
     "status": "rejected",
     "installOnHost": false,

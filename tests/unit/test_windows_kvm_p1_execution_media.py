@@ -182,17 +182,17 @@ class WindowsKvmP1ExecutionMediaTests(unittest.TestCase):
         case_value = json.loads(
             (
                 repo
-                / "research/cases/windows-kvm-p1-caseb-case-a-original-repack.json"
+                / "research/cases/windows-kvm-p1-caseb-original-repack.json"
             ).read_text(encoding="utf-8")
         )
         transform_value = json.loads(
             (
-                repo / "research/cases/windows-kvm-p1-caseb-case-a-transform.json"
+                repo / "research/cases/windows-kvm-p1-caseb-transform.json"
             ).read_text(encoding="utf-8")
         )
         contract_value = json.loads(
             (
-                repo / "research/cases/windows-kvm-p1-caseb-case-a-execution.json"
+                repo / "research/cases/windows-kvm-p1-caseb-execution.json"
             ).read_text(encoding="utf-8")
         )
         retained_case = CapabilityCase.from_dict(case_value)
@@ -206,7 +206,7 @@ class WindowsKvmP1ExecutionMediaTests(unittest.TestCase):
             retained_transform.transformations,
         )
         self.assertEqual(
-            retained_contract.installer_relative_path, "目标产品B Resolve Studio.exe"
+            retained_contract.installer_relative_path, "目标产品B  Studio.exe"
         )
         self.assertIs(retained_contract.materialization_authorized, True)
         self.assertIs(retained_contract.controller_admitted, False)

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "ordivon.security.capability-case",
-  "caseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
+  "caseId": "case:目标产品-7月构建:a-license-evaluation",
   "revision": "1",
   "role": "original-repack",
   "admission": {
@@ -14,11 +14,11 @@
   "source": {
     "archiveDigest": "sha256:baa675456427b552d7edfcc480b30574aed33a7575eac19295a9dbd678358a17",
     "archiveByteLength": 3347448340,
-    "archiveName": "目标产品-2025--bundle.7z",
-    "staticDecision": "windows-kvm-p1-目标产品-case-a-execution.json"
+    "archiveName": "目标产品-7月构建-bundle.7z",
+    "staticDecision": "windows-kvm-p1-case-a-execution.json"
   },
-  "transformationManifest": "transform:目标产品-2025-:case-a",
-  "transformationManifestDigest": "sha256:4413c74055f812af5e3e93cc4d597d98597d2f1d21b43475a3b397664c4a184c",
+  "transformationManifest": "transform:目标产品-7月构建:case-a",
+  "transformationManifestDigest": "sha256:0f8fa8b2ca0a76dd08220bd086c5eb8a7c5e2e92e046912909a535c6ea78b0d4",
   "observationProfile": "windows-installer-p1",
   "networkMode": "deny-all",
   "status": "admitted",

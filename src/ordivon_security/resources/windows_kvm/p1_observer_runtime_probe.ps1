@@ -10,7 +10,7 @@ $observerPath = 'C:\ProgramData\Ordivon\p1-observer.ps1'
 $observerDigest = 'sha256:f66834322288251407cf50dc1f8c0986cb7bb6228f139d69cc128aa8fb421399'
 $observerBytes = 14517
 $observerOutput = "$ResultPath.observer.json"
-$stagingRoot = Join-Path $env:TEMP '目标产品B Resolve'
+$stagingRoot = Join-Path $env:TEMP '目标产品B '
 $nestedRoot = Join-Path $stagingRoot 'nested'
 
 $result = [ordered]@{

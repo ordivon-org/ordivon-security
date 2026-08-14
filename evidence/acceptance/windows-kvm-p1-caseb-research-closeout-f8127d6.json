@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "ordivon.security.windows-kvm-p1-caseb-research-closeout",
-  "caseId": "case:caseb-studio",
+  "caseId": "case:目标产品B-",
   "status": "closed-current-research-cycle",
   "closedAtDate": "2026-08-09",
   "closedImplementationRevision": "git:f8127d6e840e53108f75b6b730221c75573c94c1",

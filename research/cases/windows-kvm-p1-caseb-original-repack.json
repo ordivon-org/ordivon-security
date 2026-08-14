@@ -6,7 +6,7 @@
     "hostObservationAuthorized": false,
     "targetSurface": "disposable-windows-kvm"
   },
-  "caseId": "case:caseb-studio:a-original-repack",
+  "caseId": "case:目标产品B-:a-original-repack",
   "controls": {
     "destroyOverlayAfterRun": true,
     "executionMedia": "host-materialized-read-only-tree",
@@ -16,7 +16,7 @@
     "sampleBytesChanged": false,
     "unknownSecondaryExecution": "block"
   },
-  "executionContract": "windows-kvm-p1-caseb-case-a-execution.json",
+  "executionContract": "windows-kvm-p1-caseb-execution.json",
   "kind": "ordivon.security.capability-case",
   "networkMode": "deny-all",
   "observationProfile": "windows-installer-p1",
@@ -30,6 +30,6 @@
     "staticDecision": "windows-kvm-p1-caseb-static-entry.json"
   },
   "status": "execution-media-contract-ready-runner-required",
-  "transformationManifest": "windows-kvm-p1-caseb-case-a-transform.json",
-  "transformationManifestDigest": "sha256:2db1fc9b91589f0aceef66de7bb35855d72027dc3d42af1edb55f1ebd13f4e7c"
+  "transformationManifest": "windows-kvm-p1-caseb-transform.json",
+  "transformationManifestDigest": "sha256:4198e62d8510b97d289acc067145de0f12974545589692416b7e65b36d4152cf"
 }

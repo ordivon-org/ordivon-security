@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "kind": "ordivon.security.environment-transformation-manifest",
-  "manifestId": "transform:目标产品-2025-:case-a",
+  "manifestId": "transform:目标产品-7月构建:case-a",
   "revision": "1",
-  "sourceCaseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
+  "sourceCaseId": "case:目标产品-7月构建:a-license-evaluation",
   "sourceCaseDigest": "sha256:fe648373dfe81393ea8f804d46b167da9e13e7c88418b771e37cb68fa29679af",
   "transformations": [
     "attach-source-read-only",

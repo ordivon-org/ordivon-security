@@ -5,13 +5,13 @@ import json
 from pathlib import Path
 
 from ordivon_security.evaluation.windows_host_p1 import (
-    collect_windows_host_resolve_baseline,
+    collect_windows_host_caseb_baseline,
 )
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Capture the existing Windows 目标产品B Resolve Free control read-only."
+        description="Capture the existing Windows 目标产品B  Free control read-only."
     )
     parser.add_argument(
         "--powershell",
@@ -34,7 +34,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    result = collect_windows_host_resolve_baseline(
+    result = collect_windows_host_caseb_baseline(
         args.powershell,
         args.script,
         args.receipt,

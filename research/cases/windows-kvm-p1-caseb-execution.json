@@ -6,9 +6,9 @@
     "hostModificationAuthorized": false,
     "materializationAuthorized": true
   },
-  "caseId": "case:caseb-studio:a-original-repack",
-  "caseManifestDigest": "sha256:ca0061ea6689c1d2489804132c7a2a82947712c5a911419119ed1e1ea260cf46",
-  "contractId": "contract:caseb-studio:case-a-execution-media",
+  "caseId": "case:目标产品B-:a-original-repack",
+  "caseManifestDigest": "sha256:a3daad3db6f5e9c4d4f89acfdcc5582fd4c90dc066245ec909957dcc24173594",
+  "contractId": "contract:目标产品B-:case-a-execution-media",
   "controls": {
     "destroyOverlayAfterRun": true,
     "disposableOverlay": true,
@@ -22,7 +22,7 @@
     "arguments": [],
     "byteLength": 4585876,
     "digest": "sha256:ee98ffe8a4b681caa0958704816cba7426c46842298e042e4a8ce34ad2a1d40c",
-    "relativePath": "目标产品B Resolve Studio.exe"
+    "relativePath": "目标产品B  Studio.exe"
   },
   "kind": "ordivon.security.windows-kvm-p1-execution-contract",
   "observationProfile": "windows-installer-p1",
@@ -41,6 +41,6 @@
     "digest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
     "name": "目标产品B_Resolve_Studio_.7z"
   },
-  "transformationManifestDigest": "sha256:2db1fc9b91589f0aceef66de7bb35855d72027dc3d42af1edb55f1ebd13f4e7c",
-  "transformationManifestId": "transform:caseb-studio:case-a-environment"
+  "transformationManifestDigest": "sha256:4198e62d8510b97d289acc067145de0f12974545589692416b7e65b36d4152cf",
+  "transformationManifestId": "transform:目标产品B-:case-a-environment"
 }

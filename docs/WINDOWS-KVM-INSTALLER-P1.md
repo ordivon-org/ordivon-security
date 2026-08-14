@@ -43,7 +43,7 @@ The first implemented gate is media preparation only:
 7. seal a private manifest with the preparation identity digest, media digest, and QEMU attachment arguments;
 8. require `readonly=on`, `removable=on`, and serial `ORDIVON_P1`.
 
-The retained 目标产品B profile at `research/cases/windows-kvm-p1-caseb-studio.json` authorizes only `prepare-authorized-windows-installer-media`. The current media gate passed from revision `136a8a7`: the exact 7,428,655,207-byte archive was embedded in an 8 GiB NTFS image, streamed back with the same SHA-256, bound to a QEMU-read-only topology, and tied to the Security revision plus SHA-256 identities for `mkntfs`, `ntfscp`, and `ntfscat`. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-caseb-media-136a8a7.json`](../evidence/acceptance/windows-kvm-p1-caseb-media-136a8a7.json). The earlier `bcac3cc` media is retained only as a superseded pre-provenance record.
+The retained 目标产品B profile at `research/cases/windows-kvm-p1-caseb-.json` authorizes only `prepare-authorized-windows-installer-media`. The current media gate passed from revision `136a8a7`: the exact 7,428,655,207-byte archive was embedded in an 8 GiB NTFS image, streamed back with the same SHA-256, bound to a QEMU-read-only topology, and tied to the Security revision plus SHA-256 identities for `mkntfs`, `ntfscp`, and `ntfscat`. The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-p1-caseb-media-136a8a7.json`](../evidence/acceptance/windows-kvm-p1-caseb-media-136a8a7.json). The earlier `bcac3cc` media is retained only as a superseded pre-provenance record.
 
 `executionAuthorized` remains false, so neither the archive nor any contained installer may be attached to a Guest or executed yet.
 
@@ -51,18 +51,18 @@ Later execution requires a new admitted Guest observation protocol, an exact ins
 
 ## Static entry decision
 
-The retained static decision at [`../research/cases/windows-kvm-p1-caseb-static-entry.json`](../research/cases/windows-kvm-p1-caseb-static-entry.json) rejects generation of an executable profile for the current Case. It binds the archive, wrapper, outer MSI, nested GetintoWAY MSI, embedded downloader script, replacement `intl.dll`, and main `Resolve.exe` identities.
+The retained static decision at [`../research/cases/windows-kvm-p1-caseb-static-entry.json`](../research/cases/windows-kvm-p1-caseb-static-entry.json) rejects generation of an executable profile for the current Case. It binds the archive, wrapper, outer MSI, nested GetintoWAY MSI, embedded downloader script, replacement `intl.dll`, and main `.exe` identities.
 
 The original rejection remains correct, but the R2 causality re-assessment sharpens the attack model into two independent branches rather than pretending the package is one continuous proven chain.
 
 The **ordinary wrapper installation path is statically bound**:
 
-- the wrapper's 312,380-byte PE overlay contains one configured prerequisite action, `SetupFile=目标产品B Resolve\\目标产品B.msi` with `CommandLine=/qr`;
+- the wrapper's 312,380-byte PE overlay contains one configured prerequisite action, `SetupFile=目标产品B \\目标产品B.msi` with `CommandLine=/qr`;
 - the outer MSI binds the 152,576-byte unsigned replacement `intl.dll`, the 20,848-byte `intl_original.dll`, and `Patches.txt` to `ResolveFeature` under `INSTALLATIONDIR`;
-- the replacement DLL exports the expected `libintl` proxy surface, references `intl_original.dll`, imports `VirtualProtect`, and contains `Patches.txt`, `Resolve.exe`, offset-regeneration, and in-memory patch logic;
-- the observed `Resolve.exe` import table does not directly import `intl.dll`, so the exact runtime loader remains a separate question.
+- the replacement DLL exports the expected `libintl` proxy surface, references `intl_original.dll`, imports `VirtualProtect`, and contains `Patches.txt`, `.exe`, offset-regeneration, and in-memory patch logic;
+- the observed `.exe` import table does not directly import `intl.dll`, so the exact runtime loader remains a separate question.
 
-The package also contains a **malicious nested branch**. `目标产品B Resolve.7z` contains exactly one unsigned GetintoWAY MSI whose first-install chain still independently verifies:
+The package also contains a **malicious nested branch**. `目标产品B .7z` contains exactly one unsigned GetintoWAY MSI whose first-install chain still independently verifies:
 
 - `AI_DATA_SETTER` at sequence 6401;
 - `PowerShellScriptInline` at sequence 6402;
@@ -85,7 +85,7 @@ The observation contract is evidence infrastructure only. It does not change `ex
 
 The current 目标产品B package is closed as **rejected**, not promoted to an execution Trial. Independent table-level verification reproduced the wrapper identity, the original and replacement `intl.dll` entries, the nested GetintoWAY MSI, first-install sequences 6401 and 6402, the external downloader, BITS/WebClient transports, highest-privilege scheduled-task creation, and recursive execution of downloaded EXE files.
 
-The final sanitized Case index is [`../evidence/acceptance/windows-kvm-p1-caseb-case-closeout-bf272ab.json`](../evidence/acceptance/windows-kvm-p1-caseb-case-closeout-bf272ab.json). That closeout originally claimed complete media removal, but a later state-root audit found one manifest-bound non-executable 8 GiB image still present. The corrected residual authority is [`../evidence/acceptance/windows-kvm-p1-caseb-residual-correction-r0.json`](../evidence/acceptance/windows-kvm-p1-caseb-residual-correction-r0.json). No installer or contained component was executed to reach the original static decision.
+The final sanitized Case index is [`../evidence/acceptance/windows-kvm-p1-caseb-closeout-bf272ab.json`](../evidence/acceptance/windows-kvm-p1-caseb-closeout-bf272ab.json). That closeout originally claimed complete media removal, but a later state-root audit found one manifest-bound non-executable 8 GiB image still present. The corrected residual authority is [`../evidence/acceptance/windows-kvm-p1-caseb-residual-correction-r0.json`](../evidence/acceptance/windows-kvm-p1-caseb-residual-correction-r0.json). No installer or contained component was executed to reach the original static decision.
 
 This closes the **ordinary installation admission** for the current 目标产品B package. It does not erase the package or prohibit a separately authorized isolated research Trial. Product admission and research admission are different authorities.
 
@@ -161,13 +161,13 @@ Process-tree orchestration and the third-party execution backend remain unadmitt
 
 | Case | Surface | Current state |
 | --- | --- | --- |
-| C — installed Resolve Free  control | existing main Windows host, read-only | signed executable and official `intl.dll` identities captured before and after without change |
+| C — installed  Free  control | existing main Windows host, read-only | signed executable and official `intl.dll` identities captured before and after without change |
 | A — original repack | disposable Windows KVM | mandatory environment transformation manifest binds read-only media, deny-all egress, local record-only FakeNet, secondary-EXE blocking, and overlay destruction; runner still required |
 | B — deweaponized derived payload | main Windows controlled-evaluation surface | exact `intl.dll` and `Patches.txt` privately rematerialized; pre/post observer and explicit host-write Gate required before any installed file changes |
 
 Case A's transformation manifest changes the environment while preserving the original Sample bytes. Case B's payload manifest records what was removed and retained, but the materializer refuses `/mnt/*` destinations and cannot deploy to Windows. R3 therefore establishes the comparison topology and evidence inputs without changing the main Windows installation. Case C is labeled Free from the user's declaration; feature-level behavior remains a later comparison Gate.
 
-The host baseline can be reproduced with `ordivon-security-windows-host-p1-baseline`. Its public acceptance index binds the private receipt digest and verifies that `Resolve.exe` and the signed official `intl.dll` were stable before and after collection.
+The host baseline can be reproduced with `ordivon-security-windows-host-p1-baseline`. Its public acceptance index binds the private receipt digest and verifies that `.exe` and the signed official `intl.dll` were stable before and after collection.
 
 
 ## R4 architecture decision: one controller/orchestrator Runner
@@ -208,7 +208,7 @@ The host-prepared extracted view removes Guest 7-Zip from the trusted execution 
 
 ### R4-A contracts and materializer
 
-The retained contract at [`../research/cases/windows-kvm-p1-caseb-case-a-execution.json`](../research/cases/windows-kvm-p1-caseb-case-a-execution.json) binds the exact Case manifest, transformation manifest, original archive, wrapper path, wrapper SHA-256 and byte length, observation profile, and required controls. It authorizes only Host-side materialization. It explicitly retains:
+The retained contract at [`../research/cases/windows-kvm-p1-caseb-execution.json`](../research/cases/windows-kvm-p1-caseb-execution.json) binds the exact Case manifest, transformation manifest, original archive, wrapper path, wrapper SHA-256 and byte length, observation profile, and required controls. It authorizes only Host-side materialization. It explicitly retains:
 
 - `controllerAdmitted: false`;
 - `executionAuthorized: false`;
@@ -237,7 +237,7 @@ Case A remains non-executable until a **selective** Windows execution-control ca
 
 ### R5 selective staging execution control
 
-The exact retained downloader script was re-read from the Case source and re-verified at 2,910 bytes with SHA-256 `fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397`. Its relevant runtime surface is concrete rather than hypothetical: it creates `%TEMP%\\目标产品B Resolve`, downloads `packagecache_x64_data.zip`, expands the archive into that directory, recursively enumerates `*.exe`, registers each discovered executable as a highest-privilege scheduled task, and starts it. R5 therefore tests only whether the disposable environment can keep that staging tree writable while preventing PE execution from the tree.
+The exact retained downloader script was re-read from the Case source and re-verified at 2,910 bytes with SHA-256 `fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397`. Its relevant runtime surface is concrete rather than hypothetical: it creates `%TEMP%\\目标产品B `, downloads `packagecache_x64_data.zip`, expands the archive into that directory, recursively enumerates `*.exe`, registers each discovered executable as a highest-privilege scheduled task, and starts it. R5 therefore tests only whether the disposable environment can keep that staging tree writable while preventing PE execution from the tree.
 
 An AppLocker blocklist prototype was physically rejected. After correcting the policy XML and adding stage-by-stage evidence, the canary ran as `NT AUTHORITY\\SYSTEM` (`S-1-5-18`), with `Everyone` and `BUILTIN\\Administrators` present in the token. The local policy appeared in the effective policy, but `Test-AppLockerPolicy` returned `AllowedByDefault` for both the allowed and staging-path executables; the staging executable then ran to exit code zero, wrote its marker, and produced no AppLocker deny event. The prototype is therefore not an admitted Guardian for this SYSTEM execution surface.
 

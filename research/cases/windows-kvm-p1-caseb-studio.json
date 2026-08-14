@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "kind": "ordivon.security.windows-kvm-installer-profile",
-  "profileId": "profile:windows-kvm-p1:caseb-studio",
+  "profileId": "profile:windows-kvm-p1:目标产品B-",
   "revision": "1",
-  "caseId": "case:caseb-studio",
+  "caseId": "case:目标产品B-",
   "archiveDigest": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
   "archiveByteLength": 7428655207,
   "archiveName": "目标产品B_Resolve_Studio_.7z",

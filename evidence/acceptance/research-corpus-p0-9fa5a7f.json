@@ -50,13 +50,13 @@
       "manifestDigest": "sha256:b96ccc34cbccf5940ad803a0d3fc93083d8f02c58da5b46eb3146a4eb4f697bd"
     },
     {
-      "recordId": "sample:275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+      "recordId": "sample:(哈希略)bfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
       "recordKind": "sample",
       "manifest": "research/corpus/seed-eicar-sample.json",
       "manifestDigest": "sha256:abe54ae32256bc8f06f9509729777f05663e6912bdb75462f324a9c8ba04ef97"
     },
     {
-      "recordId": "sample:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+      "recordId": "sample:(哈希略)b21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
       "recordKind": "sample",
       "manifest": "research/corpus/seed-caseb-sample.json",
       "manifestDigest": "sha256:965d0a9203117d0b22ac2b7de7a3abba266beea9f576764e6f89b9ef550d7223"

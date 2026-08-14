@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "kind": "ordivon.security.windows-kvm-p1-case-a-d2-bootstrapper-gate-acceptance",
   "status": "accepted-component-bootstrapper-gate-observed",
-  "caseId": "case:caseb-studio:a-original-repack",
+  "caseId": "case:目标产品B-:a-original-repack",
   "runId": "evaluation-run:321c8dd2bcb2af3eb76d9431",
   "jobId": "job-019fe526-3022-75f3-be7a-006f6fee8b92",
   "formalRuntimeTerminal": "guardian-runtime-bound-exceeded",
   "residualClosed": true,
   "component": {
     "digest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
-    "originalDatabase": "F:\\nested\\目标产品B Resolve.msi",
+    "originalDatabase": "F:\\nested\\目标产品B .msi",
     "clientPid": 5788,
     "exitCode": 1603,
     "runtimeBoundHit": false

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "ordivon.security.windows-kvm-p1-caseb-causality-reassessment",
-  "caseId": "case:caseb-studio",
+  "caseId": "case:目标产品B-",
   "analysisSourceRevision": "git:1ee60a35064fc1e51caa986959d49fd5737f19bb",
   "status": "accepted-static-causality-reassessment",
   "sample": {
@@ -45,7 +45,7 @@
     "peOverlayOffset": 4273496,
     "peOverlayByteLength": 312380,
     "configuredPrerequisiteEntries": 1,
-    "configuredSetupFile": "目标产品B Resolve\\目标产品B.msi",
+    "configuredSetupFile": "目标产品B \\目标产品B.msi",
     "configuredCommandLine": "/qr",
     "nestedArchiveListedAsDistributedFile": true,
     "nestedArchiveConfiguredAsSetupFile": false,
@@ -119,7 +119,7 @@
     "containedMaliciousBranch": {
       "status": "contained-reachability-unproven",
       "steps": [
-        "distribution contains 目标产品B Resolve.7z",
+        "distribution contains 目标产品B .7z",
         "that archive contains exactly one nested GetintoWAY MSI",
         "the nested MSI contains the first-install downloader and privileged scheduled-task chain"
       ],
@@ -198,7 +198,7 @@
   },
   "limitations": [
     "Absence of a literal nested-MSI reference in the wrapper action fields and outer MSI tables does not prove that no dynamic or data-dependent path can ever invoke it.",
-    "Resolve.exe does not directly import intl.dll in the observed import table; the exact runtime module that loads the proxy DLL remains unproved by this reassessment.",
+    ".exe does not directly import intl.dll in the observed import table; the exact runtime module that loads the proxy DLL remains unproved by this reassessment.",
     "Historical CoreHubPro D0 receipts prove failed isolated attempts and clean closure, not successful malicious stage-2 activation.",
     "The historical stage-2 input bundle is no longer retained in the known Security state roots, so its acquisition provenance was not reconstructed in this reassessment."
   ],

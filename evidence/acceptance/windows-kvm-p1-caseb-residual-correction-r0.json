@@ -4,8 +4,8 @@
     "hostModificationAuthorized": false,
     "removed": true
   },
-  "caseId": "case:caseb-studio",
-  "corrects": "windows-kvm-p1-caseb-case-closeout-bf272ab.json",
+  "caseId": "case:目标产品B-",
+  "corrects": "windows-kvm-p1-caseb-closeout-bf272ab.json",
   "finding": "an 8 GiB prepared non-executable NTFS image remained in the retired windows-kvm-p1 state root",
   "kind": "ordivon.security.windows-kvm-p1-residual-closure-correction-index",
   "limitations": [

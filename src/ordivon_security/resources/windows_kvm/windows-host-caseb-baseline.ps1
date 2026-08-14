@@ -2,8 +2,8 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
 $paths = @(
-    'C:\Program Files\厂商B Design\目标产品B Resolve\Resolve.exe',
-    'C:\Program Files\厂商B Design\目标产品B Resolve\intl.dll'
+    'C:\Program Files\厂商B\目标产品B \.exe',
+    'C:\Program Files\厂商B\目标产品B \intl.dll'
 )
 $files = @()
 foreach ($path in $paths) {
@@ -31,7 +31,7 @@ foreach ($root in @(
     'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'
 )) {
     Get-ItemProperty $root -ErrorAction SilentlyContinue |
-        Where-Object { $_.DisplayName -like '*目标产品B Resolve*' } |
+        Where-Object { $_.DisplayName -like '*目标产品B *' } |
         ForEach-Object {
             $uninstall += [ordered]@{
                 displayName = [string]$_.DisplayName
@@ -58,7 +58,7 @@ $result = [ordered]@{
     files = $files
     uninstallEntries = $uninstall
     relatedServices = $services
-    runningProcesses = @(Get-Process -Name Resolve -ErrorAction SilentlyContinue | ForEach-Object {
+    runningProcesses = @(Get-Process -Name  -ErrorAction SilentlyContinue | ForEach-Object {
         [ordered]@{ id = [int]$_.Id; path = [string]$_.Path }
     })
     readOnly = $true

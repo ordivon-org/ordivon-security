@@ -7,7 +7,7 @@
     "targetSurface": "windows-host-read-only-baseline"
   },
   "caseDigest": "sha256:c9ae0a7f2b10851e73cf6e6c213a08c526aa769aa0ef2670e138d49cbc57fd24",
-  "caseId": "case:目标产品B-caseb-free-:c-host-control",
+  "caseId": "case:目标产品B-:c-host-control",
   "edition": {
     "behaviorallyVerified": false,
     "claim": "free-user-declared",
@@ -39,22 +39,22 @@
     "receiptDigest": "sha256:a0b7bac280a81144e4c08ad6e1b400a0b6e8c20fb5a7812d921bb7e113e1c4f3"
   },
   "product": {
-    "displayName": "目标产品B Resolve",
+    "displayName": "目标产品B ",
     "displayVersion": "21.0.30007",
     "intlDll": {
       "byteLength": 20848,
       "digest": "sha256:dec4671bdb1946562301c434bef589fbe52bf193b0c1aa9be47faf9661f87f2e",
       "signatureStatus": "Valid",
-      "signerSubject": "CN=厂商B Design Pty Ltd, O=厂商B Design Pty Ltd, L=South Melbourne, S=Victoria, C=AU"
+      "signerSubject": "CN=厂商B Pty Ltd"
     },
-    "publisher": "厂商B Design",
+    "publisher": "厂商B",
     "resolveExe": {
       "byteLength": 574885744,
       "digest": "sha256:3a35bca1214d7463803033e2a94742a30db470c125b420f4daa89ce126f409aa",
       "fileVersion": "",
       "productVersion": "",
       "signatureStatus": "Valid",
-      "signerSubject": "CN=厂商B Design Pty Ltd, O=厂商B Design Pty Ltd, L=South Melbourne, S=Victoria, C=AU"
+      "signerSubject": "CN=厂商B Pty Ltd"
     }
   },
   "schemaVersion": 1,

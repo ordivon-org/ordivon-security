@@ -2,7 +2,7 @@
   "exportableArtifact": false,
   "hostDeployment": false,
   "kind": "ordivon.security.deweaponized-derived-case",
-  "manifestId": "transform:caseb-studio:case-b",
+  "manifestId": "transform:目标产品B-:case-b",
   "materializationStatus": "materialized",
   "removedComponents": [
     {
@@ -27,20 +27,20 @@
     {
       "byteLength": 152576,
       "digest": "sha256:737ba26966f648a4383ab28faae13a02a20b91f2d779a5e1ad24b4a4589e5f34",
-      "logicalPath": "目标产品B Resolve/intl.dll",
+      "logicalPath": "目标产品B /intl.dll",
       "role": "patch-loader"
     },
     {
       "byteLength": 4081,
       "digest": "sha256:32f25947ef6f60529622a2a1a7ed6340b17ca92ba2d11e9cbaefb5a0436c2216",
-      "logicalPath": "目标产品B Resolve/Patches.txt",
+      "logicalPath": "目标产品B /Patches.txt",
       "role": "patch-rules"
     }
   ],
   "revision": "2",
   "schemaVersion": 1,
   "sourceCaseDigest": "sha256:1d5203ed28ab8f21562d3f5c6828199a7e1902fc3e336d20e83338944ecbb504",
-  "sourceCaseId": "case:caseb-studio:a-original-repack",
+  "sourceCaseId": "case:目标产品B-:a-original-repack",
   "transformations": [
     "exclude-distribution-wrapper",
     "exclude-outer-and-nested-installer-chain",

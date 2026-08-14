@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "kind": "ordivon.security.windows-kvm-p1-case-a-d3-powershell-edge-acceptance",
   "status": "accepted-minimal-bootstrap-context-reaches-malicious-powershell",
-  "caseId": "case:caseb-studio:a-original-repack",
+  "caseId": "case:目标产品B-:a-original-repack",
   "runId": "evaluation-run:38c957a335c2b8da7549ae1c",
   "jobId": "job-019fe532-2e21-7763-a8de-68380eab46c7",
   "formalRuntimeTerminal": "guardian-runtime-bound-exceeded",

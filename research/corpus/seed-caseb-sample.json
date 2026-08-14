@@ -6,7 +6,7 @@
     "sha256": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
     "byteLength": 7428655207,
     "mediaType": "application/x-7z-compressed",
-    "originalName": "目标产品B_Resolve_Studio_.7z",
+    "originalName": "目标产品B_Studio.7z",
     "artifactRole": "third-party-artifact",
     "materialization": "metadata-only",
     "executionAdmission": "denied-by-default"
@@ -14,7 +14,7 @@
   "sourceRefs": [
     {
       "provider": "ordivon-security-p1-case",
-      "recordId": "case:caseb-studio",
+      "recordId": "case:目标产品B-studio",
       "locator": "research/cases/windows-kvm-p1-caseb-studio.json"
     }
   ],
@@ -25,7 +25,10 @@
       "value": true,
       "truthRole": "case-conclusion",
       "assertedBy": "ordivon-security-p1-static-causality",
-      "evidenceRefs": ["evidence/acceptance/windows-kvm-p1-caseb-causality-r2.json", "docs/WINDOWS-KVM-INSTALLER-P1.md"]
+      "evidenceRefs": [
+        "evidence/acceptance/windows-kvm-p1-caseb-causality-r2.json",
+        "docs/WINDOWS-KVM-INSTALLER-P1.md"
+      ]
     },
     {
       "claimId": "ordinary-execution-rejected",
@@ -33,8 +36,13 @@
       "value": false,
       "truthRole": "case-conclusion",
       "assertedBy": "ordivon-security-p1-case-closeout",
-      "evidenceRefs": ["evidence/acceptance/windows-kvm-p1-caseb-case-closeout-bf272ab.json"]
+      "evidenceRefs": [
+        "evidence/acceptance/windows-kvm-p1-caseb-closeout-bf272ab.json"
+      ]
     }
   ],
-  "evidenceRefs": ["evidence/acceptance/windows-kvm-p1-caseb-causality-r2.json", "docs/WINDOWS-KVM-INSTALLER-P1.md"]
+  "evidenceRefs": [
+    "evidence/acceptance/windows-kvm-p1-caseb-causality-r2.json",
+    "docs/WINDOWS-KVM-INSTALLER-P1.md"
+  ]
 }

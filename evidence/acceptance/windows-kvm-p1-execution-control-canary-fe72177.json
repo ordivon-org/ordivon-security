@@ -16,8 +16,8 @@
   "attackSurface": {
     "source": "retained-downloader-static-evidence",
     "downloaderScriptDigest": "sha256:fe335766b60b18bfc4890e832a1dfff1e8d0b44bd0aa6059206f34cf7081c397",
-    "stagingRoot": "%TEMP%\\目标产品B Resolve",
-    "target": "%TEMP%\\目标产品B Resolve\\**\\PE",
+    "stagingRoot": "%TEMP%\\目标产品B ",
+    "target": "%TEMP%\\目标产品B \\**\\PE",
     "claim": "keep the exact staging tree writable while denying PE execution from the root and inherited descendants"
   },
   "control": {
@@ -101,7 +101,7 @@
   },
   "limitations": [
     "the accepted executable is an Ordivon-maintained canary, not the 目标产品B Case A package or another third-party Sample",
-    "the deny is an exact sample-specific environmental transformation for the observed %TEMP%\\目标产品B Resolve staging tree, not a general malware sandbox",
+    "the deny is an exact sample-specific environmental transformation for the observed %TEMP%\\目标产品B  staging tree, not a general malware sandbox",
     "code able to rewrite the ACL, execute from another path, inject into an existing process, or use another untested execution mechanism is outside this gate's claim",
     "this acceptance does not establish runtime reachability from the ordinary wrapper or outer MSI to the contained malicious nested MSI",
     "the generic Controller and execution-control resources are not yet sealed together into a newly accepted P1 base",

@@ -10,11 +10,11 @@ from ordivon_security._canonical import JsonObject, canonical_digest
 
 from .windows_kvm import _digest_path, _replace_private_json
 
-_RESOLVE_PATH = Path("/mnt/c/Program Files/厂商B Design/目标产品B Resolve/Resolve.exe")
-_INTL_PATH = Path("/mnt/c/Program Files/厂商B Design/目标产品B Resolve/intl.dll")
+_RESOLVE_PATH = Path("/mnt/c/Program Files/目标产品B/引擎.exe")
+_INTL_PATH = Path("/mnt/c/Program Files/目标产品B/intl.dll")
 
 
-def collect_windows_host_resolve_baseline(
+def collect_windows_host_caseb_baseline(
     powershell_path: Path,
     script_path: Path,
     receipt_path: Path,
@@ -56,7 +56,7 @@ def collect_windows_host_resolve_baseline(
         raise ValueError("Windows host baseline did not preserve read-only semantics")
     after = {str(path): _digest_path(path) for path in watched}
     if after != before:
-        raise RuntimeError("Windows host Resolve identity changed during baseline collection")
+        raise RuntimeError("Windows host  identity changed during baseline collection")
     powershell_digest, powershell_length = _digest_path(powershell_path)
     script_digest, script_length = _digest_path(script_path)
     receipt: JsonObject = {

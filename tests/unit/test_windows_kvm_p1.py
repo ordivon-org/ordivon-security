@@ -62,7 +62,7 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(index["mediaRetained"], False)
         self.assertEqual(
             index["supersededBy"],
-            "windows-kvm-p1-caseb-case-closeout-bf272ab.json",
+            "windows-kvm-p1-caseb-closeout-bf272ab.json",
         )
         self.assertIs(index["authorization"]["prepareAuthorizedMedia"], True)
         self.assertIs(index["authorization"]["attachToGuest"], False)
@@ -84,7 +84,7 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertEqual(old_index["status"], "superseded-pre-provenance")
         self.assertEqual(old_index["supersededBy"], path.name)
 
-    def test_目标产品B_static_decision_rejects_execution_profile(self) -> None:
+    def test_caseb_static_decision_rejects_execution_profile(self) -> None:
         path = (
             Path(__file__).parents[2]
             / "research"
@@ -110,7 +110,7 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(profile_decision["attachToGuest"], False)
         self.assertIs(profile_decision["executeInstaller"], False)
 
-    def test_目标产品B_causality_reassessment_keeps_unproven_edges_explicit(self) -> None:
+    def test_caseb_causality_reassessment_keeps_unproven_edges_explicit(self) -> None:
         path = (
             Path(__file__).parents[2]
             / "evidence"
@@ -123,7 +123,7 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(value["sample"]["executedDuringReassessment"], False)
         self.assertEqual(
             value["wrapperBootstrapper"]["configuredSetupFile"],
-            "目标产品B Resolve\\目标产品B.msi",
+            "目标产品B \\目标产品B.msi",
         )
         self.assertIs(value["wrapperBootstrapper"]["nestedArchiveConfiguredAsSetupFile"], False)
         self.assertEqual(value["outerMsi"]["nestedArchiveLiteralReferenceCount"], 0)
@@ -185,7 +185,7 @@ class WindowsKvmP1Tests(unittest.TestCase):
             Path(__file__).parents[2]
             / "evidence"
             / "acceptance"
-            / "windows-kvm-p1-caseb-case-closeout-bf272ab.json"
+            / "windows-kvm-p1-caseb-closeout-bf272ab.json"
         )
         index = __import__("json").loads(path.read_text(encoding="utf-8"))
         self.assertEqual(index["status"], "closed-rejected")
@@ -216,7 +216,7 @@ class WindowsKvmP1Tests(unittest.TestCase):
         self.assertIs(index["decision"]["attachToGuest"], False)
         self.assertIs(index["decision"]["executeInstaller"], False)
 
-    def test_目标产品B_research_admission_does_not_reverse_product_rejection(self) -> None:
+    def test_caseb_research_admission_does_not_reverse_product_rejection(self) -> None:
         path = (
             Path(__file__).parents[2]
             / "research"

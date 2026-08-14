@@ -7,7 +7,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $allowedRoot = 'C:\ProgramData\Ordivon\P1PolicyAllowed'
-$blockedRoot = Join-Path $env:TEMP '目标产品B Resolve'
+$blockedRoot = Join-Path $env:TEMP '目标产品B '
 $nestedRoot = Join-Path $blockedRoot 'nested'
 $allowedExe = Join-Path $allowedRoot 'allowed-child.exe'
 $blockedExe = Join-Path $blockedRoot 'blocked-child.exe'
@@ -25,7 +25,7 @@ $result = [ordered]@{
     kind = 'ordivon.security.p1-execution-control-canary-result'
     fixtureId = 'ordivon-p1-execution-control-canary-v1'
     controlMechanism = 'ntfs-inherited-execute-deny'
-    targetSurface = '%TEMP%\目标产品B Resolve\**\PE'
+    targetSurface = '%TEMP%\目标产品B \**\PE'
     phase = 'created'
     phaseHistory = @('created')
     currentIdentityName = $identity.Name

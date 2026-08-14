@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from ordivon_security._canonical import canonical_digest
 from ordivon_security.evaluation.windows_host_p1 import (
-    collect_windows_host_resolve_baseline,
+    collect_windows_host_caseb_baseline,
 )
 from ordivon_security.evaluation.windows_kvm_p1 import (
     reconcile_windows_kvm_p1_non_executable_media,
@@ -37,10 +37,10 @@ class WindowsKvmP1CaseTests(unittest.TestCase):
 
     def test_case_a_requires_environment_transformation_manifest(self) -> None:
         manifest = EnvironmentTransformationManifest.from_dict(
-            self._json("research/cases/windows-kvm-p1-caseb-case-a-transform.json")
+            self._json("research/cases/windows-kvm-p1-caseb-transform.json")
         )
         case_a = CapabilityCase.from_dict(
-            self._json("research/cases/windows-kvm-p1-caseb-case-a-original-repack.json")
+            self._json("research/cases/windows-kvm-p1-caseb-original-repack.json")
         )
         self.assertEqual(case_a.role, "original-repack")
         self.assertEqual(case_a.admission.target_surface, "disposable-windows-kvm")
@@ -51,10 +51,10 @@ class WindowsKvmP1CaseTests(unittest.TestCase):
 
     def test_case_b_and_c_target_main_windows_without_open_write_gate(self) -> None:
         case_b = CapabilityCase.from_dict(
-            self._json("research/cases/windows-host-p1-caseb-case-b-derived.json")
+            self._json("research/cases/windows-host-p1-caseb-derived.json")
         )
         case_c = CapabilityCase.from_dict(
-            self._json("research/cases/windows-host-p1-caseb-case-c-free-control.json")
+            self._json("research/cases/windows-host-p1-caseb-free-control.json")
         )
         self.assertEqual(case_b.role, "deweaponized-derived")
         self.assertEqual(case_c.role, "control-free")
@@ -71,7 +71,7 @@ class WindowsKvmP1CaseTests(unittest.TestCase):
 
     def test_case_b_materialization_binds_exact_components(self) -> None:
         manifest = DerivedCaseManifest.from_dict(
-            self._json("research/cases/windows-host-p1-caseb-case-b-transform.json")
+            self._json("research/cases/windows-host-p1-caseb-transform.json")
         )
         manifest = replace(manifest, materialization_status="planned", resulting_tree_digest=None)
         sources: dict[str, Path] = {}
@@ -144,13 +144,13 @@ class WindowsKvmP1CaseTests(unittest.TestCase):
             patch.object(Path, "is_file", return_value=True),
             patch.object(Path, "is_symlink", return_value=False),
         ):
-            result = collect_windows_host_resolve_baseline(powershell, script, receipt)
+            result = collect_windows_host_caseb_baseline(powershell, script, receipt)
         self.assertEqual(result["status"], "captured-read-only")
         self.assertIs(result["hostModified"], False)
         self.assertTrue(receipt.is_file())
 
     def test_public_case_c_and_r0_evidence_bind_private_receipts(self) -> None:
-        case_c = self._json("research/cases/windows-host-p1-caseb-case-c-free-control.json")
+        case_c = self._json("research/cases/windows-host-p1-caseb-free-control.json")
         public_c = self._json("evidence/acceptance/windows-host-p1-caseb-free-baseline-r3.json")
         public_r0 = self._json(
             "evidence/acceptance/windows-kvm-p1-caseb-residual-correction-r0.json"

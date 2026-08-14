@@ -1,7 +1,7 @@
 """License model + verification chain for ToyDesigner (CA-LIC lab target).
 
 Mirrors the shape of 目标产品's entitlement surface observed in
-核心库.dll: license object with tier/status/system_code, tiered features,
+核心引擎 DLL: license object with tier/status/system_code, tiered features,
 scattered gates, TD-style denial strings.
 
 Defense levels (the V ladder), each adds ONE defense mechanism:

@@ -2,7 +2,7 @@
   "exportableArtifact": false,
   "hostDeployment": false,
   "kind": "ordivon.security.environment-transformation-manifest",
-  "manifestId": "transform:caseb-studio:case-a-environment",
+  "manifestId": "transform:目标产品B-:case-a-environment",
   "materializationStatus": "environment-bound",
   "retainedSample": {
     "byteLength": 7428655207,
@@ -12,7 +12,7 @@
   "sampleBytesChanged": false,
   "schemaVersion": 1,
   "sourceCaseDigest": "sha256:5ac181597d6fdae86befb6d0a9692ee56b5f6ff2abb05b5d10fc26f9a3f1d2a4",
-  "sourceCaseId": "case:caseb-studio",
+  "sourceCaseId": "case:目标产品B-",
   "transformations": [
     "attach-source-read-only",
     "host-materialize-read-only-execution-tree",

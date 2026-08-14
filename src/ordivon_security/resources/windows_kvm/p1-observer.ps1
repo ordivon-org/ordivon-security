@@ -1,7 +1,7 @@
 param(
     [Parameter(Mandatory = $true)][ValidateSet('pre','post')][string]$Phase,
     [Parameter(Mandatory = $true)][string]$OutputPath,
-    [string[]]$FileRoots = @('C:\Program Files\厂商B Design\目标产品B Resolve'),
+    [string[]]$FileRoots = @('C:\Program Files\厂商B\目标产品B '),
     [int]$MaxFileEntries = 20000,
     [int]$MaxEventEntries = 4000
 )

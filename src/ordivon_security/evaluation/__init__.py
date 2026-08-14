@@ -51,7 +51,7 @@ from .static import (
     StaticAnalyzerResult,
 )
 from .vault import SampleVault
-from .windows_host_p1 import collect_windows_host_resolve_baseline
+from .windows_host_p1 import collect_windows_host_caseb_baseline
 from .windows_kvm import (
     WindowsKvmBaseImage,
     WindowsKvmEvaluationBackend,
@@ -106,7 +106,7 @@ __all__ = [
     "DerivedCaseManifest",
     "EnvironmentTransformationManifest",
     "DerivedComponent",
-    "collect_windows_host_resolve_baseline",
+    "collect_windows_host_caseb_baseline",
     "materialize_derived_case",
     "reconcile_windows_kvm_p1_non_executable_media",
     "AuthorityManifest",

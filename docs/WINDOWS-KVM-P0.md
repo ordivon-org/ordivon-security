@@ -329,11 +329,11 @@ It does not authorize:
 - third-party installers;
 - internet-connected detonation;
 - production secrets or user data;
-- the retained 目标产品B Resolve Case;
+- the retained 目标产品B  Case;
 - claims of resistance to hypervisor escape, hardware side channels, or every
   Windows kernel attack.
 
 Any broader Sample class requires a separate Provider profile, admission schema,
-resource model, evidence plan, and real acceptance gate. The planned Resolve
+resource model, evidence plan, and real acceptance gate. The planned 
 work therefore belongs to a later P1 large-Sample path and cannot reuse this P0
 admission by changing a size limit or bypassing the fixture identity checks.

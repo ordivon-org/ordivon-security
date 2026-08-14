@@ -3,7 +3,7 @@
 Status: **current research cycle closed**
 Closeout implementation revision: `f8127d6e840e53108f75b6b730221c75573c94c1`
 
-This document closes the current 目标产品B Resolve Studio  research cycle. It does not create a new execution Authority or Activation.
+This document closes the current 目标产品B  Studio  research cycle. It does not create a new execution Authority or Activation.
 
 ## What is scientifically closed
 
@@ -41,7 +41,7 @@ A bound Subject stored inside an immutable derived environment still requires ex
 
 ## E2-B1 loader-causality state
 
-The exact retained product tree was sealed into a derived Windows execution environment and verified by full Host-side readback. A maintained benign Guest boot probe reverified the four key exact identities without launching Resolve or explicitly loading the third-party DLL. A maintained module-load observer canary established `Win32_ModuleLoadTrace` as an admissible exact PID/module-path join mechanism.
+The exact retained product tree was sealed into a derived Windows execution environment and verified by full Host-side readback. A maintained benign Guest boot probe reverified the four key exact identities without launching  or explicitly loading the third-party DLL. A maintained module-load observer canary established `Win32_ModuleLoadTrace` as an admissible exact PID/module-path join mechanism.
 
 The single-use loader Activation was then consumed, but the trial failed **before Windows boot and before any third-party launch** because the bound Subject lacked explicit immutable projection identity in its `EvaluationSubjectBinding`.
 
@@ -50,7 +50,7 @@ The failure is scientifically invalid for loader causality but methodologically 
 Therefore the current B1 cycle closes with:
 
 - Windows boot observed: **no**
-- Resolve launch observed: **no**
+-  launch observed: **no**
 - replacement `intl.dll` module load observed: **no**
 - residual closure: **yes**
 - primary loader-causality question resolved: **no**

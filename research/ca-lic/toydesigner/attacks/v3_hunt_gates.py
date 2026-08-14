@@ -7,7 +7,7 @@ across three modules using three idioms:
   - features/projects.py  registry import       (module-level `gate`)
 
 The TD-style denial strings are the discovery key (same technique as
-string-xref hunting in 核心库.dll: "This feature requires Pro license.").
+string-xref hunting in 核心引擎 DLL: "This feature requires Pro license.").
 
 Hunt = AST scan for gate call sites. Patch = neutralize each *site's own
 binding* (patched registry.gate does NOT disarm projects.py, which imported

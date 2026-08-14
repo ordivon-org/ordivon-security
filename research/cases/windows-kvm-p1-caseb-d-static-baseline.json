@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "ordivon.security.windows-kvm-p1-case-a-d-static-baseline",
-  "caseId": "case:caseb-studio:a-original-repack",
+  "caseId": "case:目标产品B-:a-original-repack",
   "question": {
     "postEdge": "After the already-proven exact wrapper -> exact nested malicious MSI edge, what bounded local behavior occurs under QMP zero-NIC plus the accepted staging ExecuteFile deny?",
     "outerMsi": "Does the same ordinary wrapper execution dynamically invoke the exact outer MSI, and if so when and under which caller/session identity?"
@@ -10,26 +10,26 @@
     "digest": "sha256:ee98ffe8a4b681caa0958704816cba7426c46842298e042e4a8ce34ad2a1d40c",
     "staticStrings": {
       "DefaultProdCode": "{DD86D73F-EBDF-4B04-B799-70B3CA46F2C0}",
-      "SetupFile": "目标产品B Resolve\\目标产品B.msi",
+      "SetupFile": "目标产品B \\目标产品B.msi",
       "CommandLine": "/qr",
       "containedReferences": [
-        "目标产品B Resolve\\目标产品B Resolve.7z",
-        "目标产品B Resolve\\目标产品B.msi"
+        "目标产品B \\目标产品B .7z",
+        "目标产品B \\目标产品B.msi"
       ]
     }
   },
   "outerMsi": {
     "digest": "sha256:44ae022b71782a8a4693abbc182f8fce59ef15200defd4088d7196595f64f6cf",
     "productCode": "{4728B644-B4C9-4C37-A6F3-12FC35150D15}",
-    "productName": "目标产品B Resolve",
+    "productName": "目标产品B ",
     "productVersion": "21.0.30007",
-    "manufacturer": "厂商B Design",
-    "interpretation": "Full product installer database with normal Resolve files/custom actions; static wrapper metadata names this path as SetupFile with /qr."
+    "manufacturer": "厂商B",
+    "interpretation": "Full product installer database with normal  files/custom actions; static wrapper metadata names this path as SetupFile with /qr."
   },
   "nestedMaliciousMsi": {
     "digest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
     "productCode": "{DD86D73F-EBDF-4B04-B799-70B3CA46F2C0}",
-    "productName": "目标产品B Resolve Studio ",
+    "productName": "目标产品B  Studio ",
     "productVersion": "0.0.0.0",
     "manufacturer": "GetintoWAY",
     "advancedInstallerExtractionFolder": "[TempFolder]A46F2C0",
@@ -42,7 +42,7 @@
       "onUnreachable": "exit 1 before staging directory creation"
     },
     "downstreamIfNetworkGateSucceeds": [
-      "create %TEMP%\\目标产品B Resolve",
+      "create %TEMP%\\目标产品B ",
       "bitsadmin download with WebClient fallback",
       "Expand-Archive",
       "enumerate *.exe recursively",
@@ -62,7 +62,7 @@
   "dImplication": [
     "With QMP zero NIC, the embedded downloader is expected to fail at its initial HEAD gate before bitsadmin/staging/task creation; D should test this physical consequence rather than assume it.",
     "D should continue the ordinary wrapper beyond the nested-MSI edge long enough to observe whether the wrapper subsequently invokes the exact outer MSI.",
-    "D should stop on a positive exact outer-MSI session rather than allow a full Resolve installation to proceed.",
+    "D should stop on a positive exact outer-MSI session rather than allow a full  installation to proceed.",
     "D must preserve all newly generated MSI-session identities, not only the malicious target session."
   ]
 }

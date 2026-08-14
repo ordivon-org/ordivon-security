@@ -177,11 +177,11 @@ This preserves CA2's central result that a static finding is not current exploit
 
 ### EICAR maintained test fixture
 
-`sample:275a021b...651fd0f` records the exact harmless EICAR fixture used by CA4. `real-malware=false` is a maintained-fixture fact, while `Eicar-Test-Signature` remains a ClamAV provider claim.
+`sample:(哈希略)...651fd0f` records the exact harmless EICAR fixture used by CA4. `real-malware=false` is a maintained-fixture fact, while `Eicar-Test-Signature` remains a ClamAV provider claim.
 
 ### 目标产品B retained Case identity
 
-`sample:7289cc3a...c2c0d2e` records the exact 7.4 GiB 目标产品B archive identity as `metadata-only`. Existing static malicious-chain and ordinary-execution-rejection conclusions remain `case-conclusion` claims. The archive bytes are not copied into Git or this corpus, and corpus registration does not admit execution.
+`sample:(哈希略)...c2c0d2e` records the exact 7.4 GiB 目标产品B archive identity as `metadata-only`. Existing static malicious-chain and ordinary-execution-rejection conclusions remain `case-conclusion` claims. The archive bytes are not copied into Git or this corpus, and corpus registration does not admit execution.
 
 ## Clean-source acceptance
 

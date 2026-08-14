@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "kind": "ordivon.security.windows-kvm-p1-case-a-causal-edge-acceptance",
   "status": "accepted-positive-causal-edge-from-procedurally-incomplete-trial",
-  "caseId": "case:caseb-studio:a-original-repack",
+  "caseId": "case:目标产品B-:a-original-repack",
   "scientificVerdict": "reachability-observed",
   "formalTrialVerdict": "trial-invalid",
   "causalEdge": "exact-wrapper -> exact-contained-malicious-nested-MSI",
@@ -57,16 +57,16 @@
     "etwEventId": 1,
     "etwStartTime": "2026-08-09T04:24:36.625434200+00:00",
     "etwParentPid": 2260,
-    "etwImage": "\\Device\\CdRom0\\payload\\目标产品B Resolve Studio \\目标产品B Resolve Studio.exe",
+    "etwImage": "\\Device\\CdRom0\\payload\\目标产品B  Studio \\目标产品B  Studio.exe",
     "independentEtwIdentityMatch": true
   },
   "targetInstallerEvidence": {
     "targetExpectedDigest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
-    "installerLogCallingProcess": "F:\\payload\\目标产品B Resolve Studio \\目标产品B Resolve Studio.exe",
+    "installerLogCallingProcess": "F:\\payload\\目标产品B  Studio \\目标产品B  Studio.exe",
     "callingProcessExactWrapper": true,
     "clientProcessId": 5812,
     "clientProcessIdEqualsEtwWrapperPid": true,
-    "originalDatabase": "C:\\WINDOWS\\SystemTemp\\A46F2C0\\目标产品B Resolve.msi",
+    "originalDatabase": "C:\\WINDOWS\\SystemTemp\\A46F2C0\\目标产品B .msi",
     "liveOriginalDatabaseDigest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
     "liveDigestExactTargetMatch": true,
     "packageCode": "{FB46DD5A-2F84-4CD7-9665-FF74E13A5F03}",
@@ -80,7 +80,7 @@
     "Kernel-Process ETW independently recorded process 5812 with the exact wrapper image path on the optical projection.",
     "The automatically generated Windows Installer target log independently named the exact wrapper path as Calling process.",
     "The same Installer session recorded CLIENTPROCESSID 5812, exactly equal to the ETW wrapper PID.",
-    "The Installer session recorded OriginalDatabase C:\\WINDOWS\\SystemTemp\\A46F2C0\\目标产品B Resolve.msi.",
+    "The Installer session recorded OriginalDatabase C:\\WINDOWS\\SystemTemp\\A46F2C0\\目标产品B .msi.",
     "While OriginalDatabase still existed, maintained Guest code hashed it to the exact pre-established malicious nested MSI SHA-256."
   ],
   "relatedEtwProcessEvidence": [

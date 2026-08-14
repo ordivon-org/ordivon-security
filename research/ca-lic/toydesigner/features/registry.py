@@ -2,7 +2,7 @@
 
 Feature -> minimum tier. Gates raise NotEntitled with a TD-style string
 (these strings are the "string xrefs" an attacker greps for, exactly like
-"This feature requires Pro license." in 核心库.dll).
+"This feature requires Pro license." in 核心引擎 DLL).
 """
 
 from . import _lic

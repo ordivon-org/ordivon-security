@@ -6,7 +6,7 @@
     "hostObservationAuthorized": true,
     "targetSurface": "windows-host-controlled-evaluation"
   },
-  "caseId": "case:caseb-studio:b-deweaponized-derived",
+  "caseId": "case:目标产品B-:b-deweaponized-derived",
   "controls": {
     "automaticHostMutation": false,
     "componentNetworkCapabilityEstablished": false,
@@ -23,7 +23,7 @@
   "role": "deweaponized-derived",
   "schemaVersion": 1,
   "source": {
-    "comparisonControlCase": "case:目标产品B-caseb-free-:c-host-control",
+    "comparisonControlCase": "case:目标产品B-:c-host-control",
     "materializationStatus": "materialized",
     "privateMaterializationReceipt": {
       "byteLength": 2420,
@@ -31,10 +31,10 @@
       "logicalName": "manifest.json"
     },
     "resultingTreeDigest": "sha256:4e4c5a990a0ea84d0c299577cf206573dcb67213d0864214e4b823193f4d7a13",
-    "transformationManifest": "windows-host-p1-caseb-case-b-transform.json",
-    "transformationManifestDigest": "sha256:e18b123c903699308ae1ea5b66ed2accae62b93be88b44a9665aef9e345561cd"
+    "transformationManifest": "windows-host-p1-caseb-transform.json",
+    "transformationManifestDigest": "sha256:3e759c7e7f9b2b9cc5dacbaad8da78696d08bb710b19d4f9eb3c54719a4bb95e"
   },
   "status": "materialized-host-write-gate-pending",
-  "transformationManifest": "windows-host-p1-caseb-case-b-transform.json",
-  "transformationManifestDigest": "sha256:e18b123c903699308ae1ea5b66ed2accae62b93be88b44a9665aef9e345561cd"
+  "transformationManifest": "windows-host-p1-caseb-transform.json",
+  "transformationManifestDigest": "sha256:3e759c7e7f9b2b9cc5dacbaad8da78696d08bb710b19d4f9eb3c54719a4bb95e"
 }

@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
   "kind": "ordivon.security.windows-kvm-p1-execution-contract",
-  "contractId": "contract:目标产品-2025-:case-a-execution",
+  "contractId": "contract:目标产品-7月构建:case-a-execution",
   "revision": "1",
-  "caseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
-  "caseManifestDigest": "sha256:f7b4fc0ec9298a0b927126e2c6b3b815369e57d2096cb2b107cee537d1a99759",
-  "transformationManifestId": "transform:目标产品-2025-:case-a",
-  "transformationManifestDigest": "sha256:4413c74055f812af5e3e93cc4d597d98597d2f1d21b43475a3b397664c4a184c",
+  "caseId": "case:目标产品-7月构建:a-license-evaluation",
+  "caseManifestDigest": "sha256:40e865476b25f44c1fb98f7abc508f7e0790eec96b8daf6f651de6326b5674f6",
+  "transformationManifestId": "transform:目标产品-7月构建:case-a",
+  "transformationManifestDigest": "sha256:0f8fa8b2ca0a76dd08220bd086c5eb8a7c5e2e92e046912909a535c6ea78b0d4",
   "sourceArchive": {
     "digest": "sha256:baa675456427b552d7edfcc480b30574aed33a7575eac19295a9dbd678358a17",
     "byteLength": 3347448340,
-    "name": "目标产品-2025--bundle.7z"
+    "name": "目标产品-7月构建-bundle.7z"
   },
   "installer": {
-    "relativePath": "runner.exe",
+    "relativePath": "探针 runner.exe",
     "digest": "sha256:01817335c2841d95e6b121caf7010b699b0ac86897e48fe9e88fdd307a1ad8b5",
     "byteLength": 159349,
     "arguments": [
@@ -48,7 +48,7 @@
     "hostModificationAuthorized": false,
     "exportableArtifact": false,
     "operatorDirectedExecution": true,
-    "operatorDirection": "2026-08-14 user: run full dynamic verification of the cracked 核心库.dll; OVERRIDE residual closure: retain VM/overlay/media residuals for the stage-2 real-GPU test on the Windows host after the no-virus verdict"
+    "operatorDirection": "2026-08-14 user: run full dynamic verification of the cracked 核心引擎 DLL; OVERRIDE residual closure: retain VM/overlay/media residuals for the stage-2 real-GPU test on the Windows host after the no-virus verdict"
   },
   "residualPolicy": {
     "closureOverride": "operator-directed retention (see operatorDirection)",
@@ -66,29 +66,29 @@
       "deploy_rc": "1",
       "td_start": "ok",
       "td_alive_5s": "true",
-      "td_outcome": "exited-3221225781 (0xC0000005, self-handled crash; no WER, no event log)",
-      "registry": "no Derivative keys created",
+      "td_outcome": "exited-3221225781 (0x…, self-handled crash; no WER, no event log)",
+      "registry": "no 厂商 keys created",
       "verdict": "official TD starts in GPU-less VM, dies at GPU/render init"
     },
     "crack": {
       "runId": "run:目标产品:crack:20260814191858",
       "deploy_rc": "1",
       "crack_replace_rc": "0",
-      "deployed_核心库_sha256": "9990aabba2cf4b4a065ef80a5ec12ef8a6ebba859ef05e66bd74f0f2e79562ae (crack verified on disk)",
+      "deployed_核心引擎_sha256": "9990aabba2cf4b4a065ef80a5ec12ef8a6ebba859ef05e66bd74f0f2e79562ae (crack verified on disk)",
       "td_start": "ok",
       "td_alive_5s": "true",
       "td_outcome": "exited-3221225781 (identical to control)",
-      "registry": "no Derivative keys created (identical to control)",
+      "registry": "no 厂商 keys created (identical to control)",
       "verdict": "crack DLL loads and replaces without ABI breakage; startup behavior identical to control"
     },
-    "differential": "identical crash (0xC0000005 at GPU init) in both runs; the crack does not alter startup-path behavior",
+    "differential": "identical crash (0x… at GPU init) in both runs; the crack does not alter startup-path behavior",
     "kvm_limit": "TD dies at GPU init before the license state becomes observable; the license-bypass verdict requires stage-2 (real GPU on the Windows host)",
     "media_attachments": "readonly USB NTFS auto-mount quirk (diagnosed; writable attach used with pre/post digest integrity)"
   },
   "staticEvidence": {
-    "installer": "official Derivative-signed (fd70741d...), no malicious content",
-    "官方核心库": "286de2f7... 137,441,560B, signature valid",
-    "cracked核心库": "9990aabba2... 135,628,632B, tampered-but-signed (digest mismatch + PE checksum invalid), March-2026 build vs installer July-2026",
+    "installer": "official 厂商-signed ((哈希略)), no malicious content",
+    "officialEngineDLL": "(哈希略) 137,441,560B, signature valid",
+    "crackedEngineDLL": "(哈希略) 135,628,632B, tampered-but-signed (digest mismatch + PE checksum invalid), March-2026 build vs installer July-2026",
     "patchLocus": "not in entry surfaces (licenseResponse/runMain/intact); likely in key-verification layer; no original March binary for byte diff"
   }
 }

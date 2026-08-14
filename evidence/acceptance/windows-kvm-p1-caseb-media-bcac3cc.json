@@ -5,7 +5,7 @@
     "prepareAuthorizedMedia": true,
     "startWindows": false
   },
-  "caseId": "case:caseb-studio",
+  "caseId": "case:目标产品B-",
   "current": false,
   "embeddedSource": {
     "byteLength": 7428655207,
@@ -44,7 +44,7 @@
     "volumeLabel": "ORDIVON_P1"
   },
   "profileDigest": "sha256:dedee9615926ff2b65c6ae7b055502a384af26321e0c17dbe045770ea6d7c499",
-  "profileId": "profile:windows-kvm-p1:caseb-studio",
+  "profileId": "profile:windows-kvm-p1:目标产品B-",
   "providerId": "provider:windows-kvm",
   "schemaVersion": 1,
   "source": {

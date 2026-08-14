@@ -7,7 +7,7 @@
 ## 结构
 
     vendor.py            厂商侧：keygen + 签发 license (Ed25519)
-    license_model.py     客户端验证链 (V0..V3) + td.License 形状的模型
+    license_model.py     客户端验证链 (V0..V3) + api.License 形状的模型
     app.py               启动验证 + 能力矩阵
     features/            3 种 gate 习语散布的模块 (V3 形态)
       render.py          直接布尔检查      ("This feature requires Pro license.")
@@ -50,12 +50,12 @@
 
 ## 与 目标产品 观察的对应
 
-| ToyDesigner | 目标产品 (核心库.dll 静态观察) |
+| ToyDesigner | 目标产品 (核心引擎 DLL 静态观察) |
 |---|---|
-| tier 缓存 + 门控 | td.License.type / isPro / 各处 "requires a Pro license" |
+| tier 缓存 + 门控 | api.License.type / isPro / 各处 "requires a Pro license" |
 | system code 绑定 | systemCode, "Created with different system code(5)" |
 | registry gate | 集中 license 检查函数 (UT_License/UT_Protection 类) |
-| 伪造 tier 文件被签名拦截 | 破解版 核心库.dll 的 digest mismatch = 官方签名无法覆盖被改内容 |
+| 伪造 tier 文件被签名拦截 | 破解版 核心引擎 DLL 的 digest mismatch = 官方签名无法覆盖被改内容 |
 
 ## 边界声明 (诚实分层)
 
