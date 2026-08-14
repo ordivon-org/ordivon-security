@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca5-provider-binding-audit-acceptance",
+  "status": "accepted-no-new-shared-binding",
+  "auditedSecurityRevision": "0b81e69e18d134e1645cff8024debe362d3d80d8",
+  "auditRuntimeJobs": [
+    "job-019ffef6-e0fd-7b01-a0e3-acec76ed4390",
+    "job-019ffef7-068c-7ac3-8272-cfb350fb1b78"
+  ],
+  "consumers": ["CA1", "CA2", "CA3", "CA4"],
+  "commonAcceptanceFields": ["authority", "gates", "kind", "limitations", "runtimeJobId", "schemaVersion", "securitySourceRevision", "status"],
+  "commonInvocationFieldsForcedByAllConsumers": [],
+  "decision": {
+    "directProviderSpecificPlusExistingOwners": "retain",
+    "newNarrowSecurityProviderBinding": "not-earned",
+    "RangeActionGateway": "reject-now"
+  },
+  "retainedInvariant": "exact provider/native evidence + exact target/world identity + explicit Security authority when consequential + independent current consequence/applicability evidence",
+  "implementationAdded": false,
+  "reason": "A shared gateway would wrap rather than displace heterogeneous provider mechanics and would duplicate existing Runtime, Harness, Range authority and evidence responsibilities."
+}

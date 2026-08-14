@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca5-provider-binding-audit",
+  "sourceRevision": "0b81e69e18d134e1645cff8024debe362d3d80d8",
+  "consumers": [
+    {
+      "id": "CA1",
+      "mechanicsOwner": "Windows KVM Evaluation provider plus Windows-native carriers",
+      "invocationShape": "EvaluationSpec/AuthorityManifest -> EvaluationRunner -> WindowsKvmEvaluationBackend",
+      "nativeEvidence": "Evaluation bundle + carrier-specific process/lifecycle evidence",
+      "securityResidual": ["sample/effect authority", "same-effect experiment identity", "independent consequence", "carrier interpretation"]
+    },
+    {
+      "id": "CA2",
+      "mechanicsOwner": "Clang/LLVM Static Analyzer, libFuzzer, AddressSanitizer",
+      "invocationShape": "provider-specific compiler/analyzer/fuzzer subprocesses over exact owned target revisions",
+      "nativeEvidence": "warnings, fuzz artifact, sanitizer report, exact-input replay",
+      "securityResidual": ["target authority", "evidence-strength separation", "applicability", "bounded consequence"]
+    },
+    {
+      "id": "CA3",
+      "mechanicsOwner": "local process/filesystem world plus experiment-local synthetic authority",
+      "invocationShape": "bounded worker operations with target-side generation checks",
+      "nativeEvidence": "worker receipts plus management-owned filesystem/authority truth",
+      "securityResidual": ["CONTROL/AUTHORITY/CONTINUITY interpretation", "delegation bound", "eradication/stale-belief experiment"]
+    },
+    {
+      "id": "CA4",
+      "mechanicsOwner": "ClamAV clamscan plus local filesystem move",
+      "invocationShape": "one-shot provider scan -> current applicability adjudication -> scoped response",
+      "nativeEvidence": "ClamAV scan output/signature plus file identity",
+      "securityResidual": ["detection/truth separation", "staleness", "response admission", "post-response truth"]
+    }
+  ],
+  "commonAcceptanceFields": ["authority", "gates", "kind", "limitations", "runtimeJobId", "schemaVersion", "securitySourceRevision", "status"],
+  "commonInvocationFieldsForcedByAllConsumers": [],
+  "existingOwners": {
+    "physicalExecutionAndRecovery": "Ordivon Runtime / provider-specific runner",
+    "agentCognitionAndToolComposition": "Ordivon Harness",
+    "adversarialEffectAdmission": "Security RangeAuthority/RangeEffectRequest where an Agent requests a Range effect",
+    "experimentEvidence": "Security Evaluation/acceptance evidence",
+    "providerMechanics": "external/provider-specific owner"
+  },
+  "options": {
+    "directProviderSpecificPlusExistingOwners": {
+      "verdict": "retain",
+      "reason": "All four materially different consumers reached accepted evidence without a missing shared invocation responsibility."
+    },
+    "newNarrowSecurityProviderBinding": {
+      "verdict": "not-earned",
+      "reason": "No invocation field or lifecycle responsibility is repeated across offensive and defensive consumers strongly enough to displace existing owners."
+    },
+    "RangeActionGateway": {
+      "verdict": "reject-now",
+      "reason": "Would wrap heterogeneous provider mechanics without deleting them, duplicate existing authority/execution boundaries, and tend toward a giant optional-field action schema."
+    }
+  },
+  "retainedInvariant": "exact provider/native evidence + exact target/world identity + explicit Security authority when consequential + independent current consequence/applicability evidence",
+  "reopenConditions": [
+    "two offensive and one defensive Agent-facing consumers require the same missing binding semantics",
+    "provider replacement repeatedly changes Security code solely because an otherwise stable domain contract has no home",
+    "Harness/Runtime composition cannot preserve a required Security effect or evidence distinction without duplicated adapters",
+    "CA6 tactical composition shows provider-specific surfaces create measurable Agent failure that a narrow typed binding removes"
+  ]
+}
