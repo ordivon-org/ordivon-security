@@ -60,6 +60,7 @@ ordivon-security-windows-kvm-p1-sealed-base-probe = "ordivon_security.cli_window
 ordivon-security-windows-kvm-p1-orchestrator-probe = "ordivon_security.cli_windows_kvm_p1_orchestrator_probe:main"
 ordivon-security-ca1-carrier-matrix = "ordivon_security.cli_ca1_carrier_matrix:main"
 ordivon-security-ca2-vulnerability-evidence = "ordivon_security.cli_ca2_vulnerability_evidence:main"
+ordivon-security-ca3-post-compromise-state = "ordivon_security.cli_ca3_post_compromise_state:main"
 ordivon-security-windows-host-p1-baseline = "ordivon_security.cli_windows_host_p1_baseline:main"
 
 [tool.setuptools.packages.find]
