@@ -132,6 +132,65 @@ class ResearchCorpusTests(unittest.TestCase):
         self.assertEqual(len(projection["claimsByTruthRole"]["provider-claim"]), 1)
         self.assertEqual(projection["claimsByTruthRole"]["independent-observation"], [])
 
+    def test_compare_candidate_is_read_only_and_reports_source_change(self) -> None:
+        current = {
+            "schemaVersion": 1,
+            "recordKind": "vulnerability",
+            "recordId": "vuln:osv:CVE-K1-0001",
+            "subject": {"targetScope": "external-advisory-only", "revisions": []},
+            "sourceRefs": [
+                {
+                    "provider": "osv",
+                    "recordId": "CVE-K1-0001",
+                    "snapshotDigest": "sha256:" + "1" * 64,
+                    "providerModified": "2026-01-01T00:00:00Z",
+                }
+            ],
+            "claims": [],
+            "evidenceRefs": [],
+        }
+        self.corpus.register(current)  # type: ignore[arg-type]
+        candidate = json.loads(json.dumps(current))
+        candidate["sourceRefs"][0]["snapshotDigest"] = "sha256:" + "2" * 64
+        candidate["sourceRefs"][0]["providerModified"] = "2026-08-14T00:00:00Z"
+        before = self.corpus.load("vuln:osv:CVE-K1-0001", record_kind="vulnerability")
+        comparison = self.corpus.compare_candidate(candidate)  # type: ignore[arg-type]
+        after = self.corpus.load("vuln:osv:CVE-K1-0001", record_kind="vulnerability")
+        self.assertEqual(comparison["status"], "changed")
+        self.assertTrue(comparison["recordChanged"])
+        self.assertFalse(comparison["mutationPerformed"])
+        self.assertEqual(len(comparison["sourceChanges"]), 1)
+        self.assertEqual(
+            comparison["sourceChanges"][0]["candidateProviderModified"],
+            "2026-08-14T00:00:00Z",
+        )
+        self.assertEqual(before, after)
+
+    def test_compare_candidate_reports_unchanged_and_not_registered(self) -> None:
+        record = {
+            "schemaVersion": 1,
+            "recordKind": "vulnerability",
+            "recordId": "vuln:osv:CVE-K1-0002",
+            "subject": {"targetScope": "external-advisory-only", "revisions": []},
+            "sourceRefs": [
+                {
+                    "provider": "osv",
+                    "recordId": "CVE-K1-0002",
+                    "snapshotDigest": "sha256:" + "3" * 64,
+                    "providerModified": "2026-08-14T00:00:00Z",
+                }
+            ],
+            "claims": [],
+            "evidenceRefs": [],
+        }
+        missing = self.corpus.compare_candidate(record)  # type: ignore[arg-type]
+        self.assertEqual(missing["status"], "not-registered")
+        self.corpus.register(record)  # type: ignore[arg-type]
+        unchanged = self.corpus.compare_candidate(record)  # type: ignore[arg-type]
+        self.assertEqual(unchanged["status"], "unchanged")
+        self.assertFalse(unchanged["recordChanged"])
+        self.assertEqual(unchanged["sourceChanges"], [])
+
     def test_seed_records_are_valid_and_do_not_embed_sample_bytes(self) -> None:
         repo = Path(__file__).resolve().parents[2]
         seeds = sorted((repo / "research" / "corpus").glob("seed-*.json"))

@@ -61,6 +61,16 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
 
+    compare_provider = subparsers.add_parser("compare-provider-snapshot")
+    compare_provider.add_argument("--root", type=Path, required=True)
+    compare_provider.add_argument(
+        "--provider",
+        choices=("osv", "nvd", "cisa-kev", "malwarebazaar", "virustotal"),
+        required=True,
+    )
+    compare_provider.add_argument("--snapshot", type=Path, required=True)
+    compare_provider.add_argument("--record-id")
+
     import_sample = subparsers.add_parser("import-local-sample")
     import_sample.add_argument("--root", type=Path, required=True)
     import_sample.add_argument("--vault", type=Path, required=True)
@@ -113,6 +123,15 @@ def main() -> None:
             raise ValueError("Provider snapshot must contain one JSON object")
         record = normalize_provider_record(args.provider, value, record_id=args.record_id)
         _print(corpus.register(record).to_dict())
+        return
+    if args.command == "compare-provider-snapshot":
+        value = json.loads(args.snapshot.read_text(encoding="utf-8"))
+        if not isinstance(value, dict):
+            raise ValueError("Provider snapshot must contain one JSON object")
+        candidate = normalize_provider_record(
+            args.provider, value, record_id=args.record_id
+        )
+        _print(corpus.compare_candidate(candidate))
         return
     if args.command == "import-local-sample":
         vault = SampleVault(

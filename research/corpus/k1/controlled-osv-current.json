@@ -1,0 +1,10 @@
+{
+  "id": "CVE-K1-0001",
+  "modified": "2026-08-14T00:00:00Z",
+  "published": "2026-01-01T00:00:00Z",
+  "aliases": [
+    "CVE-K1-ALT"
+  ],
+  "affected": [],
+  "schema_version": "1.7.5"
+}

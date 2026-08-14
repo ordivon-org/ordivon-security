@@ -512,6 +512,87 @@ class ResearchCorpus:
         validate_json(projection)
         return projection
 
+    def compare_candidate(self, candidate: JsonObject) -> JsonObject:
+        validate_corpus_record(candidate)
+        record_id = _require_string(candidate.get("recordId"), "recordId")
+        record_kind = _require_string(candidate.get("recordKind"), "recordKind")
+        candidate_digest = canonical_digest(candidate)
+        try:
+            current = self.load(record_id, record_kind=record_kind)
+        except (FileNotFoundError, KeyError):
+            return {
+                "schemaVersion": 1,
+                "kind": "ordivon.security.research-corpus-candidate-comparison",
+                "recordId": record_id,
+                "recordKind": record_kind,
+                "status": "not-registered",
+                "candidateRecordDigest": candidate_digest,
+                "recordChanged": None,
+                "sourceChanges": [],
+                "mutationPerformed": False,
+                "executionAdmissionChanged": False,
+            }
+
+        current_digest = canonical_digest(current)
+        current_sources = {
+            (str(item.get("provider")), str(item.get("recordId"))): item
+            for item in current.get("sourceRefs", [])
+            if isinstance(item, dict)
+        }
+        candidate_sources = {
+            (str(item.get("provider")), str(item.get("recordId"))): item
+            for item in candidate.get("sourceRefs", [])
+            if isinstance(item, dict)
+        }
+        source_changes: list[JsonObject] = []
+        for key in sorted(set(current_sources) | set(candidate_sources)):
+            before = current_sources.get(key)
+            after = candidate_sources.get(key)
+            if before == after:
+                continue
+            source_changes.append(
+                {
+                    "provider": key[0],
+                    "providerRecordId": key[1],
+                    "currentSnapshotDigest": before.get("snapshotDigest") if before else None,
+                    "candidateSnapshotDigest": after.get("snapshotDigest") if after else None,
+                    "currentProviderModified": before.get("providerModified") if before else None,
+                    "candidateProviderModified": after.get("providerModified") if after else None,
+                    "sourceAdded": before is None,
+                    "sourceRemoved": after is None,
+                }
+            )
+
+        execution_admission_changed = False
+        if record_kind == "sample":
+            current_sample = _require_dict(current.get("sample"), "sample")
+            candidate_sample = _require_dict(candidate.get("sample"), "sample")
+            execution_admission_changed = (
+                current_sample.get("executionAdmission")
+                != candidate_sample.get("executionAdmission")
+            )
+
+        result: JsonObject = {
+            "schemaVersion": 1,
+            "kind": "ordivon.security.research-corpus-candidate-comparison",
+            "recordId": record_id,
+            "recordKind": record_kind,
+            "status": "changed" if current_digest != candidate_digest else "unchanged",
+            "currentRecordDigest": current_digest,
+            "candidateRecordDigest": candidate_digest,
+            "recordChanged": current_digest != candidate_digest,
+            "sourceChanges": source_changes,
+            "mutationPerformed": False,
+            "executionAdmissionChanged": execution_admission_changed,
+            "interpretationRules": [
+                "a changed provider snapshot means the stored provider claim may require review; it does not establish changed target applicability",
+                "an unchanged provider snapshot does not establish target exploitability or Sample execution authority",
+                "comparison is read-only and never advances the corpus head",
+            ],
+        }
+        validate_json(result)
+        return result
+
     def import_local_sample(
         self,
         *,
