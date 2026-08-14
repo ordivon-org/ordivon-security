@@ -4,12 +4,12 @@
   "contractId": "contract:目标产品-2025-:case-a-execution",
   "revision": "1",
   "caseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
-  "caseManifestDigest": "sha256:70d81e9c4486db82b813fd6f8e2288d69ad41a2fc82c5c3da4b866c109250032",
+  "caseManifestDigest": "sha256:475d4b0b8180bb0a5e811e5403e065caec7c7532f2ea72e857b4ae2c8c88b000",
   "transformationManifestId": "transform:目标产品-2025-:case-a",
-  "transformationManifestDigest": "sha256:fb25cf91c8177a403b93fd3d733f4169249ea7596db1377f718f2e4d4aa365cc",
+  "transformationManifestDigest": "sha256:cf9864bfc62c233169628a272a4bba54ef3f267f6593d49d0b8946e6e23fad5c",
   "sourceArchive": {
-    "digest": "sha256:84a1f6170b500045c56c030f6cd45be4ddf272424f723c44615209f6ffbd21a9",
-    "byteLength": 3347446447,
+    "digest": "sha256:db4d6e646a68a15f55b60d4d48405366abaad90a25cd70b25b4d11f5deaa5ab5",
+    "byteLength": 3347447622,
     "name": "目标产品-2025--bundle.7z"
   },
   "installer": {
@@ -64,17 +64,17 @@
     "installerOfficial": {
       "digest": "sha256:fd70741d5d41ed7ff7591016bc1fdec718ae7707c67f34e78208496a59d705f6",
       "byteLength": 2990276456,
-      "verdict": "official Derivative 2025. distribution; SFX + inner installer + 核心库.dll all valid Authenticode, dual-toolchain 0 disagreements"
+      "verdict": "official Derivative 2025. distribution; valid Authenticode chain"
     },
     "官方核心库": {
       "digest": "sha256:286de2f73fc3e09b0af01c1b5c197394b0f04ad7d8f7bab840a5fc736ca585e6",
       "byteLength": 137441560,
-      "verdict": "official engine DLL (2026-07-16 build), digest match, Derivative-signed"
+      "verdict": "official engine DLL (2026-07-16 build), digest match"
     },
     "cracked核心库": {
       "digest": "sha256:9990aabba2cf4b4a065ef80a5ec12ef8a6ebba859ef05e66bd74f0f2e79562ae",
       "byteLength": 135628632,
-      "verdict": "tampered-but-signed: digest MISMATCH + invalid PE checksum; 2026-03-10 build; static review clean; load-compatible"
+      "verdict": "tampered-but-signed: digest MISMATCH + invalid PE checksum; 2026-03-10 build; static review clean"
     }
   }
 }

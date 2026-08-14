@@ -12,13 +12,13 @@
     "targetSurface": "disposable-windows-kvm"
   },
   "source": {
-    "archiveDigest": "sha256:84a1f6170b500045c56c030f6cd45be4ddf272424f723c44615209f6ffbd21a9",
-    "archiveByteLength": 3347446447,
+    "archiveDigest": "sha256:db4d6e646a68a15f55b60d4d48405366abaad90a25cd70b25b4d11f5deaa5ab5",
+    "archiveByteLength": 3347447622,
     "archiveName": "目标产品-2025--bundle.7z",
     "staticDecision": "windows-kvm-p1-目标产品-case-a-execution.json"
   },
   "transformationManifest": "transform:目标产品-2025-:case-a",
-  "transformationManifestDigest": "sha256:fb25cf91c8177a403b93fd3d733f4169249ea7596db1377f718f2e4d4aa365cc",
+  "transformationManifestDigest": "sha256:cf9864bfc62c233169628a272a4bba54ef3f267f6593d49d0b8946e6e23fad5c",
   "observationProfile": "windows-installer-p1",
   "networkMode": "deny-all",
   "status": "admitted",
