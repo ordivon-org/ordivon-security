@@ -1,6 +1,6 @@
 # CA-LIC — Client Authority & Software Entitlement Security
 
-问题族世界模型（草稿 v0.1, 2026-08-14）。
+问题族世界模型（v0.2, 2026-08-15；ToyDesigner V0-V8 已验证）。
 结构遵循 Security 问题导向框架：objective / frontier / established /
 unresolved / rejected / constraints / nextActions。
 
@@ -48,24 +48,22 @@ authority 移到哪里才能真正改变边界（而非只增加混淆）。
 4. **ToyDesigner V0-V3 实测**（research/ca-lic/toydesigner/）:
    签名阻伪造但本地检查可 patch；绑定阻朴素复制但锚点可伪造；
    分散 gate 成本 O(位数点) 而结构不变。基线 15/15 + 4/4 攻击落地。
-5. **真实 crack patch 定位 + 7月移植**（2026-08-14, 官方 3月构建 同构建
-   diff, 隔离区 ANALYSIS_REPORT.md 追加3-4）: 破解基底 = 3月构建; 3 区
-   5 编辑: ①加密狗许可 gate (0x…) 恒真 — 23 调用点单一咽喉
-   ②license-state 查询 (fcn.0x…) 强制返回 4 = Pro 级别 (关键!)
-   ③状态机跳块 ④⑤quit 消息双 NOP。.data/.rdata 零改动 → 绕过型确认
-   (非 keygen)。**7月构建 移植成功并经真机验证 Pro 可用**: 5 编辑同构
-   重定位 (gate 0x… / license-state fcn.0x… / 状态机
-   0x… / quit 0x…+bf), 工具 patch_td_7月构建.py +
-   verify_port.py; 教训: gate 恒真仅保证启动 (v1 实测 NC), license-state
-   恒 4 才是 Pro 判定关键 (初判 tail 为死代码属误判, 零 E8 调用者
-   ≠ 不可达 — 经空列表路径被调用)。
+5. **现实存在性证据（已脱敏）**（2026-08-14）: 同构建差分与后续兼容性观察支持一个有限结论：未授权变体改变的是客户端本地 entitlement/enforcement 语义，而不是伪造厂商签发凭证。这一观察加强了 H1/H2，但不把第三方 bypass 过程提升为 Security capability。精确 patch 位置、字节、移植工具和私有运行回执不属于公开 canonical CA-LIC。
+
+6. **ToyDesigner V4-V8 实测**（2026-08-15，本地 Linux/self-owned；高级基线 10/10）:
+   V4 完整性检测有效但 local enforcement 仍可删除；V5 free 缺 key 时本地 patch
+   无法恢复明文，但授权 Pro 必须接收 key 因而存在授权后提取；V6 nonce-bound
+   signed remote DENY 不能阻止本地已交付能力在 gate 被移除后运行；V7 外部必要
+   primitive 与 V8 remote capability 的本地伪造都无法形成独立可验证结果。
+   **最强 A/B: remote entitlement != remote capability。** V7 仅为 trust-domain
+   语义模拟，不构成真实 TPM/dongle hostile-host 物理证明。
 
 ## Unresolved
 
-- 破解 核心引擎 DLL 的 5 处编辑的上游触发条件与状态码语义（静态已定位,
-  动态确认 pending; 见 Established 5）
+- 第三方实现的内部 enforcement 结构只保留非操作性观察；除非新的防御假说确实依赖，不再扩展具体 bypass 路径
 - 破解版是否带恶意载荷（未过 admission，未进 KVM）
-- V4-V8 各级的实测成本曲线（完整性/加密模块/远程/硬件/服务端能力）
+- V7 的真实硬件 hostile-host 抵抗与 V8 的真实云服务物理/运营边界（本轮仅语义 trust-domain 模拟）
+- V5 多授权用户、撤销、更新 churn 与授权后 key/asset 再分发经济学
 - 现实系统对照表（JetBrains/Adobe/Windows/Denuvo/iLok/SaaS/主机/移动区）
 - 目标产品 的 加密狗许可 私有组件路径的具体 enforcement 结构（静态层）
 
@@ -86,8 +84,7 @@ authority 移到哪里才能真正改变边界（而非只增加混淆）。
 
 1. [x] Phase 0 观察: 官方链验证 + tamper 证明 + entitlement 表面映射
 2. [x] ToyDesigner V0-V3: plain gate / 签名 / 绑定 / 分散 enforcement
-3. [ ] ToyDesigner V4-V6: integrity / encrypted module / remote entitlement
+3. [x] ToyDesigner V4-V8: integrity / encrypted asset / remote entitlement / external primitive / remote capability
 4. [ ] 现实系统对照表（每系统一行: 秘密在哪/authority 在哪/谁控制哪）
-5. [x] r2 定位破解 核心引擎 DLL 的 license gate patch（2026-08-14 完成:
-   3月构建 同构建 diff, 3 区 5 编辑, 见 Established 5）
-6. [ ] KVM admission 流程为破解版申请动态验证（若用户决定）
+5. [x] 现实存在性观察已收缩为脱敏、非操作性证据；不把第三方 bypass 机制产品化或继续扩展
+6. [ ] Windows/KVM 与第三方动态验证冻结；只有新的独立研究问题明确需要时再单独重开

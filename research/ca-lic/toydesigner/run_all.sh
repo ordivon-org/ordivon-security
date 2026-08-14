@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ToyDesigner V0-V3 harness: baseline must hold, then every attack must land.
+# ToyDesigner V0-V8 harness: each defense baseline must hold before its falsifier/attack treatment.
 set -u
 cd "$(dirname "$0")"
 export PYTHONPATH="$(pwd)"   # attack scripts live in attacks/; the package is one level up
@@ -17,4 +17,14 @@ for a in v0_plain_flip v1_patch_verify v2_spoof_binding v3_hunt_gates; do
 done
 
 echo
-echo "================ all attacks landed ================"
+echo "================ advanced baseline V4-V8 ================"
+"$PY" verify_advanced_baseline.py || { echo "ADVANCED BASELINE FAILED - aborting"; exit 1; }
+
+for a in v4_bypass_integrity v5_asset_boundary v6_remote_entitlement v7_external_primitive v8_remote_capability; do
+    echo
+    echo "================ treatment: $a ================"
+    "$PY" "attacks/$a.py" || { echo "TREATMENT $a FAILED"; exit 1; }
+done
+
+echo
+echo "================ V0-V8 ladder complete ================"

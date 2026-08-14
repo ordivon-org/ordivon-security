@@ -15,7 +15,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-14
+updated: 2026-08-15
 summary: Authority map for the active Contest core, CAGE Range, software Evaluation, Static P0, Case Snapshot P0, P0-admitted Windows KVM Provider, research program, authorization boundary, evidence, and frozen Round 1 materials.
 evidence_status: not_applicable
 readiness: READY
@@ -86,6 +86,7 @@ related:
 - [`PROVIDER-ASSIMILATION-CA5.md`](PROVIDER-ASSIMILATION-CA5.md) owns the CA5 cross-consumer provider-binding audit and the evidence-backed decision that no shared `RangeActionGateway` or new Security provider-binding layer is currently earned; provider-specific adapters plus existing Runtime/Harness/Range/evidence owners remain authoritative.
 - [`TACTICAL-ADAPTATION-CA6.md`](TACTICAL-ADAPTATION-CA6.md) owns the CA6 static-versus-adaptive-versus-DeepSeek/Harness tactical comparison, current-evidence capability selection/replanning result, active Blue counterplay treatment, information-acquisition cost, model/Harness instability evidence, and the conclusion that no tactical-state/Campaign/Gateway abstraction is forced by this consumer.
 - [`CAMPAIGN-ORGANIZATION-GATE-CA7.md`](CAMPAIGN-ORGANIZATION-GATE-CA7.md) owns the CA7 negative strategic-admission decision: current CA-series evidence does not admit Campaign, Organization, persistent OpponentModel, coevolution, or a cross-fidelity strategic law; it also owns the exact reopen conditions for any future strategic-state work.
+- [`CLIENT-AUTHORITY-ENTITLEMENT-CA-LIC.md`](CLIENT-AUTHORITY-ENTITLEMENT-CA-LIC.md) owns the independent CA-LIC authority-topology family: ToyDesigner V0-V8 evidence, credential-versus-enforcement separation, protected-asset placement, remote-entitlement-versus-remote-capability contrast, external-result authority, publication boundary, and the decision to keep third-party bypass mechanics out of reusable/ordinary Security surfaces.
 - [`RESEARCH-CORPUS-P0.md`](RESEARCH-CORPUS-P0.md) owns the post-CA vulnerability/Sample research-corpus boundary: revisioned exact identities, provider/evidence claim truth roles, explicit provider snapshot provenance, private SampleVault materialization, denied-by-default Sample execution, seed-set acceptance, and the decision not to build a malware downloader, public sample zoo, provider database mirror, family ontology, or automatic synchronization layer in P0.
 - [`../evidence/README.md`](../evidence/README.md) owns active and historical evidence admission.
 

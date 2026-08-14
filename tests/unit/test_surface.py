@@ -29,6 +29,7 @@ class SecuritySurfaceTests(unittest.TestCase):
         self.assertEqual(value["compatibilityFacade"]["maturity"], "mixed")
         names = {entry["name"] for entry in value["entries"]}
         self.assertIn("ResearchCorpus", names)
+        self.assertIn("CA-LIC entitlement authority research", names)
 
     def test_surface_cli_projects_manifest_without_experiment(self) -> None:
         stdout = io.StringIO()
@@ -59,6 +60,7 @@ class OrdinarySecuritySurfaceTests(unittest.TestCase):
             {"EvidenceRecorder", "RangeSession", "ResearchCorpus", "Software Evaluation"},
         )
         self.assertNotIn("Acceptance runners", names)
+        self.assertNotIn("CA-LIC entitlement authority research", names)
         routes = {route["job"]: route["primarySurface"] for route in ordinary["routes"]}
         self.assertEqual(routes["provider-snapshot-currentness"], "ResearchCorpus")
         self.assertEqual(routes["software-or-endpoint-evaluation"], "Software Evaluation")

@@ -1,4 +1,4 @@
-# ToyDesigner — CA-LIC 阶梯靶场 (V0-V3 已实现)
+# ToyDesigner — CA-LIC 阶梯靶场 (V0-V8)
 
 目标产品 形状的自建 licensing target：同一套程序，逐级叠加防御机制，
 每级配套一个可复现攻击。代码是我们的，所以可以任意猛烈地攻击它 —
@@ -66,10 +66,18 @@
 - 未建模：签名以外的时间戳/吊销 (远程禁用已出现在 TD 观察中，未实现)。
 - keys/ 与 runs/ 已 gitignore：厂商私钥绝不入库。
 
-## 路线图 (V4-V8)
+## V4-V8 authority-topology 实测
 
-    V4  integrity checking   (运行时校验自身字节/门控代码)
-    V5  encrypted feature module
-    V6  remote entitlement   (license server)
-    V7  hardware-backed      (TPM/智能卡模拟)
-    V8  server-side capability (能力在服务端，客户端只收结果)
+高级基线 10/10 PASS。第二阶段不再增加更多 local gate，而是改变能力、秘密与 authority 的位置：
+
+| V | 结构 | 结果 |
+|---|---|---|
+| V4 | signed local integrity | 能检测篡改；local enforcement 仍可单点绕过 |
+| V5 | encrypted shipped asset | free 客户端缺 key 时 patch verifier 也不能解密；Pro 收到 key 后可提取 |
+| V6 | signed remote entitlement + nonce | 远端 DENY 不可伪造，但本地能力仍可在移除 local decision 后运行 |
+| V7 | external/hardware-shaped primitive | 本地 fake 无法形成独立可验证 ticket；真实硬件隔离尚未证明 |
+| V8 | remote capability | 客户端没有 premium implementation；本地 fake 无法形成 service-authoritative result |
+
+关键 A/B：**remote license server != remote capability**。
+
+复现：`./run_all.sh`。V6-V8 的 external authority 是 stdin/stdout 本地进程模拟器，不联网、不使用 Windows/KVM，也不声称提供真实硬件隔离。

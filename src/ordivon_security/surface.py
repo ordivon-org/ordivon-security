@@ -220,6 +220,18 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "accepted-research",
     ),
     SecuritySurfaceEntry(
+        "CA-LIC entitlement authority research",
+        "research-apparatus",
+        "research/ca-lic",
+        (
+            "Self-owned ToyDesigner V0-V8 authority-topology research separating local "
+            "credential/enforcement defenses from protected assets, remote entitlement, "
+            "external primitives and remote capability. Third-party bypass mechanics are "
+            "not a reusable capability."
+        ),
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "Acceptance runners",
         "research-apparatus",
         "ordivon_security.cli_*_acceptance",

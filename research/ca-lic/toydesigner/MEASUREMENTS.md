@@ -71,3 +71,24 @@
   而能力仍在本地，V1/V3 的攻击原样成立。
 - H5 (attack economics): V3 给出第一个可度量数据点 — 分散 gate 把成本
   从 O(1) 抬到 O(位数点)，但每个位点仍是 O(1)。
+
+
+## V4-V8 authority-topology measurements
+
+Clean advanced baseline: **10/10 PASS**.
+
+| V | Observation | Boundary interpretation |
+|---|---|---|
+| V4 | integrity detector rejects changed bytes; one local enforcement patch then permits local premium module | detection improved, trust domain unchanged |
+| V5 | free verifier patch cannot recover absent key; authorized Pro key is extractable and reusable | asset placement changes graph, authorized-recipient leakage remains |
+| V6 | signed nonce-bound remote DENY remains authentic; one local enforcement patch permits shipped premium implementation | remote entitlement alone does not externalize capability |
+| V7 | local forged primitive receipt fails signature; entitled external primitive verifies | external required primitive changes result-authority boundary; hardware isolation not physically proven |
+| V8 | local fake remote output fails signature; entitled service returns verified result; premium implementation is not shipped | capability boundary genuinely externalized |
+
+### Updated hypotheses
+
+- H1: supported with qualification — V5 can withhold plaintext until key delivery; V8 does not ship the protected implementation.
+- H2: supported — V4 and V6 add two independent local-authority-collapse treatments.
+- H3: semantically supported by V7/V8; physical hardware/cloud hostile-host resistance remains untested.
+- H4: directly supported by V6 versus V8.
+- H5: supported as a multidimensional economic model, not a single hardness scalar.
