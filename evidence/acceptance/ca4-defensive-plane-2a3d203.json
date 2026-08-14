@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca4-defensive-plane-acceptance",
+  "status": "accepted-for-bounded-defensive-evidence-response-research",
+  "securitySourceRevision": "2a3d203",
+  "runtimeJobId": "job-019ffef4-46fa-7142-be20-2046e395a6a6",
+  "runtimeStdoutDigest": "sha256:0b87b389e041e2ee18a6a355181cc7251a3c4edaaed611a69c19bc7ff98c3ccc",
+  "provider": {
+    "name": "ClamAV clamscan",
+    "version": "ClamAV 1.5.3/28085/Fri Aug  7 14:24:10 2026",
+    "binaryDigest": "sha256:1104c633e10714b3018f7ebf7966ee513dc779e0b93776dff062a77dd3bff67a"
+  },
+  "authority": {
+    "ownedLocalWorld": true,
+    "realMalwareUsed": false,
+    "eicarHarmlessTestPatternOnly": true,
+    "networkUsed": false,
+    "responseScope": "case-local quarantine move only"
+  },
+  "gates": {
+    "cleanRawObservationPresent": true,
+    "cleanNoDetectionAndNoResponse": true,
+    "eicarProviderDetectionObserved": true,
+    "detectionDoesNotClaimMalwareTruth": true,
+    "currentDetectionLeadsToQuarantineResponse": true,
+    "responseReceiptIsNotTruth": true,
+    "postResponseTruthVerifiesQuarantine": true,
+    "staleDetectionRejectedAfterBytesChange": true,
+    "sensorUnavailablePreservesUnknown": true
+  },
+  "boundedResults": [
+    "raw observation, provider-derived detection, current applicability adjudication, response receipt and fresh post-response truth remain distinct evidence/action layers",
+    "EICAR test-signature detection is not promoted to a Security claim that real malware exists",
+    "a valid EICAR detection becomes STALE_NOT_APPLICABLE after current artifact bytes change before response",
+    "detector unavailability yields UNKNOWN_NO_RESPONSE rather than implicit containment authority",
+    "quarantine response success is verified only by fresh active/quarantine world truth rather than its move receipt"
+  ],
+  "limitations": [
+    "file-artifact Blue plane only",
+    "one mature detector provider",
+    "EICAR harmless standard test pattern rather than real malware",
+    "case-local quarantine only; no process kill, endpoint isolation, credential revocation or network containment",
+    "no EDR, SIEM, IDS, network sensor or autonomous Blue policy"
+  ]
+}
