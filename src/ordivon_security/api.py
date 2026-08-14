@@ -83,14 +83,6 @@ from .providers import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
 )
-from .research_corpus import (
-    CorpusHead,
-    CorpusRegistration,
-    ResearchCorpus,
-    provider_source_ref,
-    validate_corpus_record,
-)
-from .research_corpus_sources import normalize_provider_record
 from .range import (
     ActorPresence,
     AdversarialWindowsRange,
@@ -116,6 +108,15 @@ from .ranges import (
     MicroContestRange,
     RangeBackend,
 )
+from .research_corpus import (
+    CorpusHead,
+    CorpusRegistration,
+    ResearchCorpus,
+    provider_source_ref,
+    validate_corpus_record,
+)
+from .research_corpus_sources import normalize_provider_record
+from .surface import security_ordinary_surface_manifest, security_surface_manifest
 
 __all__ = [
     "ActionAdmission",
@@ -212,5 +213,7 @@ __all__ = [
     "normalize_provider_record",
     "provider_source_ref",
     "validate_corpus_record",
+    "security_ordinary_surface_manifest",
+    "security_surface_manifest",
     "write_quarantine_audit",
 ]

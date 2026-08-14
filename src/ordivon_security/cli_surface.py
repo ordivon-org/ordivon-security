@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 
-from .surface import security_surface_manifest
+from .surface import security_ordinary_surface_manifest, security_surface_manifest
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -15,6 +15,12 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--view",
+        choices=("full", "ordinary"),
+        default="full",
+        help="project the full maturity surface or the derived ordinary task view",
+    )
+    parser.add_argument(
         "--compact",
         action="store_true",
         help="emit canonical compact JSON instead of indented JSON",
@@ -24,7 +30,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    value = security_surface_manifest()
+    value = (
+        security_ordinary_surface_manifest()
+        if args.view == "ordinary"
+        else security_surface_manifest()
+    )
     if args.compact:
         print(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")))
     else:

@@ -10,8 +10,10 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-_EICAR = b"X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
-_CLEAN = b"ordivon-ca4-known-clean-v1\n"
+from .fixtures import CLEAN_TEST_BYTES, EICAR_TEST_BYTES
+
+_EICAR = EICAR_TEST_BYTES
+_CLEAN = CLEAN_TEST_BYTES
 
 
 def _sha256(data: bytes) -> str:
@@ -85,7 +87,11 @@ def _detect(clamscan: Path | None, path: Path) -> dict[str, Any]:
         "exitCode": completed.returncode,
         "stdout": completed.stdout,
         "stderrSha256": _sha256(completed.stderr.encode()),
-        "status": "MATCH" if matched else "NO_MATCH" if completed.returncode == 0 else "PROVIDER_ERROR",
+        "status": "MATCH"
+        if matched
+        else "NO_MATCH"
+        if completed.returncode == 0
+        else "PROVIDER_ERROR",
         "matched": matched,
         "signature": signature,
         "scannedSha256": _sha256(path.read_bytes()),
@@ -207,7 +213,9 @@ def _run_case(root: Path, clamscan: Path, case: str) -> dict[str, Any]:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run the bounded CA4 defensive evidence/response plane.")
+    parser = argparse.ArgumentParser(
+        description="Run the bounded CA4 defensive evidence/response plane."
+    )
     parser.add_argument("--output", type=Path)
     return parser
 
@@ -222,9 +230,10 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory(prefix="ordivon-ca4-") as raw_root:
         root = Path(raw_root)
-        cases = {name: _run_case(root, clamscan, name) for name in (
-            "clean", "eicar-current", "eicar-stale", "sensor-unavailable"
-        )}
+        cases = {
+            name: _run_case(root, clamscan, name)
+            for name in ("clean", "eicar-current", "eicar-stale", "sensor-unavailable")
+        }
         clean = cases["clean"]
         current = cases["eicar-current"]
         stale = cases["eicar-stale"]
@@ -240,7 +249,8 @@ def main() -> None:
                 current["detection"]["matched"] is True
                 and current["detection"]["signature"] is not None
             ),
-            "detectionDoesNotClaimMalwareTruth": current["adjudication"].get("malwareTruthClaim") is False,
+            "detectionDoesNotClaimMalwareTruth": current["adjudication"].get("malwareTruthClaim")
+            is False,
             "currentDetectionLeadsToQuarantineResponse": (
                 current["adjudication"]["decision"] == "QUARANTINE_TEST_PATTERN"
                 and current["responseReceipt"]["attempted"] is True

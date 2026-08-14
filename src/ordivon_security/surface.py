@@ -256,4 +256,103 @@ def security_surface_manifest() -> JsonObject:
     return value
 
 
-__all__ = ["SecuritySurfaceEntry", "security_surface_manifest"]
+__all__ = [
+    "SecuritySurfaceEntry",
+    "security_ordinary_surface_manifest",
+    "security_surface_manifest",
+]
+
+
+def security_ordinary_surface_manifest() -> JsonObject:
+    """Project the minimum task-oriented Security surface for ordinary Agent work.
+
+    This is a derived navigation view over the existing maturity-classified surface. It
+    does not grant authority, hide research provenance, or create a second capability
+    registry. Research apparatus remains available through security_surface_manifest().
+    """
+    full = security_surface_manifest()
+    entries = full["entries"]
+    if not isinstance(entries, list):
+        raise ValueError("Security surface entries must be a list")
+    by_name = {str(entry["name"]): entry for entry in entries if isinstance(entry, dict)}
+
+    routes: list[JsonObject] = [
+        {
+            "job": "vulnerability-or-advisory-triage",
+            "primarySurface": "ResearchCorpus",
+            "reason": (
+                "Inspect exact vulnerability identity, provider claims, independent "
+                "observations and source-relative currentness before reproducing research."
+            ),
+            "nextIfNeeded": ["Software Evaluation"],
+        },
+        {
+            "job": "sample-or-case-assessment",
+            "primarySurface": "ResearchCorpus",
+            "reason": (
+                "Inspect exact Sample identity, truth-role-separated claims, materialization "
+                "and denied-by-default execution before considering an Evaluation."
+            ),
+            "nextIfNeeded": ["Software Evaluation"],
+        },
+        {
+            "job": "provider-snapshot-currentness",
+            "primarySurface": "ResearchCorpus",
+            "reason": (
+                "Use read-only candidate-vs-head comparison; changed provider evidence "
+                "triggers review and does not mutate the corpus or target truth."
+            ),
+            "nextIfNeeded": [],
+        },
+        {
+            "job": "software-or-endpoint-evaluation",
+            "primarySurface": "Software Evaluation",
+            "reason": (
+                "Bind exact Sample/Authority/Environment/Observation and keep findings, "
+                "receipts and fresh consequence truth separate."
+            ),
+            "nextIfNeeded": ["RangeSession"],
+        },
+        {
+            "job": "persistent-contested-response",
+            "primarySurface": "RangeSession",
+            "reason": (
+                "Use when Actors, authority, changing world state and consequential "
+                "response must persist beyond one software Evaluation."
+            ),
+            "nextIfNeeded": ["EvidenceRecorder"],
+        },
+        {
+            "job": "record-or-verify-experiment-evidence",
+            "primarySurface": "EvidenceRecorder",
+            "reason": (
+                "Record bounded evidence while keeping actor, management, sensor and "
+                "world-truth authority separated."
+            ),
+            "nextIfNeeded": [],
+        },
+    ]
+    referenced = {str(route["primarySurface"]) for route in routes}
+    for route in routes:
+        raw_next = route.get("nextIfNeeded", [])
+        if isinstance(raw_next, list):
+            referenced.update(str(item) for item in raw_next)
+    missing = sorted(referenced - set(by_name))
+    if missing:
+        raise ValueError(f"ordinary Security view references unknown surfaces: {missing}")
+    value: JsonObject = {
+        "schemaVersion": 1,
+        "kind": "ordivon.security-ordinary-surface",
+        "routes": routes,
+        "surfaceEntries": [by_name[name] for name in sorted(referenced)],
+        "researchBoundary": (
+            "Research apparatus is reproduction/provenance by default. Escalate into it only "
+            "when an ordinary task requires reproducing or falsifying its exact experiment."
+        ),
+        "authorityBoundary": (
+            "Navigation does not grant execution. Range/Evaluation authority and exact "
+            "admission remain owner-native and separately verified."
+        ),
+    }
+    validate_json(value)
+    return value
