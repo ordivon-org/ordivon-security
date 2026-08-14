@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca1-carrier-matrix-acceptance",
+  "status": "accepted-for-bounded-same-effect-carrier-research",
+  "securitySourceRevision": "1ce7d6052b781656734814f7a8098bbe44447802",
+  "runtimeJobId": "job-019ffec2-1e26-7700-a421-f969b8547afa",
+  "physicalResultDigest": "sha256:702ffdca8699a0aa1136bc0e3999489a176a91597c6aa22ab361d8164a34af82",
+  "baseManifest": {
+    "name": "windows-p1-derived-256fdc6acef0b149.manifest.json",
+    "digest": "sha256:6bf0726530f587ef9be9724df6538316d5028c57492a10a7993520c16ca02fa9"
+  },
+  "authority": {
+    "rangeOwned": true,
+    "networkMode": "deny-all",
+    "networkDeviceAllowed": false,
+    "permittedAction": "execute-benign-fixture",
+    "unknownSampleExecution": false,
+    "thirdPartySampleExecution": false,
+    "credentialCollection": false,
+    "targetExpansion": false
+  },
+  "sameEffect": {
+    "effectId": "ca1-same-effect-v1",
+    "sha256": "sha256:5f9836e4d7068959a0efd49e57e4f8734c6867e09a5adae1d1a703fd6c767b52",
+    "byteLength": 19968,
+    "samePayloadBytesAcrossTreatments": true
+  },
+  "generatedMsi": {
+    "sha256": "sha256:6f35aaeb66ecb8f2c2c59dc14438e57d0d1ed6583ab66c43352aa85ac74cf95d",
+    "byteLength": 18944,
+    "customActionType": 18,
+    "condition": "NOT Installed",
+    "sequence": "after InstallFinalize"
+  },
+  "treatments": [
+    {
+      "carrier": "native",
+      "runId": "evaluation-run:a71d6dc1b944224a7351227e",
+      "evidenceDigest": "sha256:485eb8e7cfcea167db56869e26472530f95d8e170952cb9672e67ea4e2be0f01",
+      "operationalEvidenceDigest": "sha256:89f190c952c8df503151e482f023ca6ac85f48170b37c7e6152a1341384f332d",
+      "terminalReason": "benign-fixture-completed",
+      "disposition": "no-issue-observed",
+      "carrierElapsedMs": 141,
+      "carrierExitCode": 0,
+      "effectRanAsSystem": true,
+      "expectedParentObserved": false,
+      "residualClosed": true
+    },
+    {
+      "carrier": "powershell",
+      "runId": "evaluation-run:cded4b4609997cddab5e8eea",
+      "evidenceDigest": "sha256:1c4122fb73bea54b90366b55ae44fad8ff4e2db272e62ffde090b5957df3de2f",
+      "operationalEvidenceDigest": "sha256:88fd167b7b514439f1de87e99434dda341acd117f8ab640d051ae3d3c541e3d1",
+      "terminalReason": "benign-fixture-completed",
+      "disposition": "no-issue-observed",
+      "carrierElapsedMs": 2407,
+      "carrierExitCode": 0,
+      "effectRanAsSystem": true,
+      "expectedParentObserved": true,
+      "powershellRestrictedGateObserved": true,
+      "powershellRestrictedGateBlocked": true,
+      "powershellRestrictedExitCode": 1,
+      "powershellRestrictedMarkerAbsent": true,
+      "residualClosed": true
+    },
+    {
+      "carrier": "wsh-vbscript",
+      "runId": "evaluation-run:3b3adab20f52ac4e26bae790",
+      "evidenceDigest": "sha256:7b098e7a56a99474e3b83bd3a4fefea7ff2a327dc5758890abc9526de6c45e6d",
+      "operationalEvidenceDigest": "sha256:bc3d671daa1ab4c57e187187084d38f9fa9936e0f0bbdcdb9998db323893e471",
+      "terminalReason": "benign-fixture-completed",
+      "disposition": "no-issue-observed",
+      "carrierElapsedMs": 453,
+      "carrierExitCode": 0,
+      "effectRanAsSystem": true,
+      "expectedParentObserved": true,
+      "residualClosed": true
+    },
+    {
+      "carrier": "msi-installed-custom-action",
+      "runId": "evaluation-run:4eec9240c7b5a6f7cfa25188",
+      "evidenceDigest": "sha256:e0676bcd231dc9950d64345fa95eda07c527b579f82239fa0f0a3925ea6fa9a8",
+      "operationalEvidenceDigest": "sha256:2486c02cdc56a88aa9049b07886c8193c164857e0e3f0fa1e9e53a48c57078d4",
+      "terminalReason": "benign-fixture-completed",
+      "disposition": "no-issue-observed",
+      "carrierElapsedMs": 1750,
+      "carrierExitCode": 0,
+      "effectRanAsSystem": true,
+      "expectedParentObserved": true,
+      "installerLogPresent": true,
+      "uninstallExitCode": 0,
+      "installedPayloadRemoved": true,
+      "residualClosed": true
+    }
+  ],
+  "gates": {
+    "fourIndependentTreatmentsCompleted": true,
+    "sameSemanticEffect": true,
+    "samePayloadBytesWithinMatrix": true,
+    "allEffectsRanAsSystem": true,
+    "allProviderRunsResidualClosed": true,
+    "powershellNegativePolicyGateObserved": true,
+    "powershellNegativePolicyGateBlocked": true,
+    "msiInstallerLifecycleObserved": true,
+    "msiCleanupVerified": true,
+    "officeWordProviderPresent": false,
+    "networkRequested": false,
+    "thirdPartySampleExecuted": false
+  },
+  "retainedFalsifiers": [
+    {
+      "id": "ca1-f0-qmp-socket-path",
+      "resultId": "evaluation-run:0627104f077fd3eff4b47ca8",
+      "resultDigest": "sha256:ef024a74d38d0464f56652806492abb0d741837bafc19c6e1a49b1fb0e73760e",
+      "result": "invalid-trial",
+      "finding": "full semantic carrier name in the physical state path exceeded the provider Unix-socket path bound before VM creation; compact physical c0..c3 navigation identity fixed it without shortening semantic identity"
+    },
+    {
+      "id": "ca1-f1-fixture-identity",
+      "result": "three physical effects succeeded but backend evidence remained suspicious-inconclusive",
+      "affectedRunIds": [
+        "evaluation-run:8fd711740303fe7b7d7296ab",
+        "evaluation-run:bb6fc42a4c51b3f629112e6d",
+        "evaluation-run:169066a104b00174b97a6c7b"
+      ],
+      "finding": "Guest fixture result used an unqualified fixture ID while admission expected carrier-qualified identity; exact identity propagation fixed the experiment instead of weakening verification"
+    },
+    {
+      "id": "ca1-f2-msi-sequencing",
+      "affectedRunId": "evaluation-run:22c3a88612e267f2fddf184d",
+      "result": "msiexec exit 1603; semantic marker absent; uninstall exit 1605",
+      "finding": "non-deferred Type-18 installed-EXE custom action was sequenced after InstallFiles instead of after InstallFinalize; provider-contract correction produced the accepted MSI treatment"
+    },
+    {
+      "id": "ca1-f3-provider-build-byte-identity",
+      "result": "cross-batch PE/MSI rebuild digests changed even when source semantics were unchanged; PE timestamp can be suppressed provider-side while wixl output remained byte-variable in the bounded probe",
+      "finding": "Security binds exact generated provider output identity per experiment and does not reimplement the provider simply to own file-format reproducibility"
+    }
+  ],
+  "scopedResults": [
+    "carrier identity is not a semantic effect domain for this same-effect consumer",
+    "carrier deserves Agent projection only when current carrier properties change a decision-relevant precondition, policy, lineage, exposure, cost, lifecycle, cleanup, or fidelity",
+    "carrier policy and provider applicability remain distinct from Security RangeAuthority",
+    "installer lifecycle and hosted-process lineage are evidence/properties of a realization rather than new payload effects",
+    "Office/VBA remains a provider-dependent document/application carrier; this accepted base does not contain Word and CA1 does not install Office for taxonomy completeness",
+    "trusted-system-binary proxy execution and staging/loader labels remain mechanism/flow/carrier coordinates unless a later consumer forces a separate semantic domain"
+  ],
+  "limitations": [
+    "one Windows image and one maintained same-effect payload",
+    "no malware or third-party Sample execution",
+    "no live network or C2",
+    "no Office/VBA physical Trial",
+    "no EDR/IDS provider or comparative detection-quality claim",
+    "no universal carrier latency ordering",
+    "no Agent tactical-composition claim; that remains CA6"
+  ]
+}
