@@ -142,6 +142,23 @@ Observer and Guardian remain separate. An Observer reports; it does not mutate t
 
 Static Evaluation deliberately does not execute Sample code. Case Snapshot is a separate metadata path for evolving analysis directories and cannot inherit stronger Evaluation claims from unrelated stdout, scripts, or human reports.
 
+### Vulnerability and Sample research corpus
+
+`ResearchCorpus` is a separate research-information profile above provider-owned intelligence and the private `SampleVault`. It does not execute Samples or establish vulnerability/malware truth by itself.
+
+```text
+exact provider snapshot / Security evidence
+→ revisioned corpus manifest
+→ sourceRefs + evidenceRefs
+→ claims kept under explicit truthRole
+→ materialization state
+→ executionAdmission = denied-by-default
+```
+
+Sample records are content-addressed by exact SHA-256. Materialized bytes remain in `SampleVault`; Git retains only small manifests. External advisory, detector, family, or multi-engine results remain `provider-claim` unless separate Security evidence supports a stronger scoped claim. `inspect()` is the preferred Agent projection because it keeps provider claims, independent observations, maintained-fixture facts, and Case conclusions separate while exposing materialization and execution admission explicitly.
+
+P0 consumes explicit provider snapshots only. It owns no vulnerability-database mirror, malware download/upload path, family ontology, provider polling scheduler, or execution authority.
+
 ### Windows KVM substrate and contested worlds
 
 `WindowsKvmMachineProvider` supplies reusable machine mechanics:
@@ -260,6 +277,7 @@ The AF/AE/EC/AC/IF and C1-A→N documents remain canonical research evidence for
 | `RangeBackend` | contested world adapter for one profile |
 | `EvaluationSpec` / Evaluation backend | authorized software-assessment lifecycle |
 | `SampleVault` / `SampleIdentity` | exact private Sample admission/provenance |
+| `ResearchCorpus` | revisioned vulnerability/Sample research identity, provenance, truth-role and admission projection without owning bytes/provider truth |
 | `GuardianPolicy` / Observer records | environment/resource enforcement versus fallible observation |
 | `WindowsKvmMachineProvider` | machine lifecycle/QMP substrate without owning Sample admission |
 | evidence bundles / receipts | exact scoped proof bound to one run/revision |

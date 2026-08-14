@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.research-corpus-p0-acceptance",
+  "status": "accepted",
+  "implementationRevision": "9fa5a7f162234cf8f656bf5bf9e79a9d7716014d",
+  "cleanAcceptance": {
+    "runtimeJobId": "job-019fff4a-67e5-7ab2-b857-3f640bfa93d2",
+    "workspaceSourceStateDigest": "sha256:afeef32b86779c92ada8053a4f48322cdb62ac06c2a7811b85e0c664df9e0e3c",
+    "executionResultDigest": "sha256:982342027253b1a0e1ce7aa20e89878f15e80dc77e3aeb5462ea35859e397877",
+    "stdoutDigest": "sha256:b0131f668c0572fa38f65aba9844ab7edcfbe42ee1e2eff6b8d58a2b067d733b",
+    "terminalEvidenceDigest": "sha256:4dcc8548a8a1e5793f17263dce47889b946e36ff210a68272918d810a12aebd7"
+  },
+  "gates": {
+    "unitTestsPassed": 399,
+    "ruffE9FPassed": true,
+    "cleanDetachedSource": true,
+    "allCurrentHeadsVerified": true,
+    "allHistoricalRevisionsVerified": true,
+    "sampleRecordIdEqualsContentSha256": true,
+    "headRevisionPathDigestBound": true,
+    "localSampleImportUsesPrivateSampleVault": true,
+    "sampleExecutionAdmissionDeniedByDefault": true,
+    "agentInspectionSeparatesTruthRoles": true,
+    "providerClaimNotPromotedToIndependentTruth": true,
+    "providerEnvelopeExactRecordSelection": true,
+    "trackedCorpusContainsNoDeclaredSampleBinaryArtifact": true,
+    "automaticSampleDownload": false,
+    "automaticProviderUpload": false,
+    "automaticProviderSynchronization": false
+  },
+  "dogfood": {
+    "headCount": 4,
+    "revisionCount": 4,
+    "sampleCount": 3,
+    "vulnerabilityCount": 1,
+    "localImportExecutionAdmission": "denied-by-default",
+    "ca2ProviderClaimCount": 1,
+    "ca2IndependentObservationCount": 1,
+    "eicarRealMalwareClaim": false,
+    "目标产品BMaterialization": "metadata-only",
+    "目标产品BExecutionAdmission": "denied-by-default",
+    "目标产品BCaseConclusionCount": 2,
+    "目标产品BIndependentObservationCount": 0
+  },
+  "seedRecords": [
+    {
+      "recordId": "vuln:ordivon-ca2-owned-stack-overflow-v1",
+      "recordKind": "vulnerability",
+      "manifest": "research/corpus/seed-ca2-vulnerability.json",
+      "manifestDigest": "sha256:b96ccc34cbccf5940ad803a0d3fc93083d8f02c58da5b46eb3146a4eb4f697bd"
+    },
+    {
+      "recordId": "sample:275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+      "recordKind": "sample",
+      "manifest": "research/corpus/seed-eicar-sample.json",
+      "manifestDigest": "sha256:abe54ae32256bc8f06f9509729777f05663e6912bdb75462f324a9c8ba04ef97"
+    },
+    {
+      "recordId": "sample:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+      "recordKind": "sample",
+      "manifest": "research/corpus/seed-caseb-sample.json",
+      "manifestDigest": "sha256:965d0a9203117d0b22ac2b7de7a3abba266beea9f576764e6f89b9ef550d7223"
+    }
+  ],
+  "providerRegistry": {
+    "path": "research/corpus/providers.json",
+    "digest": "sha256:70c5957fd3695c5932e0b9f91ed62c56eedd94aed92344d038f315a33e57f048",
+    "normalizers": ["osv", "nvd", "cisa-kev", "malwarebazaar", "virustotal"],
+    "consumptionMode": "explicit-exact-snapshot"
+  },
+  "acceptedClaims": [
+    "Security may retain a revisioned research relationship among exact vulnerability/sample identities, external/provider claims, independent evidence, private materialization state and execution admission without cloning provider databases or storing Sample bytes in Git.",
+    "Sample possession or SampleVault materialization does not grant execution authority.",
+    "Provider malware/vulnerability classifications remain provider claims unless separately supported by Security-owned evidence.",
+    "One record may retain multiple evidence-strength claims without collapsing them into a scalar maliciousness or exploitability truth label.",
+    "The preferred Agent inspection surface exposes truth-role buckets plus Sample materialization and execution admission explicitly."
+  ],
+  "limitations": [
+    "P0 is local single-writer research infrastructure; concurrent multi-writer transaction semantics are not claimed.",
+    "P0 uses explicit snapshot import and has no provider polling/currentness scheduler.",
+    "P0 implements no malware downloader, public sample distribution, automatic third-party upload, vulnerability database mirror or malware-family ontology.",
+    "The 目标产品B seed is metadata-only and does not copy or execute the retained third-party archive.",
+    "Physical third-party malware execution remains a separately authorized Range/Evaluation activity."
+  ]
+}
