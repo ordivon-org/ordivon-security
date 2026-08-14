@@ -83,6 +83,17 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "accepted-profile",
     ),
     SecuritySurfaceEntry(
+        "ResearchCorpus",
+        "profile",
+        "ordivon_security.research_corpus",
+        (
+            "Revisioned vulnerability/sample research catalog with claim truth-role separation, "
+            "exact content identity, provider snapshot provenance, and denied-by-default "
+            "Sample execution."
+        ),
+        "candidate-reusable",
+    ),
+    SecuritySurfaceEntry(
         "CAGE team-plan actor",
         "profile",
         "ordivon_security.actors",

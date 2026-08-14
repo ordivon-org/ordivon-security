@@ -83,6 +83,14 @@ from .providers import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
 )
+from .research_corpus import (
+    CorpusHead,
+    CorpusRegistration,
+    ResearchCorpus,
+    provider_source_ref,
+    validate_corpus_record,
+)
+from .research_corpus_sources import normalize_provider_record
 from .range import (
     ActorPresence,
     AdversarialWindowsRange,
@@ -141,6 +149,8 @@ __all__ = [
     "ClamAvReportAnalyzer",
     "ContestResult",
     "ContestRunner",
+    "CorpusHead",
+    "CorpusRegistration",
     "DeepSeekHarnessTurnDriver",
     "EnvironmentIdentity",
     "EvaluationDisposition",
@@ -172,6 +182,7 @@ __all__ = [
     "RangeSessionBackend",
     "RangeSessionInstance",
     "RangeSessionSpec",
+    "ResearchCorpus",
     "SacrificialWindowsRangeConfig",
     "SampleIdentity",
     "SampleVault",
@@ -198,5 +209,8 @@ __all__ = [
     "verify_operational_evidence",
     "windows_kvm_install_arguments",
     "windows_kvm_qemu_arguments",
+    "normalize_provider_record",
+    "provider_source_ref",
+    "validate_corpus_record",
     "write_quarantine_audit",
 ]

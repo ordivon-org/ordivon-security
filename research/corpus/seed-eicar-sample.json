@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "recordKind": "sample",
+  "recordId": "sample:275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+  "sample": {
+    "sha256": "sha256:275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+    "byteLength": 68,
+    "mediaType": "text/plain",
+    "originalName": "eicar.com.txt",
+    "artifactRole": "maintained-test-fixture",
+    "materialization": "maintained-source-fixture",
+    "executionAdmission": "denied-by-default"
+  },
+  "sourceRefs": [
+    {
+      "provider": "ordivon-security-ca4",
+      "recordId": "ca4-defensive-plane-2a3d203",
+      "snapshotDigest": "sha256:c21b01150096efb6fe968aaf1dc2a4107c90fe2e0c0cb8d8da56bd73f2c48690",
+      "locator": "evidence/acceptance/ca4-defensive-plane-2a3d203.json"
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "fixture-not-real-malware",
+      "predicate": "real-malware",
+      "value": false,
+      "truthRole": "maintained-fixture-fact",
+      "assertedBy": "ordivon-security-ca4",
+      "evidenceRefs": ["docs/DEFENSIVE-OBSERVATION-RESPONSE-CA4.md"]
+    },
+    {
+      "claimId": "clamav-test-signature",
+      "predicate": "provider-signature-match",
+      "value": "Eicar-Test-Signature",
+      "truthRole": "provider-claim",
+      "assertedBy": "clamav-1.5.3",
+      "evidenceRefs": ["evidence/acceptance/ca4-defensive-plane-2a3d203.json"]
+    }
+  ],
+  "evidenceRefs": ["docs/DEFENSIVE-OBSERVATION-RESPONSE-CA4.md"]
+}
