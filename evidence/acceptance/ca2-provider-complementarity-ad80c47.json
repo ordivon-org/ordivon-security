@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca2-provider-complementarity-acceptance",
+  "status": "accepted-for-bounded-owned-target-research",
+  "securitySourceRevision": "ad80c47e6bbb2f320d357f41d282ae01e0e987a8",
+  "runtimeJobId": "job-019fff03-72f3-79a1-b47f-0ef1b9083706",
+  "rawRunnerOutputDigest": "sha256:6caae2dbfbe1731530872cd45748756e1b7cbf035ba203cec0774b5ace0b8c26",
+  "authority": {
+    "ownedPurposeBuiltTargets": true,
+    "networkUsed": false,
+    "thirdPartyTargets": false,
+    "externalCredentials": false,
+    "exploitGeneration": false,
+    "maximumConsequence": "local sanitizer-observed process termination"
+  },
+  "configuration": {
+    "staticMode": "default path-sensitive Clang Static Analyzer checkers",
+    "dynamicMode": "libFuzzer + AddressSanitizer",
+    "runs": 5000,
+    "seed": 1337,
+    "maxLen": 48
+  },
+  "targets": {
+    "dynamicOnly": "sha256:15585ef56e80a688a19bc55243fa097221053decde9bbd023443a9e5c961e00b",
+    "staticOnlyBounded": "sha256:e23a19c7f086cf44261c1de0347cfd97f01836060ff1eee9f8648cec23272cbc"
+  },
+  "gates": {
+    "staticCleanButDynamicFault": true,
+    "staticFindingButDynamicBoundedNegative": true,
+    "originalCa2CoreGatesStillPass": true,
+    "wheelContainsBothSupplementTargets": true
+  },
+  "policyAblation": {
+    "staticOnly": {"knownPositiveMisses": ["dynamic_only"]},
+    "dynamicOnly": {"knownPositiveMisses": ["static_only_bounded"]},
+    "staticGatesDynamic": {"knownPositiveMisses": ["dynamic_only", "static_only_bounded"]},
+    "heterogeneousObservation": {"knownPositiveMisses": []}
+  },
+  "tests": {
+    "securityUnitTestsPassed": 383,
+    "securityUnitTestsSkipped": 4,
+    "changedFilesRuffPassed": true,
+    "compileallPassed": true
+  },
+  "boundedResults": [
+    "a clean default Static Analyzer result did not safely suppress bounded runtime-search evidence on the dynamic-only owned control",
+    "a bounded-negative libFuzzer+ASan campaign at maxLen=48 did not establish absence when default Static Analyzer proved a positive path whose precondition requires at least 64 bytes",
+    "static-negative and bounded-dynamic-negative are scoped provider evidence rather than universal stop conditions",
+    "the original CA2 vulnerable/guarded/fixed treatments and original evidence gates remained accepted on a Security base already containing accepted CA3, CA4, CA5 decision evidence and CA-LIC work"
+  ],
+  "limitations": [
+    "two purpose-built local supplement targets only",
+    "one LLVM toolchain exercised through materially different static and dynamic mechanisms",
+    "zero misses under heterogeneousObservation applies only to this frozen supplement ground truth and is not a universal provider-ranking claim",
+    "no exploitability proof, arbitrary code execution, public target, persistence, movement or network effect",
+    "provider-selection adaptation under an active opponent remains a later CA6 question"
+  ]
+}
