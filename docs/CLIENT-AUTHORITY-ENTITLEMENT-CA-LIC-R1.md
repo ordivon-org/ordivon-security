@@ -138,6 +138,8 @@ research/ca-lic/toydesigner/run_r1.sh
 Detailed measurements are retained in
 `research/ca-lic/toydesigner/R1_MEASUREMENTS.md`.
 
+Exact acceptance evidence: [`../evidence/acceptance/ca-lic-r1-e919ea5.json`](../evidence/acceptance/ca-lic-r1-e919ea5.json).
+
 ## Real-system cross-check
 
 R1 separately records only vendor-documented observations in

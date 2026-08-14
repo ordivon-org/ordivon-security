@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca-lic-r1-acceptance",
+  "status": "accepted",
+  "implementationRevision": "e919ea5fcf7c82edd67856d637dbd6cf27704d85",
+  "runtimeJobId": "job-01a0015d-b102-7313-92a0-7a177547c49c",
+  "executionResultDigest": "sha256:31752bb11c2f4d38567c8f21d4741769cd15c1e16da66e031f4be76203c0bd5e",
+  "stdoutDigest": "sha256:0f67dae2b03bd51bc642edb216102b1bf84c5be5f09e75b4176e9a2a424de5fb",
+  "gates": {
+    "r1Structural": "26/26",
+    "legacyV0V8Regression": "pass",
+    "unitTests": "416 passed; 4 skipped",
+    "surfaceTests": "6/6",
+    "srcTestsRuffE9F": "pass",
+    "caLicRuffE9F": "pass",
+    "publicationAudit": "pass",
+    "authorityTopologyMatrixJson": "valid",
+    "windowsFrozen": true,
+    "publicNetworkUsedByActiveExperiment": false,
+    "thirdPartyBinaryExecuted": false
+  },
+  "v5": {
+    "activeRecipientsByRelease": [4, 3, 4],
+    "sharedKeyReused": {
+      "contentKeyDistributions": 4,
+      "ciphertextCopies": 3,
+      "futureRevocationEffective": false
+    },
+    "sharedKeyRotated": {
+      "contentKeyDistributions": 11,
+      "ciphertextCopies": 3,
+      "futureRevocationEffective": true
+    },
+    "perRecipient": {
+      "contentKeyDistributions": 11,
+      "ciphertextCopies": 11,
+      "singleKeyLeakCryptographicBlastRadiusRecipients": 1,
+      "plaintextRedistributionStillPossible": true
+    },
+    "candidate": "revocation controls future decryptability but cannot retract a key/plaintext already delivered to an authorized hostile recipient"
+  },
+  "v6": {
+    "leaseTtlSweep": [1, 2, 4, 8],
+    "offlineWindowEqualsWorstCaseStaleRevocationWindow": true,
+    "freshLeaseAfterRevocationAllowed": false,
+    "unboundLeaseReplayObserved": true,
+    "semanticBindingMismatchRejected": true,
+    "hostileHostHardwareBindingClaim": false,
+    "localCapabilityStillPresent": true,
+    "candidate": "for a locally verifiable offline lease, longer offline survivability buys the same upper-bound stale-revocation window unless a fresh external operation is required"
+  },
+  "v8": {
+    "externalizedInputBytesPerUniqueJob": 4144,
+    "cachedExactResultSurvivesOutage": true,
+    "cachedResultAppliesToChangedBody": false,
+    "newUniqueJobDuringOutage": false,
+    "newServiceReceiptValidUnderOldPinnedKey": false,
+    "oldReceiptValidUnderNewPinnedKeyOnly": false,
+    "newCallsDeniedImmediatelyAfterServerRevocation": true,
+    "deliveredResultRetroactivelyInvalidatedByRevocation": false,
+    "digestOnlyRequestEquivalentToFullInputCapability": false,
+    "protectedImplementationShipped": false,
+    "candidate": "remote capability strengthens future-use control while introducing live-service, input-disclosure, authority-identity and historical-verification obligations"
+  },
+  "crossSystemObservation": {
+    "truthRole": "vendor-documented-observation",
+    "systems": [
+      "TouchDesigner",
+      "JetBrains License Vault",
+      "Adobe desktop licensing",
+      "iLok",
+      "Denuvo Anti-Piracy / Anti-Tamper",
+      "Apple Secure Enclave / App Attest",
+      "AWS KMS"
+    ],
+    "activeThirdPartyTesting": false
+  },
+  "disposition": "Retain R1 as accepted CA-LIC research. Do not create a generic licensing, lease, DRM, key-rotation, dongle, SaaS, or authority-manager subsystem. Reopen only from a real owned consumer pressure; Windows/KVM remains frozen."
+}
