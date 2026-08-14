@@ -526,7 +526,7 @@ class AuthenticodeReportAnalyzer(ImportedReportAnalyzer):
         for line in text.splitlines():
             stripped = line.strip()
             count_match = re.match(
-                r"(VERIFIED_厂商B|VERIFIED_OTHER|UNSIGNED|DIGEST_MISMATCH):"
+                r"(VERIFIED_VENDORB|VERIFIED_OTHER|UNSIGNED|DIGEST_MISMATCH):"
                 r"\s+(\d+)$",
                 stripped,
             )

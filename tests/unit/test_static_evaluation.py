@@ -172,7 +172,7 @@ class StaticEvaluationP0Tests(unittest.TestCase):
         auth_report = self.root / "authenticode.txt"
         auth_report.write_text(
             "=== SUMMARY: 3 files ===\n"
-            "  VERIFIED_厂商B: 1\n"
+            "  VERIFIED_VENDORB: 1\n"
             "  VERIFIED_OTHER: 1\n"
             "  UNSIGNED: 1\n"
             "  DIGEST_MISMATCH: 0\n"
