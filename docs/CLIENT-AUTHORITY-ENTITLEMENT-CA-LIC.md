@@ -137,6 +137,10 @@ The current Git tree is the publication surface. Current-tree redaction is **not
 
 Exact third-party patch offsets, executable payloads, private keys, unknown binaries, and private run material are not canonical CA-LIC publication artifacts.
 
+## R1 — revocation, offline authority and capability cost
+
+R1 is accepted in [`CLIENT-AUTHORITY-ENTITLEMENT-CA-LIC-R1.md`](CLIENT-AUTHORITY-ENTITLEMENT-CA-LIC-R1.md). It extends V5/V6/V8 into recipient churn, key rotation, lease TTL, offline/revocation coupling, remote-capability outage/input exposure and authority-key rotation. The strongest new candidates are: delivered information cannot be revoked retrospectively; locally verifiable offline leases spend the same lifetime as worst-case stale revocation authority; and external capability shifts cost into availability/privacy/provider continuity rather than eliminating cost. CA-LIC remains research apparatus and Windows/KVM stays frozen.
+
 ## Product disposition
 
 CA-LIC remains `research-apparatus`. It is intentionally visible in the full Security surface for provenance but excluded from `security_ordinary_surface_manifest()`. No licensing SDK, DRM framework, generic anti-tamper library, dongle abstraction, or entitlement gateway is admitted.
@@ -145,7 +149,7 @@ Reopen productization only when an ordinary Ordivon consumer needs to protect a 
 
 ## Next questions
 
-- Repeat V5 with multiple authorized recipients and revocation/update churn.
-- Compare V6 availability/offline semantics against V8 availability/privacy/latency cost.
+- R1 has completed V5 recipient/revocation churn, V6 lease/offline semantics, V8 availability/input/authority-rotation treatments and a vendor-documented cross-system matrix.
+- Reopen V5/V6/V8 only from a real owned consumer pressure; do not extend the ladder for coverage alone.
 - Add a real external hardware/cloud experiment only when an owned consumer requires physical proof.
 - Build a cross-system observational matrix at the level of authority placement, without importing third-party bypass procedures.

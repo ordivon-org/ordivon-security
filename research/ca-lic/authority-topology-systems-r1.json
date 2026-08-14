@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca-lic-authority-topology-observation-matrix",
+  "retrievedDate": "2026-08-15",
+  "truthRole": "vendor-documented-observation",
+  "systems": [
+    {
+      "name": "TouchDesigner",
+      "implementation": "primarily-client-local",
+      "authorityCarriers": ["local-key", "CodeMeter-dongle", "network-dongle", "floating-cloud"],
+      "externalCapability": false,
+      "caLicShape": ["V2", "V3", "V6", "V7-like-carrier"],
+      "sources": ["https://docs.derivative.ca/Licensing", "https://docs.derivative.ca/License_Dongle", "https://derivative.ca/UserGuide/Privacy"]
+    },
+    {
+      "name": "JetBrains License Vault",
+      "implementation": "client-local-IDE",
+      "authorityCarriers": ["license-vault", "floating-server", "offline-activation-code"],
+      "documentedOfflineSemantics": "bounded local use; License Vault documents up to 48h disconnected if IDE is not restarted",
+      "externalCapability": false,
+      "caLicShape": ["V6"],
+      "sources": ["https://www.jetbrains.com/help/license-vault-cloud/Activating_a_license.html", "https://www.jetbrains.com/help/idea/register.html"]
+    },
+    {
+      "name": "Adobe desktop licensing",
+      "implementation": "client-local-desktop-plus-remote-services",
+      "authorityCarriers": ["named-user", "feature-restricted-licensing"],
+      "documentedOfflineSemantics": "periodic connectivity or restricted/offline deployment profiles",
+      "externalCapability": "hybrid",
+      "caLicShape": ["V6", "V8-for-cloud-services"],
+      "sources": ["https://helpx.adobe.com/business/enterprise/plan-your-deployment/basic-concepts/licensing.html", "https://www.adobe.com/devnet-docs/acrobatetk/tools/AdminGuide/whatsnewdc.html"]
+    },
+    {
+      "name": "iLok",
+      "implementation": "protected-software-client-local",
+      "authorityCarriers": ["host-computer", "iLok-USB", "iLok-Cloud"],
+      "documentedOfflineSemantics": "carrier-dependent; Cloud requires consistent internet",
+      "externalCapability": false,
+      "caLicShape": ["V7-like-external-authorizer"],
+      "sources": ["https://help.ilok.com/ilm_overview.html", "https://help.ilok.com/faq_cloud.html"]
+    },
+    {
+      "name": "Denuvo Anti-Piracy / Anti-Tamper",
+      "implementation": "protected-game-client-local",
+      "authorityCarriers": ["distribution-platform-ownership", "hardware-bound-token"],
+      "documentedOfflineSemantics": "one-time activation; no always-on requirement advertised for Anti-Tamper",
+      "externalCapability": false,
+      "caLicShape": ["V2", "V4", "V6", "H5"],
+      "sources": ["https://irdeto.com/video-games/denuvo-anti-piracy/video-game-anti-piracy", "https://irdeto.com/fight-piracy-with-denuvo-anti-tamper"]
+    },
+    {
+      "name": "Apple Secure Enclave / App Attest",
+      "implementation": "client-app-with-isolated-hardware-primitive",
+      "authorityCarriers": ["Secure-Enclave-key", "Apple-attestation", "application-server"],
+      "externalCapability": "required-hardware-primitive",
+      "caLicShape": ["V7"],
+      "sources": ["https://developer.apple.com/documentation/Security/protecting-keys-with-the-secure-enclave", "https://developer.apple.com/documentation/DeviceCheck/DCAppAttestService"]
+    },
+    {
+      "name": "AWS KMS",
+      "implementation": "caller-local-or-remote; protected-key-operation-service-side",
+      "authorityCarriers": ["IAM", "key-policy", "KMS-HSM"],
+      "externalCapability": true,
+      "caLicShape": ["V8", "V7-remote-primitive"],
+      "sources": ["https://docs.aws.amazon.com/kms/latest/developerguide/data-protection.html", "https://docs.aws.amazon.com/kms/latest/developerguide/kms-cryptography.html"]
+    }
+  ]
+}

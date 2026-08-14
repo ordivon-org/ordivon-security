@@ -1,6 +1,6 @@
 # CA-LIC — Client Authority & Software Entitlement Security
 
-问题族世界模型（v0.2, 2026-08-15；ToyDesigner V0-V8 已验证）。
+问题族世界模型（v0.3, 2026-08-15；ToyDesigner V0-V8 + R1 authority economics 已验证）。
 结构遵循 Security 问题导向框架：objective / frontier / established /
 unresolved / rejected / constraints / nextActions。
 
@@ -58,14 +58,17 @@ authority 移到哪里才能真正改变边界（而非只增加混淆）。
    **最强 A/B: remote entitlement != remote capability。** V7 仅为 trust-domain
    语义模拟，不构成真实 TPM/dongle hostile-host 物理证明。
 
+7. **CA-LIC R1 revocation/economics 实测**（2026-08-15，本地 Linux/self-owned；26/26 structural gates）:
+   V5 三版本 `4→3→4` recipient churn 显示共享 key 复用会让被撤销用户继续读取未来版本；按版本 rotation 恢复 prospective revoke，但 key distribution 从 4 增至 11；per-recipient encryption 将单 key 泄漏的密码学 blast radius 压到 1，但无法阻止已授权 plaintext 再分发。V6 对 TTL `1/2/4/8` 的 sweep 中，offline survivability 与 worst-case stale revocation window 一一相等；fresh lease 在 revoke 后立即拒绝，但旧 lease 在 expiry 前继续有效。V8 的 exact signed result 可在 outage 后继续验证但不能泛化到新 request；新 job 在 outage 时不可计算，server revoke 对下一次新调用立即生效，authority-key rotation 则要求新的 trust anchor 与旧 key 的历史保留。
+8. **现实系统 authority-topology 交叉验证**（2026-08-15，vendor-documented observation only）: TouchDesigner / iLok / Denuvo 支持 carrier externalization 与 local capability 共存；JetBrains / Adobe 明确暴露 bounded-offline licensing；Apple Secure Enclave / App Attest 与 AWS KMS 则把必要 secret/operation 留在外部 authority。该矩阵支持 `carrier externalization != capability externalization`，但不引入任何第三方主动测试。
+9. **R1 候选不变量**: delivered information irreversibility；offline/revocation duality for locally-verifiable leases；carrier externalization != capability externalization；external-authority identity continuity；remote capability shifts cost into availability/input exposure/provider lifecycle rather than deleting cost。
+
 ## Unresolved
 
-- 第三方实现的内部 enforcement 结构只保留非操作性观察；除非新的防御假说确实依赖，不再扩展具体 bypass 路径
-- 破解版是否带恶意载荷（未过 admission，未进 KVM）
-- V7 的真实硬件 hostile-host 抵抗与 V8 的真实云服务物理/运营边界（本轮仅语义 trust-domain 模拟）
-- V5 多授权用户、撤销、更新 churn 与授权后 key/asset 再分发经济学
-- 现实系统对照表（JetBrains/Adobe/Windows/Denuvo/iLok/SaaS/主机/移动区）
-- 目标产品 的 加密狗许可 私有组件路径的具体 enforcement 结构（静态层）
+- V7 的真实 hardware hostile-host 抵抗仍未物理证明；只有 real owned consumer 需要时才重开 TPM/dongle/TEE。
+- V8 的真实 remote capability 尚未进入公共云/远端物理部署；availability、privacy、redundancy、provider migration 只在 real owned consumer 出现后再验证。
+- V5 attribution/fingerprinting 是否足以改变 authorized-recipient redistribution economics 尚未研究；仅当这一变量成为真实决策条件才重开。
+- 第三方未知样本/历史动态问题继续 parked：不是当前 CA-LIC frontier，不通过研究覆盖率理由重开 Windows/KVM。
 
 ## Rejected
 
@@ -85,6 +88,7 @@ authority 移到哪里才能真正改变边界（而非只增加混淆）。
 1. [x] Phase 0 观察: 官方链验证 + tamper 证明 + entitlement 表面映射
 2. [x] ToyDesigner V0-V3: plain gate / 签名 / 绑定 / 分散 enforcement
 3. [x] ToyDesigner V4-V8: integrity / encrypted asset / remote entitlement / external primitive / remote capability
-4. [ ] 现实系统对照表（每系统一行: 秘密在哪/authority 在哪/谁控制哪）
+4. [x] 现实系统 authority-topology 对照表（vendor-documented, sanitized, no active third-party testing）
 5. [x] 现实存在性观察已收缩为脱敏、非操作性证据；不把第三方 bypass 机制产品化或继续扩展
-6. [ ] Windows/KVM 与第三方动态验证冻结；只有新的独立研究问题明确需要时再单独重开
+6. [x] R1 V5/V6/V8 revocation/offline/churn/cost + 现实系统矩阵完成；Windows/KVM 与第三方动态验证继续冻结
+7. [ ] 下一实验必须由 real owned consumer pressure 触发；不为了扩展 ladder 而创造 V9

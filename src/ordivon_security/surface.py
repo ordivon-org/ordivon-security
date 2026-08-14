@@ -224,10 +224,11 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "research-apparatus",
         "research/ca-lic",
         (
-            "Self-owned ToyDesigner V0-V8 authority-topology research separating local "
-            "credential/enforcement defenses from protected assets, remote entitlement, "
-            "external primitives and remote capability. Third-party bypass mechanics are "
-            "not a reusable capability."
+            "Self-owned ToyDesigner V0-V8 plus R1 authority-topology research separating "
+            "local credential/enforcement defenses from protected assets, lease/offline "
+            "revocation semantics, external primitives, remote capability and their "
+            "availability/privacy/churn costs. Third-party bypass mechanics are not a "
+            "reusable capability."
         ),
         "accepted-research",
     ),
