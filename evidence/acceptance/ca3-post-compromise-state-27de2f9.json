@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca3-post-compromise-state-acceptance",
+  "status": "accepted-for-bounded-local-state-research",
+  "securitySourceRevision": "27de2f9",
+  "runtimeJobId": "job-019ffeef-3c30-77a1-be91-2508ce2f59a4",
+  "runtimeStdoutDigest": "sha256:64ccc3692577a2bac1d277cce4843d0b9be8f4fe2a8e9ee586fe9822abad0bbd",
+  "authority": {
+    "ownedLocalWorld": true,
+    "syntheticCredentialsOnly": true,
+    "networkUsed": false,
+    "externalTargets": false,
+    "delegationMaxChildren": 1
+  },
+  "gates": {
+    "persistenceArtifactSurvivesRestart": true,
+    "persistenceServiceCanBeLiveWithoutUsableControl": true,
+    "validCredentialMovesToB": true,
+    "revokedCredentialBlocksSameMovement": true,
+    "controllerDirectedReachesBAndC": true,
+    "delegatedContinuationReachesC": true,
+    "controllerSelectsCOnlyInDirectedTreatment": true,
+    "delegatedContinuationIsBounded": true,
+    "eradicationRevokesAllAndRemovesCurrentControl": true,
+    "staleBeliefActionsFailAfterEradication": true
+  },
+  "boundedResults": [
+    "persistent artifact and activated service can survive while usable controller control is absent after credential revocation",
+    "synthetic credential possession is not current authority; the same movement request succeeds before revocation and fails afterward",
+    "a second foothold is verified target control state rather than credential possession or request receipt",
+    "controller-directed and delegated continuation reach the same bounded C target but differ in control provenance: controller-propagation versus delegated-from:b",
+    "eradication removes persistence, service, current control and delegation while rotating/revoking authority generations; stale old-token actions fail on all nodes"
+  ],
+  "retainedFalsifiers": [
+    "initial Ruff failure on unused import was equipment-only and not scientific evidence",
+    "initial gate read delegation.json after eradication; the corrected apparatus snapshots historical delegated state before cleanup instead of treating successful cleanup as missing evidence"
+  ],
+  "limitations": [
+    "semantic/local filesystem-process fidelity rather than a real network or OS account system",
+    "all credentials are synthetic test-only values",
+    "delegation is single-hop and maxChildren=1",
+    "no credential stealing, malware, network worm, unrestricted lateral movement, third-party target or reusable propagation engine",
+    "CA6 must determine whether delegated continuation produces tactical advantage rather than only a structural difference"
+  ]
+}
