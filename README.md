@@ -182,6 +182,8 @@ Recent Agent-first experiments narrowed several tempting abstractions:
 
 The next pressure should come from independent consumers or stronger adversarial worlds, not from completing an ontology because the research numbering exists.
 
+The first ordinary-consumption round is accepted in [`ORDINARY-SECURITY-CONSUMPTION-R1.md`](docs/ORDINARY-SECURITY-CONSUMPTION-R1.md). A derived `--view ordinary` projection reduces mixed-maturity navigation pressure without deleting research reproduction paths; ResearchCorpus earns a normal pre-analysis role for exact vulnerability/Sample/provider evidence; a bounded EICAR/ClamAV incident consumer closes current/stale response without new EDR/SIEM or higher-fidelity transfer.
+
 Use [`docs/research-agenda.md`](docs/research-agenda.md) and the scoped AF/AE/EC/AC/IF documents for the exact hypotheses and evidence.
 
 ## What is usable now
@@ -205,6 +207,7 @@ This is a research system, not a production attack platform. `readiness: EXPERIM
 | Need | Read / invoke |
 | --- | --- |
 | classify the exposed Security surface as constitution, profile, integration, or research apparatus | `uv run ordivon-security-surface` — read-only projection; it runs no experiment and grants no authority |
+| start an ordinary vulnerability/Sample/evaluation/response job without browsing research chronology | `uv run ordivon-security-surface --view ordinary` — derived task navigation only; full research surface remains available and execution authority is unchanged |
 | understand why Security exists and where experiments may act | this README + [`docs/research-boundary.md`](docs/research-boundary.md) |
 | understand constitutional law versus profiles/fixtures | [`docs/LAW-PROFILES-C0.md`](docs/LAW-PROFILES-C0.md) |
 | understand current components and data flow | [`docs/architecture.md`](docs/architecture.md) |

@@ -1,0 +1,138 @@
+{
+  "baseRevision": "1841ba44e172dc93f79d14b8d45909dc51e8371b",
+  "blueIncident": {
+    "cleanSha256": "sha256:351bde8a706259cbc4b0bfc0ecef2cb7ab02b00d82de05bd16c55eb7655bed8c",
+    "eicarSha256": "sha256:275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+    "gates": {
+      "currentDetectionProducesBoundedResponse": true,
+      "fixtureIsNotPromotedToMalwareTruth": true,
+      "newTelemetryProviderRequired": false,
+      "responseReceiptNotTruth": true,
+      "staleDetectionProducesNoResponse": true
+    },
+    "interpretation": {
+      "higherFidelityNetworkTransferEarned": false,
+      "newIncidentWorkflowAbstractionEarned": false,
+      "ordinaryCompositionSucceeded": true,
+      "sysmonOrEdrEarned": false
+    },
+    "provider": "ClamAV 1.5.3 / signatures 28092 observed 2026-08-14"
+  },
+  "cleanAcceptance": {
+    "deterministicJobId": "job-01a00008-6507-7253-9d27-26caacc4ae77",
+    "fullModelJobId": "job-01a00009-ec9d-7622-a97a-2d2325f9ec91",
+    "ordinaryModelJobId": "job-01a00008-df66-7ed3-92f2-ee6b070e4fdb",
+    "ruffE9F": "passed",
+    "unitTests": {
+      "failed": 0,
+      "passed": 412
+    }
+  },
+  "harnessAttribution": {
+    "cleanHarnessDefectEstablished": false,
+    "needsInputOrInventedDownstreamToolObserved": true,
+    "ordinaryRouteSelectionImproved": true,
+    "p1PressureRemainsHistoricalEvidence": true,
+    "reason": "route-only baseline intentionally withholds downstream owner tools, so post-route completion friction is not isolated from apparatus capability availability",
+    "securityBypassAdded": false
+  },
+  "higherFidelityGate": {
+    "networkOrMultiNodeExperimentEarned": false,
+    "reason": "ordinary Blue consumer closed current/stale response with existing provider and no decision-blocking network/process observation gap; no ordinary consumer threatened the P1 local adaptive-selection conclusion"
+  },
+  "implementationRevision": "cac3fe19240a87b6ea39750ad19ad5e2b7664e2b",
+  "kind": "ordivon.security.ordinary-consumption-r1-acceptance",
+  "memory": {
+    "ca2IndependentObservations": 1,
+    "ca2ProviderClaims": 1,
+    "目标产品BCaseConclusions": 6,
+    "目标产品BIndependentObservations": 0,
+    "目标产品BMaterialization": "metadata-only",
+    "eicarExecutionAdmission": "denied-by-default",
+    "eicarRealMalware": false,
+    "genericRecoveryLawCorpusMatches": 0,
+    "interpretation": {
+      "bulkHistoricalImportEarned": false,
+      "genericResearchLawMemoryRemainsDocsOwned": true,
+      "newRecordKindEarned": false,
+      "ordinaryPreAnalysisReadEarned": true
+    },
+    "providerCurrentness": {
+      "answeredBy": "ResearchCorpus.compare_candidate",
+      "mutationPerformed": false,
+      "sourceChanges": 1,
+      "status": "changed"
+    }
+  },
+  "rawResultDigests": {
+    "blue": {
+      "byteLength": 2392,
+      "sha256": "sha256:5f9a7b79941c23fc5c26949f139a903f27d8ea4f420384fced16311cb4173b82"
+    },
+    "fullModel": {
+      "byteLength": 85165,
+      "sha256": "sha256:712a0c57392b2ee3d00ca88b326d40bda637e9c68343f4ab4f8d634d65ed6e96"
+    },
+    "memory": {
+      "byteLength": 1439,
+      "sha256": "sha256:fe8a60e6fb23a2b31850877e18958c37e0211d4bf1ed66492d2ceaae0ee4f818"
+    },
+    "ordinaryModel": {
+      "byteLength": 91324,
+      "sha256": "sha256:1914106a8d072bcd11d96a13cae82b0c019964c7e3c2c1d15b27eeb3c20d816a"
+    },
+    "surface": {
+      "byteLength": 3369,
+      "sha256": "sha256:82403e5b0e22d9754c5e8c8c595ef04bde88b91a6af8c0a05a9337674e1bc145"
+    }
+  },
+  "retainedLaws": [
+    "ordinary navigation should project task-relevant mature surfaces before research apparatus",
+    "navigation is not authority and does not hide reproduction provenance",
+    "ResearchCorpus is useful as pre-analysis memory for exact vulnerability/sample/provider evidence, not as a bulk store for generic system laws",
+    "ordinary Blue response can reuse CA4 semantics without depending on the CA4 research runner",
+    "stronger fidelity and richer telemetry remain demand-driven gates"
+  ],
+  "schemaVersion": 1,
+  "surface": {
+    "exploratoryOrdinaryReplicates": [
+      {
+        "jobId": "job-019fffff-6f09-7160-81bb-404d0f858e3c",
+        "modelCorrect": 4,
+        "packetCount": 4
+      },
+      {
+        "jobId": "job-01a00001-bd96-7b52-9490-6cc1029889df",
+        "modelCorrect": 4,
+        "packetCount": 4
+      },
+      {
+        "jobId": "job-01a00006-2cd3-7bd1-a3a5-16ba8b5a315c",
+        "modelCorrect": 4,
+        "packetCount": 4,
+        "sampleOpaqueShaHallucination": false
+      }
+    ],
+    "fullEntryCount": 29,
+    "fullRemainsDefault": true,
+    "opaqueNavigationDigestExposed": false,
+    "ordinaryRouteCount": 6,
+    "ordinaryUniqueSurfaceCount": 4,
+    "pairedModel": {
+      "full": {
+        "deterministicCorrect": 4,
+        "modelCorrect": 2,
+        "modelForbiddenSelections": 2,
+        "modelNoRoute": 0
+      },
+      "interpretation": "sampled navigation improvement, not deterministic model correctness",
+      "ordinary": {
+        "deterministicCorrect": 4,
+        "modelCorrect": 3,
+        "modelForbiddenSelections": 1,
+        "modelNoRoute": 0
+      }
+    },
+    "researchCommandsDeleted": false
+  }
+}
