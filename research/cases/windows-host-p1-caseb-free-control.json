@@ -18,7 +18,7 @@
     "privateReceiptDigest": "sha256:ee6e348eca0fff6176be68d0dac85f804881593e80490872b08a5a120ea25c32",
     "privateSemanticReceiptDigest": "sha256:a0b7bac280a81144e4c08ad6e1b400a0b6e8c20fb5a7812d921bb7e113e1c4f3",
     "publicIndex": "windows-host-p1-caseb-free-baseline-r3.json",
-    "publicIndexDigest": "sha256:34c0306b22cdccb18ae4523ebf46fa804bf9c6155e546e43d51945b45ceca9d9"
+    "publicIndexDigest": "sha256:02d92581a4680bf5bf85d60864f74153ba6ac65bed36e2452da3ba4033625940"
   },
   "kind": "ordivon.security.capability-case",
   "networkMode": "host-existing",

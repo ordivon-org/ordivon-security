@@ -7,7 +7,7 @@
     "materializationAuthorized": true
   },
   "caseId": "case:目标产品B-:a-original-repack",
-  "caseManifestDigest": "sha256:a3daad3db6f5e9c4d4f89acfdcc5582fd4c90dc066245ec909957dcc24173594",
+  "caseManifestDigest": "sha256:14092da50f2fc6f91fda08961e310d71ed7f056f44dd1535f02c3e2a0fd5dac1",
   "contractId": "contract:目标产品B-:case-a-execution-media",
   "controls": {
     "destroyOverlayAfterRun": true,
