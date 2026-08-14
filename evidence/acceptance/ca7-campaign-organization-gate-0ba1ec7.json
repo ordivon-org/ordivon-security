@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.ca7-strategic-admission-gate",
+  "status": "accepted-negative-admission",
+  "auditedSecurityRevision": "0ba1ec702ee96745ef4afc0919040135fdd811e1",
+  "sourceAuditRuntimeJobId": "job-019fff0b-edf2-7363-8045-a52bd0ea7c64",
+  "ca6CanonicalRuntimeJobId": "job-019fff05-30cd-7c12-a2c0-ac9d235ce2aa",
+  "ca6CanonicalResultDigest": "sha256:5028f6b3b791643f227da5fb14bc16488eb632a6b2b33ec3041fbbb6b1bec295",
+  "admission": {
+    "CampaignState": false,
+    "Organization": false,
+    "PersistentOpponentModel": false,
+    "CoevolutionService": false,
+    "CrossFidelityStrategicLaw": false
+  },
+  "evidence": [
+    "CA6 static scripted policy fails 3/4 held-out worlds while a generic current-observation adaptive policy succeeds 4/4",
+    "canonical DeepSeek/Harness succeeds 4/4 but does not outperform the thin deterministic adaptive policy",
+    "CA6 handles explicit Blue counterplay using fresh applicability plus ordinary action history without persistent strategic state",
+    "active Security source contains no CampaignState, Organization model, persistent OpponentModel or coevolution service",
+    "the only retained Campaign description is historical docs/archive/campaign-v0.md",
+    "RangeSession, Host and Harness already own world persistence, durable work continuity and cognition/tool composition respectively"
+  ],
+  "reopenConditions": [
+    "cross-mission objective/resource state causally changes later decisions beyond current world plus ordinary trajectory",
+    "actor replacement loses a strategic obligation despite valid Host/Harness continuity",
+    "controlled specialist-team experiments materially outperform monolithic actors after communication/latency/cost controls",
+    "opponent history improves held-out decisions beyond current observation and ordinary evidence computation",
+    "repeated Red/Blue adaptation transfers to held-out opponents/worlds beyond evaluator exploitation or memorization",
+    "higher-fidelity reproduction fails in a way that forces strategic state rather than provider-specific mechanics"
+  ],
+  "implementationAdded": false,
+  "reason": "No CA6 or earlier CA-series failure survives current-observation composition strongly enough to justify a persistent strategic subsystem."
+}
