@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.post-ca-p1-physical-adaptation-acceptance",
+  "status": "accepted",
+  "implementationRevision": "e0ba5c13bd2ea820dff5190e4e197c80e8453ecb",
+  "cleanModelJobId": "job-019fffcd-476e-7d52-a13e-359774110b1e",
+  "cleanGateJobId": "job-019fffcf-2b25-72e0-8c78-7c80632c34df",
+  "rawPrivateResult": {
+    "path": "/var/lib/ordivon/security/p1-clean-acceptance.json",
+    "digest": "sha256:44fbb07877b0266cf9de2b8370ae8deefb9d71e1871f65b2d6ad3deb167962af"
+  },
+  "deterministic": {
+    "staticCounterplaySuccess": false,
+    "adaptiveSuccessCount": 4,
+    "variantCount": 4,
+    "adaptiveRegret": {
+      "current-low-cost": 0,
+      "stale-credential-counterplay": 2,
+      "all-control-unknown": 1,
+      "script-current-credential-revoked": 0
+    },
+    "adaptiveCounterplaySequence": [
+      "control.credential",
+      "control.maintenance"
+    ],
+    "adaptiveUnknownSequence": [
+      "inspect.applicability",
+      "control.script"
+    ]
+  },
+  "canonicalModel": {
+    "successCount": 1,
+    "variantCount": 4,
+    "current-low-cost": {
+      "success": true,
+      "sequence": [
+        "inspect.applicability",
+        "control.credential"
+      ],
+      "score": 97,
+      "regret": 1
+    },
+    "stale-credential-counterplay": {
+      "success": false,
+      "sequence": [],
+      "outcome": "IF2 needs_input; no world effect",
+      "regret": 92
+    },
+    "all-control-unknown": {
+      "success": false,
+      "sequence": [],
+      "outcome": "IF2 needs_input; no world effect",
+      "regret": 95
+    },
+    "script-current-credential-revoked": {
+      "success": false,
+      "sequence": [],
+      "outcome": "IF2 needs_input; no world effect",
+      "regret": 95
+    }
+  },
+  "exploratoryModelJobs": [
+    {
+      "jobId": "job-019fffbb-b73d-7fa1-9572-fd6c91aca759",
+      "classification": "provider-finalization-robustness-falsifier",
+      "worldEffectsObserved": false
+    },
+    {
+      "jobId": "job-019fffc6-4900-7821-a574-df6158066625",
+      "classification": "pre-action-slot-label-fix exploratory replicate"
+    },
+    {
+      "jobId": "job-019fffca-16c2-7df3-8391-8b5fd469f65f",
+      "classification": "post-label-fix exploratory replicate",
+      "modelSuccessCount": 2
+    }
+  ],
+  "gates": {
+    "unitTestsPassed": 409,
+    "ruffE9FPassed": true,
+    "staticFailsCounterplay": true,
+    "adaptiveSucceedsAllVariants": true,
+    "adaptiveInspectsUnknown": true,
+    "adaptiveSubstitutesAfterCounterplay": true,
+    "allDeterministicResidualsClosed": true,
+    "modelFinalizedWorldEffectObserved": true,
+    "modelWorldEffectsOnlyAfterFinalizedIntent": true,
+    "modelResidualsClosed": true,
+    "realCredentials": false,
+    "thirdPartySample": false,
+    "networkEffects": false,
+    "gatewayRequired": false
+  },
+  "acceptedClaims": [
+    "CA6 thin adaptive capability selection survives this physical provider/authority world: the deterministic adaptive policy succeeds in all four frozen variants while the fixed adjacent-retry script fails the counterplay variant.",
+    "The current Harness/model treatment does not demonstrate a stable tactical advantage over the thin adaptive policy and is materially less robust across exploratory and clean-source replicates.",
+    "P1 integration friction does not force RangeActionGateway, Campaign, Organization, a tactical state machine or a generic provider registry."
+  ],
+  "limitations": [
+    "owned local benign physical world",
+    "synthetic credential only",
+    "no exploit/malware/network/lateral movement",
+    "model outcome includes Harness/provider/finalization effects and is not a universal LLM capability estimate"
+  ]
+}
