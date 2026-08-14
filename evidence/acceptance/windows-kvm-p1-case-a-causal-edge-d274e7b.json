@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-case-a-causal-edge-acceptance",
+  "status": "accepted-positive-causal-edge-from-procedurally-incomplete-trial",
+  "caseId": "case:caseb-studio:a-original-repack",
+  "scientificVerdict": "reachability-observed",
+  "formalTrialVerdict": "trial-invalid",
+  "causalEdge": "exact-wrapper -> exact-contained-malicious-nested-MSI",
+  "interpretation": "The C harness failed during post-capture ETW correlation, but the causal question was already independently resolved by frozen ETW plus Windows Installer evidence and a live SHA-256 of the invoked MSI path. The historical trial remains invalid; this acceptance adjudicates the causal edge without rewriting that trial result.",
+  "authority": {
+    "revision": "2",
+    "canonicalDigest": "sha256:7cdc14dea17a98221535912bafb722de4b3c93e116eda0cf07fdbf0b0103efb0",
+    "fileDigest": "sha256:ec04ba85aa41e8852f02e7c51379571a7935bbb35b88b33a64584e8ddc36989e"
+  },
+  "activation": {
+    "revision": "r3",
+    "digest": "sha256:d76c26a69489ed1c3225dd5c2ae6350d9a870518fe3edfc53625190618ba7a94",
+    "singleExactRun": true,
+    "trialMode": "reachability-only",
+    "networkAuthorized": false,
+    "caseBAdmitted": false
+  },
+  "physicalRun": {
+    "runId": "evaluation-run:d274e7bea171585e7383a64e",
+    "jobId": "job-019fe4bf-4026-7742-8190-ad6777ea6e3c",
+    "attemptId": "attempt-019fe4bf-4026-7742-8190-ad72529d1822",
+    "runnerDigest": "sha256:74ac3674e26c864377bb7e5696a18164aaedff5e087b2721342f9b9c39cb95b3",
+    "runnerByteLength": 35840,
+    "terminalReason": "windows-kvm-guest-result-invalid",
+    "runtimeDisposition": "suspicious-inconclusive",
+    "residualClosed": true,
+    "qmpNetworkDeviceCount": 0,
+    "providerErrorAbsent": true,
+    "qemuExitCode": 0,
+    "wrapperObservationMs": 4690
+  },
+  "preflight": {
+    "activationVerified": true,
+    "systemIdentityVerified": true,
+    "udfVolume": "F:\\",
+    "treeManifestIdentityMatch": true,
+    "wrapperIdentityMatch": true,
+    "outerMsiIdentityMatch": true,
+    "nestedContainerIdentityMatch": true,
+    "observerIdentityMatch": true,
+    "stagingExecuteDenyApplied": true,
+    "stagingExecuteDenyCanaryBlocked": true,
+    "preObserverCompleted": true,
+    "installerPolicyEnabled": true,
+    "kernelEtwStarted": true,
+    "networkRequested": false,
+    "policyRemovedBeforeExit": true
+  },
+  "wrapperEvidence": {
+    "expectedDigest": "sha256:ee98ffe8a4b681caa0958704816cba7426c46842298e042e4a8ce34ad2a1d40c",
+    "pid": 5812,
+    "etwEventId": 1,
+    "etwStartTime": "2026-08-09T04:24:36.625434200+00:00",
+    "etwParentPid": 2260,
+    "etwImage": "\\Device\\CdRom0\\payload\\目标产品B Resolve Studio \\目标产品B Resolve Studio.exe",
+    "independentEtwIdentityMatch": true
+  },
+  "targetInstallerEvidence": {
+    "targetExpectedDigest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+    "installerLogCallingProcess": "F:\\payload\\目标产品B Resolve Studio \\目标产品B Resolve Studio.exe",
+    "callingProcessExactWrapper": true,
+    "clientProcessId": 5812,
+    "clientProcessIdEqualsEtwWrapperPid": true,
+    "originalDatabase": "C:\\WINDOWS\\SystemTemp\\A46F2C0\\目标产品B Resolve.msi",
+    "liveOriginalDatabaseDigest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+    "liveDigestExactTargetMatch": true,
+    "packageCode": "{FB46DD5A-2F84-4CD7-9665-FF74E13A5F03}",
+    "installerPackageVerificationTime": "04:24:37.560",
+    "originalDatabasePropertyTime": "04:24:38.521",
+    "clientProcessIdPropertyTime": "04:24:38.716",
+    "approxSecondsFromEtwWrapperStartToPackageVerification": 0.935
+  },
+  "directCausalJoin": [
+    "The preflight verified the exact wrapper bytes on the sealed read-only UDF before execution.",
+    "Kernel-Process ETW independently recorded process 5812 with the exact wrapper image path on the optical projection.",
+    "The automatically generated Windows Installer target log independently named the exact wrapper path as Calling process.",
+    "The same Installer session recorded CLIENTPROCESSID 5812, exactly equal to the ETW wrapper PID.",
+    "The Installer session recorded OriginalDatabase C:\\WINDOWS\\SystemTemp\\A46F2C0\\目标产品B Resolve.msi.",
+    "While OriginalDatabase still existed, maintained Guest code hashed it to the exact pre-established malicious nested MSI SHA-256."
+  ],
+  "relatedEtwProcessEvidence": [
+    {
+      "time": "2026-08-09T04:24:38.000700600+00:00",
+      "pid": 5924,
+      "parentPid": 852,
+      "image": "\\Device\\HarddiskVolume3\\Windows\\System32\\msiexec.exe",
+      "interpretation": "Windows Installer service-side process; package identity not assigned solely from ETW."
+    },
+    {
+      "time": "2026-08-09T04:24:38.757878200+00:00",
+      "pid": 4568,
+      "parentPid": 5924,
+      "image": "\\Device\\HarddiskVolume3\\Windows\\SysWOW64\\msiexec.exe",
+      "interpretation": "Installer descendant; package identity not assigned solely from ETW."
+    },
+    {
+      "time": "2026-08-09T04:24:40.013494400+00:00",
+      "pid": 5444,
+      "parentPid": 5812,
+      "image": "\\Device\\HarddiskVolume3\\Windows\\SysWOW64\\msiexec.exe",
+      "interpretation": "Wrapper-spawned msiexec observed after the target package was already opened; exact package identity was not retained and must not be inferred as the outer MSI."
+    }
+  ],
+  "outerMsiFinding": {
+    "staticExactIdentityStillValid": true,
+    "dynamicExactOuterMsiSessionObserved": false,
+    "conclusion": "The positive nested-MSI edge does not require an inferred outer-MSI bridge: Windows Installer directly identifies the wrapper as the target MSI calling process. The dynamic relationship of the exact outer MSI remains a separate unresolved edge.",
+    "oldModelRefined": true
+  },
+  "proceduralFailure": {
+    "stage": "correlate",
+    "errorType": "System.Management.Automation.SessionStateUnauthorizedAccessException",
+    "errorMessage": "Cannot overwrite variable PID because it is read-only or constant.",
+    "postObserverCompleted": false,
+    "historicalTrialResultPreserved": true,
+    "failureOccurredAfterTargetLogAndEtwWereDurablyProduced": true,
+    "failureAffectsPostCaptureHarnessCompletion": true,
+    "failureNegatesDirectCausalEvidence": false
+  },
+  "offlineAdjudication": {
+    "implementationRevision": "git:5e217e1ad3dd4d9e3b4a046d635c36608d84a427",
+    "bundleIntegrityVerified": true,
+    "causalEdgeObserved": true,
+    "proceduralTrialComplete": false,
+    "qmpZeroNetworkDevices": true,
+    "unitSuiteAfterFix": "300/300 passed"
+  },
+  "evidence": {
+    "evidenceDigest": "sha256:1ac062940fb15eba465de32cb2853a8bab4249d3d8cca6076a94bc1a437c1b63",
+    "bundleManifestFileDigest": "sha256:fa4bdac38dbab3b7fcccf4ad3121ace95b86137c2aa16f90afb53e7d02536cfd",
+    "resultFileDigest": "sha256:e3b3fe3561e0f6fb55ab9f3e7bf82108b3e1ef5b8ec433cdc0c56cff74453e2d",
+    "evaluationSpecDigest": "sha256:abdbf24c918631fa9bb2ec62590e1c55e27b219324e400b156c115591e9d9722",
+    "executionIdentityDigest": "sha256:7f4420f8f5972cc285748907cdc0a144d6fc80992e79e7129aa172aa36a21f39",
+    "operationalEvidenceDigest": "sha256:6ce7be6a4b3f111be4b01fbf573aca031fdf33c47f0701535e337a566766eb1f",
+    "fixtureResultDigest": "sha256:6a20f652db3c7a0bd01029da7ac2f8c41253161fa6ae8a610be71ce7b27bbf48",
+    "rawEtwDigest": "sha256:8891cd003bdc997fa6f3d988c00a6551363d37f10be4d2e4a458da650be972d1",
+    "etwXmlDigest": "sha256:55f566133f3812ae07e9f01647464c7bd945b01ac2d5b8c75ba03315744d2585",
+    "targetInstallerLogDigest": "sha256:e498ddbeba85f6c4f12b8deb414fd9e2913ac2cddc58aab51afcf91b22d5b7d2",
+    "preObserverDigest": "sha256:becceb8c82f46f93f36448e9bbfdcb05328ffa47798a4f222beec7eaa63d76d3",
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131",
+    "managementChannelDigest": "sha256:a92976d532cffb4bc9a52e4787a0a213fc8ba870a42a41a2ce36dc6f78686b2d",
+    "guardianChannelDigest": "sha256:1923bbed87a9274cfe73b808409cbe02e584d07d873e604b6b9436376c51305a"
+  },
+  "attemptHistory": [
+    {
+      "runId": "evaluation-run:f9ee52b50c4da70958e9f4a0",
+      "activationDigest": "sha256:193f1e30be577070e6e945974041304d7be80a17ce2ead3902087edb358fbd3b",
+      "outcome": "pre-execution-trial-invalid",
+      "thirdPartySampleExecuted": false,
+      "reason": "Observer invocation incorrectly consulted unset LASTEXITCODE under StrictMode."
+    },
+    {
+      "runId": "evaluation-run:6117086f5f48bf579d4210bb",
+      "activationDigest": "sha256:a07e3011f0cc5d071a47501b72e907f2632881502321e0d395dcde2c3151e298",
+      "outcome": "instrumentation-envelope-timeout",
+      "thirdPartyExecutionEstablished": false,
+      "reason": "Outer runner/Guardian envelope was shorter than the expensive pre/post instrumentation path; no C ETL or fixture result was retained."
+    },
+    {
+      "runId": "evaluation-run:d274e7bea171585e7383a64e",
+      "activationDigest": "sha256:d76c26a69489ed1c3225dd5c2ae6350d9a870518fe3edfc53625190618ba7a94",
+      "outcome": "positive-causal-evidence-captured-harness-postprocessing-invalid",
+      "thirdPartySampleExecuted": true,
+      "reason": "Exact target evidence was captured; later ETW parser used local variable pid, colliding case-insensitively with PowerShell read-only PID."
+    }
+  ],
+  "acceptedClaims": [
+    "Execution of the exact Case A wrapper under the accepted sealed no-network research environment dynamically reaches the exact contained malicious nested MSI.",
+    "The target MSI is not merely co-located: Windows Installer records the exact wrapper as Calling process and CLIENTPROCESSID 5812, while ETW independently records PID 5812 as the exact wrapper image.",
+    "The invoked OriginalDatabase bytes match the pre-established nested malicious MSI identity exactly."
+  ],
+  "notAcceptedClaims": [
+    "The exact outer MSI is dynamically on the causal path to the nested malicious MSI in this run.",
+    "Absence of any other behavior proves it cannot occur.",
+    "Downloader, persistence, secondary payload, or replacement intl.dll behavior was fully exercised or characterized.",
+    "The historical C-r3 trial was procedurally complete.",
+    "A further malware execution is required merely to turn the harness result green."
+  ],
+  "closure": {
+    "causalQuestionClosed": true,
+    "automaticReexecutionRequired": false,
+    "automaticReexecutionAuthorized": false,
+    "postEdgeBehaviorBelongsToSeparateExperiment": true,
+    "caseBAdmitted": false
+  }
+}

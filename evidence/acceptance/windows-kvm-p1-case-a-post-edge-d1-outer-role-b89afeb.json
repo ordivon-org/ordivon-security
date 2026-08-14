@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-case-a-post-edge-d1-outer-role-acceptance",
+  "status": "accepted-outer-role-from-procedurally-time-bounded-run",
+  "caseId": "case:caseb-studio:a-original-repack",
+  "scientificVerdict": "outer-msi-role-resolved",
+  "formalRuntimeTerminal": "guardian-runtime-bound-exceeded",
+  "outerRole": "wrapper-spawned pre-install prerequisite installer",
+  "run": {
+    "runId": "evaluation-run:b89afebeaf3ed74ba05e722a",
+    "jobId": "job-019fe4e0-8487-7e10-b045-d0aaa06bd303",
+    "attemptId": "attempt-019fe4e0-8487-7e10-b045-d0b58a58bf70",
+    "activationDigest": "sha256:013b44c6a3aa671b83425b8ba26375e184bc31a88764f6c2e03f28772734f6e6",
+    "residualClosed": true,
+    "qmpZeroNetworkDevices": true,
+    "providerErrorAbsent": true,
+    "qemuExitCode": 0
+  },
+  "wrapper": {
+    "digest": "sha256:ee98ffe8a4b681caa0958704816cba7426c46842298e042e4a8ce34ad2a1d40c",
+    "pid": 5732,
+    "etwStart": "2026-08-09T04:59:39.297881700+00:00"
+  },
+  "nestedMainInspection": {
+    "digest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+    "callingProcess": "exact wrapper",
+    "clientPid": 5732,
+    "verboseLogStopped": "2026-08-09 04:59:43",
+    "aiPreRequisiteReferencesObserved": 4,
+    "maliciousPowerShellActionStarted": false,
+    "interpretation": "The bootstrapper opened/inspected the Advanced Installer main MSI and prerequisite metadata but did not yet enter its malicious InstallExecuteSequence custom action."
+  },
+  "outerSession": {
+    "digest": "sha256:44ae022b71782a8a4693abbc182f8fce59ef15200defd4088d7196595f64f6cf",
+    "originalDatabase": "F:\\payload\\目标产品B Resolve Studio \\目标产品B Resolve\\目标产品B.msi",
+    "clientPid": 5216,
+    "clientEtwParentPid": 5732,
+    "clientImage": "\\Device\\HarddiskVolume3\\Windows\\SysWOW64\\msiexec.exe",
+    "clientEtwStart": "2026-08-09T04:59:43.129750200+00:00",
+    "clientDirectChildOfWrapper": true,
+    "commandLineProperties": "CURRENTDIRECTORY=F:\\payload\\目标产品B Resolve Studio  CLIENTUILEVEL=3 CLIENTPROCESSID=5216 CURRENTMEDIAVOLUMELABEL=ORDIVON_P1_CASEA"
+  },
+  "ordering": {
+    "nestedSessionClosedBeforeOuterClientStarted": true,
+    "approxGapMs": 119
+  },
+  "staticDynamicJoin": {
+    "wrapperPrerequisiteConfigObserved": true,
+    "configuredSetupFile": "目标产品B Resolve\\目标产品B.msi",
+    "configuredCommandLine": "/qr",
+    "outerProduct": "厂商B Design 目标产品B Resolve 21.0.30007"
+  },
+  "boundedLocalBehavior": {
+    "bitsadminProcessObservedByEtw": false,
+    "maliciousDownloaderActionReached": false,
+    "stagingSnapshotAvailable": false,
+    "scheduledTaskSnapshotAvailable": false,
+    "reasonSnapshotsMissing": "Guest exceeded evidence-finalization envelope after exact outer evidence and ETW/session artifacts were already durable."
+  },
+  "evidence": {
+    "evidenceDigest": "sha256:f7151bdf795a20d1593fbcc860b718f01ff4694981470cbca1edfeee4a64246d",
+    "rawEtwDigest": "sha256:f6ef3a8411a9ab79f97c12dbc13e399de32c0dcc53722867fa3f15b17a3d52b3",
+    "etwXmlDigest": "sha256:c2d3dc4c1fdd86710400cca5b2f4bc77cb77b8e67fdcd561079bf13b82f3169e",
+    "targetInstallerLogDigest": "sha256:0333a2678b4dfe123a4d34f53316a3b8ed73900a599a7935e6c3d535bdbcacd0",
+    "outerInstallerLogDigest": "sha256:d0fd8a470cdab2a593ffb458f5c34c68f51d762fa852b6de803d82a4d6509832",
+    "installerSessionsDigest": "sha256:33bac00b4368789e4154b911c46bf1cbdb65873157d157bcbafa4020ac7afcce",
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131"
+  },
+  "modelRevision": "C established wrapper -> nested MSI reachability. D1 refines the semantics: that first nested session is bootstrapper/main-MSI inspection before prerequisites, not execution of the malicious PowerShell action. The exact 厂商B outer MSI is then launched as a wrapper-child prerequisite installer.",
+  "nextQuestion": "D2 should isolate the already-identified nested malicious MSI as a component under zero NIC + R5 to physically test its PowerShell downloader gate without requiring a full 11GB Resolve prerequisite installation.",
+  "notAcceptedClaims": [
+    "The malicious downloader executed in D1.",
+    "The outer MSI is required as a causal bridge for the already-proven wrapper-to-nested-MSI reachability edge.",
+    "Absence of bitsadmin in D1 proves the downloader can never run.",
+    "The D1 harness completed normally."
+  ]
+}

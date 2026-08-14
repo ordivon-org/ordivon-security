@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-case-a-d2-bootstrapper-gate-acceptance",
+  "status": "accepted-component-bootstrapper-gate-observed",
+  "caseId": "case:caseb-studio:a-original-repack",
+  "runId": "evaluation-run:321c8dd2bcb2af3eb76d9431",
+  "jobId": "job-019fe526-3022-75f3-be7a-006f6fee8b92",
+  "formalRuntimeTerminal": "guardian-runtime-bound-exceeded",
+  "residualClosed": true,
+  "component": {
+    "digest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+    "originalDatabase": "F:\\nested\\目标产品B Resolve.msi",
+    "clientPid": 5788,
+    "exitCode": 1603,
+    "runtimeBoundHit": false
+  },
+  "dynamicFinding": {
+    "launchConditionFailure": "This package can only be run from a bootstrapper.",
+    "launchConditionReturnValue": 3,
+    "powerShellScriptInlineStarted": false,
+    "powershellProcessObserved": false,
+    "bitsadminProcessObserved": false,
+    "newStagingFiles": [],
+    "newOneDriveStandaloneUpdateTaskFiles": []
+  },
+  "staticJoin": {
+    "launchCondition": "SETUPEXEDIR OR (REMOVE=\"ALL\")",
+    "secureCustomPropertiesIncludes": [
+      "SETUPEXEDIR",
+      "AI_SETUPEXEPATH"
+    ],
+    "minimalNextHypothesis": "Provide SETUPEXEDIR as a command-line public property while preserving exact MSI bytes and all zero-NIC/R5 controls."
+  },
+  "evidence": {
+    "evidenceDigest": "sha256:6fd674d12f6c27c0b8bda848fd815af24d632f408649d189a140219030e174a7",
+    "installerLogDigest": "sha256:c338aece9b8530ddadef836985d395fe8e7f5465b8c9c3e3022ba37ae024d4ea",
+    "localStateDigest": "sha256:426d412cfc417398c6842547123f5708cb7e6f35207926f7ad45e522ff7fc696",
+    "processEtlDigest": "sha256:2383396ef9e427e62b1a345b23024419f64f67bf1edeee520930ff7bd3bdb20f",
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131"
+  },
+  "interpretation": "D2 proves direct exact-component execution does not reach the malicious PowerShell because the MSI enforces a bootstrapper-only LaunchCondition. It does not test the network gate itself.",
+  "nextQuestion": "D3 should preserve exact MSI bytes and inject only SETUPEXEDIR to satisfy the declared bootstrapper contract, then observe whether PowerShellScriptInline reaches the zero-NIC network gate.",
+  "notAcceptedClaims": [
+    "The malicious PowerShell ran in D2.",
+    "Zero NIC caused the D2 1603.",
+    "D2 proves the downloader is inert.",
+    "D2 is wrapper-reachability evidence."
+  ]
+}

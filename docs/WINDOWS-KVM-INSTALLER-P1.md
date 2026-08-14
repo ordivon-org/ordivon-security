@@ -104,6 +104,20 @@ The separate contract at [`../research/cases/windows-kvm-p1-caseb-isolated-resea
 
 The `ordivon-security-windows-kvm-p1-readback` command implements this first research Gate. It does not reverse the package rejection and does not yet admit third-party execution. Later Gates may execute the original package or a backdoor-removed derived Case only after the generic installer observer is implemented and independently admitted.
 
+
+## Later bounded physical research (recovered closed history)
+
+The paragraphs above are the historical **pre-C admission state** and remain useful as evidence of what was not yet known at that gate. A later separately authorized, zero-NIC research cycle did proceed in the isolated Case-A line and is now recovered from `refs/ordivon/closed/security-malware-evidence-continuation-20260808` into current canonical evidence. It supersedes only the earlier *unknown reachability* claim; it does not reverse the ordinary-product rejection or create standing Sample execution authority.
+
+Accepted later results are:
+
+- [`../evidence/acceptance/windows-kvm-p1-case-a-causal-edge-d274e7b.json`](../evidence/acceptance/windows-kvm-p1-case-a-causal-edge-d274e7b.json): the exact ordinary wrapper was physically observed reaching the exact contained main/malicious MSI in one bounded Case-A trial.
+- [`../evidence/acceptance/windows-kvm-p1-case-a-post-edge-d1-outer-role-b89afeb.json`](../evidence/acceptance/windows-kvm-p1-case-a-post-edge-d1-outer-role-b89afeb.json): the exact 厂商B outer MSI was observed as a separate wrapper-spawned pre-install prerequisite after the main MSI inspection session; it was not the causal bridge to the already observed wrapper→main-MSI edge.
+- [`../evidence/acceptance/windows-kvm-p1-case-a-d2-bootstrapper-gate-321c8dd.json`](../evidence/acceptance/windows-kvm-p1-case-a-d2-bootstrapper-gate-321c8dd.json) and [`../evidence/acceptance/windows-kvm-p1-case-a-d3-powershell-edge-38c957a.json`](../evidence/acceptance/windows-kvm-p1-case-a-d3-powershell-edge-38c957a.json): direct component work showed that bootstrapper context was required and that the minimal observed context was sufficient to reach the malicious PowerShell custom-action edge.
+- [`../evidence/acceptance/windows-kvm-p1-case-a-d4-bounded-no-secondary-effects-197053c.json`](../evidence/acceptance/windows-kvm-p1-case-a-d4-bounded-no-secondary-effects-197053c.json): in the bounded zero-NIC D4 window, no downstream `bitsadmin` process, new staging file, or matching `OneDriveStandaloneUpdate` task was observed after reaching the PowerShell edge. D4 did **not** directly instrument the first HEAD request, so this is a bounded absence result rather than proof of a particular network-failure instruction.
+
+The canonical scientific closeout is [`CASEB-RESEARCH-CLOSEOUT.md`](CASEB-RESEARCH-CLOSEOUT.md). That closeout also freezes a later loader-causality question as unresolved after its single-use Activation failed before Windows boot; it explicitly authorizes no automatic retry.
+
 P1 remains a candidate infrastructure track: the read-only media verification backend is implemented; the observer resource and Case authorities are implemented below; generic third-party execution and process-tree orchestration remain pending.
 
 ## R0 correction: residual closure

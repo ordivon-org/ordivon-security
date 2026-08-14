@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "recordKind": "sample",
+  "recordId": "sample:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+  "sample": {
+    "sha256": "sha256:7289cc3ab21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e",
+    "byteLength": 7428655207,
+    "mediaType": "application/x-7z-compressed",
+    "originalName": "目标产品B_Resolve_Studio_.7z",
+    "artifactRole": "third-party-artifact",
+    "materialization": "metadata-only",
+    "executionAdmission": "denied-by-default"
+  },
+  "sourceRefs": [
+    {
+      "provider": "ordivon-security-p1-case",
+      "recordId": "case:caseb-studio",
+      "locator": "research/cases/windows-kvm-p1-caseb-studio.json"
+    },
+    {
+      "provider": "ordivon-security-closed-case-history",
+      "recordId": "refs/ordivon/closed/security-malware-evidence-continuation-20260808",
+      "locator": "docs/CASEB-RESEARCH-CLOSEOUT.md"
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "static-malicious-nested-chain",
+      "predicate": "contains-statically-verified-malicious-downloader-chain",
+      "value": true,
+      "truthRole": "case-conclusion",
+      "assertedBy": "ordivon-security-p1-static-causality",
+      "evidenceRefs": [
+        "evidence/acceptance/windows-kvm-p1-caseb-causality-r2.json",
+        "docs/WINDOWS-KVM-INSTALLER-P1.md"
+      ]
+    },
+    {
+      "claimId": "ordinary-execution-rejected",
+      "predicate": "ordinary-product-execution-admitted",
+      "value": false,
+      "truthRole": "case-conclusion",
+      "assertedBy": "ordivon-security-p1-case-closeout",
+      "evidenceRefs": [
+        "evidence/acceptance/windows-kvm-p1-caseb-case-closeout-bf272ab.json"
+      ]
+    },
+    {
+      "claimId": "wrapper-to-nested-main-msi-observed",
+      "predicate": "ordinary-wrapper-reached-exact-contained-main-msi",
+      "value": true,
+      "truthRole": "case-conclusion",
+      "assertedBy": "ordivon-security-case-a-causal-trial",
+      "evidenceRefs": [
+        "evidence/acceptance/windows-kvm-p1-case-a-causal-edge-d274e7b.json"
+      ]
+    },
+    {
+      "claimId": "outer-msi-role-resolved",
+      "predicate": "outer-msi-runtime-role",
+      "value": "wrapper-spawned-preinstall-prerequisite",
+      "truthRole": "case-conclusion",
+      "assertedBy": "ordivon-security-case-a-post-edge-d1",
+      "evidenceRefs": [
+        "evidence/acceptance/windows-kvm-p1-case-a-post-edge-d1-outer-role-b89afeb.json"
+      ]
+    },
+    {
+      "claimId": "minimal-bootstrap-powershell-edge-observed",
+      "predicate": "exact-nested-msi-malicious-powershell-action-reached-with-minimal-bootstrap-context",
+      "value": true,
+      "truthRole": "case-conclusion",
+      "assertedBy": "ordivon-security-case-a-d3",
+      "evidenceRefs": [
+        "evidence/acceptance/windows-kvm-p1-case-a-d3-powershell-edge-38c957a.json"
+      ]
+    },
+    {
+      "claimId": "bounded-zero-nic-no-secondary-effects-observed",
+      "predicate": "bounded-downstream-secondary-effects-observed",
+      "value": false,
+      "truthRole": "case-conclusion",
+      "assertedBy": "ordivon-security-case-a-d4",
+      "evidenceRefs": [
+        "evidence/acceptance/windows-kvm-p1-case-a-d4-bounded-no-secondary-effects-197053c.json"
+      ]
+    }
+  ],
+  "evidenceRefs": [
+    "evidence/acceptance/windows-kvm-p1-caseb-causality-r2.json",
+    "docs/WINDOWS-KVM-INSTALLER-P1.md",
+    "evidence/acceptance/windows-kvm-p1-case-a-causal-edge-d274e7b.json",
+    "evidence/acceptance/windows-kvm-p1-case-a-post-edge-d1-outer-role-b89afeb.json",
+    "evidence/acceptance/windows-kvm-p1-case-a-d2-bootstrapper-gate-321c8dd.json",
+    "evidence/acceptance/windows-kvm-p1-case-a-d3-powershell-edge-38c957a.json",
+    "evidence/acceptance/windows-kvm-p1-case-a-d4-bounded-no-secondary-effects-197053c.json",
+    "evidence/acceptance/windows-kvm-p1-caseb-research-closeout-f8127d6.json",
+    "docs/CASEB-RESEARCH-CLOSEOUT.md"
+  ]
+}

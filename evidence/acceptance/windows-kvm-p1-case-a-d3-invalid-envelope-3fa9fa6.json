@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-case-a-d3-invalid-trial-record",
+  "status": "trial-invalid-no-behavior-claim",
+  "runId": "evaluation-run:3fa9fa6f5b0c1e8ae14539a0",
+  "jobId": "job-019fe52e-4f01-70c1-af79-58637e2fd316",
+  "activationDigest": "sha256:34ddcc79dda3b2356a65a04d81f9b6c516384e3e5734945b4814a6aed0b3f2b9",
+  "formalTerminal": "guardian-runtime-bound-exceeded",
+  "residualClosed": true,
+  "qmpZeroNetworkDevices": true,
+  "guestResultPresent": false,
+  "fixtureResultPresent": false,
+  "invalidReason": "Provider Guardian max runtime was configured to 90000 ms while the D3 authority instrumentation envelope is 120000 ms, so the outer control budget invalidly preempted the experiment before any Guest result was durable.",
+  "behaviorClaimsAuthorized": false,
+  "rerunRule": "Use a new single-run activation after fixing the provider Guardian to at least the authority instrumentation envelope; do not reuse the consumed activation."
+}

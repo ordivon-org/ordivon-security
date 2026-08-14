@@ -44,6 +44,7 @@ Absence of an `independent-observation` claim is not a negative observation.
 - `seed-ca2-vulnerability.json` — the exact CA2 owned vulnerable/guarded/fixed C revisions and their static-versus-replay evidence;
 - `seed-eicar-sample.json` — the harmless maintained EICAR test fixture and its ClamAV provider classification boundary;
 - `seed-caseb-sample.json` — metadata-only identity for the retained 目标产品B case archive and existing case conclusions. The 7.4 GiB archive is not copied here.
+- `seed-caseb-sample-postedge.json` — a post-P0 revision of the same exact 目标产品B Sample identity that adds the recovered bounded C/D case conclusions without changing materialization or execution admission.
 
 `providers.json` records the first external provider roles. OSV, NVD and CISA KEV remain vulnerability-intelligence owners. MalwareBazaar and VirusTotal remain sample-intelligence owners. P0 accepts explicit exact snapshots only; it performs no automatic synchronization, upload, download or bulk mirroring.
 

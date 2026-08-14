@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-case-a-d3-powershell-edge-acceptance",
+  "status": "accepted-minimal-bootstrap-context-reaches-malicious-powershell",
+  "caseId": "case:caseb-studio:a-original-repack",
+  "runId": "evaluation-run:38c957a335c2b8da7549ae1c",
+  "jobId": "job-019fe532-2e21-7763-a8de-68380eab46c7",
+  "formalRuntimeTerminal": "guardian-runtime-bound-exceeded",
+  "residualClosed": true,
+  "component": {
+    "digest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+    "setupexeDir": "F:\\nested",
+    "msiBytesModified": false,
+    "onlyBootstrapPropertyInjected": "SETUPEXEDIR"
+  },
+  "dynamicFinding": {
+    "launchConditionPassed": true,
+    "powerShellScriptInlineStarted": true,
+    "powerShellScriptInlineActionReturnValue": 1,
+    "powerShellScriptInlineActualErrorCode": 1603,
+    "actualErrorTranslatedToSuccessByContinueMarking": true,
+    "msiMainEngineReturnCode": 0,
+    "msiInstallationStatus": 0
+  },
+  "processEvidence": {
+    "rawEtlDigest": "sha256:12158885ab1d3096796650845183f880c63fc985ee91f0b274966afc6eb6dbf5",
+    "powershellNamePresentInRawEtlStrings": true,
+    "bitsadminNamePresentInRawEtlStrings": false,
+    "schtasksNamePresentInRawEtlStrings": false,
+    "absenceFromRawStringsIsNotTreatedAsCompleteProcessAbsenceProof": true
+  },
+  "network": {
+    "qmpZeroNetworkDevices": true,
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131"
+  },
+  "evidence": {
+    "evidenceDigest": "sha256:5871512d71fef4c90791c04f19e94158d6692c4a7a3feb9a1420345f1c4e80f9",
+    "installerLogDigest": "sha256:9418f3fb3bb512a93f160fee2696d9d963ae138056cf2a3132313c7ce6a3b4b4",
+    "partialFixtureResultDigest": "sha256:9b65897825d6955eeb5465bc499a68450ea5b2fd9533934296c4ad9a085aa7b8"
+  },
+  "interpretation": "SETUPEXEDIR is sufficient to satisfy the bootstrapper-only LaunchCondition and reach the malicious PowerShell custom action without modifying MSI bytes. The custom action fails internally with 1603 under the isolated environment, but the MSI package masks that failure and reports overall success because the action is marked continue-on-error.",
+  "sideEffectBoundary": {
+    "stagingSnapshotAvailable": false,
+    "scheduledTaskSnapshotAvailable": false,
+    "directBitsadminAbsenceProven": false,
+    "inferenceOnly": "Given QMP zero NIC, static script ordering, rapid custom-action failure and no bitsadmin/schtasks raw-ETL string hints, first network-gate failure is the leading explanation, but D3 alone does not directly prove no downstream side effects."
+  },
+  "nextQuestion": "D4 should use a lighter validated process-start watcher plus before/after staging and task-file snapshots, avoiding ETW XML conversion, to directly close the bounded local-side-effect question.",
+  "notAcceptedClaims": [
+    "D3 proves no bitsadmin process ever started.",
+    "D3 proves no staging files or scheduled tasks were created.",
+    "MSI return code 0 means the malicious custom action succeeded.",
+    "D3 is wrapper reachability evidence."
+  ]
+}

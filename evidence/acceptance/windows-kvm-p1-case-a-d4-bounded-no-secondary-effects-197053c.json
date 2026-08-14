@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-case-a-d4-side-effect-acceptance",
+  "status": "accepted-bounded-no-secondary-effects-observed",
+  "caseId": "case:caseb-studio:a-original-repack",
+  "runId": "evaluation-run:197053c97e2a2ccaa16fa95b",
+  "jobId": "job-019fe55f-6839-7501-9470-d7b0b7731a68",
+  "formalRuntimeTerminal": "case-a-d4-side-effect-completed",
+  "disposition": "no-issue-observed",
+  "residualClosed": true,
+  "authority": {
+    "canonicalDigest": "sha256:b055eb2481a82556e48008287e63738bbe276ed1fbdb4ea1a60cef3f89434e7b",
+    "fileDigest": "sha256:a6146d29324b2ff5952cd0d2b547c0731fb6a931606ee4ede4773aade9eca4e4"
+  },
+  "activationDigest": "sha256:dedb44458f20b4de00bf43e6e2a7926fd87182828456ea4db7f0b4b776ab4021",
+  "runner": {
+    "digest": "sha256:f140acbac0b8403abb869a111ddf23c5786a8abec96dde1b52393064c5441f22",
+    "byteLength": 35840,
+    "networkImportMatches": [],
+    "arbitraryExecutablePathAccepted": false,
+    "sideEffectObservationOnly": true
+  },
+  "component": {
+    "digest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+    "originalDatabase": "F:\\nested\\目标产品B Resolve.msi",
+    "clientPid": 5996,
+    "setupexeDir": "F:\\nested",
+    "msiBytesModified": false,
+    "onlyBootstrapPropertyInjected": "SETUPEXEDIR",
+    "componentExitCode": 0,
+    "componentRuntimeBoundHit": false
+  },
+  "network": {
+    "qmpZeroNetworkDevices": true,
+    "qmpTopologyDigest": "sha256:f6e9d04ab2fb7bd9c05e6b9d97802d9ac16343d18237e9d308736788a4317131",
+    "liveInternetAuthorized": false,
+    "liveC2Authorized": false
+  },
+  "executionControl": {
+    "stagingRoot": "C:\\WINDOWS\\TEMP\\目标产品B Resolve",
+    "executeFileDenyApplied": true,
+    "maintainedDenyCanaryBlocked": true,
+    "secondaryDownloadedPeExecutionAuthorized": false
+  },
+  "processObserver": {
+    "mechanism": "Win32_ProcessStartTrace",
+    "registered": true,
+    "maintainedCanaryPid": 5784,
+    "maintainedCanaryProcess": "cmd.exe",
+    "maintainedCanaryObserved": true,
+    "sampleWindowEventCount": 16,
+    "powershellProcessStartCount": 1,
+    "bitsadminProcessStartCount": 0,
+    "schtasksProcessStartCount": 0,
+    "cmdProcessStartCountAfterCanaryQueueClear": 0,
+    "powershellProcess": {
+      "pid": 5584,
+      "parentPid": 5452,
+      "parentRole": "service-side msiexec.exe"
+    }
+  },
+  "installer": {
+    "logPresent": true,
+    "originalDatabaseDigest": "sha256:ffc59cca203cc0eac7dc939bce70f4f2435536685fa097dca4b047875fd6a2d3",
+    "clientProcessId": 5996,
+    "powerShellScriptInlineStarted": true,
+    "powerShellScriptInlineEnded": true,
+    "powerShellScriptInlineReturnValue": 1,
+    "powerShellScriptInlineActualErrorCode": 1603,
+    "msiMainEngineReturnCode": 0,
+    "interpretation": "The malicious PowerShell custom action executed and failed internally with 1603, while the MSI masked that failure through continue-on-error and returned success."
+  },
+  "localEffects": {
+    "stagingFilesBefore": 0,
+    "stagingFilesAfter": 0,
+    "newStagingFiles": [],
+    "matchingTaskFilesBefore": [],
+    "matchingTaskFilesAfter": [],
+    "newOneDriveStandaloneUpdateTaskFiles": [],
+    "secondaryEffectsObserved": false
+  },
+  "evidence": {
+    "evidenceDigest": "sha256:2f2896ea259fca1136c26d0179c407d2cbbde1b8d045eab5b0df8219791961ce",
+    "fixtureResultDigest": "sha256:f1fc5948c4cd1648d8791796d7f3cfee471d518bd4b93853c841897d3e8b798b",
+    "installerLogDigest": "sha256:58267fa4c02d708021f99fb7533053254dff55afa5e5e567b3385b31082f2e70",
+    "processEventsDigest": "sha256:b36ac0daa83351b7e9b96786c503bf133d923c4354cb97dd110d001e20f8de68",
+    "localStateDigest": "sha256:7c1f1a3d2d14be53baf1262aa4cb14a92f32719f2a18bf6ec745159a119210ff"
+  },
+  "acceptedClaim": "Within this exact isolated zero-NIC D4 environment, after the exact nested MSI reached its malicious PowerShell action under the minimal SETUPEXEDIR bootstrap context, no downstream bitsadmin process start, no new staging file, and no matching OneDriveStandaloneUpdate task file were observed during the bounded trial.",
+  "causalInterpretation": "Combined with the statically established script order (network HEAD gate precedes staging/download/task logic), the result is consistent with the script failing at or before its network gate. D4 does not directly observe an outbound HEAD attempt and therefore does not claim that exact line as independently proven runtime causality.",
+  "scopeBoundary": "This is a bounded zero-NIC component-behavior result. It does not mean the malicious package is inert when network is available, does not re-prove wrapper reachability, and does not authorize a network-enabled follow-up.",
+  "notAcceptedClaims": [
+    "The downloader is harmless or inert with network access.",
+    "The HEAD request itself was directly observed.",
+    "No possible side effect exists outside the bounded observed surfaces.",
+    "MSI return code 0 means the malicious PowerShell succeeded.",
+    "D4 is evidence for wrapper reachability or ordinary-user execution semantics.",
+    "Case B is admitted."
+  ]
+}

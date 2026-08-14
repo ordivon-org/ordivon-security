@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-caseb-research-closeout",
+  "caseId": "case:caseb-studio",
+  "status": "closed-current-research-cycle",
+  "closedAtDate": "2026-08-09",
+  "closedImplementationRevision": "git:f8127d6e840e53108f75b6b730221c75573c94c1",
+  "scope": {
+    "caseACausalityClosed": true,
+    "caseDPostEdgeClosed": true,
+    "e2SemanticEquipmentWorkFrozen": true,
+    "e2b1CurrentActivationCycleClosed": true,
+    "e2b1PrimaryLoaderQuestionResolved": false,
+    "caseBAdmitted": false,
+    "networkEnabledFollowupAuthorized": false,
+    "automaticSampleReexecutionAuthorized": false,
+    "automaticReplacementActivationAuthorized": false
+  },
+  "scientificCloseout": {
+    "wrapperToNestedMainMsiReachability": {
+      "verdict": "observed",
+      "acceptancePath": "evidence/acceptance/windows-kvm-p1-case-a-causal-edge-d274e7b.json",
+      "acceptanceFileDigest": "sha256:a1427b5924ccb2c43d7d2f85e1aea9a1e4686c291ff562b9e8d4827762908938",
+      "claim": "The exact wrapper reached the exact contained malicious/main MSI in the observed bounded run."
+    },
+    "outerMsiRole": {
+      "verdict": "wrapper-spawned-preinstall-prerequisite",
+      "claim": "The outer 厂商B MSI was a separate wrapper-spawned prerequisite installer, not the causal bridge to the malicious/main MSI."
+    },
+    "componentPostEdge": {
+      "verdict": "closed-bounded-zero-nic",
+      "acceptancePath": "evidence/acceptance/windows-kvm-p1-case-a-d-closeout-e4e2066.json",
+      "acceptanceFileDigest": "sha256:2702897bb9dac6589bbe99a3a19e3b2c0040acb6beedcaa03c1ba7bbff02fd73",
+      "claim": "Exact component execution with minimal bootstrap context reached malicious PowerShell; bounded zero-NIC D4 observed no downstream bitsadmin process, new staging file, or matching OneDrive task. D4 did not directly instrument the first HEAD request."
+    },
+    "replacementIntlLoaderCausality": {
+      "verdict": "unresolved-current-cycle-closed",
+      "reason": "The only single-run Activation was consumed by a prelaunch admission failure before Windows boot or third-party launch.",
+      "runId": "evaluation-run:461c8fa2f4625a38c27cd165",
+      "runtimeJobId": "job-019fe665-f786-75d1-b4dd-936cbf73b86d",
+      "acceptancePath": "evidence/acceptance/windows-kvm-e2b1-loader-prelaunch-invalid-461c8fa.json",
+      "acceptanceFileDigest": "sha256:e18ea97aa0d7ef7d8db525c847e6fc0d1119175f7486016745043dfecb1cff4a",
+      "windowsBootObserved": false,
+      "thirdPartyLaunchObserved": false,
+      "thirdPartyModuleLoadObserved": false,
+      "residualClosed": true
+    }
+  },
+  "e2Results": {
+    "semanticCore": [
+      "Subject, Executor, Execution Context, and Execution Binding are distinct first-class identities.",
+      "Authority, Activation, and Execution are distinct authorities/events.",
+      "Procedural outcome, containment outcome, and scientific assessment are separate truth domains.",
+      "execute-bound-subject is the generic semantic action; provider equipment does not own case-specific scientific meaning."
+    ],
+    "equipmentLaws": [
+      "reuse mechanism != reuse scientific claim != reuse authority",
+      "dangerous/subject dwell <= Executor child bound <= Guest envelope <= Provider Guardian wall-clock",
+      "real physical canaries remain necessary because unit suites can miss provider runtime-path failures",
+      "stable exact multi-gigabyte execution context should be pre-materialized into a sealed derived environment instead of recopied and fully rehashed per trial"
+    ],
+    "newProjectionLaw": "Environment identity does not substitute for Subject projection provenance. A bound Subject inside a sealed derived environment still requires explicit immutable projection identity in EvaluationSubjectBinding.",
+    "projectionLawImplementationFixed": true
+  },
+  "e2b1FrozenEvidence": {
+    "designPath": "research/cases/windows-kvm-p1-caseb-e2b1-intl-loader-design.json",
+    "designFileDigest": "sha256:35d4a223c28d635f3dc2a8272e243d40de2f2967d767bec3e0c6fbb75e53b001",
+    "designCanonicalDigest": "sha256:cd22956e896962219ee8a3cfdadc17809e8ac125b35ba272bd9836cee9fb3124",
+    "designRevision": "5",
+    "designStatus": "closed-current-cycle-consumed-prelaunch-invalid",
+    "authorityCanonicalDigest": "sha256:cd30d25329024e1a6eb6b5fb2fcf959322d6616f6567a9fc2a115b18e8a7d4e4",
+    "activationCanonicalDigest": "sha256:7b3c132c6c67bdad03cc8629206d5aa1f0043831fa5fb85fe68dfa645e42a8ea",
+    "activationConsumed": true,
+    "sourceProjectionDigest": "sha256:8c7fb53edcddb5ea50d28c1fc203bf1f7aac7b1a114eb404f4ecf44ae6d28197",
+    "executionEnvironmentImageDigest": "sha256:6ac8c39c0579aac8aa5d6bbebda299c1c43d34e082f9f40c8eb947937b4e0b54",
+    "observerCanaryAcceptancePath": "evidence/acceptance/windows-kvm-e2b1-module-load-observer-canary-04a5a06.json",
+    "observerCanaryAcceptanceFileDigest": "sha256:34cde08c4a052c79ca24054e0e211c82dbf3b08f0b2905b60cc7d9c849397b81",
+    "environmentSealAcceptanceFileDigest": "sha256:21bee3025aa253488ec5633b21b9eaf6fb57bf0548ef979a99b0c4e9fa3c0bb9",
+    "environmentBootAcceptanceFileDigest": "sha256:8742dfa8d47c4435426bb14f7fa387736897462583faed2d26553adb97cb904f"
+  },
+  "verification": {
+    "targetedE2b1UnitRegression": {
+      "jobId": "job-019fe6d2-d6e6-7c92-9a1b-4dd272fc545c",
+      "testsRun": 16,
+      "passed": 16,
+      "failed": 0,
+      "status": "passed"
+    },
+    "fullUnitRegression": {
+      "jobId": "job-019fe6d4-114d-70b3-9c1d-ef2c90c6a44b",
+      "testsRun": 355,
+      "passed": 354,
+      "logicFailures": 0,
+      "environmentErrors": 1,
+      "status": "environment-prerequisite-incomplete",
+      "environmentError": {
+        "test": "test_windows_kvm_p1_causal_transcript_canary.WindowsKvmP1CausalTranscriptCanaryTests.test_msi_and_fixture_compile_without_network_imports",
+        "missingPath": "/usr/bin/wixl",
+        "message": "wixl is missing or unsafe: /usr/bin/wixl",
+        "interpretation": "Historical maintained MSI canary cannot be recompiled in the current host tool environment. This is not an E2-B1 semantic or logic assertion failure and was not hidden by skipping or weakening the test."
+      }
+    }
+  },
+  "repositoryState": {
+    "workspaceId": "security-malware-evidence-continuation-20260808",
+    "workspaceHeadAtCloseout": "git:f8127d6e840e53108f75b6b730221c75573c94c1",
+    "securityMainObservedHead": "git:478e25f9d1b14df0c2c8489488c9baf3e0499642",
+    "workspaceUniqueCommitsVsMain": 60,
+    "mainUniqueCommitsVsWorkspace": 58,
+    "integrationDisposition": "not-integrated-divergent-no-blind-merge"
+  },
+  "futureWorkBoundary": {
+    "currentCycleHasNextPhysicalAction": false,
+    "futureLoaderStudyAllowedOnlyAsSeparateWork": true,
+    "requirements": [
+      "revalidate Runtime/Git/evidence physical truth",
+      "create a new narrow Authority and a new single-use Activation",
+      "bind explicit immutable Subject projection identity",
+      "remain zero-NIC and disposable",
+      "do not infer paid-feature, license-success, or patch-success from module mapping",
+      "do not automatically rerun after instrumentation or admission failure"
+    ]
+  },
+  "safetyBoundary": {
+    "hostWindowsExecutionAuthorized": false,
+    "networkAuthorized": false,
+    "liveC2Authorized": false,
+    "downloadedSecondaryPeExecutionAuthorized": false,
+    "caseBAdmitted": false,
+    "redistributionOfReplacementDllOrPatchRecipeAuthorized": false
+  }
+}
