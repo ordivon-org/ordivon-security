@@ -48,10 +48,20 @@ authority 移到哪里才能真正改变边界（而非只增加混淆）。
 4. **ToyDesigner V0-V3 实测**（research/ca-lic/toydesigner/）:
    签名阻伪造但本地检查可 patch；绑定阻朴素复制但锚点可伪造；
    分散 gate 成本 O(位数点) 而结构不变。基线 15/15 + 4/4 攻击落地。
+5. **真实 crack patch 定位**（2026-08-14, 官方 2025. 同构建 diff,
+   隔离区 ANALYSIS_REPORT.md 追加3）: 破解基底 = 2025. (2026-03-10,
+   与破解 DLL 同尺寸); 全文件仅 3 差异区 4531B 全在 .text, 实际 5 处编辑:
+   ①授权服务 可用性 gate (0x181279e40) deny 检查 NOP + 恒真 — 23 调用点
+   单一咽喉 ②状态码函数 fcn.… 强制 status 4 ③授权服务 状态机
+   fcn.… 跳过错失注册块 ④⑤Python quit 方法双消息 NOP
+   (AP_QuitRequested/AP_QuitConfirmed)。.data/.rdata 零改动 →
+   绕过型确认 (非 keygen), 主机制 = 伪 dongle 存在 → 最高级 license 选型。
+   证据: 版本错配 (3月引擎+7月安装包) 启动失败 + ins5.dat 官方验签拒 → 实际不可用。
 
 ## Unresolved
 
-- 破解 核心库.dll 的具体 patch 位置（需 2026-03 构建原始文件或 r2 定位）
+- 破解 核心库.dll 的 5 处编辑的上游触发条件与状态码语义（静态已定位,
+  动态确认 pending; 见 Established 5）
 - 破解版是否带恶意载荷（未过 admission，未进 KVM）
 - V4-V8 各级的实测成本曲线（完整性/加密模块/远程/硬件/服务端能力）
 - 现实系统对照表（JetBrains/Adobe/Windows/Denuvo/iLok/SaaS/主机/移动区）
@@ -76,5 +86,6 @@ authority 移到哪里才能真正改变边界（而非只增加混淆）。
 2. [x] ToyDesigner V0-V3: plain gate / 签名 / 绑定 / 分散 enforcement
 3. [ ] ToyDesigner V4-V6: integrity / encrypted module / remote entitlement
 4. [ ] 现实系统对照表（每系统一行: 秘密在哪/authority 在哪/谁控制哪）
-5. [ ] r2 定位破解 核心库.dll 的 license gate patch（可选，标注构建差异）
+5. [x] r2 定位破解 核心库.dll 的 license gate patch（2026-08-14 完成:
+    同构建 diff, 3 区 5 编辑, 见 Established 5）
 6. [ ] KVM admission 流程为破解版申请动态验证（若用户决定）
