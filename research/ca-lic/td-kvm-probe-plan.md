@@ -2,6 +2,20 @@
 
 Case: research/cases/windows-kvm-p1-目标产品-case-a-execution.json
 
+## 运行实证 (2026-08-14, 三次迭代)
+
+1. **拼写陷阱**: guest-runner 读 ordivon-run.json (i), 驱动曾写 ordovon-* (o)
+   → ItemNotFoundException。已修。
+2. **只读 USB NTFS 不自动挂载**: readonly=on usb-storage 挂载 9.6GB NTFS,
+   Win11 guest 120s 内 Get-Volume 找不到 ORDIVON_P1_EXEC 卷; 改 writable
+   挂载立即找到。实证: P1 只读媒体从未在真实 guest 验证过。
+   → 运行使用 --writable-exec-media (operator-directed 偏差);
+     媒体完整性由 pre/post digest 保护 (材料化 manifest 记录 pre-digest,
+     运行后 re-hash 对比)。
+3. **runner 版本漂移**: bundle 内 runner.exe 是旧版 (a0a804fa),
+   驱动 fixture 用新版 (b53e6636) → 契约 installer digest 不匹配。
+   已同步 td-src + 重打包 + 重建 manifest + 重材料化。
+
 ## 两阶段结构 (operator-directed 2026-08-14)
 
 - **阶段一 (KVM, deny-all 网络)**: 无病毒判定 + license 状态/效验点动态定位。

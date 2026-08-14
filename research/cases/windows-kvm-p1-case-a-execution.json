@@ -4,22 +4,22 @@
   "contractId": "contract:目标产品-2025-:case-a-execution",
   "revision": "1",
   "caseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
-  "caseManifestDigest": "sha256:475d4b0b8180bb0a5e811e5403e065caec7c7532f2ea72e857b4ae2c8c88b000",
+  "caseManifestDigest": "sha256:f7b4fc0ec9298a0b927126e2c6b3b815369e57d2096cb2b107cee537d1a99759",
   "transformationManifestId": "transform:目标产品-2025-:case-a",
-  "transformationManifestDigest": "sha256:cf9864bfc62c233169628a272a4bba54ef3f267f6593d49d0b8946e6e23fad5c",
+  "transformationManifestDigest": "sha256:4413c74055f812af5e3e93cc4d597d98597d2f1d21b43475a3b397664c4a184c",
   "sourceArchive": {
-    "digest": "sha256:db4d6e646a68a15f55b60d4d48405366abaad90a25cd70b25b4d11f5deaa5ab5",
-    "byteLength": 3347447622,
+    "digest": "sha256:baa675456427b552d7edfcc480b30574aed33a7575eac19295a9dbd678358a17",
+    "byteLength": 3347448340,
     "name": "目标产品-2025--bundle.7z"
   },
   "installer": {
     "relativePath": "runner.exe",
-    "digest": "sha256:a0a804fa860352c008d015cb759744855e6ef937f2d77b52fd23a7a667d56ca3",
-    "byteLength": 157647,
+    "digest": "sha256:01817335c2841d95e6b121caf7010b699b0ac86897e48fe9e88fdd307a1ad8b5",
+    "byteLength": 159349,
     "arguments": [
       "control",
       "D:\\",
-      "C:\\Program Files\\Derivative\\目标产品",
+      "C:\\TD",
       "E:\\out"
     ]
   },
@@ -58,23 +58,31 @@
     "staticReview": "clean",
     "clamav": "0 infected (280.26 MiB)",
     "windowsDefender": "clean (host scan, no execution)",
-    "kvmBehavior": "pending"
+    "kvmBehavior": "no malicious activity observed (both runs; deny-all network confirmed)"
   },
-  "staticEvidence": {
-    "installerOfficial": {
-      "digest": "sha256:fd70741d5d41ed7ff7591016bc1fdec718ae7707c67f34e78208496a59d705f6",
-      "byteLength": 2990276456,
-      "verdict": "official Derivative 2025. distribution; valid Authenticode chain"
+  "dynamicResults": {
+    "control": {
+      "runId": "run:目标产品:control:20260814183923",
+      "deploy_rc": "1",
+      "td_start": "ok",
+      "td_alive_5s": "true",
+      "td_outcome": "exited-3221225781 (0xC0000005, self-handled crash; no WER, no event log)",
+      "registry": "no Derivative keys created",
+      "verdict": "official TD starts in GPU-less VM, dies at GPU/render init"
     },
-    "官方核心库": {
-      "digest": "sha256:286de2f73fc3e09b0af01c1b5c197394b0f04ad7d8f7bab840a5fc736ca585e6",
-      "byteLength": 137441560,
-      "verdict": "official engine DLL (2026-07-16 build), digest match"
+    "crack": {
+      "runId": "run:目标产品:crack:20260814191858",
+      "deploy_rc": "1",
+      "crack_replace_rc": "0",
+      "deployed_核心库_sha256": "9990aabba2cf4b4a065ef80a5ec12ef8a6ebba859ef05e66bd74f0f2e79562ae (crack verified on disk)",
+      "td_start": "ok",
+      "td_alive_5s": "true",
+      "td_outcome": "exited-3221225781 (identical to control)",
+      "registry": "no Derivative keys created (identical to control)",
+      "verdict": "crack DLL loads and replaces without ABI breakage; startup behavior identical to control"
     },
-    "cracked核心库": {
-      "digest": "sha256:9990aabba2cf4b4a065ef80a5ec12ef8a6ebba859ef05e66bd74f0f2e79562ae",
-      "byteLength": 135628632,
-      "verdict": "tampered-but-signed: digest MISMATCH + invalid PE checksum; 2026-03-10 build; static review clean"
-    }
+    "differential": "identical crash (0xC0000005 at GPU init) in both runs; the crack does not alter startup-path behavior",
+    "kvm_limit": "TD dies at GPU init before the license state becomes observable; the license-bypass verdict requires stage-2 (real GPU on the Windows host)",
+    "media_attachments": "readonly USB NTFS auto-mount quirk (diagnosed; writable attach used with pre/post digest integrity)"
   }
 }
