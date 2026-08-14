@@ -15,6 +15,7 @@ from ordivon_security._canonical import (
     canonical_digest,
     validate_json,
 )
+from ordivon_security._paths import resolve_relative_regular_file
 from ordivon_security.evidence.operational import OperationalEvidenceEvent
 
 from .backend import EvaluationArtifact
@@ -185,8 +186,12 @@ class EvaluationEvidenceRecorder:
         result: JsonObject,
         artifacts: tuple[EvaluationArtifact, ...] = (),
     ) -> EvaluationEvidenceBundle:
-        if output_path.exists() and any(output_path.iterdir()):
-            raise FileExistsError(f"Evaluation evidence path is not empty: {output_path}")
+        if output_path.is_symlink():
+            raise ValueError("Evaluation evidence output path must not be a symbolic link")
+        if output_path.exists() and (not output_path.is_dir() or any(output_path.iterdir())):
+            raise FileExistsError(
+                f"Evaluation evidence path is not an empty directory: {output_path}"
+            )
         output_path.mkdir(parents=True, exist_ok=True)
         output_path.chmod(0o700)
         events_path = output_path / "events"
@@ -291,7 +296,12 @@ def _load_object(path: Path, label: str) -> JsonObject:
 
 
 def verify_evaluation_evidence(path: Path) -> str:
-    manifest = _load_object(path / "bundle-manifest.json", "Evaluation bundle manifest")
+    manifest = _load_object(
+        resolve_relative_regular_file(
+            path, "bundle-manifest.json", label="Evaluation bundle manifest"
+        ),
+        "Evaluation bundle manifest",
+    )
     if manifest.get("schemaVersion") not in {1, 2}:
         raise ValueError("Evaluation evidence schema revision is unsupported")
     run_id = manifest.get("runId")
@@ -305,7 +315,9 @@ def verify_evaluation_evidence(path: Path) -> str:
         relative_path = metadata.get("path")
         if not isinstance(relative_path, str):
             raise ValueError("Evaluation channel path is invalid")
-        raw = (path / relative_path).read_bytes()
+        raw = resolve_relative_regular_file(
+            path, relative_path, label=f"Evaluation channel {channel.value}"
+        ).read_bytes()
         if "sha256:" + hashlib.sha256(raw).hexdigest() != metadata.get("fileDigest"):
             raise ValueError(f"Evaluation channel file digest differs: {channel.value}")
         previous: str | None = None
@@ -341,9 +353,9 @@ def verify_evaluation_evidence(path: Path) -> str:
         relative_path = metadata.get("path")
         if not isinstance(relative_path, str):
             raise ValueError("Evaluation Artifact path is invalid")
-        artifact_path = path / relative_path
-        if not artifact_path.is_file() or artifact_path.is_symlink():
-            raise ValueError("Evaluation Artifact file is missing or unsafe")
+        artifact_path = resolve_relative_regular_file(
+            path, relative_path, label="Evaluation Artifact"
+        )
         digest, byte_length = _digest_path(artifact_path)
         if digest != metadata.get("digest") or byte_length != metadata.get("byteLength"):
             raise ValueError("Evaluation Artifact digest or byte length differs")
@@ -355,7 +367,9 @@ def verify_evaluation_evidence(path: Path) -> str:
         ("result.json", "resultDigest"),
     )
     for filename, digest_field in named:
-        value = _load_object(path / filename, filename)
+        value = _load_object(
+            resolve_relative_regular_file(path, filename, label=filename), filename
+        )
         if canonical_digest(value) != manifest.get(digest_field):
             raise ValueError(f"Evaluation object digest differs: {filename}")
     return canonical_digest(manifest)
@@ -364,7 +378,11 @@ def verify_evaluation_evidence(path: Path) -> str:
 def verify_evaluation_operational_evidence(path: Path) -> str:
     semantic_digest = verify_evaluation_evidence(path)
     manifest = _load_object(
-        path / "operational-manifest.json",
+        resolve_relative_regular_file(
+            path,
+            "operational-manifest.json",
+            label="Evaluation operational evidence manifest",
+        ),
         "Evaluation operational evidence manifest",
     )
     if manifest.get("semanticEvidenceDigest") != semantic_digest:
@@ -373,7 +391,9 @@ def verify_evaluation_operational_evidence(path: Path) -> str:
     relative_path = manifest.get("path")
     if not isinstance(run_id, str) or not isinstance(relative_path, str):
         raise ValueError("Evaluation operational identity or path is invalid")
-    raw = (path / relative_path).read_bytes()
+    raw = resolve_relative_regular_file(
+        path, relative_path, label="Evaluation operational evidence"
+    ).read_bytes()
     if "sha256:" + hashlib.sha256(raw).hexdigest() != manifest.get("fileDigest"):
         raise ValueError("Evaluation operational file digest differs")
     previous: str | None = None

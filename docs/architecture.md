@@ -14,7 +14,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-12
+updated: 2026-08-15
 summary: Canonical architecture for authorized persistent Ranges, bounded Contests and software Evaluations, with exact identity, separated authorities, consequence verification, recovery, and sealed evidence.
 evidence_status: verified
 readiness: EXPERIMENTAL
@@ -97,6 +97,8 @@ RangeSession
 ```
 
 `RangeAuthority` says which Actor may request which capability in which zone. Capability is permission, not instruction: the Agent still chooses whether to request the effect.
+
+`RangeSessionSpec` currently freezes those grants for the lifetime of that Security session object. `RangeSession.inspect()` projects `authorityId`, human-readable revision and exact `authorityDigest`; every `RangeEffectAdmission` retains the digest that actually admitted or rejected the request. This is a historical binding, not a revocation/lease subsystem. A future consumer that needs authority changes while one world continues must introduce an explicit new authority epoch/revision and define stale-request semantics rather than mutating past admission history. [`AUTHORITY-LIFECYCLE-ENGINEERING.md`](AUTHORITY-LIFECYCLE-ENGINEERING.md) owns this engineering disposition.
 
 The accepted executable-authority profile proves this path for one physical S6 peer replacement. It does not turn every future adversarial action into one universal Range effect schema.
 
@@ -253,6 +255,8 @@ Active Trials separate semantic and operational evidence. Depending on the profi
 - Findings/evaluator judgments.
 
 An evaluator may consume these sources, but evaluator output does not replace them.
+
+Retained evidence is historical information, not current authority. Later revocation may prevent future admission/materialization, but it does not retroactively erase a valid earlier admission, receipt, observation, or already delivered result. External signed evidence, if introduced later, must retain producer/key/version identity across authority rotation so historical verification does not silently inherit only the newest trust anchor.
 
 For exact ownership of each current experiment and evidence family, use [`authority.md`](authority.md). For evidence admission and retained bundles, use [`../evidence/README.md`](../evidence/README.md).
 

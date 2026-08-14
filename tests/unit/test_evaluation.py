@@ -10,6 +10,7 @@ from ordivon_security.evaluation import (
     AuthorityManifest,
     EnvironmentIdentity,
     EvaluationDisposition,
+    EvaluationEvidenceRecorder,
     EvaluationResult,
     EvaluationRunner,
     EvaluationSpec,
@@ -245,6 +246,50 @@ class EvaluationTrialTests(unittest.TestCase):
                 network_mode="simulated-only",
                 allow_network=False,
             )
+
+    def test_evidence_recorder_rejects_symlink_output_root(self) -> None:
+        real = self.root / "real-evidence"
+        real.mkdir()
+        alias = self.root / "evidence-alias"
+        alias.symlink_to(real, target_is_directory=True)
+        recorder = EvaluationEvidenceRecorder("evaluation-run:symlink-test")
+        with self.assertRaisesRegex(ValueError, "must not be a symbolic link"):
+            recorder.seal(
+                alias,
+                evaluation_spec={"kind": "test"},
+                execution_identity={"kind": "test"},
+                findings={"findings": []},
+                result={"result": "test"},
+            )
+
+    def test_evidence_manifest_path_cannot_escape_bundle(self) -> None:
+        backend = FixtureEvaluationBackend()
+        result = self._run(backend)
+        bundle = Path(result.evidence_path)
+        manifest_path = bundle / "bundle-manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        observer_path = bundle / "events" / "observer.jsonl"
+        outside = bundle.parent / "outside-observer.jsonl"
+        outside.write_bytes(observer_path.read_bytes())
+        manifest["channels"]["observer"]["path"] = "../outside-observer.jsonl"
+        manifest_path.write_text(
+            json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(ValueError, "must remain relative to the bundle"):
+            verify_evaluation_evidence(bundle)
+
+    def test_evidence_named_result_symlink_is_rejected(self) -> None:
+        backend = FixtureEvaluationBackend()
+        result = self._run(backend)
+        bundle = Path(result.evidence_path)
+        named_result = bundle / "result.json"
+        outside = bundle.parent / "outside-result.json"
+        outside.write_bytes(named_result.read_bytes())
+        named_result.unlink()
+        named_result.symlink_to(outside)
+        with self.assertRaisesRegex(ValueError, "must not traverse symbolic links"):
+            verify_evaluation_evidence(bundle)
 
     def test_evidence_tampering_is_detected(self) -> None:
         backend = FixtureEvaluationBackend(

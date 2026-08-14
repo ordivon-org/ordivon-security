@@ -14,7 +14,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-12
+updated: 2026-08-15
 summary: Canonical entry to the authorized adversarial-autonomy laboratory, with explicit Range sovereignty, separated truth and evidence, verified consequence, recovery, scoped profiles, and research routes.
 evidence_status: verified
 readiness: EXPERIMENTAL
@@ -97,6 +97,8 @@ These laws make autonomous conflict intelligible. They do not choose the Agent's
 ### Authority and resource grants
 
 A grant states what one principal may control or spend inside a declared scope: zones, capabilities, Samples, environments, time, processes, model/Tool budgets, or an explicitly delegated external boundary. A grant is not a moral judgment and need not be permanent.
+
+Current `RangeSession` engineering intentionally binds an **exact grant snapshot** in `RangeSessionSpec`; it does not silently refresh a remote entitlement or mutate the grant in place. Admissions retain the exact authority digest that decided them. If a future world needs live revocation/rotation, that becomes an explicit new authority revision/epoch for future decisions, while earlier admissions remain historical facts. See [`docs/AUTHORITY-LIFECYCLE-ENGINEERING.md`](docs/AUTHORITY-LIFECYCLE-ENGINEERING.md).
 
 ### Experiment profiles and fixtures
 
@@ -181,6 +183,8 @@ Recent Agent-first experiments narrowed several tempting abstractions:
 - deliberation **before** effect authority succeeded with the ordinary AF2 intent path in the exact consumer, so the extra ceremony was removed rather than promoted.
 
 The next pressure should come from independent consumers or stronger adversarial worlds, not from completing an ontology because the research numbering exists.
+
+CA-LIC V0-V8/R1 adds one engineering correction rather than a new subsystem: distinguish a frozen grant, current/future authority, external authorization carriers, external capability execution, and already delivered information. Security therefore keeps exact grant/admission identity and historical evidence, while rejecting a generic lease/revocation manager until a real owned consumer needs dynamic authority. The same audit also hardened evidence-bundle verification so manifest path claims cannot escape the bundle or traverse symlinks.
 
 The first ordinary-consumption round is accepted in [`ORDINARY-SECURITY-CONSUMPTION-R1.md`](docs/ORDINARY-SECURITY-CONSUMPTION-R1.md). A derived `--view ordinary` projection reduces mixed-maturity navigation pressure without deleting research reproduction paths; ResearchCorpus earns a normal pre-analysis role for exact vulnerability/Sample/provider evidence; a bounded EICAR/ClamAV incident consumer closes current/stale response without new EDR/SIEM or higher-fidelity transfer.
 

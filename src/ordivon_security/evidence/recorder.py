@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
+from ordivon_security._paths import resolve_relative_regular_file
 
 from .events import EvidenceChannel, EvidenceEvent
 from .operational import OperationalEvidenceEvent
@@ -183,7 +184,12 @@ def _load_object(path: Path, label: str) -> JsonObject:
 
 
 def verify_evidence_bundle(path: Path) -> str:
-    manifest = _load_object(path / "bundle-manifest.json", "Evidence bundle manifest")
+    manifest = _load_object(
+        resolve_relative_regular_file(
+            path, "bundle-manifest.json", label="Evidence bundle manifest"
+        ),
+        "Evidence bundle manifest",
+    )
     if manifest.get("schemaVersion") != 2:
         raise ValueError("Evidence bundle schema revision is unsupported")
     channels = manifest.get("channels")
@@ -199,7 +205,9 @@ def verify_evidence_bundle(path: Path) -> str:
         relative_path = metadata.get("path")
         if not isinstance(relative_path, str):
             raise ValueError("Evidence channel path is invalid")
-        raw = (path / relative_path).read_bytes()
+        raw = resolve_relative_regular_file(
+            path, relative_path, label=f"Evidence channel {channel.value}"
+        ).read_bytes()
         actual_file_digest = "sha256:" + hashlib.sha256(raw).hexdigest()
         if actual_file_digest != metadata.get("fileDigest"):
             raise ValueError(f"Evidence channel file digest differs: {channel.value}")
@@ -226,10 +234,22 @@ def verify_evidence_bundle(path: Path) -> str:
             count += 1
         if count != metadata.get("eventCount") or previous != metadata.get("headDigest"):
             raise ValueError("Evidence channel summary differs")
-    scenario = _load_object(path / "manifest.json", "Scenario manifest")
-    identity = _load_object(path / "trial-identity.json", "Trial identity")
-    metrics = _load_object(path / "raw-metrics.json", "Raw metrics")
-    result = _load_object(path / "result.json", "Contest result")
+    scenario = _load_object(
+        resolve_relative_regular_file(path, "manifest.json", label="Scenario manifest"),
+        "Scenario manifest",
+    )
+    identity = _load_object(
+        resolve_relative_regular_file(path, "trial-identity.json", label="Trial identity"),
+        "Trial identity",
+    )
+    metrics = _load_object(
+        resolve_relative_regular_file(path, "raw-metrics.json", label="Raw metrics"),
+        "Raw metrics",
+    )
+    result = _load_object(
+        resolve_relative_regular_file(path, "result.json", label="Contest result"),
+        "Contest result",
+    )
     if canonical_digest(scenario) != manifest.get("scenarioManifestDigest"):
         raise ValueError("Scenario manifest digest differs")
     if canonical_digest(identity) != manifest.get("trialIdentityDigest"):
@@ -243,14 +263,21 @@ def verify_evidence_bundle(path: Path) -> str:
 
 def verify_operational_evidence(path: Path) -> str:
     semantic_digest = verify_evidence_bundle(path)
-    manifest = _load_object(path / "operational-manifest.json", "Operational evidence manifest")
+    manifest = _load_object(
+        resolve_relative_regular_file(
+            path, "operational-manifest.json", label="Operational evidence manifest"
+        ),
+        "Operational evidence manifest",
+    )
     if manifest.get("semanticEvidenceDigest") != semantic_digest:
         raise ValueError("Operational evidence is bound to another semantic bundle")
     trial_id = manifest.get("trialId")
     relative_path = manifest.get("path")
     if not isinstance(trial_id, str) or not isinstance(relative_path, str):
         raise ValueError("Operational evidence identity or path is invalid")
-    raw = (path / relative_path).read_bytes()
+    raw = resolve_relative_regular_file(
+        path, relative_path, label="Operational evidence"
+    ).read_bytes()
     actual_file_digest = "sha256:" + hashlib.sha256(raw).hexdigest()
     if actual_file_digest != manifest.get("fileDigest"):
         raise ValueError("Operational evidence file digest differs")

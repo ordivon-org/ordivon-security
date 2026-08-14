@@ -7,6 +7,7 @@ from ordivon_security.range import (
     BackendCheckpoint,
     PendingRangeEvent,
     RangeAuthority,
+    RangeEffectAdmission,
     RangeEffectRequest,
     RangeSession,
     RangeSessionInstance,
@@ -255,6 +256,51 @@ class RangeSessionS0Tests(unittest.TestCase):
         event = session.poll_backend()[0]
         self.assertEqual(event.plane, "sensor")
         self.assertNotEqual(event.plane, "world-truth")
+
+    def test_inspect_exposes_exact_frozen_authority_bindings(self) -> None:
+        session = RangeSession(_MemoryRangeBackend(), _spec("actor:red"))
+        session.start()
+        authority = _authority("actor:red")
+        inspected = session.inspect()
+        self.assertEqual(
+            inspected["authorityBindings"],
+            [
+                {
+                    "authorityId": authority.authority_id,
+                    "revision": authority.revision,
+                    "authorityDigest": authority.digest,
+                }
+            ],
+        )
+
+    def test_effect_admission_digest_fields_are_exact_sha256(self) -> None:
+        valid = "sha256:" + "0" * 64
+        with self.assertRaisesRegex(ValueError, "SHA-256 hex digest"):
+            RangeEffectAdmission(
+                request_id="range-effect-request:bad-request-digest",
+                request_digest="sha256:short",
+                actor_id="actor:red",
+                authority_id="range-authority:red",
+                authority_digest=valid,
+                zone_ref="zone:battlefield",
+                capability="range-network",
+                effect_type="fabric.replace-peer",
+                admitted=True,
+                reason="admitted",
+            )
+        with self.assertRaisesRegex(ValueError, "lowercase hexadecimal"):
+            RangeEffectAdmission(
+                request_id="range-effect-request:bad-authority-digest",
+                request_digest=valid,
+                actor_id="actor:red",
+                authority_id="range-authority:red",
+                authority_digest="sha256:" + "A" * 64,
+                zone_ref="zone:battlefield",
+                capability="range-network",
+                effect_type="fabric.replace-peer",
+                admitted=True,
+                reason="admitted",
+            )
 
     def test_effect_admission_uses_exact_actor_zone_and_capability_authority(self) -> None:
         session = RangeSession(_MemoryRangeBackend(), _spec("actor:red"))

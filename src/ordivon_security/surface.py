@@ -37,7 +37,10 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "RangeAuthority",
         "constitution",
         "ordivon_security.range",
-        "Exact principal/Actor zone and capability grant; boundary labels are profile-defined.",
+        (
+            "Exact session-frozen principal/Actor zone and capability grant; admission retains "
+            "its authority digest and boundary labels remain profile-defined."
+        ),
         "reusable-experimental",
     ),
     SecuritySurfaceEntry(
@@ -330,7 +333,8 @@ def security_ordinary_surface_manifest() -> JsonObject:
             "job": "persistent-contested-response",
             "primarySurface": "RangeSession",
             "reason": (
-                "Use when Actors, authority, changing world state and consequential "
+                "Use when Actors, exact authority snapshots, changing world state and "
+                "consequential "
                 "response must persist beyond one software Evaluation."
             ),
             "nextIfNeeded": ["EvidenceRecorder"],

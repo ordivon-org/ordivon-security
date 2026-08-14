@@ -312,6 +312,14 @@ class RangeSession:
             "state": self._state,
             "actors": [self._presence[actor_id].to_dict() for actor_id in self.spec.actor_ids],
             "authorities": [authority.to_dict() for authority in self.spec.authorities],
+            "authorityBindings": [
+                {
+                    "authorityId": authority.authority_id,
+                    "revision": authority.revision,
+                    "authorityDigest": authority.digest,
+                }
+                for authority in self.spec.authorities
+            ],
             "eventCount": len(self._events),
             "backendState": backend_state,
         }

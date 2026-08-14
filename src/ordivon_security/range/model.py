@@ -18,6 +18,19 @@ def _text(value: str, label: str, *, prefix: str | None = None) -> str:
     return value
 
 
+def _digest(value: str, label: str) -> str:
+    _text(value, label, prefix="sha256")
+    if len(value) != 71:
+        raise ValueError(f"{label} must contain a SHA-256 hex digest")
+    try:
+        bytes.fromhex(value.removeprefix("sha256:"))
+    except ValueError as error:
+        raise ValueError(f"{label} must contain lowercase hexadecimal") from error
+    if value.lower() != value:
+        raise ValueError(f"{label} must contain lowercase hexadecimal")
+    return value
+
+
 def _unique(values: tuple[str, ...], label: str) -> None:
     if len(values) != len(set(values)):
         raise ValueError(f"{label} values must be unique")
@@ -126,13 +139,13 @@ class RangeEffectAdmission:
             "Range effect admission request identity",
             prefix="range-effect-request",
         )
-        _text(self.request_digest, "Range effect admission request digest", prefix="sha256")
+        _digest(self.request_digest, "Range effect admission request digest")
         _text(self.actor_id, "Range effect admission Actor identity", prefix="actor")
         _text(
             self.authority_id, "Range effect admission authority identity", prefix="range-authority"
         )
         if self.authority_digest is not None:
-            _text(self.authority_digest, "Range effect admission authority digest", prefix="sha256")
+            _digest(self.authority_digest, "Range effect admission authority digest")
         _text(self.zone_ref, "Range effect admission zone")
         _text(self.capability, "Range effect admission capability")
         _text(self.effect_type, "Range effect admission type")

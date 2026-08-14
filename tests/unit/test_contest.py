@@ -217,6 +217,37 @@ class ContestCoreTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 verify_evidence_bundle(Path(result.evidence_path))
 
+    def test_evidence_bundle_manifest_symlink_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = self._run(root / "evidence", ("wait",) * 5)
+            bundle = Path(result.evidence_path)
+            manifest = bundle / "bundle-manifest.json"
+            outside = bundle.parent / "outside-bundle-manifest.json"
+            outside.write_bytes(manifest.read_bytes())
+            manifest.unlink()
+            manifest.symlink_to(outside)
+            with self.assertRaisesRegex(ValueError, "must not traverse symbolic links"):
+                verify_evidence_bundle(bundle)
+
+    def test_evidence_manifest_path_cannot_escape_bundle(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            result = self._run(root / "evidence", ("wait",) * 5)
+            bundle = Path(result.evidence_path)
+            manifest_path = bundle / "bundle-manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            actor_path = bundle / "events" / "actor.jsonl"
+            outside = bundle.parent / "outside-actor.jsonl"
+            outside.write_bytes(actor_path.read_bytes())
+            manifest["channels"]["actor"]["path"] = "../outside-actor.jsonl"
+            manifest_path.write_text(
+                json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "must remain relative to the bundle"):
+                verify_evidence_bundle(bundle)
+
     def test_tampered_operational_event_fails_verification(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             result = self._run(Path(directory), ("wait",) * 5)
