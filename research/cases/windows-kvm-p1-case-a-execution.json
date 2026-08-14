@@ -10,8 +10,8 @@
   "caseManifestDigest": "pending-seal",
   "contractId": "contract:目标产品-2025-:case-a-execution",
   "controls": {
-    "destroyOverlayAfterRun": true,
-    "disposableOverlay": true,
+    "destroyOverlayAfterRun": false,
+    "disposableOverlay": false,
     "executionMediaReadOnly": true,
     "knownDestinationBoundary": "loopback-record-only",
     "networkMode": "deny-all-at-hypervisor",
@@ -20,7 +20,18 @@
   },
   "kind": "ordivon.security.windows-kvm-p1-execution-contract",
   "observationProfile": "windows-installer-p1",
-  "operatorDirection": "2026-08-14 user: start dynamic verification of the cracked 核心库.dll (does it unlock Pro?); both control and test runs required",
+  "operatorDirection": "2026-08-14 user: (1) run full dynamic verification of the cracked 核心库.dll; (2) OVERRIDE residual closure: retain VM/overlay/media residuals for the stage-2 real-GPU test on the Windows host after the no-virus verdict; (3) stage-2: after sandbox confirms clean, test Pro features with real GPU in Windows",
+  "residualPolicy": {
+    "closureOverride": "operator-directed retention; runs remain valid behavioral evidence, labeled with the override (closure proof waived by operator direction)",
+    "stage2": "post-clean-verdict real-GPU test on Windows host (user-owned decision; cracked DLL treated as clean only after stage-1 verdicts: static review + ClamAV + sandbox behavior)"
+  },
+  "toolingConstraint": "2026-08-14 empirical: P1 contract schema (windows_kvm_p1_execution_media.py L148-149, L162-163) hard-rejects controllerAdmitted=true / executionAuthorized=true / destroyOverlayAfterRun=false; materialize CLI failed with 'execution contract sections are invalid'. P1 tooling = media-prep-only by design; execution + residual retention need either a tooling extension or an ad-hoc pathway.",
+  "noVirusEvidence": {
+    "staticReview": "clean (Derivative engine + license-related modification only, no suspicious strings/imports/exfil)",
+    "clamav": "0 infected (280.26 MiB scanned: cracked 核心库 + official installer + official 核心库, freshclam-updated 2026-08-14)",
+    "windowsDefender": "clean (host-side Start-MpScan CustomScan on D:\\迅雷下载\\核心库.dll, no execution)",
+    "kvmBehavior": "pending (blocked by tooling constraint)"
+  },
   "staticEvidence": {
     "installerOfficial": {
       "digest": "sha256:fd70741d5d41ed7ff7591016bc1fdec718ae7707c67f34e78208496a59d705f6",

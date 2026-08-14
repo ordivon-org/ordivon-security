@@ -2,6 +2,24 @@
 
 Case: research/cases/windows-kvm-p1-目标产品-case-a-execution.json
 
+## 两阶段结构 (operator-directed 2026-08-14)
+
+- **阶段一 (KVM, deny-all 网络)**: 无病毒判定 + license 状态/效验点动态定位。
+  残余不销毁 (operator 覆盖 closure 策略) — 媒体/VM 状态保留给阶段二。
+- **阶段二 (真实 Windows + GPU, host)**: 阶段一 verdict 干净后, 用户在
+  真实机器上用 GPU 实测 Pro 功能 (render 4K / 同步输出 / private toe)。
+  这是机器所有者的自决; 破解 DLL 仅在阶段一全绿后视为 clean。
+  阶段二产出 = "实际使用层面"的最终答案。
+
+## 阶段一无病毒证据链 (verdict 输入)
+
+1. 静态审查 (已完成): 官方树全链签名有效; 破解 DLL = Derivative 原版二进制
+   + license 相关修改, 无可疑字符串/导入/外联痕迹
+2. ClamAV (freshclam 更新后): 破解 DLL + 官方安装器 + 官方 核心库
+3. KVM 行为: 进程/文件/注册表/网络全插桩, 无恶意行为 (下载器/持久化/外联)
+4. 诚实边界: 以上 = "无恶意行为证据", 非"绝对无病毒" (加密载荷不可排除,
+   但破解 DLL 来源已知 = Derivative 引擎, 风险面有界)
+
 ## 目标 (双重)
 
 1. **判定破解是否有效**: A/B (对照官方无 key / 实验破解 DLL) → license 状态差值
