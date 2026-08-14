@@ -65,7 +65,13 @@
   "providerRegistry": {
     "path": "research/corpus/providers.json",
     "digest": "sha256:70c5957fd3695c5932e0b9f91ed62c56eedd94aed92344d038f315a33e57f048",
-    "normalizers": ["osv", "nvd", "cisa-kev", "malwarebazaar", "virustotal"],
+    "normalizers": [
+      "osv",
+      "nvd",
+      "cisa-kev",
+      "malwarebazaar",
+      "virustotal"
+    ],
     "consumptionMode": "explicit-exact-snapshot"
   },
   "acceptedClaims": [
