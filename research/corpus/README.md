@@ -58,6 +58,7 @@ uv run ordivon-security-research-corpus inspect --root <corpus-root> --record-id
 uv run ordivon-security-research-corpus query --root <corpus-root> <needle>
 uv run ordivon-security-research-corpus register-manifest --root <corpus-root> --manifest <json>
 uv run ordivon-security-research-corpus register-provider-snapshot --root <corpus-root> --provider <provider> --snapshot <json> [--record-id <provider-record-id>]
+uv run ordivon-security-research-corpus compare-provider-snapshot --root <corpus-root> --provider <provider> --snapshot <json> [--record-id <provider-record-id>]
 uv run ordivon-security-research-corpus import-local-sample --root <corpus-root> --vault <vault-root> --path <local-file>
 ```
 

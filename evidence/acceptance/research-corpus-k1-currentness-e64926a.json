@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.research-corpus-k1-currentness-acceptance",
+  "status": "accepted",
+  "implementationRevision": "e64926aee86ff98357b970b3ef55de8ea5612043",
+  "runtimeJobId": "job-019fffac-7516-7cc2-96ef-ac5fbcdbeb1f",
+  "gates": {
+    "unitTestsPassed": 404,
+    "ruffE9FPassed": true,
+    "candidateComparisonReadOnly": true,
+    "headUnchangedByComparison": true,
+    "changedProviderSnapshotDetected": true,
+    "explicitRegistrationCreatesSecondRevision": true,
+    "automaticFetch": false,
+    "automaticPolling": false,
+    "bulkMirror": false,
+    "globalFreshnessLabel": false,
+    "targetApplicabilityPromotedFromProviderChange": false
+  },
+  "controlledDogfood": {
+    "recordId": "vuln:osv:CVE-K1-0001",
+    "oldProviderModified": "2026-01-01T00:00:00Z",
+    "candidateProviderModified": "2026-08-14T00:00:00Z",
+    "oldSnapshotDigest": "sha256:cc06e25eb150a76a507dcbfb7dd6afa0053c69467c1f30969c5bfd9ceb992618",
+    "candidateSnapshotDigest": "sha256:afabb34eeaa62e895aa8811b9baf0a71be151168be34c6f309c9454652014546",
+    "comparisonMutationPerformed": false,
+    "postExplicitRegistrationRevisionCount": 2
+  },
+  "externalObservation": {
+    "recordId": "CVE-2024-3094",
+    "apiLocator": "https://api.osv.dev/v1/vulns/CVE-2024-3094",
+    "apiObservedModified": "2026-04-10T05:12:24.048240Z",
+    "pageLocator": "https://osv.dev/vulnerability/CVE-2024-3094",
+    "pageObservedModified": "2026-07-15T01:49:07.156785507Z",
+    "registeredAsExactProviderBytes": false,
+    "directGenericContainerDnsSucceeded": false,
+    "interpretation": "official-surface disagreement is currentness pressure, not target applicability truth"
+  },
+  "acceptedClaims": [
+    "ResearchCorpus needs a read-only exact candidate-vs-head comparison surface for consumer-driven provider currentness.",
+    "A changed provider snapshot is evidence that provider material advanced or differed; it is not evidence that an owned target became exploitable or that Sample execution is admitted.",
+    "K1 does not justify automatic synchronization, provider mirroring, TTL freshness, or a Security-owned network fetcher."
+  ],
+  "limitations": [
+    "The controlled stale/current pair is provider-shaped synthetic data used to isolate comparison semantics.",
+    "The OSV external observation is a source-surface currentness observation, not retained raw HTTP response bytes.",
+    "K1 evaluates currentness comparison, not vulnerability prioritization quality or target exploitability."
+  ]
+}

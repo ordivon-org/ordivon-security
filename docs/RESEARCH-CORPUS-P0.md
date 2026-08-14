@@ -262,3 +262,5 @@ P0 does not implement:
 - autonomous triage policy.
 
 Add synchronization only when a consumer demonstrates that explicit snapshots create material stale-data friction. Add richer Sample behavior evidence only when a real analysis consumer requires it. Physical third-party malware execution remains a separately authorized Range experiment and does not inherit authority from this corpus.
+
+K1 later admits only a read-only candidate-vs-head comparison surface; see [`RESEARCH-CORPUS-K1-CURRENTNESS.md`](RESEARCH-CORPUS-K1-CURRENTNESS.md). It still does not admit automatic polling or mirroring.
