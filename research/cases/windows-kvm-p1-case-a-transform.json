@@ -4,7 +4,7 @@
   "manifestId": "transform:目标产品-2025-:case-a",
   "revision": "1",
   "sourceCaseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
-  "sourceCaseDigest": "sha256:a9bfd6af14f8c55714359077ace9b88b793b6704698dc27ed641c5b0220e9511",
+  "sourceCaseDigest": "sha256:0c8e4adb208f8460264acba21fe39cd93675596511dc8f8a426a1c5a0c153758",
   "transformations": [
     "attach-source-read-only",
     "host-materialize-read-only-execution-tree",
@@ -14,8 +14,8 @@
     "use-disposable-overlay-and-destroy-after-run"
   ],
   "retainedSample": {
-    "digest": "sha256:6350a1ce2f897ac4aab0272f595c92d88b5029aa7bd4c36ba253ab2d3c79c703",
-    "byteLength": 3347447025
+    "digest": "sha256:84a1f6170b500045c56c030f6cd45be4ddf272424f723c44615209f6ffbd21a9",
+    "byteLength": 3347446447
   },
   "sampleBytesChanged": false,
   "materializationStatus": "environment-bound",

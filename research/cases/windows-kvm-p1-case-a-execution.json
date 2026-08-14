@@ -4,12 +4,12 @@
   "contractId": "contract:目标产品-2025-:case-a-execution",
   "revision": "1",
   "caseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
-  "caseManifestDigest": "sha256:60b80b9199b50128d26d359faa6eaed5786c4d458f16cc8ada731c0314feed15",
+  "caseManifestDigest": "sha256:70d81e9c4486db82b813fd6f8e2288d69ad41a2fc82c5c3da4b866c109250032",
   "transformationManifestId": "transform:目标产品-2025-:case-a",
-  "transformationManifestDigest": "sha256:9c652b269722dae66af35e6c2c76e2c3a2250c67b25e5d947bcd7f21a25c8e95",
+  "transformationManifestDigest": "sha256:fb25cf91c8177a403b93fd3d733f4169249ea7596db1377f718f2e4d4aa365cc",
   "sourceArchive": {
-    "digest": "sha256:6350a1ce2f897ac4aab0272f595c92d88b5029aa7bd4c36ba253ab2d3c79c703",
-    "byteLength": 3347447025,
+    "digest": "sha256:84a1f6170b500045c56c030f6cd45be4ddf272424f723c44615209f6ffbd21a9",
+    "byteLength": 3347446447,
     "name": "目标产品-2025--bundle.7z"
   },
   "installer": {
@@ -64,17 +64,17 @@
     "installerOfficial": {
       "digest": "sha256:fd70741d5d41ed7ff7591016bc1fdec718ae7707c67f34e78208496a59d705f6",
       "byteLength": 2990276456,
-      "verdict": "official Derivative 2025. distribution; SFX + inner installer + 核心库.dll all valid Authenticode (厂商.), dual-toolchain 0 disagreements"
+      "verdict": "official Derivative 2025. distribution; SFX + inner installer + 核心库.dll all valid Authenticode, dual-toolchain 0 disagreements"
     },
     "官方核心库": {
       "digest": "sha256:286de2f73fc3e09b0af01c1b5c197394b0f04ad7d8f7bab840a5fc736ca585e6",
       "byteLength": 137441560,
-      "verdict": "official engine DLL from installer (2026-07-16 build), digest match, Derivative-signed"
+      "verdict": "official engine DLL (2026-07-16 build), digest match, Derivative-signed"
     },
     "cracked核心库": {
       "digest": "sha256:9990aabba2cf4b4a065ef80a5ec12ef8a6ebba859ef05e66bd74f0f2e79562ae",
       "byteLength": 135628632,
-      "verdict": "tampered-but-signed: embedded Derivative PKCS7 digest MISMATCH + invalid PE checksum; 2026-03-10 build; static review clean; load-compatible with official TD.exe (name imports, 616/616 exports)"
+      "verdict": "tampered-but-signed: digest MISMATCH + invalid PE checksum; 2026-03-10 build; static review clean; load-compatible"
     }
   }
 }
