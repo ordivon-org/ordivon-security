@@ -146,6 +146,12 @@ Evaluation is a separate path for authorized software assessment. It binds exact
 
 Static analysis, Case Snapshots, and Windows KVM are scoped Evaluation/Range profiles with their own truth boundaries. Guest claims remain observations; management-plane QMP/Host evidence owns the management facts it can actually establish.
 
+### Vulnerability and Sample research corpus
+
+`ResearchCorpus` gives Agents a revisioned query/inspection surface over exact vulnerability and Sample identities without turning possession or provider labels into authority. Provider/advisory classifications, Security observations, maintained-fixture facts and Case conclusions remain visibly separate. Sample bytes stay in the private `SampleVault` or provider-owned systems; every corpus Sample is `denied-by-default` for execution.
+
+The accepted P0 seed set contains CA2 owned vulnerability evidence, the harmless EICAR test fixture, and metadata-only 目标产品B Case identity. OSV/NVD/CISA KEV/MalwareBazaar/VirusTotal are consumed through explicit exact snapshots only; P0 implements no automatic fetch, malware download/upload, database mirror or family ontology. Use `uv run ordivon-security-research-corpus ...`; [`docs/RESEARCH-CORPUS-P0.md`](docs/RESEARCH-CORPUS-P0.md) owns the exact boundary.
+
 ## Recovery laws that survived the C1 programme
 
 The C1 fault programme is extensive; the retained current laws are smaller:
@@ -206,6 +212,7 @@ This is a research system, not a production attack platform. `readiness: EXPERIM
 | inspect exact ownership of current/research documents | [`docs/authority.md`](docs/authority.md) |
 | inspect open questions and falsifiers | [`docs/research-agenda.md`](docs/research-agenda.md) |
 | verify active/historical evidence | [`evidence/README.md`](evidence/README.md) |
+| inspect or register exact vulnerability/Sample research records without granting execution | `uv run ordivon-security-research-corpus ...` + [`docs/RESEARCH-CORPUS-P0.md`](docs/RESEARCH-CORPUS-P0.md) |
 | reproduce a specific C1/AF/AE/EC/AC/IF result | read that experiment's canonical document from the authority map |
 
 Research phase identifiers preserve provenance. They are not prerequisites for understanding the current constitutional model.

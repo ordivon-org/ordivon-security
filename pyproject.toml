@@ -63,6 +63,7 @@ ordivon-security-ca2-vulnerability-evidence = "ordivon_security.cli_ca2_vulnerab
 ordivon-security-ca3-post-compromise-state = "ordivon_security.cli_ca3_post_compromise_state:main"
 ordivon-security-ca4-defensive-plane = "ordivon_security.cli_ca4_defensive_plane:main"
 ordivon-security-ca6-tactical-adaptation = "ordivon_security.cli_ca6_tactical_adaptation:main"
+ordivon-security-research-corpus = "ordivon_security.cli_research_corpus:main"
 ordivon-security-windows-host-p1-baseline = "ordivon_security.cli_windows_host_p1_baseline:main"
 
 [tool.setuptools.packages.find]

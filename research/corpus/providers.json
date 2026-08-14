@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.research-corpus-provider-registry",
+  "providers": [
+    {
+      "id": "osv",
+      "ownership": "external",
+      "consumption": "exact vulnerability record or query snapshot",
+      "role": "open-source package/version/commit applicability evidence",
+      "automaticSampleDownload": false
+    },
+    {
+      "id": "nvd",
+      "ownership": "external",
+      "consumption": "CVE API record snapshot",
+      "role": "CVE/CWE/CVSS/CPE enrichment and change history",
+      "automaticSampleDownload": false
+    },
+    {
+      "id": "cisa-kev",
+      "ownership": "external",
+      "consumption": "KEV JSON/CSV record snapshot",
+      "role": "authoritative exploited-in-the-wild prioritization input, not target exploitability truth",
+      "automaticSampleDownload": false
+    },
+    {
+      "id": "malwarebazaar",
+      "ownership": "external",
+      "consumption": "hash metadata/query snapshot by default",
+      "role": "malware-sample intelligence and optional separately authorized acquisition",
+      "automaticSampleDownload": false
+    },
+    {
+      "id": "virustotal",
+      "ownership": "external",
+      "consumption": "hash/report metadata; private upload only under explicit operator/provider authority",
+      "role": "multi-provider characterization and behavior evidence",
+      "automaticSampleDownload": false
+    }
+  ],
+  "rules": [
+    "provider claim != Security independent truth",
+    "provider currentness and exact record identity are retained",
+    "sample acquisition is never implied by metadata synchronization",
+    "standard public upload is never implied by corpus registration",
+    "private SampleVault bytes never enter Git corpus manifests"
+  ]
+}

@@ -27,6 +27,8 @@ class SecuritySurfaceTests(unittest.TestCase):
             {"constitution", "profile", "integration", "research-apparatus"},
         )
         self.assertEqual(value["compatibilityFacade"]["maturity"], "mixed")
+        names = {entry["name"] for entry in value["entries"]}
+        self.assertIn("ResearchCorpus", names)
 
     def test_surface_cli_projects_manifest_without_experiment(self) -> None:
         stdout = io.StringIO()
