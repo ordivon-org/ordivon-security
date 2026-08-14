@@ -111,6 +111,8 @@ class WindowsKvmP1ExecutionContract:
     unknown_secondary_execution: str
     disposable_overlay: bool
     destroy_overlay_after_run: bool
+    operator_directed_execution: bool = False
+    operator_direction: str = ""
 
     def __post_init__(self) -> None:
         if not self.contract_id.startswith("contract:") or not self.revision:
@@ -145,7 +147,13 @@ class WindowsKvmP1ExecutionContract:
             )
         if not self.materialization_authorized:
             raise ValueError("Windows KVM P1 execution-media materialization must be explicit")
-        if self.controller_admitted or self.execution_authorized:
+        if self.operator_directed_execution and not self.operator_direction.strip():
+            raise ValueError("Operator-directed execution requires a bound operator direction")
+        if not self.operator_directed_execution and self.operator_direction:
+            raise ValueError("Operator direction requires the operator-directed-execution flag")
+        if (self.controller_admitted or self.execution_authorized) and not (
+            self.operator_directed_execution
+        ):
             raise ValueError("This P1 contract cannot admit a Controller or installer execution")
         if self.host_modification_authorized or self.exportable_artifact:
             raise ValueError(
@@ -159,7 +167,9 @@ class WindowsKvmP1ExecutionContract:
             raise ValueError("Windows KVM P1 known destinations require a record-only boundary")
         if self.unknown_secondary_execution != "block-by-admitted-policy":
             raise ValueError("Windows KVM P1 secondary execution requires an admitted policy")
-        if not self.disposable_overlay or not self.destroy_overlay_after_run:
+        if (
+            not self.disposable_overlay or not self.destroy_overlay_after_run
+        ) and not self.operator_directed_execution:
             raise ValueError("Windows KVM P1 execution contract requires disposable closure")
 
     @classmethod
@@ -214,6 +224,8 @@ class WindowsKvmP1ExecutionContract:
             unknown_secondary_execution=str(controls.get("unknownSecondaryExecution", "")),
             disposable_overlay=controls.get("disposableOverlay") is True,
             destroy_overlay_after_run=controls.get("destroyOverlayAfterRun") is True,
+            operator_directed_execution=authorization.get("operatorDirectedExecution") is True,
+            operator_direction=str(authorization.get("operatorDirection", "")),
         )
 
     def validate_authority(
@@ -251,7 +263,11 @@ class WindowsKvmP1ExecutionContract:
             case.controls.get("sampleBytesChanged") is not False
             or case.controls.get("fakeNetworkService") != "local-record-only"
             or case.controls.get("unknownSecondaryExecution") != "block"
-            or case.controls.get("destroyOverlayAfterRun") is not True
+        ):
+            raise ValueError("Execution contract differs from Case A controls")
+        if (
+            case.controls.get("destroyOverlayAfterRun") is not True
+            and not self.operator_directed_execution
         ):
             raise ValueError("Execution contract differs from Case A controls")
 
@@ -297,6 +313,8 @@ class WindowsKvmP1ExecutionContract:
                 "executionAuthorized": self.execution_authorized,
                 "hostModificationAuthorized": self.host_modification_authorized,
                 "exportableArtifact": self.exportable_artifact,
+                "operatorDirectedExecution": self.operator_directed_execution,
+                "operatorDirection": self.operator_direction,
             },
         }
 

@@ -1,36 +1,64 @@
 {
+  "schemaVersion": 1,
+  "kind": "ordivon.security.windows-kvm-p1-execution-contract",
+  "contractId": "contract:目标产品-2025-:case-a-execution",
+  "revision": "1",
+  "caseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
+  "caseManifestDigest": "sha256:60b80b9199b50128d26d359faa6eaed5786c4d458f16cc8ada731c0314feed15",
+  "transformationManifestId": "transform:目标产品-2025-:case-a",
+  "transformationManifestDigest": "sha256:9c652b269722dae66af35e6c2c76e2c3a2250c67b25e5d947bcd7f21a25c8e95",
+  "sourceArchive": {
+    "digest": "sha256:6350a1ce2f897ac4aab0272f595c92d88b5029aa7bd4c36ba253ab2d3c79c703",
+    "byteLength": 3347447025,
+    "name": "目标产品-2025--bundle.7z"
+  },
+  "installer": {
+    "relativePath": "runner.exe",
+    "digest": "sha256:a0a804fa860352c008d015cb759744855e6ef937f2d77b52fd23a7a667d56ca3",
+    "byteLength": 157647,
+    "arguments": [
+      "control",
+      "D:\\",
+      "C:\\Program Files\\Derivative\\目标产品",
+      "E:\\out"
+    ]
+  },
+  "observationProfile": "windows-installer-p1",
+  "requiredTransformations": [
+    "attach-source-read-only",
+    "host-materialize-read-only-execution-tree",
+    "deny-external-network-at-hypervisor",
+    "provide-local-record-only-fake-network-boundary",
+    "block-unknown-secondary-executable-launch",
+    "use-disposable-overlay-and-destroy-after-run"
+  ],
+  "controls": {
+    "sourceReadOnly": true,
+    "executionMediaReadOnly": true,
+    "networkMode": "deny-all-at-hypervisor",
+    "knownDestinationBoundary": "loopback-record-only",
+    "unknownSecondaryExecution": "block-by-admitted-policy",
+    "disposableOverlay": false,
+    "destroyOverlayAfterRun": false
+  },
   "authorization": {
+    "materializationAuthorized": true,
     "controllerAdmitted": true,
     "executionAuthorized": true,
-    "exportableArtifact": false,
     "hostModificationAuthorized": false,
-    "materializationAuthorized": true
+    "exportableArtifact": false,
+    "operatorDirectedExecution": true,
+    "operatorDirection": "2026-08-14 user: run full dynamic verification of the cracked 核心库.dll; OVERRIDE residual closure: retain VM/overlay/media residuals for the stage-2 real-GPU test on the Windows host after the no-virus verdict"
   },
-  "caseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
-  "caseManifestDigest": "pending-seal",
-  "contractId": "contract:目标产品-2025-:case-a-execution",
-  "controls": {
-    "destroyOverlayAfterRun": false,
-    "disposableOverlay": false,
-    "executionMediaReadOnly": true,
-    "knownDestinationBoundary": "loopback-record-only",
-    "networkMode": "deny-all-at-hypervisor",
-    "sourceReadOnly": true,
-    "unknownSecondaryExecution": "block-by-admitted-policy"
-  },
-  "kind": "ordivon.security.windows-kvm-p1-execution-contract",
-  "observationProfile": "windows-installer-p1",
-  "operatorDirection": "2026-08-14 user: (1) run full dynamic verification of the cracked 核心库.dll; (2) OVERRIDE residual closure: retain VM/overlay/media residuals for the stage-2 real-GPU test on the Windows host after the no-virus verdict; (3) stage-2: after sandbox confirms clean, test Pro features with real GPU in Windows",
   "residualPolicy": {
-    "closureOverride": "operator-directed retention; runs remain valid behavioral evidence, labeled with the override (closure proof waived by operator direction)",
-    "stage2": "post-clean-verdict real-GPU test on Windows host (user-owned decision; cracked DLL treated as clean only after stage-1 verdicts: static review + ClamAV + sandbox behavior)"
+    "closureOverride": "operator-directed retention (see operatorDirection)",
+    "stage2": "real-GPU test on Windows host after clean no-virus verdict"
   },
-  "toolingConstraint": "2026-08-14 empirical: P1 contract schema (windows_kvm_p1_execution_media.py L148-149, L162-163) hard-rejects controllerAdmitted=true / executionAuthorized=true / destroyOverlayAfterRun=false; materialize CLI failed with 'execution contract sections are invalid'. P1 tooling = media-prep-only by design; execution + residual retention need either a tooling extension or an ad-hoc pathway.",
   "noVirusEvidence": {
-    "staticReview": "clean (Derivative engine + license-related modification only, no suspicious strings/imports/exfil)",
-    "clamav": "0 infected (280.26 MiB scanned: cracked 核心库 + official installer + official 核心库, freshclam-updated 2026-08-14)",
-    "windowsDefender": "clean (host-side Start-MpScan CustomScan on D:\\迅雷下载\\核心库.dll, no execution)",
-    "kvmBehavior": "pending (blocked by tooling constraint)"
+    "staticReview": "clean",
+    "clamav": "0 infected (280.26 MiB)",
+    "windowsDefender": "clean (host scan, no execution)",
+    "kvmBehavior": "pending"
   },
   "staticEvidence": {
     "installerOfficial": {
@@ -46,32 +74,7 @@
     "cracked核心库": {
       "digest": "sha256:9990aabba2cf4b4a065ef80a5ec12ef8a6ebba859ef05e66bd74f0f2e79562ae",
       "byteLength": 135628632,
-      "verdict": "tampered-but-signed: embedded Derivative PKCS7 digest MISMATCH + invalid PE checksum; 2026-03-10 build (older than installer's 2026-07-16); static review: no malicious strings/imports, all observable license surfaces intact, patch suspected in string-less key-verification layer; load-compatible with official TD.exe (name imports, 616/616 exports)"
+      "verdict": "tampered-but-signed: embedded Derivative PKCS7 digest MISMATCH + invalid PE checksum; 2026-03-10 build; static review clean; load-compatible with official TD.exe (name imports, 616/616 exports)"
     }
-  },
-  "experiment": {
-    "design": "A/B in disposable Windows 11 guest, deny-all network: (control) official tree, no license key -> record license state; (test) replace 核心库.dll with cracked -> record license state + Pro feature probes. Difference = crack behavior.",
-    "probe": {
-      "signal1": "TD Python API: td.License.type / status / systemCode / isPro() / isNonCommercial() / app.product",
-      "signal2": "Pro gate test: create private COMP, save .toe -> 'Cannot save a private toe without a Pro licence' expected when not Pro",
-      "signal3": "registry license state (licenceAccess.exe ADVAPI32 helper domain) pre/post",
-      "output": "JSON on controller-extractable FAT/run disk"
-    },
-    "runs": ["control-official-no-key", "cracked-dll-replaced"],
-    "gpuNote": "guest has no GPU passthrough; TD may require D3D11 (WARP fallback uncertain). Run 1 must establish 'does TD start at all'; failure is still evidence (recorded)."
-  },
-  "requiredTransformations": [
-    "attach-source-read-only",
-    "host-materialize-read-only-execution-tree",
-    "deny-external-network-at-hypervisor",
-    "provide-local-record-only-fake-network-boundary",
-    "block-unknown-secondary-executable-launch",
-    "use-disposable-overlay-and-destroy-after-run"
-  ],
-  "revision": "1",
-  "schemaVersion": 1,
-  "sourceTree": {
-    "name": "目标产品-2025--official-tree-plus-cracked-核心库",
-    "note": "official extracted tree (inno_out/$/app) + cracked 核心库.dll, prepared read-only; exact per-file digests recorded at materialization time"
   }
 }

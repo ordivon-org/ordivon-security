@@ -226,6 +226,42 @@ class WindowsKvmP1ExecutionMediaTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "cannot admit"):
             WindowsKvmP1ExecutionContract.from_dict(opened)
 
+    def test_operator_directed_execution_requires_bound_direction(self) -> None:
+        opened = json.loads(json.dumps(self.contract_value))
+        opened["authorization"]["executionAuthorized"] = True
+        opened["authorization"]["controllerAdmitted"] = True
+        opened["authorization"]["operatorDirectedExecution"] = True
+        opened["authorization"]["operatorDirection"] = ""
+        with self.assertRaisesRegex(ValueError, "bound operator direction"):
+            WindowsKvmP1ExecutionContract.from_dict(opened)
+
+    def test_operator_directed_execution_admits_execution_and_retention(self) -> None:
+        opened = json.loads(json.dumps(self.contract_value))
+        opened["authorization"]["executionAuthorized"] = True
+        opened["authorization"]["controllerAdmitted"] = True
+        opened["authorization"]["operatorDirectedExecution"] = True
+        opened["authorization"]["operatorDirection"] = (
+            "operator: test direction binding execution + retained residuals"
+        )
+        opened["controls"]["disposableOverlay"] = False
+        opened["controls"]["destroyOverlayAfterRun"] = False
+        contract = WindowsKvmP1ExecutionContract.from_dict(opened)
+        self.assertIs(contract.execution_authorized, True)
+        self.assertIs(contract.controller_admitted, True)
+        self.assertIs(contract.destroy_overlay_after_run, False)
+        self.assertIs(contract.operator_directed_execution, True)
+        self.assertEqual(contract.operator_direction, opened["authorization"]["operatorDirection"])
+        # the round-trip serializes the operator authority
+        roundtrip = WindowsKvmP1ExecutionContract.from_dict(contract.to_dict())
+        self.assertIs(roundtrip.operator_directed_execution, True)
+        self.assertEqual(roundtrip.operator_direction, contract.operator_direction)
+
+    def test_operator_direction_flag_requires_direction_text(self) -> None:
+        opened = json.loads(json.dumps(self.contract_value))
+        opened["authorization"]["operatorDirection"] = "stray direction"
+        with self.assertRaisesRegex(ValueError, "requires the operator-directed-execution flag"):
+            WindowsKvmP1ExecutionContract.from_dict(opened)
+
     def test_archive_listing_rejects_links_before_extraction(self) -> None:
         listing = b"""----------\nPath = link.txt\nSize = 10\nAttributes = A lrwxrwxrwx\n\n"""
         completed = Mock(returncode=0, stdout=listing, stderr=b"")

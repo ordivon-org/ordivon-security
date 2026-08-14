@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.capability-case",
+  "caseId": "case:目标产品-2025-:a-crack-核心库-evaluation",
+  "revision": "1",
+  "role": "original-repack",
+  "admission": {
+    "deploymentAuthorized": false,
+    "evaluationAuthorized": true,
+    "hostObservationAuthorized": false,
+    "hostModificationAuthorized": false,
+    "targetSurface": "disposable-windows-kvm"
+  },
+  "source": {
+    "archiveDigest": "sha256:6350a1ce2f897ac4aab0272f595c92d88b5029aa7bd4c36ba253ab2d3c79c703",
+    "archiveByteLength": 3347447025,
+    "archiveName": "目标产品-2025--bundle.7z",
+    "staticDecision": "windows-kvm-p1-目标产品-case-a-execution.json"
+  },
+  "transformationManifest": "transform:目标产品-2025-:case-a",
+  "transformationManifestDigest": "sha256:9c652b269722dae66af35e6c2c76e2c3a2250c67b25e5d947bcd7f21a25c8e95",
+  "observationProfile": "windows-installer-p1",
+  "networkMode": "deny-all",
+  "status": "admitted",
+  "controls": {
+    "sampleBytesChanged": false,
+    "fakeNetworkService": "local-record-only",
+    "unknownSecondaryExecution": "block",
+    "destroyOverlayAfterRun": false
+  }
+}
