@@ -1,6 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <bcrypt.h>
+#include <winevt.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -89,6 +90,36 @@ done:
     if (buffer != NULL) HeapFree(GetProcessHeap(), 0, buffer);
     CloseHandle(file);
     return ok;
+}
+
+static long count_event_log(const wchar_t *channel, const wchar_t *query) {
+    EVT_HANDLE result = NULL;
+    EVT_HANDLE events[32];
+    DWORD returned = 0;
+    DWORD error = ERROR_SUCCESS;
+    long total = 0;
+    DWORD i;
+    result = EvtQuery(NULL, channel, query, EvtQueryChannelPath);
+    if (result == NULL) return -1;
+    for (;;) {
+        returned = 0;
+        if (!EvtNext(result, ARRAYSIZE(events), events, 0, 0, &returned)) {
+            error = GetLastError();
+            if (error == ERROR_NO_MORE_ITEMS) break;
+            EvtClose(result);
+            return -1;
+        }
+        for (i = 0; i < returned; ++i) {
+            EvtClose(events[i]);
+            total += 1;
+            if (total >= 8192) {
+                EvtClose(result);
+                return total;
+            }
+        }
+    }
+    EvtClose(result);
+    return total;
 }
 
 static int file_contains(const wchar_t *path, const char *needle) {
@@ -314,6 +345,9 @@ static int carrier_probe(const wchar_t *result_path) {
     int wsh_present = file_exists(WSH_PATH);
     int msiexec_present = file_exists(MSIEXEC_PATH);
     int office_present = file_exists(OFFICE_WORD_X64) || file_exists(OFFICE_WORD_X86);
+    long powershell_events_before = -1, powershell_events_after = -1;
+    long msi_events_before = -1, msi_events_after = -1;
+    long powershell_event_delta = -1, msi_event_delta = -1;
     int completed = 0;
     char output[16384];
     int output_len;
@@ -325,6 +359,13 @@ static int carrier_probe(const wchar_t *result_path) {
     if (!sha256_file(EFFECT_PATH, effect_digest, &effect_bytes) ||
         strcmp(effect_digest, CA1_EFFECT_EXE_SHA256) != 0 ||
         effect_bytes != CA1_EFFECT_EXE_BYTE_LENGTH) return 23;
+
+    powershell_events_before = count_event_log(
+        L"Microsoft-Windows-PowerShell/Operational", L"*"
+    );
+    msi_events_before = count_event_log(
+        L"Application", L"*[System[Provider[@Name='MsiInstaller']]]"
+    );
 
 #if CA1_CARRIER == 0
     started = run_native(&carrier_exit, &elapsed_ms);
@@ -372,6 +413,17 @@ static int carrier_probe(const wchar_t *result_path) {
     }
 #endif
 
+    powershell_events_after = count_event_log(
+        L"Microsoft-Windows-PowerShell/Operational", L"*"
+    );
+    msi_events_after = count_event_log(
+        L"Application", L"*[System[Provider[@Name='MsiInstaller']]]"
+    );
+    if (powershell_events_before >= 0 && powershell_events_after >= powershell_events_before)
+        powershell_event_delta = powershell_events_after - powershell_events_before;
+    if (msi_events_before >= 0 && msi_events_after >= msi_events_before)
+        msi_event_delta = msi_events_after - msi_events_before;
+
     completed = started && carrier_exit == 0 && marker_exact && evidence_present && system_sid;
 #if CA1_CARRIER == 3
     completed = completed && uninstall_exit == 0 && installed_payload_removed;
@@ -389,6 +441,11 @@ static int carrier_probe(const wchar_t *result_path) {
         "\"effectPayloadSha256\":\"sha256:%s\",\"effectPayloadByteLength\":%llu,"
         "\"powershellPresent\":%s,\"wshPresent\":%s,\"msiexecPresent\":%s,"
         "\"officeWordProviderPresent\":%s,"
+        "\"blueTelemetry\":{"
+        "\"powershellOperationalBefore\":%ld,\"powershellOperationalAfter\":%ld,"
+        "\"powershellOperationalDelta\":%ld,"
+        "\"msiInstallerApplicationBefore\":%ld,\"msiInstallerApplicationAfter\":%ld,"
+        "\"msiInstallerApplicationDelta\":%ld},"
         "\"powershellRestrictedGateStarted\":%s,"
         "\"powershellRestrictedExitCode\":%lu,"
         "\"powershellRestrictedMarkerAbsent\":%s,"
@@ -405,6 +462,8 @@ static int carrier_probe(const wchar_t *result_path) {
         effect_digest, (unsigned long long)effect_bytes,
         powershell_present ? "true" : "false", wsh_present ? "true" : "false",
         msiexec_present ? "true" : "false", office_present ? "true" : "false",
+        powershell_events_before, powershell_events_after, powershell_event_delta,
+        msi_events_before, msi_events_after, msi_event_delta,
         restricted_gate_started ? "true" : "false", (unsigned long)restricted_exit,
         restricted_marker_absent ? "true" : "false", restricted_blocked ? "true" : "false",
 #if CA1_CARRIER == 3

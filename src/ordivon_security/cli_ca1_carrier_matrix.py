@@ -364,6 +364,7 @@ def _compile_probe(
             str(output),
             str(source),
             "-lbcrypt",
+            "-lwevtapi",
         ],
         check=True,
         timeout=120,
@@ -545,6 +546,11 @@ def _compare(treatments: list[JsonObject]) -> JsonObject:
         str(item.get("carrier")): bool(item["fixtureResult"].get("expectedParentObserved"))
         for item in completed
     }
+    blue_telemetry = {
+        str(item.get("carrier")): dict(item["fixtureResult"].get("blueTelemetry", {}))
+        for item in completed
+        if isinstance(item["fixtureResult"].get("blueTelemetry"), dict)
+    }
     office_presence = {
         bool(item["fixtureResult"].get("officeWordProviderPresent")) for item in completed
     }
@@ -558,6 +564,23 @@ def _compare(treatments: list[JsonObject]) -> JsonObject:
         "sameSemanticEffectAcrossCompleted": effects == {"ca1-same-effect-v1"},
         "samePayloadBytesAcrossCompleted": len(effect_digests) == 1 and len(completed) > 0,
         "expectedParentObservedByCarrier": parent_matches,
+        "blueTelemetryByCarrier": blue_telemetry,
+        "powershellOperationalSignalCarrierSpecific": (
+            blue_telemetry.get("powershell", {}).get("powershellOperationalDelta", -1) > 0
+            and all(
+                blue_telemetry.get(carrier, {}).get("powershellOperationalDelta", 0) == 0
+                for carrier in ("native", "wsh-vbscript", "msi-installed-custom-action")
+            )
+        ),
+        "msiInstallerSignalCarrierSpecific": (
+            blue_telemetry.get("msi-installed-custom-action", {}).get(
+                "msiInstallerApplicationDelta", -1
+            ) > 0
+            and all(
+                blue_telemetry.get(carrier, {}).get("msiInstallerApplicationDelta", 0) == 0
+                for carrier in ("native", "powershell", "wsh-vbscript")
+            )
+        ),
         "officeWordProviderPresenceConsistent": len(office_presence) <= 1,
         "officeWordProviderPresent": next(iter(office_presence))
         if len(office_presence) == 1
