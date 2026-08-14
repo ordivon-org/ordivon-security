@@ -17,7 +17,7 @@ from .api import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
 )
-from .surface import security_surface_manifest
+from .surface import security_ordinary_surface_manifest, security_surface_manifest
 
 __all__ = [
     "AdversarialWindowsRange",
@@ -31,6 +31,7 @@ __all__ = [
     "RangeSession",
     "RangeSessionSpec",
     "ResearchCorpus",
+    "security_ordinary_surface_manifest",
     "SacrificialWindowsRangeConfig",
     "ScenarioManifest",
     "WindowsKvmMachineConfig",

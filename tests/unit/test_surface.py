@@ -49,5 +49,25 @@ class SecuritySurfaceTests(unittest.TestCase):
         self.assertTrue(WorldEntityKvmDestination.__name__)
 
 
+class OrdinarySecuritySurfaceTests(unittest.TestCase):
+    def test_ordinary_view_is_derived_and_excludes_research_apparatus(self) -> None:
+        ordinary = ordivon_security.security_ordinary_surface_manifest()
+        self.assertEqual(ordinary["kind"], "ordivon.security-ordinary-surface")
+        names = {entry["name"] for entry in ordinary["surfaceEntries"]}
+        self.assertEqual(
+            names,
+            {"EvidenceRecorder", "RangeSession", "ResearchCorpus", "Software Evaluation"},
+        )
+        self.assertNotIn("Acceptance runners", names)
+        routes = {route["job"]: route["primarySurface"] for route in ordinary["routes"]}
+        self.assertEqual(routes["provider-snapshot-currentness"], "ResearchCorpus")
+        self.assertEqual(routes["software-or-endpoint-evaluation"], "Software Evaluation")
+
+    def test_ordinary_view_does_not_grant_authority(self) -> None:
+        ordinary = ordivon_security.security_ordinary_surface_manifest()
+        self.assertIn("does not grant execution", ordinary["authorityBoundary"].lower())
+        self.assertIn("reproduction/provenance", ordinary["researchBoundary"])
+
+
 if __name__ == "__main__":
     unittest.main()

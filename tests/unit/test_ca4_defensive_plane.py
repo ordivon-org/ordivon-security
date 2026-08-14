@@ -5,9 +5,14 @@ from importlib.resources import files
 from pathlib import Path
 
 from ordivon_security.cli_ca4_defensive_plane import _CLEAN, _EICAR
+from ordivon_security.fixtures import CLEAN_TEST_BYTES, EICAR_TEST_BYTES
 
 
 class Ca4DefensivePlaneTests(unittest.TestCase):
+    def test_ca4_uses_reusable_maintained_fixtures(self) -> None:
+        self.assertEqual(_EICAR, EICAR_TEST_BYTES)
+        self.assertEqual(_CLEAN, CLEAN_TEST_BYTES)
+
     def test_eicar_fixture_is_bounded_test_pattern_not_real_malware(self) -> None:
         self.assertEqual(len(_EICAR), 68)
         self.assertIn(b"EICAR-STANDARD-ANTIVIRUS-TEST-FILE", _EICAR)
