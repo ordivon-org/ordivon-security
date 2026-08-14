@@ -266,3 +266,8 @@ AC2's verified mismatch removes epistemic ambiguity but still exposes Tool-inten
 ## Intent ceremony ablation IF3 — ordinary AF2 after deliberation
 
 IF3 removes IF1's readback and finalize Tools but retains IF2's no-domain-Tool deliberation. The exact AC2 mismatch is unchanged. Deliberation again derives hold. In the authority phase, ordinary AF2 first records an advisory message request and then actively replaces it with `[]` before admission; all 12 gates pass. Relevant Harness drift from IF2 to IF3 was audited: DeepSeek, DomainToolLoop, model, loop and no-Tool projection paths were unchanged; only unrelated `agent_run.py` plus docs/evidence changed, and the Computing protocol remained fixed. Thus the accepted scoped result is smaller than IF2: deliberation-before-authority plus ordinary AF2 revision is sufficient in this consumer, while IF1-style readback/finalization is not required. Next pressure should leave the AC2 world and seek an independent consumer or a Harness-native ablation.
+
+
+## Post-CA physical consumption
+
+O1 carrier observability is accepted in [`POST-CA-O1-CARRIER-OBSERVABILITY.md`](POST-CA-O1-CARRIER-OBSERVABILITY.md). The exact same-effect Windows matrix produced a valid MSI-specific MsiInstaller event-channel contrast against completed native and WSH treatments. The PowerShell telemetry clue remains unresolved because that treatment did not complete, and a later VM retry was invalid before fixture evidence. This is enough to retain carrier observability as a conditional Agent decision coordinate without adding Sysmon, EDR/SIEM, a stealth score, or a new semantic capability domain.

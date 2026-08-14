@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.post-ca-o1-carrier-observability-acceptance",
+  "status": "accepted-scoped",
+  "runtimeJobId": "job-019fffa8-96ce-7650-8c05-757aa2a070fc",
+  "rawPrivateResult": {
+    "path": "/var/lib/ordivon/security/o1-result.json",
+    "digest": "sha256:a8d525e3565f62bbc562641ef07a0c051a46e76cb79d55c601b591925aff694e"
+  },
+  "validCompletedTreatments": {
+    "native": {
+      "powershellOperationalDelta": 0,
+      "msiInstallerApplicationDelta": 0,
+      "effectCompleted": true,
+      "residualClosed": true
+    },
+    "wsh-vbscript": {
+      "powershellOperationalDelta": 0,
+      "msiInstallerApplicationDelta": 0,
+      "effectCompleted": true,
+      "residualClosed": true
+    },
+    "msi-installed-custom-action": {
+      "powershellOperationalDelta": 0,
+      "msiInstallerApplicationDelta": 8,
+      "effectCompleted": true,
+      "residualClosed": true
+    }
+  },
+  "invalidTreatments": [
+    {
+      "carrier": "powershell",
+      "jobId": "job-019fffa8-96ce-7650-8c05-757aa2a070fc",
+      "powershellOperationalDelta": 2,
+      "effectCompleted": false,
+      "terminalReason": "guardian-runtime-bound-exceeded",
+      "residualClosed": true,
+      "acceptedAsCarrierEffectTelemetry": false
+    },
+    {
+      "scope": "full-matrix-retry",
+      "jobId": "job-019fffbb-0c6c-7612-8c7f-e927f64516a4",
+      "fixtureResultPresent": false,
+      "terminalReason": "guardian-runtime-bound-exceeded",
+      "residualClosed": true,
+      "acceptedAsEvidence": false
+    }
+  ],
+  "gates": {
+    "samePayloadAcrossCompleted": true,
+    "sameSemanticEffectAcrossCompleted": true,
+    "msiCarrierSpecificTelemetryEstablished": true,
+    "powershellCompletedTelemetryEstablished": false,
+    "allValidTrialsResidualClosed": true,
+    "thirdPartySampleExecuted": false,
+    "networkRequested": false,
+    "sysmonRequired": false,
+    "universalStealthRankingClaimed": false
+  },
+  "acceptedClaims": [
+    "For the exact accepted Windows image and same benign payload/effect, a completed MSI installed-custom-action treatment produced eight MsiInstaller Application events while completed native and WSH/VBScript treatments produced zero on that channel.",
+    "Carrier-specific Blue observability can therefore be decision-relevant without making carrier identity a semantic capability domain.",
+    "The invalid PowerShell treatment cannot support a completed-effect telemetry claim despite observing two PowerShell Operational events."
+  ],
+  "limitations": [
+    "one Windows image and one maintained benign payload",
+    "PowerShell completed-effect observability unresolved",
+    "event-channel configuration dependent",
+    "no malware/evasion or universal stealth claim"
+  ]
+}
