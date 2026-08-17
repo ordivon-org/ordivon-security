@@ -22,15 +22,50 @@ from .protocol import ActorProposalFailureCode
 from .runtime_mcp import RuntimeMcpClient, RuntimeMcpError, read_runtime_token
 
 _RESULT_MARKER = "ORDIVON_SECURITY_RUNTIME_RESULT="
-_TERMINAL_STATUSES = {
-    "succeeded",
-    "failed",
-    "cancelled",
-    "timed_out",
-    "lost",
-    "orphaned",
+_RUNTIME_DELIVERY_DISPOSITIONS = {
+    "in_progress",
+    "committed",
+    "reconciliation_required",
     "unknown",
 }
+
+
+def _runtime_delivery_state(payload: JsonObject) -> str:
+    """Classify the safe next action from exact Runtime execution/delivery truth."""
+
+    execution_terminal = payload.get("executionTerminal")
+    execution_disposition = payload.get("executionDisposition")
+    delivery_disposition = payload.get("deliveryDisposition")
+    recovery_required = payload.get("recoveryRequired")
+    result_available = payload.get("resultAvailable")
+    semantic_completion_evaluated = payload.get("semanticCompletionEvaluated")
+
+    if not isinstance(execution_terminal, bool):
+        raise RuntimeMcpError("Runtime observation omitted executionTerminal")
+    if execution_disposition is not None and not isinstance(execution_disposition, str):
+        raise RuntimeMcpError("Runtime executionDisposition is invalid")
+    if delivery_disposition not in _RUNTIME_DELIVERY_DISPOSITIONS:
+        raise RuntimeMcpError("Runtime deliveryDisposition is invalid")
+    if not isinstance(recovery_required, bool):
+        raise RuntimeMcpError("Runtime observation omitted recoveryRequired")
+    if not isinstance(result_available, bool):
+        raise RuntimeMcpError("Runtime observation omitted resultAvailable")
+    if semantic_completion_evaluated is not False:
+        raise RuntimeMcpError("Runtime must not claim Security/domain semantic completion")
+
+    if recovery_required or delivery_disposition == "reconciliation_required":
+        return "reconcile"
+    if delivery_disposition == "unknown":
+        if not execution_terminal or execution_disposition != "lost" or not result_available:
+            raise RuntimeMcpError("Runtime unknown delivery projection is inconsistent")
+        return "unknown"
+    if delivery_disposition == "in_progress":
+        if execution_terminal or execution_disposition is not None or result_available:
+            raise RuntimeMcpError("Runtime in-progress projection is inconsistent")
+        return "reconcile"
+    if not execution_terminal or execution_disposition is None or not result_available:
+        raise RuntimeMcpError("Runtime committed terminal projection is incomplete")
+    return "terminal"
 
 
 def _text(value: object, label: str, *, prefix: str | None = None) -> str:
@@ -531,7 +566,12 @@ class RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver(HostAssignedDeepSeekHar
                 raise RuntimeMcpError("Runtime Job recovery lookup was not unique")
             deadline = time.monotonic() + self.runtime_timeout_ms / 1000 + 30
             terminal = submitted
-            while terminal.get("status") not in _TERMINAL_STATUSES:
+            while True:
+                delivery_state = _runtime_delivery_state(terminal)
+                if delivery_state == "terminal":
+                    break
+                if delivery_state == "unknown":
+                    raise RuntimeMcpError("Runtime Job terminal delivery is unknown")
                 if time.monotonic() >= deadline:
                     raise RuntimeMcpError("Runtime Job observation exceeded P0-C deadline")
                 terminal = client.call_tool(
@@ -598,8 +638,17 @@ class RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver(HostAssignedDeepSeekHar
                     _text(worker_result.get("message"), "Runtime worker failure message"),
                     details=failure_details,
                 )
-            if terminal.get("status") != "succeeded" or terminal.get("exitCode") != 0:
-                raise RuntimeMcpError("Runtime Job did not succeed despite worker success result")
+            if (
+                _runtime_delivery_state(terminal) != "terminal"
+                or terminal.get("executionDisposition") != "succeeded"
+                or terminal.get("deliveryDisposition") != "committed"
+                or terminal.get("recoveryRequired") is not False
+                or terminal.get("resultAvailable") is not True
+                or terminal.get("exitCode") != 0
+            ):
+                raise RuntimeMcpError(
+                    "Runtime Job did not converge to committed success despite worker success result"
+                )
             if worker_result.get("requestPayloadDigest") != request_digest:
                 raise RuntimeMcpError("Runtime worker result belongs to another request")
             evidence_value = _object(worker_result.get("evidence"), "Runtime worker evidence")

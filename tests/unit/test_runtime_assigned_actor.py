@@ -9,7 +9,8 @@ from pathlib import Path
 from ordivon_security._canonical import JsonObject, canonical_digest
 from ordivon_security.actors.agent_stack import AgentTurnEvidence
 from ordivon_security.actors.native_harness import NativeHarnessActorBackend
-from ordivon_security.actors.runtime_mcp import read_runtime_token
+from ordivon_security.actors.runtime_assigned import _runtime_delivery_state
+from ordivon_security.actors.runtime_mcp import RuntimeMcpError, read_runtime_token
 from ordivon_security.cli_cage4_deepseek import build_parser
 from ordivon_security.contest.model import (
     ActorActionResult,
@@ -120,6 +121,38 @@ class _RuntimeDriver:
 
 
 class RuntimeAssignedActorTests(unittest.TestCase):
+    def test_runtime_delivery_state_does_not_trust_succeeded_status_during_recovery(self) -> None:
+        recovering: JsonObject = {
+            "status": "succeeded",
+            "executionTerminal": True,
+            "executionDisposition": "succeeded",
+            "deliveryDisposition": "reconciliation_required",
+            "recoveryRequired": True,
+            "semanticCompletionEvaluated": False,
+            "resultAvailable": True,
+        }
+        self.assertEqual(_runtime_delivery_state(recovering), "reconcile")
+
+        committed = dict(recovering)
+        committed["deliveryDisposition"] = "committed"
+        committed["recoveryRequired"] = False
+        self.assertEqual(_runtime_delivery_state(committed), "terminal")
+
+    def test_runtime_delivery_state_preserves_unknown_and_rejects_semantic_overclaim(self) -> None:
+        lost: JsonObject = {
+            "status": "lost",
+            "executionTerminal": True,
+            "executionDisposition": "lost",
+            "deliveryDisposition": "unknown",
+            "recoveryRequired": False,
+            "semanticCompletionEvaluated": False,
+            "resultAvailable": True,
+        }
+        self.assertEqual(_runtime_delivery_state(lost), "unknown")
+        lost["semanticCompletionEvaluated"] = True
+        with self.assertRaisesRegex(RuntimeMcpError, "must not claim"):
+            _runtime_delivery_state(lost)
+
     def test_runtime_lifecycle_enters_proposal_and_receipt(self) -> None:
         backend = NativeHarnessActorBackend(
             actor_id="actor:red",
