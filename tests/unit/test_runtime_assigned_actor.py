@@ -121,6 +121,10 @@ class _RuntimeDriver:
 
 
 class RuntimeAssignedActorTests(unittest.TestCase):
+    def test_status_only_runtime_projection_fails_closed(self) -> None:
+        with self.assertRaisesRegex(RuntimeMcpError, "executionTerminal"):
+            _runtime_delivery_state({"status": "succeeded"})
+
     def test_runtime_delivery_state_does_not_trust_succeeded_status_during_recovery(self) -> None:
         recovering: JsonObject = {
             "status": "succeeded",

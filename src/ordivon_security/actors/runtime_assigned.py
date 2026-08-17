@@ -647,7 +647,8 @@ class RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver(HostAssignedDeepSeekHar
                 or terminal.get("exitCode") != 0
             ):
                 raise RuntimeMcpError(
-                    "Runtime Job did not converge to committed success despite worker success result"
+                    "Runtime Job did not converge to committed success "
+                    "despite worker success result"
                 )
             if worker_result.get("requestPayloadDigest") != request_digest:
                 raise RuntimeMcpError("Runtime worker result belongs to another request")
