@@ -44,9 +44,27 @@ JUNK_DIR_NAMES = {
 }
 JUNK_GLOBS = ("*.pyc", "*.pyo", "*.egg-info")
 
-# Quarantine is a gitignored isolation area: compiled artifacts there mean
-# someone executed code inside the quarantine, which admission forbids.
-QUARANTINE = REPO_ROOT / "quarantine"
+# Quarantine is owner state, not source-repository state.  The default follows
+# the production Security state root; tests/operators may bind another exact root.
+SECURITY_STATE_ROOT = Path(
+    os.environ.get("ORDIVON_SECURITY_STATE_ROOT", "/var/lib/ordivon/security")
+)
+QUARANTINE = Path(
+    os.environ.get("ORDIVON_SECURITY_QUARANTINE_ROOT", str(SECURITY_STATE_ROOT / "quarantine"))
+).resolve()
+
+
+def _display_path(path: Path) -> str:
+    """Use repository-relative display when possible, absolute owner-state path otherwise."""
+    try:
+        return str(path.relative_to(REPO_ROOT))
+    except ValueError:
+        return str(path)
+
+
+def _finding_path(target: str) -> Path:
+    path = Path(target)
+    return path if path.is_absolute() else REPO_ROOT / path
 
 
 @dataclass
@@ -305,7 +323,7 @@ def detect(report: SweepReport) -> None:
             report.add(
                 "CAREFUL",
                 "quarantine-compiled-artifact",
-                str(pyc.relative_to(REPO_ROOT)),
+                _display_path(pyc),
                 "隔离区出现编译产物,可能有人在隔离目录里执行过代码",
                 fixable=True,
             )
@@ -394,7 +412,7 @@ def apply_safe_fixes(report: SweepReport, dry_run: bool = True) -> None:
     # quarantine __pycache__ removal is CAREFUL-tier fixable; only with --fix.
     quarantine_pyc = [f for f in report.by_tier("CAREFUL") if f.category == "quarantine-compiled-artifact"]
     for f in quarantine_pyc:
-        path = REPO_ROOT / f.target
+        path = _finding_path(f.target)
         if not path.is_dir():
             continue
         label = f"删除隔离区编译产物 {f.target}"
