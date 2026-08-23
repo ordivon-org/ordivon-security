@@ -62,7 +62,7 @@ project six task routes over four existing surfaces:
 - persistent contested response -> `RangeSession`;
 - evidence recording/verification -> `EvidenceRecorder`.
 
-The full maturity-classified surface remains the default. No research command, acceptance runner or compatibility export was deleted. The ordinary view is generated from the existing owner-native surface and fails if it references an unknown surface.
+The accepted ordinary view is now the default first interface. The full maturity-classified surface remains explicitly available through `--view full`; no research command, acceptance runner or compatibility export is deleted. The ordinary view is generated from the existing owner-native surface and fails if it references an unknown surface.
 
 A useful falsifier appeared during the A/B work: an opaque SHA-256 digest of the full surface was initially included in the ordinary projection. Across two model treatments it was misread as the 目标产品B Sample SHA-256. R1 removes that digest from the Agent-visible navigation packet. Acceptance evidence binds source revision/digests outside the semantic view instead. A later model replicate contained no SHA-256 mention in the Sample summary.
 
@@ -75,7 +75,7 @@ A clean temporary Corpus registers the current CA2, EICAR and 目标产品B post
 - 目标产品B: 6 scoped `case-conclusion` claims, 0 Corpus `independent-observation` claims, `metadata-only`, execution `denied-by-default`;
 - provider currentness: exact candidate-vs-head comparison reports changed source evidence with `mutationPerformed=false`.
 
-A query for the generic compensation/recovery law returns zero Corpus records. That is accepted behavior: generic system laws remain canonical-doc/evidence owned. R1 therefore accepts ResearchCorpus as an **ordinary pre-analysis read for exact vulnerability/Sample/provider evidence**, but rejects bulk historical import, a new record kind and a universal Security knowledge graph.
+A query for the generic compensation/recovery law returns zero Corpus records. That is accepted behavior: generic system laws remain canonical-doc/evidence owned. R1 therefore accepts ResearchCorpus as an **ordinary pre-analysis memory/read for exact retained vulnerability/Sample/provider evidence**, but not as live discovery authority. Current advisory/provider discovery may be performed by a mature external provider/tool; Security retains an exact snapshot only when currentness comparison, owner memory, or reproducibility requires it. R1 still rejects bulk historical import, a new record kind and a universal Security knowledge graph.
 
 ## R1-D — Ordinary Blue incident consumer
 

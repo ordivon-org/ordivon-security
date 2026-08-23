@@ -31,10 +31,19 @@ class SecuritySurfaceTests(unittest.TestCase):
         self.assertIn("ResearchCorpus", names)
         self.assertIn("CA-LIC entitlement authority research", names)
 
-    def test_surface_cli_projects_manifest_without_experiment(self) -> None:
+    def test_surface_cli_defaults_to_ordinary_navigation_without_experiment(self) -> None:
         stdout = io.StringIO()
         with contextlib.redirect_stdout(stdout):
             status = surface_cli_main([])
+        self.assertEqual(status, 0)
+        value = json.loads(stdout.getvalue())
+        self.assertEqual(value, ordivon_security.security_ordinary_surface_manifest())
+        self.assertEqual(value["kind"], "ordivon.security-ordinary-surface")
+
+    def test_surface_cli_preserves_explicit_full_maturity_surface(self) -> None:
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            status = surface_cli_main(["--view", "full"])
         self.assertEqual(status, 0)
         value = json.loads(stdout.getvalue())
         self.assertEqual(value, ordivon_security.security_surface_manifest())
@@ -64,6 +73,13 @@ class OrdinarySecuritySurfaceTests(unittest.TestCase):
         routes = {route["job"]: route["primarySurface"] for route in ordinary["routes"]}
         self.assertEqual(routes["provider-snapshot-currentness"], "ResearchCorpus")
         self.assertEqual(routes["software-or-endpoint-evaluation"], "Software Evaluation")
+        vulnerability_route = next(
+            route
+            for route in ordinary["routes"]
+            if route["job"] == "vulnerability-or-advisory-triage"
+        )
+        self.assertIn("mature external provider/tool", vulnerability_route["reason"])
+        self.assertIn("does not own network fetch authority", vulnerability_route["reason"])
 
     def test_ordinary_view_does_not_grant_authority(self) -> None:
         ordinary = ordivon_security.security_ordinary_surface_manifest()

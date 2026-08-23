@@ -17,8 +17,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--view",
         choices=("full", "ordinary"),
-        default="full",
-        help="project the full maturity surface or the derived ordinary task view",
+        default="ordinary",
+        help="project the ordinary task view by default or the explicit full maturity surface",
     )
     parser.add_argument(
         "--compact",

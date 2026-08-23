@@ -297,8 +297,10 @@ def security_ordinary_surface_manifest() -> JsonObject:
             "job": "vulnerability-or-advisory-triage",
             "primarySurface": "ResearchCorpus",
             "reason": (
-                "Inspect exact vulnerability identity, provider claims, independent "
-                "observations and source-relative currentness before reproducing research."
+                "Use a mature external provider/tool for current advisory discovery when needed; "
+                "use ResearchCorpus for exact retained identity, provider claims, independent "
+                "observations and source-relative currentness before deeper analysis. "
+                "ResearchCorpus does not own network fetch authority."
             ),
             "nextIfNeeded": ["Software Evaluation"],
         },

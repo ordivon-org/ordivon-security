@@ -152,7 +152,7 @@ Static analysis, Case Snapshots, and Windows KVM are scoped Evaluation/Range pro
 
 `ResearchCorpus` gives Agents a revisioned query/inspection surface over exact vulnerability and Sample identities without turning possession or provider labels into authority. Provider/advisory classifications, Security observations, maintained-fixture facts and Case conclusions remain visibly separate. Sample bytes stay in the private `SampleVault` or provider-owned systems; every corpus Sample is `denied-by-default` for execution.
 
-The accepted P0 seed set contains CA2 owned vulnerability evidence, the harmless EICAR test fixture, and metadata-only 目标产品B Case identity. OSV/NVD/CISA KEV/MalwareBazaar/VirusTotal are consumed through explicit exact snapshots only; P0 implements no automatic fetch, malware download/upload, database mirror or family ontology. Use `uv run ordivon-security-research-corpus ...`; [`docs/RESEARCH-CORPUS-P0.md`](docs/RESEARCH-CORPUS-P0.md) owns the exact boundary.
+The accepted P0 seed set contains CA2 owned vulnerability evidence, the harmless EICAR test fixture, and metadata-only 目标产品B Case identity. ResearchCorpus consumes provider evidence only as explicit exact snapshots and implements no automatic fetch, malware download/upload, database mirror or family ontology. Current discovery may use a mature external provider/tool outside Security; retain an exact snapshot in ResearchCorpus only when owner memory, comparison, or reproducibility needs it. Use `uv run ordivon-security-research-corpus ...`; [`docs/RESEARCH-CORPUS-P0.md`](docs/RESEARCH-CORPUS-P0.md) owns the exact boundary.
 
 ## Recovery laws that survived the C1 programme
 
@@ -210,8 +210,8 @@ This is a research system, not a production attack platform. `readiness: EXPERIM
 
 | Need | Read / invoke |
 | --- | --- |
-| classify the exposed Security surface as constitution, profile, integration, or research apparatus | `uv run ordivon-security-surface` — read-only projection; it runs no experiment and grants no authority |
-| start an ordinary vulnerability/Sample/evaluation/response job without browsing research chronology | `uv run ordivon-security-surface --view ordinary` — derived task navigation only; full research surface remains available and execution authority is unchanged |
+| start an ordinary vulnerability/Sample/evaluation/response job without browsing research chronology | `uv run ordivon-security-surface` — ordinary task navigation is the default; it runs no experiment and grants no authority |
+| inspect the complete maturity-classified Security surface, including research apparatus | `uv run ordivon-security-surface --view full` — explicit full projection; research reproduction remains available and execution authority is unchanged |
 | understand why Security exists and where experiments may act | this README + [`docs/research-boundary.md`](docs/research-boundary.md) |
 | understand constitutional law versus profiles/fixtures | [`docs/LAW-PROFILES-C0.md`](docs/LAW-PROFILES-C0.md) |
 | understand current components and data flow | [`docs/architecture.md`](docs/architecture.md) |
