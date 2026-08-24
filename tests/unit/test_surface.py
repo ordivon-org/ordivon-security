@@ -80,6 +80,23 @@ class OrdinarySecuritySurfaceTests(unittest.TestCase):
         )
         self.assertIn("mature external provider/tool", vulnerability_route["reason"])
         self.assertIn("does not own network fetch authority", vulnerability_route["reason"])
+        self.assertEqual(
+            vulnerability_route["nextOwnerOperation"],
+            "security.ordinary.research.query",
+        )
+        sample_route = next(
+            route for route in ordinary["routes"] if route["job"] == "sample-or-case-assessment"
+        )
+        self.assertEqual(sample_route["nextOwnerOperation"], "security.ordinary.research.query")
+        operation_names = {item["operation"] for item in ordinary["ownerOperations"]}
+        self.assertEqual(
+            operation_names,
+            {
+                "security.ordinary.research.query",
+                "security.ordinary.research.inspect",
+                "security.ordinary.provider-currentness",
+            },
+        )
 
     def test_ordinary_view_does_not_grant_authority(self) -> None:
         ordinary = ordivon_security.security_ordinary_surface_manifest()

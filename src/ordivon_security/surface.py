@@ -303,6 +303,7 @@ def security_ordinary_surface_manifest() -> JsonObject:
                 "ResearchCorpus does not own network fetch authority."
             ),
             "nextIfNeeded": ["Software Evaluation"],
+            "nextOwnerOperation": "security.ordinary.research.query",
         },
         {
             "job": "sample-or-case-assessment",
@@ -312,6 +313,7 @@ def security_ordinary_surface_manifest() -> JsonObject:
                 "and denied-by-default execution before considering an Evaluation."
             ),
             "nextIfNeeded": ["Software Evaluation"],
+            "nextOwnerOperation": "security.ordinary.research.query",
         },
         {
             "job": "provider-snapshot-currentness",
@@ -321,6 +323,7 @@ def security_ordinary_surface_manifest() -> JsonObject:
                 "triggers review and does not mutate the corpus or target truth."
             ),
             "nextIfNeeded": [],
+            "nextOwnerOperation": "security.ordinary.provider-currentness",
         },
         {
             "job": "software-or-endpoint-evaluation",
@@ -364,6 +367,30 @@ def security_ordinary_surface_manifest() -> JsonObject:
         "kind": "ordivon.security-ordinary-surface",
         "routes": routes,
         "surfaceEntries": [by_name[name] for name in sorted(referenced)],
+        "ownerOperations": [
+            {
+                "operation": "security.ordinary.research.query",
+                "ownerCallable": "ordivon_security.ordinary_memory:security_ordinary_research_query",
+                "effect": "read-only",
+                "input": "semantic query string",
+                "nextWhenCandidateSelected": "security.ordinary.research.inspect",
+                "boundary": "The corpus storage root and retained record identities are mechanically owner-resolved; query intent remains Agent-semantic.",
+            },
+            {
+                "operation": "security.ordinary.research.inspect",
+                "ownerCallable": "ordivon_security.ordinary_memory:security_ordinary_research_inspect",
+                "effect": "read-only",
+                "input": "exact recordId returned by the current query standing",
+                "boundary": "Inspection preserves claim truth roles and never grants Sample execution authority.",
+            },
+            {
+                "operation": "security.ordinary.provider-currentness",
+                "ownerCallable": "ordivon_security.ordinary_memory:security_ordinary_provider_currentness",
+                "effect": "read-only",
+                "input": "none",
+                "boundary": "Provider snapshot comparison is retained-owner evidence currentness, not target applicability or mutation authority.",
+            },
+        ],
         "researchBoundary": (
             "Research apparatus is reproduction/provenance by default. Escalate into it only "
             "when an ordinary task requires reproducing or falsifying its exact experiment."

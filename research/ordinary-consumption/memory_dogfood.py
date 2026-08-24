@@ -21,20 +21,18 @@ def count_role(inspection: dict, role: str) -> int:
 def main() -> None:
     with tempfile.TemporaryDirectory(prefix="ordivon-security-memory-") as td:
         corpus = ResearchCorpus(Path(td) / "corpus")
-        for name in (
+        seed_paths = (
             "research/corpus/seed-ca2-vulnerability.json",
             "research/corpus/seed-eicar-sample.json",
             "research/corpus/seed-caseb-sample-postedge.json",
-        ):
-            corpus.register(load(name))
+        )
+        seeds = {name: load(name) for name in seed_paths}
+        for record in seeds.values():
+            corpus.register(record)
 
-        ca2 = corpus.inspect("vuln:ordivon-ca2-owned-stack-overflow-v1")
-        eicar = corpus.inspect(
-            "sample:(哈希略)bfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f"
-        )
-        目标产品B = corpus.inspect(
-            "sample:(哈希略)b21bac9c9606dbcad0d3076db9cf4714c39d1ad84bcd9ef1cc2c0d2e"
-        )
+        ca2 = corpus.inspect(str(seeds[seed_paths[0]]["recordId"]))
+        eicar = corpus.inspect(str(seeds[seed_paths[1]]["recordId"]))
+        目标产品B = corpus.inspect(str(seeds[seed_paths[2]]["recordId"]))
 
         old = normalize_provider_record("osv", load("research/corpus/k1/controlled-osv-old.json"))
         current = normalize_provider_record(
