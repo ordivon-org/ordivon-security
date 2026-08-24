@@ -370,25 +370,43 @@ def security_ordinary_surface_manifest() -> JsonObject:
         "ownerOperations": [
             {
                 "operation": "security.ordinary.research.query",
-                "ownerCallable": "ordivon_security.ordinary_memory:security_ordinary_research_query",
+                "ownerCallable": (
+                    "ordivon_security.ordinary_memory:"
+                    "security_ordinary_research_query"
+                ),
                 "effect": "read-only",
                 "input": "semantic query string",
                 "nextWhenCandidateSelected": "security.ordinary.research.inspect",
-                "boundary": "The corpus storage root and retained record identities are mechanically owner-resolved; query intent remains Agent-semantic.",
+                "boundary": (
+                    "The corpus storage root and retained record identities are mechanically "
+                    "owner-resolved; query intent remains Agent-semantic."
+                ),
             },
             {
                 "operation": "security.ordinary.research.inspect",
-                "ownerCallable": "ordivon_security.ordinary_memory:security_ordinary_research_inspect",
+                "ownerCallable": (
+                    "ordivon_security.ordinary_memory:"
+                    "security_ordinary_research_inspect"
+                ),
                 "effect": "read-only",
                 "input": "exact recordId returned by the current query standing",
-                "boundary": "Inspection preserves claim truth roles and never grants Sample execution authority.",
+                "boundary": (
+                    "Inspection preserves claim truth roles and never grants Sample "
+                    "execution authority."
+                ),
             },
             {
                 "operation": "security.ordinary.provider-currentness",
-                "ownerCallable": "ordivon_security.ordinary_memory:security_ordinary_provider_currentness",
+                "ownerCallable": (
+                    "ordivon_security.ordinary_memory:"
+                    "security_ordinary_provider_currentness"
+                ),
                 "effect": "read-only",
                 "input": "none",
-                "boundary": "Provider snapshot comparison is retained-owner evidence currentness, not target applicability or mutation authority.",
+                "boundary": (
+                    "Provider snapshot comparison is retained-owner evidence currentness, "
+                    "not target applicability or mutation authority."
+                ),
             },
         ],
         "researchBoundary": (

@@ -41,7 +41,11 @@ class OrdinarySecurityMemoryTests(unittest.TestCase):
             [False],
         )
         self.assertEqual(
-            [claim["value"] for claim in provider if claim["predicate"] == "provider-signature-match"],
+            [
+                claim["value"]
+                for claim in provider
+                if claim["predicate"] == "provider-signature-match"
+            ],
             ["Eicar-Test-Signature"],
         )
         self.assertEqual(inspection["sample"]["executionAdmission"], "denied-by-default")

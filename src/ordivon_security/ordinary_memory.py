@@ -5,6 +5,7 @@ import json
 import re
 import tempfile
 from pathlib import Path
+
 from ordivon_security._canonical import JsonObject, validate_json
 from ordivon_security.research_corpus import ResearchCorpus
 from ordivon_security.research_corpus_sources import normalize_provider_record
@@ -118,8 +119,11 @@ def security_ordinary_research_query(needle: str, *, root: Path = ROOT) -> JsonO
                 for relative in (*_SEED_PATHS, _OSV_OLD)
             ],
             "boundaries": [
-                "query candidates are bounded lexical matches over exact retained owner-memory records, not semantic-equivalence judgments or live provider discovery",
-                "absence of a candidate does not establish semantic non-equivalence or absence in the external world",
+                "query candidates are bounded lexical matches over exact retained "
+                "owner-memory records, not semantic-equivalence judgments or live "
+                "provider discovery",
+                "absence of a candidate does not establish semantic non-equivalence "
+                "or absence in the external world",
                 "catalog possession does not grant Sample execution authority",
             ],
         }
