@@ -237,6 +237,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "accepted-research",
     ),
     SecuritySurfaceEntry(
+        "P1 real-provider current capability-surface transfer",
+        "research-apparatus",
+        "ordivon_security.cli_p1_capability_surface_transfer",
+        "Real-provider transfer of owner-native current applicability into model-facing effect exposure plus same-surface returned-intent rejection; deterministic fault injection accepted, model uplift not claimed.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "CA-LIC entitlement authority research",
         "research-apparatus",
         "research/ca-lic",
