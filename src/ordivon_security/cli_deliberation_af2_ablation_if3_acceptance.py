@@ -257,14 +257,31 @@ class DeliberationPrimedAF2Driver:
                     payload=cast(JsonObject, item["payload"]),
                 )
             )
-        decision = context.decision(
-            tuple(effect_requests),
-            metadata={
-                "source": "deepseek-via-ordivon-harness",
-                "promptRevision": _IF3_PROMPT_REVISION,
-                "baseAF2PromptRevision": _PROMPT_REVISION,
-            },
-        )
+        try:
+            decision = context.decision(
+                tuple(effect_requests),
+                metadata={
+                    "source": "deepseek-via-ordivon-harness",
+                    "promptRevision": _IF3_PROMPT_REVISION,
+                    "baseAF2PromptRevision": _PROMPT_REVISION,
+                },
+            )
+        except ValueError as error:
+            if str(error) != "Range intent decision requested an undeclared effect interface":
+                raise
+            rejection: JsonObject = {
+                **common,
+                "stopCode": "security_intent_rejected",
+                "reason": "requested-effect-interface-not-currently-declared",
+                "requestedEffects": recorded,
+                "intentRecording": intent_recording,
+                "conclusionStatus": str(result.conclusion.status),
+                "conclusionSummary": str(result.conclusion.summary),
+                "securityAdmissionPerformed": False,
+                "effectExecuted": False,
+            }
+            validate_json(rejection)
+            raise RangeIntentHarnessFailure("security_intent_rejected", rejection) from error
         evidence: JsonObject = {
             **common,
             "stopCode": stop_code,
