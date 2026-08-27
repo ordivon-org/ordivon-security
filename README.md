@@ -182,6 +182,9 @@ Recent Agent-first experiments narrowed several tempting abstractions:
 - explicit intent readback/finalization ceremony did not guarantee correct action convergence in the tested consumer;
 - deliberation **before** effect authority succeeded with the ordinary AF2 intent path in the exact consumer, so the extra ceremony was removed rather than promoted.
 
+
+A previously detached W5-B physical result is now recovered as [`research/w5b/README.md`](research/w5b/README.md): exact 2026-08-09 acceptance is preserved, today's KVM/migration/Guest-runner substrate remains relevant, and the standing is explicitly `HISTORICAL_VALID + CURRENT_RELEVANT + NOT_REEXECUTED_20260827`. It does not create a production Embodiment/Presence contract or claim a fresh physical replay.
+
 The next pressure should come from independent consumers or stronger adversarial worlds, not from completing an ontology because the research numbering exists.
 
 CA-LIC V0-V8/R1 adds one engineering correction rather than a new subsystem: distinguish a frozen grant, current/future authority, external authorization carriers, external capability execution, and already delivered information. Security therefore keeps exact grant/admission identity and historical evidence, while rejecting a generic lease/revocation manager until a real owned consumer needs dynamic authority. The same audit also hardened evidence-bundle verification so manifest path claims cannot escape the bundle or traverse symlinks.

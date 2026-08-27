@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.w5b-currentness-rebind",
+  "date": "2026-08-27",
+  "sourceResearchRevision": "22c94ff64182a018029c3cc2f94cd453e0266520",
+  "currentSecurityBase": "63f0636aca579ce95df0ff3c34713fe00e8cba5d",
+  "sourceEvidence": {
+    "path": "research/w5b/evidence/b1-second-active-destination.json",
+    "sha256": "sha256:7b5698d06c1d64defccf788802c5d5d80e00e1acac3e147ae30033ce9c5b9c65",
+    "byteLength": 4809
+  },
+  "historicalValidity": {
+    "status": "EXACT_EVIDENCE_PRESERVED",
+    "meaning": "The 2026-08-09 bounded physical acceptance remains an exact historical result; this rebind does not rerun it."
+  },
+  "currentRelevance": {
+    "status": "SUBSTRATE_BOUNDARIES_STILL_PRESENT",
+    "witnesses": [
+      {
+        "role": "KVM_SUBSTRATE",
+        "path": "README.md",
+        "blob": "1d441893ba44d4a68cd189b8c1580645766e5772",
+        "needle": "disposable/recoverable Windows KVM machine substrate"
+      },
+      {
+        "role": "MIGRATION_LABEL",
+        "path": "src/ordivon_security/evaluation/world_entity.py",
+        "blob": "08a6b67ea021d267c1c6e4c98146ab4759ccadc4",
+        "needle": "ORDIVON_MIG"
+      },
+      {
+        "role": "MATERIALIZATION_ROLE",
+        "path": "src/ordivon_security/evaluation/world_entity.py",
+        "blob": "08a6b67ea021d267c1c6e4c98146ab4759ccadc4",
+        "needle": "entity-continuity-carrier"
+      },
+      {
+        "role": "GUEST_CLAIM_NONAUTHORITY",
+        "path": "src/ordivon_security/evaluation/world_entity.py",
+        "blob": "08a6b67ea021d267c1c6e4c98146ab4759ccadc4",
+        "needle": "guestClaimAuthority"
+      },
+      {
+        "role": "RUN_LABEL",
+        "path": "src/ordivon_security/evaluation/windows_kvm.py",
+        "blob": "b9a599883694f1620d052576f8fb4292b10377f6",
+        "needle": "ORDIVON_RUN"
+      },
+      {
+        "role": "SEALED_GUEST_RUNNER",
+        "path": "src/ordivon_security/resources/windows_kvm/base-finalize.ps1",
+        "blob": "bca3fb8868fc989e0b177103402531cb6c6496ad",
+        "needle": "OrdivonGuestRunner"
+      }
+    ]
+  },
+  "standing": [
+    "HISTORICAL_VALID",
+    "CURRENT_RELEVANT",
+    "NOT_REEXECUTED_20260827"
+  ],
+  "notProvenByRebind": [
+    "post-materialization reactivation",
+    "persistent or ambient Presence",
+    "Guest identity authority",
+    "untrusted-relay authentication",
+    "general arbitrary Guest execution",
+    "Body shutdown as part of activation semantics",
+    "a production cross-domain Embodiment or Presence contract",
+    "fresh 2026-08-27 physical W5-B acceptance"
+  ],
+  "apparatusCorrection": "Guest bounded action completion != Body shutdown completion; earlier shutdown-coupled failures remain inconclusive for post-materialization reactivation.",
+  "fixtureDisposition": {
+    "sourcePathAtHistoricalRevision": "research/w5b/subject_activation_fixture.c",
+    "currentExecutableSurface": "NOT_MATERIALIZED",
+    "reason": "The completed research fixture remains recoverable through Git and is not a current production or active-research executable capability."
+  }
+}
