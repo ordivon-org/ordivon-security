@@ -26,11 +26,11 @@ class SecurityResearchOwnerPublicationTests(unittest.TestCase):
         self.assertEqual(self.current["ownerResearchRef"], "research-owner:security")
         self.assertEqual(self.current["authorityRef"], "authority:ordivon:research-owner:security")
 
-    def test_manifest_digest_and_77_anchors_revalidate(self):
+    def test_manifest_digest_and_78_anchors_revalidate(self):
         observed = "sha256:" + hashlib.sha256(self.manifest_path.read_bytes()).hexdigest()
         self.assertEqual(observed, self.publication["source"]["aggregateManifestDigest"])
-        self.assertEqual(self.manifest["inventory"]["canonicalDocs"], 73)
-        self.assertEqual(len(self.manifest["anchors"]), 77)
+        self.assertEqual(self.manifest["inventory"]["canonicalDocs"], 74)
+        self.assertEqual(len(self.manifest["anchors"]), 78)
         for anchor in self.manifest["anchors"]:
             payload = subprocess.run(["git", "show", f"{anchor['revision']}:{anchor['path']}"], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True).stdout
             self.assertEqual(len(payload), anchor["bytes"], anchor["path"])
@@ -44,7 +44,7 @@ class SecurityResearchOwnerPublicationTests(unittest.TestCase):
         result_refs = {s["subjectRef"] for s in self.publication["statements"] if s.get("scope") == "RESULT"}
         closeout_refs = {r for c in self.publication["closeouts"] for r in c.get("resultRefs", [])}
         self.assertEqual(result_refs, closeout_refs)
-        self.assertEqual(len(result_refs), 20)
+        self.assertEqual(len(result_refs), 23)
         self.assertLess(len(result_refs), self.manifest["inventory"]["canonicalDocs"])
 
     def test_negative_and_historical_standing_are_not_promoted(self):
@@ -53,6 +53,9 @@ class SecurityResearchOwnerPublicationTests(unittest.TestCase):
         self.assertIn(("result:security:ca7-campaign-organization-not-admitted", "STANDING:NOT_ADMITTED"), standing)
         self.assertIn(("result:security:ace0-direct-representation-poison-sufficient-falsified", "STANDING:FALSIFIED"), standing)
         self.assertIn(("result:security:ordinary-mechanical-preflight-current", "STANDING:CURRENT"), standing)
+        self.assertIn(("result:security:ace4-capability-consequence-misrepresentation-established", "STANDING:ACCEPTED"), standing)
+        self.assertIn(("result:security:ace10-deterministic-consequence-reduction-accepted", "STANDING:ACCEPTED"), standing)
+        self.assertIn(("result:security:ace11-current-effect-binding-same-surface-admission-accepted", "STANDING:ACCEPTED"), standing)
         self.assertIn(("result:security:whole-domain-exhaustive-not-claimed", "STANDING:NOT_CLAIMED"), standing)
         self.assertIn(("result:security:w5b-historical-current-relevant", "STANDING:HISTORICAL_VALID"), standing)
         self.assertNotIn(("result:security:w5b-historical-current-relevant", "STANDING:ACCEPTED"), standing)
@@ -66,7 +69,7 @@ class SecurityResearchOwnerPublicationTests(unittest.TestCase):
                 canonical.append(p)
         links=set(re.findall(r"\]\(([^)#?]+)", (ROOT / "docs" / "authority.md").read_text()))
         uncovered=[p.name for p in canonical if p.name != "authority.md" and p.name not in links]
-        self.assertEqual(len(canonical), 73)
+        self.assertEqual(len(canonical), 74)
         self.assertEqual(uncovered, [])
 
 

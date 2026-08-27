@@ -1,0 +1,715 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.research-owner-publication",
+  "profile": "AUTHORITY_MAP_INVENTORY_V1",
+  "authorityRef": "authority:ordivon:research-owner:security",
+  "ownerResearchRef": "research-owner:security",
+  "source": {
+    "kind": "git-multi-ref-aggregate",
+    "aggregateManifest": "research/security/authority/SOURCE-MANIFEST-20260827.json",
+    "aggregateManifestDigest": "sha256:fbc72fd7e6cd811f43616c72f87977c196cb9625ee5a63fdb3c49449b46d0552",
+    "semanticBase": "75565c5c4525874c48e2c85c20cd6fec8aa6bfc1",
+    "truthRole": "OWNER_NATIVE_AUTHORITY_MAP_AND_EXACT_INVENTORY_NOT_CONSUMER_ADMISSION"
+  },
+  "currentRecovery": {
+    "targetRole": "OWNER_RESEARCH_AUTHORITY_MAP",
+    "locator": "docs/authority.md"
+  },
+  "closeouts": [
+    {
+      "researchRef": "research:security:owner-authority-current-20260827",
+      "contractRef": "owner:security:authority-map",
+      "profile": "OWNER_AUTHORITY_RECOVERY",
+      "resultRefs": [
+        "result:security:constitutional-boundaries-current",
+        "result:security:authority-map-complete-current",
+        "result:security:range-session-current",
+        "result:security:recovery-laws-current",
+        "result:security:whole-domain-exhaustive-not-claimed"
+      ],
+      "epistemicVerdict": "ESTABLISHED_IN_SCOPE",
+      "evidenceScope": "78 exact source anchors at owner semantic base 75565c5, including the complete 74-document canonical authority inventory; publication is a projection and recovery binding, not a second authority map.",
+      "residualState": "OPEN_RESEARCH_FRONTIER"
+    },
+    {
+      "researchRef": "research:security:current-programme-high-control-20260827",
+      "contractRef": "owner:security:research-agenda",
+      "profile": "BOUNDED_HIGH_CONTROL_STANDING",
+      "resultRefs": [
+        "result:security:af2-agent-intent-accepted",
+        "result:security:ae3b-raw-history-falsified",
+        "result:security:ae3c-evidence-reduction-accepted",
+        "result:security:ec0-shared-reducer-not-earned",
+        "result:security:ec1-exact-dependency-currentness-accepted",
+        "result:security:ac0-cheap-talk-sufficient-credibility-falsified",
+        "result:security:ac1-aligned-incentives-sufficient-credibility-falsified",
+        "result:security:ac2-epistemic-resolution-intent-convergence-falsified",
+        "result:security:if2-deliberation-before-authority-supported",
+        "result:security:if3-extra-intent-ceremony-not-required",
+        "result:security:ca7-campaign-organization-not-admitted",
+        "result:security:ace0-direct-representation-poison-sufficient-falsified",
+        "result:security:ace4-capability-consequence-misrepresentation-established",
+        "result:security:ace10-deterministic-consequence-reduction-accepted",
+        "result:security:ace11-current-effect-binding-same-surface-admission-accepted"
+      ],
+      "epistemicVerdict": "SUPPORTED_IN_SCOPE",
+      "evidenceScope": "Projection of selected accepted, falsified and non-admitted high-control standings already owned by canonical Security documents; omitted canonical results remain recoverable from docs/authority.md and are not negated by omission.",
+      "residualState": "PROGRAMME_CONTINUES"
+    },
+    {
+      "researchRef": "research:security:consumption-history-current-20260827",
+      "contractRef": "owner:security:current-navigation",
+      "profile": "CONSUMPTION_AND_HISTORY",
+      "resultRefs": [
+        "result:security:ordinary-consumption-r1-accepted",
+        "result:security:w5b-historical-current-relevant",
+        "result:security:ordinary-mechanical-preflight-current"
+      ],
+      "epistemicVerdict": "SUPPORTED_IN_SCOPE",
+      "evidenceScope": "Current ordinary-consumption standing plus bounded W5-B historical/current relevance; neither publication nor Atlas currentness upgrades historical physical evidence.",
+      "residualState": "CONSUMPTION_AND_REVALIDATION_OPEN"
+    }
+  ],
+  "statements": [
+    {
+      "predicate": "OWNER_BINDING",
+      "scope": "OWNER",
+      "subjectRef": "research-owner:security",
+      "value": "security"
+    },
+    {
+      "predicate": "CANONICAL_NAME",
+      "scope": "OWNER",
+      "subjectRef": "research-owner:security",
+      "value": "Ordivon Security"
+    },
+    {
+      "predicate": "CANONICAL_REFERENT",
+      "scope": "OWNER",
+      "subjectRef": "research-owner:security",
+      "value": "Authorized adversarial-autonomy research and Security-domain authority/evidence/consequence semantics"
+    },
+    {
+      "predicate": "STANDING:CURRENT",
+      "scope": "OWNER",
+      "subjectRef": "research-owner:security",
+      "value": true
+    },
+    {
+      "predicate": "CLOSURE",
+      "scope": "WHOLE_DOMAIN_EXHAUSTIVE",
+      "subjectRef": "research-owner:security",
+      "value": "NOT_CLAIMED"
+    },
+    {
+      "predicate": "RESEARCH_PUBLICATION_SURFACE",
+      "scope": "OWNER_RESEARCH_METADATA",
+      "subjectRef": "research-owner:security",
+      "value": "DIGEST_BOUND_AUTHORITY_MAP_INVENTORY"
+    },
+    {
+      "predicate": "STANDING:CURRENT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:constitutional-boundaries-current",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:constitutional-boundaries-current",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:constitutional-boundaries-current",
+      "value": "Security current constitutional distinctions preserve sovereignty/authority, truth separation, causal accountability, exact identity/provenance, honest uncertainty, recoverability without guessing, and scoped subsystem authority."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:constitutional-boundaries-current",
+      "value": [
+        "CONSTITUTION"
+      ]
+    },
+    {
+      "predicate": "STANDING:CURRENT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:authority-map-complete-current",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:authority-map-complete-current",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:authority-map-complete-current",
+      "value": "docs/authority.md now explicitly routes all 74 canonical Security documents while preserving active versus accepted lifecycle distinctions."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:authority-map-complete-current",
+      "value": [
+        "RECOVERY"
+      ]
+    },
+    {
+      "predicate": "STANDING:CURRENT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:range-session-current",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:range-session-current",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:range-session-current",
+      "value": "RangeSession remains the persistent semantic spine for contested worlds; synchronous Contest, Evaluation, CAGE and Windows shapes remain scoped profiles or apparatus."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:range-session-current",
+      "value": [
+        "DOMAIN_MODEL"
+      ]
+    },
+    {
+      "predicate": "STANDING:CURRENT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:recovery-laws-current",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:recovery-laws-current",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:recovery-laws-current",
+      "value": "The retained C1 recovery laws preserve publication/physical-progress separation, exclusion plus re-observation, UNKNOWN under missing history, and predicate-truth requirements without admitting a universal transaction or causal-DAG service."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:recovery-laws-current",
+      "value": [
+        "RECOVERY"
+      ]
+    },
+    {
+      "predicate": "STANDING:ACCEPTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:af2-agent-intent-accepted",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:af2-agent-intent-accepted",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:af2-agent-intent-accepted",
+      "value": "AF2 retains the minimal observation + objective + authority + effect-interface intent surface without transferring generic cognition ownership from Harness."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:af2-agent-intent-accepted",
+      "value": [
+        "AGENT_INTERFACE"
+      ]
+    },
+    {
+      "predicate": "STANDING:FALSIFIED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ae3b-raw-history-falsified",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ae3b-raw-history-falsified",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ae3b-raw-history-falsified",
+      "value": "AE3-B falsifies raw verified source history in ordinary Agent context as sufficient for stable evidence aggregation or reproducible current effect strategy."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ae3b-raw-history-falsified",
+      "value": [
+        "NEGATIVE_RESULT"
+      ]
+    },
+    {
+      "predicate": "STANDING:ACCEPTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ae3c-evidence-reduction-accepted",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ae3c-evidence-reduction-accepted",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ae3c-evidence-reduction-accepted",
+      "value": "AE3-C supports exact reconstructable factual reduction for the tested history-sensitive consumer without promoting the projection to current truth, policy, Trust, or Reputation."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ae3c-evidence-reduction-accepted",
+      "value": [
+        "EVIDENCE"
+      ]
+    },
+    {
+      "predicate": "STANDING:NOT_ADMITTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ec0-shared-reducer-not-earned",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ec0-shared-reducer-not-earned",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ec0-shared-reducer-not-earned",
+      "value": "EC0 externalizes exact evidence computation and rejects a Security-owned reducer primitive or new shared EvidenceReducer library under current cross-domain pressure."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ec0-shared-reducer-not-earned",
+      "value": [
+        "NEGATIVE_ADMISSION"
+      ]
+    },
+    {
+      "predicate": "STANDING:ACCEPTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ec1-exact-dependency-currentness-accepted",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ec1-exact-dependency-currentness-accepted",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ec1-exact-dependency-currentness-accepted",
+      "value": "EC1 separates derivation integrity from applicability and supports exact dependency comparison for the tested consumer without TTL, clocks, generation freshness, or a generic freshness service."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ec1-exact-dependency-currentness-accepted",
+      "value": [
+        "CURRENTNESS"
+      ]
+    },
+    {
+      "predicate": "STANDING:FALSIFIED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac0-cheap-talk-sufficient-credibility-falsified",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac0-cheap-talk-sufficient-credibility-falsified",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac0-cheap-talk-sufficient-credibility-falsified",
+      "value": "AC0 rejects one-shot cheap-talk message projection as sufficient strategic credibility for zero-regret coordination."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac0-cheap-talk-sufficient-credibility-falsified",
+      "value": [
+        "NEGATIVE_RESULT"
+      ]
+    },
+    {
+      "predicate": "STANDING:FALSIFIED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac1-aligned-incentives-sufficient-credibility-falsified",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac1-aligned-incentives-sufficient-credibility-falsified",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac1-aligned-incentives-sufficient-credibility-falsified",
+      "value": "AC1 rejects public common knowledge of aligned payoff as sufficient credibility in the tested one-shot communication consumer."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac1-aligned-incentives-sufficient-credibility-falsified",
+      "value": [
+        "NEGATIVE_RESULT"
+      ]
+    },
+    {
+      "predicate": "STANDING:FALSIFIED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac2-epistemic-resolution-intent-convergence-falsified",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac2-epistemic-resolution-intent-convergence-falsified",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac2-epistemic-resolution-intent-convergence-falsified",
+      "value": "AC2 shows authoritative disclosure can resolve epistemic ambiguity while Tool-authoritative effect intent may still contradict final reasoning."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ac2-epistemic-resolution-intent-convergence-falsified",
+      "value": [
+        "NEGATIVE_RESULT"
+      ]
+    },
+    {
+      "predicate": "STANDING:ACCEPTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:if2-deliberation-before-authority-supported",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:if2-deliberation-before-authority-supported",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:if2-deliberation-before-authority-supported",
+      "value": "IF2 supports deliberation before consequence authority on the scoped AC2 mismatch consumer."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:if2-deliberation-before-authority-supported",
+      "value": [
+        "COGNITION_AUTHORITY_BOUNDARY"
+      ]
+    },
+    {
+      "predicate": "STANDING:ACCEPTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:if3-extra-intent-ceremony-not-required",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:if3-extra-intent-ceremony-not-required",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:if3-extra-intent-ceremony-not-required",
+      "value": "IF3 preserves the scoped IF2 success after removing IF1 readback/finalization Tools; ordinary AF2 revision semantics remain sufficient after prior deliberation in that consumer."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:if3-extra-intent-ceremony-not-required",
+      "value": [
+        "SUBTRACTION"
+      ]
+    },
+    {
+      "predicate": "STANDING:NOT_ADMITTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ca7-campaign-organization-not-admitted",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ca7-campaign-organization-not-admitted",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ca7-campaign-organization-not-admitted",
+      "value": "CA7 records that current evidence does not admit Campaign, Organization, persistent OpponentModel, coevolution infrastructure, or a cross-fidelity strategic law."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ca7-campaign-organization-not-admitted",
+      "value": [
+        "NEGATIVE_ADMISSION"
+      ]
+    },
+    {
+      "predicate": "STANDING:ACCEPTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ordinary-consumption-r1-accepted",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ordinary-consumption-r1-accepted",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ordinary-consumption-r1-accepted",
+      "value": "Ordinary Security Consumption R1 accepts a thin ordinary task view, ResearchCorpus pre-analysis memory, and a bounded Blue response path while rejecting several larger workflow/infrastructure expansions."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ordinary-consumption-r1-accepted",
+      "value": [
+        "CONSUMPTION"
+      ]
+    },
+    {
+      "predicate": "STANDING:HISTORICAL_VALID",
+      "scope": "RESULT",
+      "subjectRef": "result:security:w5b-historical-current-relevant",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:w5b-historical-current-relevant",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:w5b-historical-current-relevant",
+      "value": "W5-B retains exact 2026-08-09 bounded physical acceptance as HISTORICAL_VALID + CURRENT_RELEVANT + NOT_REEXECUTED_20260827; it is not a fresh physical proof or production Embodiment/Presence contract."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:w5b-historical-current-relevant",
+      "value": [
+        "HISTORY"
+      ]
+    },
+    {
+      "predicate": "STANDING:NOT_CLAIMED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:whole-domain-exhaustive-not-claimed",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:whole-domain-exhaustive-not-claimed",
+      "value": "UNDERDETERMINED"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:whole-domain-exhaustive-not-claimed",
+      "value": "Security remains an open research system with explicit future adversarial pressures; current local coherence and accepted programs do not establish exhaustive completion of the whole domain."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:whole-domain-exhaustive-not-claimed",
+      "value": [
+        "CLOSURE"
+      ]
+    },
+    {
+      "predicate": "STANDING:FALSIFIED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace0-direct-representation-poison-sufficient-falsified",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace0-direct-representation-poison-sufficient-falsified",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace0-direct-representation-poison-sufficient-falsified",
+      "value": "ACE0 ran two real DeepSeek/Harness replicates across clean, Tool-output-poison, Tool-description-poison and combined-poison treatments with fixed authority, fixed independent healthy world truth and suppressed effect execution. All eight decisions requested zero reset effects; the result falsifies only direct representation poison as sufficient in this explicitly scaffolded consumer and does not establish general prompt-injection robustness."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace0-direct-representation-poison-sufficient-falsified",
+      "value": [
+        "NEGATIVE_RESULT",
+        "ADVERSARIAL_REPRESENTATION"
+      ]
+    },
+    {
+      "predicate": "STANDING:CURRENT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ordinary-mechanical-preflight-current",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ordinary-mechanical-preflight-current",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ordinary-mechanical-preflight-current",
+      "value": "Ordinary Security R2 now performs owner-local read-only mechanical preflight before model-facing disclosure. Exact record inspection is withdrawn until a current recordId is selected, missing owner sources withdraw dependent operations, and the output is intended for Tool-schema filtering without semantic routing or authority grants."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ordinary-mechanical-preflight-current",
+      "value": [
+        "CONSUMPTION",
+        "CAPABILITY_EXPOSURE"
+      ]
+    },
+    {
+      "predicate": "STANDING:ACCEPTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace4-capability-consequence-misrepresentation-established",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace4-capability-consequence-misrepresentation-established",
+      "value": "ESTABLISHED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace4-capability-consequence-misrepresentation-established",
+      "value": "ACE4 holds Actor, objective, world, RangeAuthority, capability/effect identity, implementation identity and actual disruptive restart consequence fixed. Truthful consequence semantics yield 0/2 positive intents; misleading read-only semantics yield 2/2 positive intents and 2/2 ordinary Range authority admissions with effect execution suppressed."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace4-capability-consequence-misrepresentation-established",
+      "value": [
+        "ADVERSARIAL_REPRESENTATION",
+        "CONSEQUENCE_SELECTION"
+      ]
+    },
+    {
+      "predicate": "STANDING:ACCEPTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace10-deterministic-consequence-reduction-accepted",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace10-deterministic-consequence-reduction-accepted",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace10-deterministic-consequence-reduction-accepted",
+      "value": "ACE10 mechanically withdraws source prose already declared non-authoritative and compares raw structured consequence against an exact deterministic consequence-derived consumer summary. In the 6+6 stability treatment, structured-only yields 3/6 wrong final positive intents while deterministic summary yields 0/6; one Provider UNKNOWN is retained as non-decision and replaced by a new trial."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace10-deterministic-consequence-reduction-accepted",
+      "value": [
+        "DETERMINISTIC_REDUCTION",
+        "MODEL_FACING_PROJECTION"
+      ]
+    },
+    {
+      "predicate": "STANDING:ACCEPTED",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace11-current-effect-binding-same-surface-admission-accepted",
+      "value": true
+    },
+    {
+      "predicate": "EPISTEMIC_VERDICT",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace11-current-effect-binding-same-surface-admission-accepted",
+      "value": "SUPPORTED_IN_SCOPE"
+    },
+    {
+      "predicate": "EVIDENCE_SCOPE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace11-current-effect-binding-same-surface-admission-accepted",
+      "value": "ACE11 advances the current effect implementation/consequence beyond an internally coherent stale source. Exact implementation identity plus consequence-digest mismatch classifies the source STALE_NOT_APPLICABLE and withdraws it before model exposure. Unchecked stale source yields 4/4 model positives and 4/4 Range admissions; the bound treatment yields 3/4 model-invented positives rejected against the same current interface surface and 0/4 Range admissions, with the fourth decision zero-effect."
+    },
+    {
+      "predicate": "STRUCTURAL_ROLE",
+      "scope": "RESULT",
+      "subjectRef": "result:security:ace11-current-effect-binding-same-surface-admission-accepted",
+      "value": [
+        "CURRENTNESS",
+        "CAPABILITY_EXPOSURE",
+        "ADMISSION"
+      ]
+    }
+  ]
+}
