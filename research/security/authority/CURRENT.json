@@ -3,6 +3,6 @@
   "kind": "ordivon.research-owner-current",
   "authorityRef": "authority:ordivon:research-owner:security",
   "ownerResearchRef": "research-owner:security",
-  "currentAuthorityVersionRef": "sha256:a9005e42044173a8d4a61ccde2a21f4d1f73d4c84ccbc706609be50944292825",
-  "publication": "authority/publications/a9005e42044173a8d4a61ccde2a21f4d1f73d4c84ccbc706609be50944292825.json"
+  "currentAuthorityVersionRef": "sha256:713082bd577faa52aabc2da0f73d1370a6ec2729da990e420649a4ff201eeb28",
+  "publication": "authority/publications/713082bd577faa52aabc2da0f73d1370a6ec2729da990e420649a4ff201eeb28.json"
 }
