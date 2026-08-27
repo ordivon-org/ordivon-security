@@ -1,0 +1,556 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.security.research-owner-source-manifest",
+  "authorityRef": "authority:ordivon:research-owner:security",
+  "ownerResearchRef": "research-owner:security",
+  "state": "CURRENT_OWNER_AUTHORITY_INVENTORY",
+  "sourceBase": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+  "inventory": {
+    "canonicalDocs": 71,
+    "activeCanonicalDocs": 65,
+    "acceptedCanonicalDocs": 6,
+    "exactAnchors": 75
+  },
+  "anchors": [
+    {
+      "role": "OWNER_ENTRY",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "README.md",
+      "bytes": 17741,
+      "sha256": "sha256:491b268ba87887d3ddd376fa9e2b755667919ca7f82bdfa73850f48b8c46412e"
+    },
+    {
+      "role": "OWNER_CHARTER",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "CHARTER.md",
+      "bytes": 9185,
+      "sha256": "sha256:d642d3b472a76c82972017d40f6189cea7d57e806af59144d69c203467fab65f"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/ADVERSARIAL-EPISTEMICS-AE0.md",
+      "bytes": 9679,
+      "sha256": "sha256:d8392014cebb7477fe5d697d2e49db0d5cff1c3d1ea359ee5e97e4882807d1fd"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/ADVERSARIAL-EPISTEMICS-AE1.md",
+      "bytes": 12544,
+      "sha256": "sha256:81d860af18517815599c59ab8d20ae3eb71393a18941961e215209315b8e2876"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/ADVERSARIAL-EPISTEMICS-AE2.md",
+      "bytes": 12003,
+      "sha256": "sha256:b74e0c27c21ab71c8f555777f94c98f4352c95a5bb614a4c1151394ee8e24b75"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/ADVERSARIAL-EPISTEMICS-AE3.md",
+      "bytes": 9388,
+      "sha256": "sha256:8039a6fc761c3a60fae7fed17bdbd112d652239f8e11d107590f0a4325432288"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/ADVERSARIAL-EPISTEMICS-AE3B.md",
+      "bytes": 10294,
+      "sha256": "sha256:b60174e53f677e4bfbc96df8920c0d01e97634404416fb1877cd1fc88eaf7080"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/ADVERSARIAL-EPISTEMICS-AE3C.md",
+      "bytes": 9338,
+      "sha256": "sha256:c6eb718218decaad3c1a178e08a8e0d1e9968c33207e155d6e9cd8f20d151f96"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/AGENT-EXPERIMENT-P0.md",
+      "bytes": 22119,
+      "sha256": "sha256:746fd20485e479243ff61b464678ad37dad4f62c4500066e6843ced18e73a1f3"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/AGENT-FIRST-DECEPTION-AF3.md",
+      "bytes": 7630,
+      "sha256": "sha256:7ef62b97e7a1aca2f2a68605a27c9abd9975a63b88ff3579e14b28a9158963b5"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/AGENT-FIRST-INTENT-AF2.md",
+      "bytes": 8093,
+      "sha256": "sha256:36bf05443acd668afa279b63b1eb3d321436e2b917c0e41ad9c7a541fc5b3a09"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/AGENT-FIRST-STRUCTURE-AF1.md",
+      "bytes": 3314,
+      "sha256": "sha256:7028f7b063532c6ae933550594f5b86da7121e5673b4cf6fe00d84fa6da65ac5"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/AUTHORITY-LIFECYCLE-ENGINEERING.md",
+      "bytes": 7363,
+      "sha256": "sha256:1a421fd87f24a798415574b26d523e1e6ee36d024fd21531eeee91bfbc4de570"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/AUTONOMOUS-COMMUNICATION-AC0.md",
+      "bytes": 8545,
+      "sha256": "sha256:c690300fab08080bb8533a4c5470e6fd21a4e50de02b23e773256c28b3955666"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/AUTONOMOUS-INTENT-C1A.md",
+      "bytes": 8783,
+      "sha256": "sha256:e885f500eb8c843c18e9d639930aa5e198aaa8f99278c1a799a7a4f733cc30e8"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/CAMPAIGN-ORGANIZATION-GATE-CA7.md",
+      "bytes": 7371,
+      "sha256": "sha256:f7e230ccbba77c0362701e459993ca6992ee37556fa54a09c7b72016e22e6e79"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/CASE-SNAPSHOT-P0.md",
+      "bytes": 8579,
+      "sha256": "sha256:39a22db07d34afcd1cf900275413991ab6300f4d1d6b45d0d92e050394711bbd"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/CLASSICAL-CAPABILITY-BASIS-CA0.md",
+      "bytes": 32308,
+      "sha256": "sha256:6ce87b1129d2b16a8c09f135a54fc12013513aa8b7b4ba5fba575b5bbbf49be2"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/CLASSICAL-EXECUTION-CARRIERS-CA1.md",
+      "bytes": 16377,
+      "sha256": "sha256:601eb524036c71570f45b64fb55de66c416a436399f0f7be80c20e323a441569"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/CLIENT-AUTHORITY-ENTITLEMENT-CA-LIC-R1.md",
+      "bytes": 9485,
+      "sha256": "sha256:15c7d235b42ae230466ce66bf7702482f77823e27dec40877ec37b441f0ac1e3"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/CLIENT-AUTHORITY-ENTITLEMENT-CA-LIC.md",
+      "bytes": 9025,
+      "sha256": "sha256:1b661b5ef036811aa8deae10a1150ee9e8a607b3d3a679524e7165fe8d66c752"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/COMPENSATION-C1L.md",
+      "bytes": 8407,
+      "sha256": "sha256:cf02ce758427f2ea75d8bb497f2935628cb17276e1e4198961d9f893c67780a4"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/COMPENSATION-INFORMATION-LOSS-C1M.md",
+      "bytes": 9244,
+      "sha256": "sha256:26682e460186ddd71135b503d4ab4cd1c00d988377f7c0d931bad706403c394c"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/DEFENSIVE-OBSERVATION-RESPONSE-CA4.md",
+      "bytes": 4918,
+      "sha256": "sha256:6fa5b0a8e5b7f83b9f8c0a72931d0318f9c06c063f424d70cf6af6ad389c7782"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/DOWNSTREAM-TRUTH-FAILURE-C1N.md",
+      "bytes": 6947,
+      "sha256": "sha256:5a4e43913b41998a9bc1a79f82bc9b755ce4fc86468631b5def0ee464994e565"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/EVALUATION-TRIAL-P0.md",
+      "bytes": 11134,
+      "sha256": "sha256:c3a73b80e841bfe1dedee1f651b7094cefb055da51054ef2da85f3841ea585c4"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/EVIDENCE-COMPUTATION-EC0.md",
+      "bytes": 14318,
+      "sha256": "sha256:358f57d71e70f62a14b23dfe13ddd44fb4cee9a5663262ad04b387e85e2bde86"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/EVIDENCE-FRESHNESS-EC1.md",
+      "bytes": 12804,
+      "sha256": "sha256:03349b5533df8f3ad7639ac82981d825a3293b4eba40f041785e77f077d8126b"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/EXECUTABLE-AUTHORITY-C1.md",
+      "bytes": 7428,
+      "sha256": "sha256:a058d400aa3c66fe4951c16c385c3bdea12633ccb9aaedff53a6562dad9b17d0"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/FRESH-CONTROLLER-CONTINUATION-C1D.md",
+      "bytes": 9197,
+      "sha256": "sha256:09b77c5d2f8c179872fa08a98b4aab51cd43fc036ad5c306f1e6babbaa989cbe"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/INCENTIVE-COMMUNICATION-AC1.md",
+      "bytes": 6794,
+      "sha256": "sha256:e703bf8d37ec55edc125a02f4147c4b673a85f2f410046b6e75f642dd170114b"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/INFORMATION-LOSS-C1I.md",
+      "bytes": 10563,
+      "sha256": "sha256:e51a9511bf961683d3887bdb371ed3867c07bd2fb8b096216b8aae909c62aaa7"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/INTENT-CEREMONY-ABLATION-IF3.md",
+      "bytes": 6990,
+      "sha256": "sha256:dbd81adfc2321877e09e9f39925955d877cd6db7969ef5710ae06e109b777ae7"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/INTENT-CONVERGENCE-IF0-IF2.md",
+      "bytes": 10272,
+      "sha256": "sha256:7657977892ae90f91363e7d06c2da85a049687265327768ff9f689c1ea5f7f5f"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/INTERRUPTED-CONSEQUENCE-C1B.md",
+      "bytes": 10938,
+      "sha256": "sha256:9eef0b1fa610f06a4859d7c0c174d041cfe8ea4cff3414d47ffd1d9f002a0b2d"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/INTRINSIC-IDEMPOTENCY-C1K.md",
+      "bytes": 7370,
+      "sha256": "sha256:14f2fcd0f79bf752f7f3ba2969ebef48b96224b900919b09b5005dde8020fd60"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/ISOLATED-FABRIC-S5.md",
+      "bytes": 10145,
+      "sha256": "sha256:14146dd3091955916b82298b216a2ba7a3bd76d71ca736a36de08e6fad3f9297"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/LAW-PROFILES-C0.md",
+      "bytes": 17871,
+      "sha256": "sha256:1ceacfe92cfc6e132d90ccd1019cf850bb4eefd0b84ae77e978a539aeb67c20d"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/MID-SUCCESSOR-RECOVERY-C1G.md",
+      "bytes": 9623,
+      "sha256": "sha256:a8b199ad2161b8ceb20355a9188dc158fd967bc36eb51dcd4107e3cae769d385"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/MIGRATION-ROUND-1.md",
+      "bytes": 3415,
+      "sha256": "sha256:cff174a368ab8b379e5bb999842c45551f574a20a7cc4010596a46cf4473e340"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/MIGRATION-ROUND-2.md",
+      "bytes": 5135,
+      "sha256": "sha256:434824e38dcfaae6adb5c68c8fd8c7a3be3af3c7ea0ff4b48c8457806848d78e"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/MIGRATION-ROUND-3-P0.md",
+      "bytes": 5270,
+      "sha256": "sha256:d0decc2c4b123826074c17332c09443a6920da00dbe5f56b6b755a40b3962e7f"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/MULTIPLE-SUCCESSORS-C1F.md",
+      "bytes": 11158,
+      "sha256": "sha256:9ef6c1520a2955197df1164a6f0295c137b167021237019e5d531e458997d94c"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/ORDINARY-SECURITY-CONSUMPTION-R1.md",
+      "bytes": 9364,
+      "sha256": "sha256:0807ed9b6f9d37f26276cd86932e05c3e345990128b20cc3d2fe81139f1a1783"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/OUT-OF-BAND-TRUTH-S4.md",
+      "bytes": 5773,
+      "sha256": "sha256:ed27a73c2b469cc40194b647026ae7f904616331f9908d2277e6037e05fcc788"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/PARTIAL-MATERIALIZATION-C1C.md",
+      "bytes": 11253,
+      "sha256": "sha256:399732bcd76cdba54c530c88ddef077e7337919a17ec77f1627918cb44090bba"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/PERSISTENT-RANGE-RECOVERY-S6R.md",
+      "bytes": 12292,
+      "sha256": "sha256:26163ff0fa84f85ca54a2ad4b6422cb54a3d535480133471c7efc935860298d5"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/POST-CA-O1-CARRIER-OBSERVABILITY.md",
+      "bytes": 4803,
+      "sha256": "sha256:420e1753d11f4e003397ac52b7a3e8906e5f398e1402111a947f1a978fbd3fae"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/POST-CA-P1-PHYSICAL-ADAPTATION.md",
+      "bytes": 7627,
+      "sha256": "sha256:a452fb58f40a4b495a05a9b14c223023f8bd882e0759472a13a8be0b7a269f81"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/POST-COMPROMISE-STATE-CA3.md",
+      "bytes": 5654,
+      "sha256": "sha256:f1792408beabd07ba3e16759167bad0ba0d8fc4c9d844ca01db24792b173e8c8"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/PROVIDER-ASSIMILATION-CA5.md",
+      "bytes": 5172,
+      "sha256": "sha256:4ca6e391ed37ab149e08e374519f4720e99ed305f174bcbd7b0955ab7aa3ad03"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/RANGE-SESSION-S0.md",
+      "bytes": 3762,
+      "sha256": "sha256:1d87a554ad8ac14a89337405c455c4abd91c32856df43523cb6329cfe22a6d71"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/RECIPIENT-COMMIT-GAP-C1J.md",
+      "bytes": 7868,
+      "sha256": "sha256:9ff60e4a95363b670313b08308907c9084a4f454863fa277dc8498ff9cd1c6ad"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/RESEARCH-CORPUS-K1-CURRENTNESS.md",
+      "bytes": 4611,
+      "sha256": "sha256:8edd615892fd9d565ccc91fdaba823e536bfeeb1060c41672e373a93ea666136"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/RESEARCH-CORPUS-P0.md",
+      "bytes": 10693,
+      "sha256": "sha256:98b8ae073e646f94a39471af29f83ba8fade277138d90c266f489aef9839075e"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/SACRIFICIAL-NODE-S3.md",
+      "bytes": 5618,
+      "sha256": "sha256:601e21bdb1cc1e8c3ac6f609478da0cd4093f917e2d23196bfb4c3acc19c7b33"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/STATIC-EVALUATION-P0.md",
+      "bytes": 9556,
+      "sha256": "sha256:dc5ba80900dda6ff13c3237077ffca9568c5da9321c39cc4cb4fe9631bc5133b"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/SUCCESSOR-OWNERSHIP-C1E.md",
+      "bytes": 10681,
+      "sha256": "sha256:c10256ccea351e6e24fbc6bbfb36b329458475addc0309b5fc10ad03c03e1a7d"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/SYNCHRONOUS-CONTEST-S1.md",
+      "bytes": 3686,
+      "sha256": "sha256:7d2faa517403bfdc78a67c3bc341fe6818ee3c4efea232cc302a008fc8145e59"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/TACTICAL-ADAPTATION-CA6.md",
+      "bytes": 8594,
+      "sha256": "sha256:66e8fd6ef03c5873e021cdd071a8ce4207e6550f52bde2b6f6e1b3fbad221698"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/TOPOLOGY-CHURN-S6.md",
+      "bytes": 9739,
+      "sha256": "sha256:5a0c94305a27f3bc3bc5104c65d478d328c057984e489ec9bff07b55081cf53a"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/UNPUBLISHED-COMPLETION-C1H.md",
+      "bytes": 10547,
+      "sha256": "sha256:42d9a9625c077d3b5b655a512d3dd82512e9ef07245648efb40b2d0bf3bc060e"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/VERIFIABLE-DISCLOSURE-AC2.md",
+      "bytes": 10761,
+      "sha256": "sha256:813a7cb2f3970501d4e4a10e53063472488805318948dda9e9a3ad8d080c0d2a"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/VULNERABILITY-EVIDENCE-CA2.md",
+      "bytes": 13250,
+      "sha256": "sha256:103269c5f34c59c8485044dce2a992cf79d712cd31299efc4b49f5c1d65b0bf3"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/WINDOWS-KVM-INSTALLER-P1.md",
+      "bytes": 36820,
+      "sha256": "sha256:54b23bfa1213fdc0902a24e82979c5e732a1f4f6389d6162dd29a10db687b26b"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/WINDOWS-KVM-P0.md",
+      "bytes": 12399,
+      "sha256": "sha256:29f574496867278bc7211afec050ffc5f079642f8adb1ab33fd34ae3de7ab136"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/WINDOWS-KVM-RECOVERY-P0.1.md",
+      "bytes": 2590,
+      "sha256": "sha256:a09cf2b4b57f632268e9b8077e2a14dd0a69efaea64302a5207ae7ad0b2f3ab0"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/WINDOWS-KVM-SUBSTRATE-S2.md",
+      "bytes": 4436,
+      "sha256": "sha256:b18503e4d54bcb8398d9c4800747b6efc1358cd3d80b0730bc83fc2f12c4cb8e"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/WORLD-ENTITY-MIGRATION-RECOVERY.md",
+      "bytes": 16777,
+      "sha256": "sha256:fd9bd67f4e158ea5551fa89e671b4f955aab18f06ad33cd516df55630d97d016"
+    },
+    {
+      "role": "CANONICAL_OWNER_DOCUMENT",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/architecture.md",
+      "bytes": 16463,
+      "sha256": "sha256:9c7bac69107b243f4f2766e49774d8f742e8bd81b49d6bbac53ebace8ab39f7b"
+    },
+    {
+      "role": "CURRENT_AUTHORITY_MAP",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/authority.md",
+      "bytes": 23906,
+      "sha256": "sha256:bdd981b4cbc8bab226d1d6b1ee229428672d809caa121bd872c6efafb7321e97"
+    },
+    {
+      "role": "RESEARCH_PROGRAM",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/research-agenda.md",
+      "bytes": 57785,
+      "sha256": "sha256:848b3b0ae73d544b4abbcea447f6f21373da6ab9258ff49e983c59fff8277d1b"
+    },
+    {
+      "role": "SOVEREIGNTY_BOUNDARY",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "docs/research-boundary.md",
+      "bytes": 5135,
+      "sha256": "sha256:d224be301418334c6c33d899e774a59963857cb34ff0a1dc13c4c30700a78b75"
+    },
+    {
+      "role": "W5B_CURRENTNESS",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "research/w5b/README.md",
+      "bytes": 3163,
+      "sha256": "sha256:0bc2a3bcdaac5a80f6e65ef354ef5438721310840adef12a6ea2fba8dcf81a0d"
+    },
+    {
+      "role": "W5B_CURRENTNESS",
+      "revision": "07a900b6ded12ddc14162aa72351fc610ae0e1c0",
+      "path": "research/w5b/CURRENTNESS-REBIND-20260827.json",
+      "bytes": 3064,
+      "sha256": "sha256:a5fe9a2bbdef5ac61e47a5804c03ba1905e8bb0d4752310a2d07ae744fe37cda"
+    }
+  ],
+  "sourceTopology": {
+    "repository": "/root/projects/ordivon-security",
+    "canonicalRef": "refs/heads/main",
+    "configuredGitRemotes": [
+      "git@github.com:zycxfyh/ordivon-security.git"
+    ],
+    "truthRole": "SOURCE_TOPOLOGY_ONLY",
+    "consumerCurrentnessRule": "Consumers must independently establish exact currentness. Remote existence, repository recency, and publication projection do not create Security semantic authority."
+  },
+  "laws": [
+    "CANONICALITY != ACTIVE_LIFECYCLE",
+    "ACCEPTED_CANONICAL_HISTORY != ACTIVE_SURFACE",
+    "PUBLICATION_PROJECTION != SECOND_AUTHORITY_MAP",
+    "CONSUMER_CURRENTNESS != OWNER_SEMANTIC_AUTHORITY"
+  ]
+}

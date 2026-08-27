@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "kind": "ordivon.research-owner-current",
+  "authorityRef": "authority:ordivon:research-owner:security",
+  "ownerResearchRef": "research-owner:security",
+  "currentAuthorityVersionRef": "sha256:a9005e42044173a8d4a61ccde2a21f4d1f73d4c84ccbc706609be50944292825",
+  "publication": "authority/publications/a9005e42044173a8d4a61ccde2a21f4d1f73d4c84ccbc706609be50944292825.json"
+}
