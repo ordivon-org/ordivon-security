@@ -42,25 +42,32 @@ _VARIANT_IDS = (
 )
 
 
-def _source_fence(*, require_clean: bool) -> JsonObject:
-    root = Path(__file__).resolve().parents[2]
+def _git_source_fence(*, path: Path, repository: str, require_clean: bool) -> JsonObject:
     revision = subprocess.run(
-        ["git", "-C", str(root), "rev-parse", "HEAD"],
+        ["git", "-C", str(path), "rev-parse", "HEAD"],
         check=True, capture_output=True, text=True, timeout=30,
     ).stdout.strip()
     dirty = subprocess.run(
-        ["git", "-C", str(root), "status", "--porcelain", "--untracked-files=no"],
+        ["git", "-C", str(path), "status", "--porcelain", "--untracked-files=no"],
         check=True, capture_output=True, text=True, timeout=30,
     ).stdout.strip()
     if dirty and require_clean:
-        raise RuntimeError("P1 capability-surface acceptance requires a clean tracked source tree")
+        raise RuntimeError(f"P1 capability-surface acceptance requires clean tracked source: {repository}")
     value: JsonObject = {
-        "repository": "ordivon-security",
+        "repository": repository,
         "revision": revision,
         "trackedSourceCleanAtStart": not bool(dirty),
     }
     validate_json(value)
     return value
+
+
+def _source_fence(*, require_clean: bool) -> JsonObject:
+    return _git_source_fence(
+        path=Path(__file__).resolve().parents[2],
+        repository="ordivon-security",
+        require_clean=require_clean,
+    )
 
 
 def _interface_map() -> dict[str, RangeEffectInterface]:
@@ -471,6 +478,14 @@ def run_experiment(
             "real-provider intents without using hidden world truth?"
         ),
         "sourceFence": _source_fence(require_clean=require_clean_source),
+        "externalSourceFences": {
+            "harness": _git_source_fence(
+                path=config.harness_source, repository="ordivon-harness", require_clean=True
+            ),
+            "computingProtocol": _git_source_fence(
+                path=config.protocol_repository, repository="ordivon-computing", require_clean=True
+            ),
+        },
         "controls": {
             "samePhysicalWorldImplementations": True,
             "sameProviders": True,
