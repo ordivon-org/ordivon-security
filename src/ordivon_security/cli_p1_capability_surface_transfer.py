@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 from pathlib import Path
 from typing import cast
 
@@ -39,6 +40,27 @@ _VARIANT_IDS = (
     "script-current-credential-revoked",
     "stale-credential-counterplay",
 )
+
+
+def _source_fence(*, require_clean: bool) -> JsonObject:
+    root = Path(__file__).resolve().parents[2]
+    revision = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "HEAD"],
+        check=True, capture_output=True, text=True, timeout=30,
+    ).stdout.strip()
+    dirty = subprocess.run(
+        ["git", "-C", str(root), "status", "--porcelain", "--untracked-files=no"],
+        check=True, capture_output=True, text=True, timeout=30,
+    ).stdout.strip()
+    if dirty and require_clean:
+        raise RuntimeError("P1 capability-surface acceptance requires a clean tracked source tree")
+    value: JsonObject = {
+        "repository": "ordivon-security",
+        "revision": revision,
+        "trackedSourceCleanAtStart": not bool(dirty),
+    }
+    validate_json(value)
+    return value
 
 
 def _interface_map() -> dict[str, RangeEffectInterface]:
@@ -338,7 +360,7 @@ def _fault_injection_case(*, variant_id: str, requested_action: str) -> JsonObje
     return result
 
 
-def run_fault_injection() -> JsonObject:
+def run_fault_injection(*, require_clean_source: bool = False) -> JsonObject:
     cases = [
         _fault_injection_case(
             variant_id="all-control-unknown", requested_action="control.script"
@@ -354,6 +376,7 @@ def run_fault_injection() -> JsonObject:
     result: JsonObject = {
         "schemaVersion": 1,
         "kind": "ordivon.security.p1-capability-surface-fault-injection",
+        "sourceFence": _source_fence(require_clean=require_clean_source),
         "cases": cases,
         "gates": {
             "rawUnknownIntentAcceptedAndProviderAttempted": (
@@ -398,7 +421,9 @@ def run_fault_injection() -> JsonObject:
     return result
 
 
-def run_experiment(*, config: DeepSeekRangeIntentConfig, replicates: int) -> JsonObject:
+def run_experiment(
+    *, config: DeepSeekRangeIntentConfig, replicates: int, require_clean_source: bool = True
+) -> JsonObject:
     if not 1 <= replicates <= 4:
         raise ValueError("P1 surface transfer replicates must be between 1 and 4")
     episodes: list[JsonObject] = []
@@ -445,7 +470,7 @@ def run_experiment(*, config: DeepSeekRangeIntentConfig, replicates: int) -> Jso
             "interface set, then validating returned intent against that same set, reduce unjustified "
             "real-provider intents without using hidden world truth?"
         ),
-        "sourceRevision": "fad10c78d18a81fd2bd350f3fc71b04eb3cc3673",
+        "sourceFence": _source_fence(require_clean=require_clean_source),
         "controls": {
             "samePhysicalWorldImplementations": True,
             "sameProviders": True,
@@ -464,7 +489,7 @@ def run_experiment(*, config: DeepSeekRangeIntentConfig, replicates: int) -> Jso
         "replicatesPerTreatmentVariant": replicates,
         "variants": list(_VARIANT_IDS),
         "episodes": episodes,
-        "faultInjection": run_fault_injection(),
+        "faultInjection": run_fault_injection(require_clean_source=require_clean_source),
         "summary": {
             "rawEpisodeCount": len(raw),
             "compiledEpisodeCount": len(compiled),
