@@ -19,6 +19,31 @@ from ordivon_security.world_boundary import (
 
 
 class SecuritySurfaceTests(unittest.TestCase):
+    def test_package_root_stays_narrow_after_mixed_api_facade_retirement(self) -> None:
+        expected = {
+            "AdversarialWindowsRange",
+            "ContestResult",
+            "ContestRunner",
+            "EvaluationResult",
+            "EvaluationRunner",
+            "EvaluationSpec",
+            "RangeAuthority",
+            "RangeEvent",
+            "RangeSession",
+            "RangeSessionSpec",
+            "ResearchCorpus",
+            "SacrificialWindowsRangeConfig",
+            "ScenarioManifest",
+            "WindowsKvmMachineConfig",
+            "WindowsKvmMachineProvider",
+            "security_ordinary_capability_preflight",
+            "security_ordinary_surface_manifest",
+            "security_surface_manifest",
+        }
+        self.assertEqual(set(ordivon_security.__all__), expected)
+        for name in expected:
+            self.assertIsNotNone(getattr(ordivon_security, name))
+
     def test_manifest_exposes_distinct_maturity_tiers(self) -> None:
         value = ordivon_security.security_surface_manifest()
         tiers = {entry["tier"] for entry in value["entries"]}
@@ -26,7 +51,7 @@ class SecuritySurfaceTests(unittest.TestCase):
             tiers,
             {"constitution", "profile", "integration", "research-apparatus"},
         )
-        self.assertEqual(value["compatibilityFacade"]["maturity"], "mixed")
+        self.assertNotIn("compatibilityFacade", value)
         names = {entry["name"] for entry in value["entries"]}
         self.assertIn("ResearchCorpus", names)
         self.assertIn("CA-LIC entitlement authority research", names)

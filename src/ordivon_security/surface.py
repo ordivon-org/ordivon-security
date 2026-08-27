@@ -277,11 +277,6 @@ def security_surface_manifest() -> JsonObject:
     value: JsonObject = {
         "schemaVersion": 1,
         "kind": "ordivon.security.agent-first-surface",
-        "compatibilityFacade": {
-            "module": "ordivon_security.api",
-            "maturity": "mixed",
-            "rule": "Presence in the compatibility facade does not imply constitutional or stable status.",
-        },
         "entries": [entry.to_dict() for entry in _SURFACE],
         "rules": [
             "Profiles do not become constitutional law merely because they are accepted.",

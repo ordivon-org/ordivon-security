@@ -31,7 +31,7 @@ Security code and experiments are interpreted through four tiers:
 3. **integration** — bindings to Host, Runtime, Harness, World destination interfaces or other repositories whose state machines remain foreign authority;
 4. **research apparatus** — acceptance runners, fault injectors, canaries and Case-specific probes whose evidence may be durable while their orchestration API is not.
 
-`ordivon_security.security_surface_manifest()` is the machine-readable projection of this classification. `ordivon_security.api` remains a compatibility facade with mixed maturity; presence there is not a stability or constitutional claim.
+`ordivon_security.security_surface_manifest()` is the machine-readable projection of this classification. AF1 originally retained `ordivon_security.api` as a mixed-maturity compatibility facade. A later Existence Gauntlet 2.0 pass found no external production consumer and retired that broad intermediary while preserving the narrower package-root exports through direct owner-module bindings; the full maturity-classified surface remains available through `security_surface_manifest()`.
 
 ## Boundary correction
 
