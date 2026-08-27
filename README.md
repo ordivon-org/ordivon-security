@@ -232,3 +232,8 @@ Research phase identifiers preserve provenance. They are not prerequisites for u
 Security permits strong autonomous experimentation **because** the experiment owns its sovereignty, truth, consequence, and recovery boundaries. It does not make unrelated systems legitimate targets, and it does not make a safer profile into a universal ban on stronger authorized worlds.
 
 The goal is not to keep Agents weak. It is to make stronger adversarial Agents experimentally legible: what they knew, what they wanted, what they were allowed to do, what physically happened, what the world became, and which uncertainty still remains.
+
+
+## Owner environment
+
+Use `scripts/owner-environment test`; use `cold-start` for fresh-environment proof and the explicit `*-cage` modes for the optional CAGE dependency profile.

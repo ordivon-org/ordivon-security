@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+mode=${1:-}
+uv_bin=${UV_BIN:-$(command -v uv || true)}
+env_dir=${ORDIVON_OWNER_ENV_DIR:-"$repo/.venv"}
+python_bin="$env_dir/bin/python"
+
+usage() {
+  cat <<'TXT'
+usage: scripts/owner-environment bootstrap|doctor|test|cold-start|bootstrap-cage|doctor-cage|test-cage
+
+bootstrap       materialize the locked default Security test/dev profile
+doctor          verify the default profile without repairing it
+test            bootstrap, doctor, lint, and run the default unit suite
+cold-start      prove the default suite from a fresh temporary environment
+bootstrap-cage  additionally materialize the optional CAGE dependency profile
+doctor-cage     verify the optional CAGE packages are present at locked versions
+test-cage       run the default suite with the CAGE package profile materialized
+
+The external CAGE 4 source checkout remains owned by scripts/bootstrap_cage4.sh.
+TXT
+}
+require_uv() { [[ -n "$uv_bin" ]] || { echo 'Security owner environment requires uv' >&2; exit 1; }; }
+bootstrap() {
+  require_uv
+  UV_PROJECT_ENVIRONMENT="$env_dir" "$uv_bin" sync --frozen --group dev
+}
+bootstrap_cage() {
+  require_uv
+  UV_PROJECT_ENVIRONMENT="$env_dir" "$uv_bin" sync --frozen --group dev --extra cage
+}
+doctor() {
+  [[ -x "$python_bin" ]] || { echo "Security owner environment is not materialized: $python_bin" >&2; exit 1; }
+  (cd "$repo" && "$python_bin" - <<'PY'
+import importlib.metadata as md
+import sys, tomllib
+import ordivon_security
+if sys.version_info[:2] != (3, 12):
+    raise SystemExit(f"Security requires Python 3.12, got {sys.version.split()[0]}")
+lock=tomllib.load(open('uv.lock','rb'))
+expected={p['name']:p['version'] for p in lock.get('package',[]) if p.get('name')=='ruff'}['ruff']
+actual=md.version('ruff')
+if actual != expected:
+    raise SystemExit(f"ruff={actual}; lock expects {expected}")
+print("owner environment doctor: valid profile=test")
+PY
+  )
+}
+doctor_cage() {
+  doctor
+  (cd "$repo" && "$python_bin" - <<'PY'
+import importlib.metadata as md
+import tomllib
+lock=tomllib.load(open('uv.lock','rb'))
+expected={p['name']:p['version'] for p in lock.get('package',[]) if isinstance(p,dict) and p.get('name')}
+for distribution in ('gym','gymnasium','networkx','numpy','pettingzoo','prettytable','pygame','PyYAML','rich','typing_extensions'):
+    key=distribution.lower().replace('_','-')
+    candidates=(key,key.replace('-','_'))
+    actual=md.version(distribution)
+    locked=None
+    for c in candidates:
+        if c in expected:
+            locked=expected[c]
+            break
+    if locked is None:
+        raise SystemExit(f"{distribution}: absent from lock")
+    if actual != locked:
+        raise SystemExit(f"{distribution}={actual}; lock expects {locked}")
+print("owner environment doctor: valid profile=capability:cage")
+PY
+  )
+}
+run_tests() {
+  bootstrap
+  doctor
+  cd "$repo"
+  "$python_bin" -m unittest discover -s tests/unit -v
+}
+run_cage_tests() {
+  bootstrap_cage
+  doctor_cage
+  cd "$repo"
+  "$python_bin" -m unittest discover -s tests/unit -v
+}
+case "$mode" in
+  bootstrap) bootstrap ;;
+  doctor) doctor ;;
+  test) run_tests ;;
+  cold-start)
+    tmp=$(mktemp -d -t ordivon-security-owner-env-XXXXXX)
+    trap 'rm -rf "$tmp"' EXIT
+    ORDIVON_OWNER_ENV_DIR="$tmp/.venv" "$0" test
+    ;;
+  bootstrap-cage) bootstrap_cage ;;
+  doctor-cage) doctor_cage ;;
+  test-cage) run_cage_tests ;;
+  --help|-h) usage ;;
+  *) usage >&2; exit 2 ;;
+esac

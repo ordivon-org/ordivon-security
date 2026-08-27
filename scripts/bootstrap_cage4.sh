@@ -25,7 +25,8 @@ actual=$(git -C "$SOURCE" rev-parse HEAD)
 }
 
 cd "$ROOT"
-uv sync --locked --extra cage
+"$ROOT/scripts/owner-environment" bootstrap-cage
+"$ROOT/scripts/owner-environment" doctor-cage
 
 printf 'ORDIVON_CAGE4_SOURCE=%q\n' "$SOURCE"
 printf 'CAGE4_REVISION=%s\n' "$REVISION"
