@@ -214,6 +214,7 @@ This is a research system, not a production attack platform. `readiness: EXPERIM
 | Need | Read / invoke |
 | --- | --- |
 | start an ordinary vulnerability/Sample/evaluation/response job without browsing research chronology | `uv run ordivon-security-surface` — ordinary task navigation is the default; it runs no experiment and grants no authority |
+| compile current owner-local mechanical eligibility before exposing ordinary owner operations as model-facing Tools | `uv run ordivon-security-surface --preflight` — read-only; an exact selected record can be supplied with `--record-id`; use `turnAddressableOwnerOperations` for Tool-schema filtering, not as semantic routing |
 | inspect the complete maturity-classified Security surface, including research apparatus | `uv run ordivon-security-surface --view full` — explicit full projection; research reproduction remains available and execution authority is unchanged |
 | understand why Security exists and where experiments may act | this README + [`docs/research-boundary.md`](docs/research-boundary.md) |
 | understand constitutional law versus profiles/fixtures | [`docs/LAW-PROFILES-C0.md`](docs/LAW-PROFILES-C0.md) |

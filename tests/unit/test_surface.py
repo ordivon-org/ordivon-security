@@ -104,5 +104,69 @@ class OrdinarySecuritySurfaceTests(unittest.TestCase):
         self.assertIn("reproduction/provenance", ordinary["researchBoundary"])
 
 
+class OrdinarySecurityCapabilityPreflightTests(unittest.TestCase):
+    def test_preflight_withdraws_inspect_until_exact_record_is_selected(self) -> None:
+        value = ordivon_security.security_ordinary_capability_preflight()
+        self.assertEqual(value["kind"], "ordivon.security.ordinary-capability-preflight")
+        self.assertEqual(
+            set(value["turnAddressableOwnerOperations"]),
+            {"security.ordinary.research.query", "security.ordinary.provider-currentness"},
+        )
+        self.assertEqual(value["withdrawnOwnerOperations"], ["security.ordinary.research.inspect"])
+        inspect = next(
+            item for item in value["operations"] if item["operation"] == "security.ordinary.research.inspect"
+        )
+        self.assertEqual(inspect["mechanicalEligibility"], "input-required")
+        self.assertFalse(inspect["turnAddressable"])
+
+    def test_selected_current_record_recompiles_inspect_into_turn_surface(self) -> None:
+        from ordivon_security.ordinary_memory import security_ordinary_research_query
+
+        query = security_ordinary_research_query("EICAR")
+        record_id = query["candidates"][0]["recordId"]
+        value = ordivon_security.security_ordinary_capability_preflight(record_id=record_id)
+        self.assertIn("security.ordinary.research.inspect", value["turnAddressableOwnerOperations"])
+        inspect = next(
+            item for item in value["operations"] if item["operation"] == "security.ordinary.research.inspect"
+        )
+        self.assertEqual(inspect["mechanicalEligibility"], "eligible")
+        self.assertEqual(inspect["basis"]["recordId"], record_id)
+
+    def test_unknown_record_fails_closed_without_withdrawing_independent_operations(self) -> None:
+        value = ordivon_security.security_ordinary_capability_preflight(record_id="sample:does-not-exist")
+        self.assertNotIn("security.ordinary.research.inspect", value["turnAddressableOwnerOperations"])
+        self.assertIn("security.ordinary.research.query", value["turnAddressableOwnerOperations"])
+        inspect = next(
+            item for item in value["operations"] if item["operation"] == "security.ordinary.research.inspect"
+        )
+        self.assertEqual(inspect["mechanicalEligibility"], "ineligible")
+        self.assertIn("failureClass", inspect["basis"])
+
+    def test_missing_owner_sources_withdraw_mechanically_dependent_operations(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as raw:
+            value = ordivon_security.security_ordinary_capability_preflight(root=Path(raw))
+        self.assertEqual(value["turnAddressableOwnerOperations"], [])
+        state = {item["operation"]: item for item in value["operations"]}
+        self.assertEqual(state["security.ordinary.research.query"]["mechanicalEligibility"], "ineligible")
+        self.assertEqual(state["security.ordinary.provider-currentness"]["mechanicalEligibility"], "ineligible")
+        self.assertEqual(state["security.ordinary.research.inspect"]["mechanicalEligibility"], "ineligible")
+
+    def test_record_id_is_not_silently_ignored_without_preflight(self) -> None:
+        with self.assertRaises(SystemExit):
+            surface_cli_main(["--record-id", "sample:test"])
+
+    def test_preflight_cli_is_projection_only_and_does_not_add_a_new_console_script(self) -> None:
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            status = surface_cli_main(["--preflight"])
+        self.assertEqual(status, 0)
+        value = json.loads(stdout.getvalue())
+        self.assertEqual(value["truthRole"], "derived-owner-local-mechanical-eligibility-projection")
+        self.assertIn("never grants Range/Evaluation execution authority", " ".join(value["rules"]))
+
+
 if __name__ == "__main__":
     unittest.main()

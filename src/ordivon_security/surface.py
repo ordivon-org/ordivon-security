@@ -223,6 +223,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "accepted-research",
     ),
     SecuritySurfaceEntry(
+        "ACE0 adversarial capability-environment falsifier",
+        "research-apparatus",
+        "ordivon_security.cli_adversarial_capability_environment_ace0",
+        "Bounded direct Tool-output/effect-description poisoning pressure with fixed authority/world truth and suppressed effect execution.",
+        "accepted-negative-research",
+    ),
+    SecuritySurfaceEntry(
         "CA-LIC entitlement authority research",
         "research-apparatus",
         "research/ca-lic",
