@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
 from ordivon_security.integrations import RangeIntentHarnessFailure
@@ -197,7 +198,7 @@ class AutonomousRangeIntentTests(unittest.TestCase):
         self.assertIn('"intentRecording": intent_recording', source)
         self.assertIn('"intentRevisionCount": len(bridge.intent_revisions)', source)
         self.assertIn('"intentRevisions": bridge.intent_revisions', source)
-        decision_block = source.split("decision = context.decision(", 1)[1].split("if effective", 1)[0]
+        decision_block = source.split("decision = context.decision(", 1)[1].split("except ValueError", 1)[0]
         self.assertNotIn("harnessConclusionStatus", decision_block)
         self.assertNotIn("intentRecording", decision_block)
 
@@ -210,6 +211,13 @@ class AutonomousRangeIntentTests(unittest.TestCase):
         error = RangeIntentHarnessFailure("harness_failed", evidence)
         self.assertEqual(error.stop_code, "harness_failed")
         self.assertEqual(error.evidence, evidence)
+
+    def test_driver_source_structures_post_model_undeclared_interface_rejection(self) -> None:
+        source = Path("src/ordivon_security/integrations/harness_range_intent.py").read_text(encoding="utf-8")
+        self.assertIn('"kind": "ordivon.security.af2-range-intent-decision-rejected"', source)
+        self.assertIn('"stopCode": "security_intent_rejected"', source)
+        self.assertIn('"securityAdmissionPerformed": False', source)
+        self.assertIn('"effectExecuted": False', source)
 
     def test_context_rejects_interface_outside_authority(self) -> None:
         with self.assertRaises(ValueError):

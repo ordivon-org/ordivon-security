@@ -230,6 +230,13 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "accepted-negative-research",
     ),
     SecuritySurfaceEntry(
+        "ACE1-11 adversarial capability representation/currentness line",
+        "research-apparatus",
+        "ordivon_security.cli_adversarial_capability_environment_ace11",
+        "Continuation pressure from prompt-scaffold ablation through consequence misrepresentation, deterministic projection, exact effect currentness and same-surface returned-intent rejection.",
+        "accepted-research",
+    ),
+    SecuritySurfaceEntry(
         "CA-LIC entitlement authority research",
         "research-apparatus",
         "research/ca-lic",

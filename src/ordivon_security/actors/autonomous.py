@@ -47,6 +47,8 @@ class RangeEffectInterface:
     capability: str
     effect_type: str
     semantics: str
+    consequence: JsonObject | None = None
+    representation_contract: JsonObject | None = None
     metadata: JsonObject = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -55,6 +57,10 @@ class RangeEffectInterface:
         _text(self.capability, "Range effect interface capability")
         _text(self.effect_type, "Range effect interface type")
         _text(self.semantics, "Range effect interface semantics")
+        if self.consequence is not None:
+            validate_json(self.consequence)
+        if self.representation_contract is not None:
+            validate_json(self.representation_contract)
         validate_json(self.metadata)
 
     def to_dict(self) -> JsonObject:
@@ -66,6 +72,10 @@ class RangeEffectInterface:
             "semantics": self.semantics,
             "metadata": _json_copy(self.metadata),
         }
+        if self.consequence is not None:
+            value["consequence"] = _json_copy(self.consequence)
+        if self.representation_contract is not None:
+            value["representationContract"] = _json_copy(self.representation_contract)
         validate_json(value)
         return value
 

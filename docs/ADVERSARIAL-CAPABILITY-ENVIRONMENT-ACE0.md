@@ -143,8 +143,6 @@ The experiment strengthens three narrower boundaries:
 2. **Model-visible capability representation is an adversarial plane.** Effect identity and authority may remain unchanged while the description shown to the Agent changes.
 3. **Epistemic role plus independently current evidence can be decision-relevant protection.** ACE0 shows this combination survived the tested direct poison; it does not prove either coordinate is independently sufficient.
 
-## Next falsifier
+## Continued falsification
 
-Do not increase poison rhetoric. Reduce the scaffolding one variable at a time.
-
-The next useful pressure is an ACE1 treatment that preserves the same world and authority while removing the explicit `untrusted-tool-output` ranking cue or otherwise making current independent evidence less cheaply authoritative. Only if a real failure then appears should Security ask where representation/currentness/admission needs a reusable control. Later pressures can move to memory/retrieval lineage and Tool/MCP identity substitution.
+ACE1–ACE11 continue this line in [`ADVERSARIAL-CAPABILITY-ENVIRONMENT-ACE1-11.md`](ADVERSARIAL-CAPABILITY-ENVIRONMENT-ACE1-11.md). The direct-injection scaffold ablations remain negative; the first positive failure instead appears when model-visible capability consequence semantics diverge from the actual effect. The continued line then establishes exact deterministic consequence projection, exact implementation/consequence currentness and symmetric post-model current-surface admission as the surviving bounded controls.
