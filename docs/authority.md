@@ -15,7 +15,7 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-15
+updated: 2026-08-27
 summary: Authority map for the active Contest core, CAGE Range, software Evaluation, Static P0, Case Snapshot P0, P0-admitted Windows KVM Provider, research program, authorization boundary, evidence, and frozen Round 1 materials.
 evidence_status: not_applicable
 readiness: READY
@@ -77,6 +77,26 @@ related:
 - [`WINDOWS-KVM-INSTALLER-P1.md`](WINDOWS-KVM-INSTALLER-P1.md) owns the large-Sample research profile, deployment/evaluation/host authority split, Case A/B/C topology, transformation-manifest requirements, main-Windows Free control, read-only media gates, and pending execution/write gates.
 - [`AGENT-EXPERIMENT-P0.md`](AGENT-EXPERIMENT-P0.md) owns the Provider/Harness/Host/Runtime experiment variants, credential-scope identity, and model-Actor admission boundary.
 - [`research-agenda.md`](research-agenda.md) owns the ordered research program and falsifiers.
+- [`AGENT-FIRST-STRUCTURE-AF1.md`](AGENT-FIRST-STRUCTURE-AF1.md) owns the AF1 structural classification separating reusable Security constitution, scoped profiles, cross-repository integrations, and research apparatus without promoting a new universal framework.
+- [`AGENT-FIRST-INTENT-AF2.md`](AGENT-FIRST-INTENT-AF2.md) owns the AF2 minimal reusable Range-intent surface and its boundary against Contest ticks, action menus, exactly-one-action rules, or Security ownership of the cognition loop.
+- [`AGENT-FIRST-DECEPTION-AF3.md`](AGENT-FIRST-DECEPTION-AF3.md) owns the AF3 higher-order deception consumer, its same-claim/different-world consequence result, and the non-admission of Trust, Reputation, Organization, or a generic policy primitive.
+- [`ADVERSARIAL-EPISTEMICS-AE0.md`](ADVERSARIAL-EPISTEMICS-AE0.md) owns the AE0 autonomous-deception/partial-truth experiment and its bounded information-acquisition result without promoting adversarial claims to truth.
+- [`ADVERSARIAL-EPISTEMICS-AE1.md`](ADVERSARIAL-EPISTEMICS-AE1.md) owns the AE1 delayed-truth/costly-waiting experiment and its scoped UNKNOWN-under-risk result without forcing Trust, Reputation, freshness machinery, or reversible containment.
+- [`ADVERSARIAL-EPISTEMICS-AE2.md`](ADVERSARIAL-EPISTEMICS-AE2.md) owns the AE2 conflicting-independent-observation experiment, explicit-adjudication result, and boundary against promoting either sensor to world truth or durable Trust/Reputation state.
+- [`ADVERSARIAL-EPISTEMICS-AE3.md`](ADVERSARIAL-EPISTEMICS-AE3.md) owns the AE3 no-adjudication experiment, its bounded consequence-under-UNKNOWN result, and the falsifier against claiming one counterfactually optimal risk action from the supplied evidence.
+- [`ADVERSARIAL-EPISTEMICS-AE3B.md`](ADVERSARIAL-EPISTEMICS-AE3B.md) owns the falsified AE3-B raw-history treatment showing that verified episodes in ordinary Agent context are insufficient for stable evidence aggregation or reproducible effect strategy.
+- [`ADVERSARIAL-EPISTEMICS-AE3C.md`](ADVERSARIAL-EPISTEMICS-AE3C.md) owns the accepted AE3-C reconstructable evidence-reduction treatment and its boundary against turning derived projection into current truth, policy, Trust, or Reputation.
+- [`EVIDENCE-COMPUTATION-EC0.md`](EVIDENCE-COMPUTATION-EC0.md) owns the EC0 cross-domain evidence-computation ownership experiment and the rejection of a Security-owned reducer primitive or new shared reducer library.
+- [`EVIDENCE-FRESHNESS-EC1.md`](EVIDENCE-FRESHNESS-EC1.md) owns the EC1 source-evolution experiment separating derivation integrity from current applicability and the non-admission of TTL/clock/generation freshness or a new freshness service.
+- [`AUTONOMOUS-COMMUNICATION-AC0.md`](AUTONOMOUS-COMMUNICATION-AC0.md) owns the falsified AC0 one-shot cheap-talk coordination treatment and the result that message projection alone does not establish strategic credibility.
+- [`INCENTIVE-COMMUNICATION-AC1.md`](INCENTIVE-COMMUNICATION-AC1.md) owns the falsified AC1 aligned-incentive treatment, including the first B-to-A reply evidence and the rejection of common aligned incentives as sufficient credibility.
+- [`VERIFIABLE-DISCLOSURE-AC2.md`](VERIFIABLE-DISCLOSURE-AC2.md) owns the falsified AC2 selective-disclosure experiment showing epistemic resolution without reliable Tool-intent/reasoning convergence.
+- [`INTENT-CONVERGENCE-IF0-IF2.md`](INTENT-CONVERGENCE-IF0-IF2.md) owns the IF0/IF1 finalization/readback falsifiers and the accepted IF2 deliberation-before-authority treatment on the scoped AC2 consumer.
+- [`INTENT-CEREMONY-ABLATION-IF3.md`](INTENT-CEREMONY-ABLATION-IF3.md) owns the IF3 ablation showing that ordinary AF2 revision semantics remain sufficient after prior deliberation without IF1 readback/finalization Tools in the tested consumer.
+- [`POST-CA-O1-CARRIER-OBSERVABILITY.md`](POST-CA-O1-CARRIER-OBSERVABILITY.md) owns the accepted scoped same-effect carrier-observability result and its boundary against universal stealth/loudness ranking or a new semantic capability domain.
+- [`POST-CA-P1-PHYSICAL-ADAPTATION.md`](POST-CA-P1-PHYSICAL-ADAPTATION.md) owns the accepted physical adaptive-composition consumer and its scoped comparison among fixed, thin-adaptive, and Harness/model treatments.
+- [`RESEARCH-CORPUS-K1-CURRENTNESS.md`](RESEARCH-CORPUS-K1-CURRENTNESS.md) owns the accepted on-demand provider-currentness experiment, exact candidate-vs-head comparison result, and rejection of automatic polling/mirroring/global freshness labels.
+- [`ORDINARY-SECURITY-CONSUMPTION-R1.md`](ORDINARY-SECURITY-CONSUMPTION-R1.md) owns the accepted ordinary-consumption round, thin ordinary task-view result, ResearchCorpus pre-analysis role, bounded Blue response path, and its rejected over-expansions.
 - [`research-boundary.md`](research-boundary.md) owns authorization and external-effect limits.
 - [`CLASSICAL-CAPABILITY-BASIS-CA0.md`](CLASSICAL-CAPABILITY-BASIS-CA0.md) owns the CA0 first-principles classical capability decomposition, competing-model falsifiers, orthogonal capability-contract candidate, Red/Blue relation-symmetry candidate, current Security capability-gap map, and the boundary against prematurely promoting a tool tree, ATT&CK clone, universal mechanism vocabulary, or `RangeActionGateway`.
 - [`CLASSICAL-EXECUTION-CARRIERS-CA1.md`](CLASSICAL-EXECUTION-CARRIERS-CA1.md) owns the CA1 same-effect execution-carrier experiment, carrier-versus-semantic-effect boundary, provider-policy-versus-RangeAuthority separation, Windows hosted-process/installer-lifecycle evidence, retained QMP/identity/MSI-sequencing/build-identity falsifiers, Office-provider non-admission, and the rule that carrier becomes Agent-visible only through decision-relevant operational properties.
