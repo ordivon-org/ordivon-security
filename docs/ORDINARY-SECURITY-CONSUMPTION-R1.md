@@ -64,6 +64,8 @@ project six task routes over four existing surfaces:
 
 The accepted ordinary view is now the default first interface. The full maturity-classified surface remains explicitly available through `--view full`; no research command, acceptance runner or compatibility export is deleted. The ordinary view is generated from the existing owner-native surface and fails if it references an unknown surface.
 
+**Later Existence Gauntlet 2.0 update.** R1 intentionally stopped at representation: research/acceptance commands remained installed while the ordinary projection hid them. After the ordinary surface had stabilized and repository-wide command-consumer review found no current operational dependency, 13 clearly research-only acceptance/probe/CA/baseline console entrypoints were retired from the wheel. Their Python modules, tests, evidence, authority documents and explicit `python -m ...` reproduction paths remain. This contracts default executable affordance without rewriting historical research or deleting reproducibility.
+
 A useful falsifier appeared during the A/B work: an opaque SHA-256 digest of the full surface was initially included in the ordinary projection. Across two model treatments it was misread as the 目标产品B Sample SHA-256. R1 removes that digest from the Agent-visible navigation packet. Acceptance evidence binds source revision/digests outside the semantic view instead. A later model replicate contained no SHA-256 mention in the Sample summary.
 
 ## R1-C — ResearchCorpus as ordinary memory

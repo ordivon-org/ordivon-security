@@ -227,7 +227,7 @@ constructs a Provider instance that admits only that exact output digest. The fi
 5. exits without persistence, Registry, service, or network actions.
 
 ```bash
-uv run ordivon-security-windows-kvm-acceptance \
+uv run python -m ordivon_security.cli_windows_kvm_acceptance \
   --base-manifest /var/lib/ordivon/security/providers/windows-kvm/images/<base>.manifest.json \
   --state-root /var/lib/ordivon/security/providers/windows-kvm \
   --vault /var/lib/ordivon/security/vault \

@@ -167,7 +167,7 @@ Process-tree orchestration and the third-party execution backend remain unadmitt
 
 Case A's transformation manifest changes the environment while preserving the original Sample bytes. Case B's payload manifest records what was removed and retained, but the materializer refuses `/mnt/*` destinations and cannot deploy to Windows. R3 therefore establishes the comparison topology and evidence inputs without changing the main Windows installation. Case C is labeled Free from the user's declaration; feature-level behavior remains a later comparison Gate.
 
-The host baseline can be reproduced with `ordivon-security-windows-host-p1-baseline`. Its public acceptance index binds the private receipt digest and verifies that `.exe` and the signed official `intl.dll` were stable before and after collection.
+The host baseline can be reproduced with `uv run python -m ordivon_security.cli_windows_host_p1_baseline`. Its public acceptance index binds the private receipt digest and verifies that `.exe` and the signed official `intl.dll` were stable before and after collection.
 
 
 ## R4 architecture decision: one controller/orchestrator Runner
