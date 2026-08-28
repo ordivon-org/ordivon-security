@@ -63,6 +63,8 @@ The current surface therefore no longer uses wildcard module locators. Historica
 
 This preserves AF1's four-tier distinction while adding a currentness rule: **category membership and historical provenance do not establish current executable existence.**
 
+A later locator audit applies the same rule to module identity: when one surface entry names one concrete contract, its locator points to the module that actually defines that contract rather than a broader convenience facade. Aggregate family entries may still point to aggregate owner facades. This matters operationally: the old `ContestRunner` locator named `ordivon_security.contest`, which does not export `ContestRunner`; the owner-exact locator is `ordivon_security.contest.runner`.
+
 ## Post-Existence-Gauntlet executable topology — 2026-08-28
 
 At Security source revision `774e33594345bfd1dd0686456498d9ea7a3f0154`, the current top-level CLI namespace has 38 modules and an exact liveness partition:

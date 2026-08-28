@@ -29,14 +29,14 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
     SecuritySurfaceEntry(
         "RangeSession",
         "constitution",
-        "ordivon_security.range",
+        "ordivon_security.range.session",
         "Security projection over a persistent contested world without mandatory ticks.",
         "reusable-experimental",
     ),
     SecuritySurfaceEntry(
         "RangeAuthority",
         "constitution",
-        "ordivon_security.range",
+        "ordivon_security.range.model",
         (
             "Exact session-frozen principal/Actor zone and capability grant; admission retains "
             "its authority digest and boundary labels remain profile-defined."
@@ -46,7 +46,7 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
     SecuritySurfaceEntry(
         "RangeEffectRequest",
         "constitution",
-        "ordivon_security.range",
+        "ordivon_security.range.model",
         "Typed consequential intent envelope; admission and execution remain separate facts.",
         "reusable-experimental",
     ),
@@ -60,21 +60,21 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
     SecuritySurfaceEntry(
         "EvidenceRecorder",
         "constitution",
-        "ordivon_security.evidence",
+        "ordivon_security.evidence.recorder",
         "Bounded experiment evidence with separated actor/management/sensor/world-truth authority.",
         "reusable",
     ),
     SecuritySurfaceEntry(
         "SynchronousContestProfile",
         "profile",
-        "ordivon_security.range",
+        "ordivon_security.range.synchronous",
         "Deterministic synchronous comparison profile over a RangeSession.",
         "accepted-profile",
     ),
     SecuritySurfaceEntry(
         "ContestRunner",
         "profile",
-        "ordivon_security.contest",
+        "ordivon_security.contest.runner",
         "Tick/proposal/admission/resolution runner for bounded reproducible Contests.",
         "accepted-profile",
     ),
@@ -106,7 +106,7 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
     SecuritySurfaceEntry(
         "DeepSeek Range-intent driver",
         "integration",
-        "ordivon_security.integrations",
+        "ordivon_security.integrations.harness_range_intent",
         "Harness-backed AF2 decision producer; cognition remains owned by Harness/Provider.",
         "experimental-integration",
     ),

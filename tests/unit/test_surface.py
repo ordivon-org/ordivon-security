@@ -38,6 +38,20 @@ class SecuritySurfaceTests(unittest.TestCase):
         ):
             self.assertFalse(hasattr(ordivon_security, domain_name), domain_name)
 
+    def test_single_contract_surface_entries_point_to_owner_modules(self) -> None:
+        entries = {entry["name"]: entry for entry in ordivon_security.security_surface_manifest()["entries"]}
+        expected = {
+            "RangeSession": "ordivon_security.range.session",
+            "RangeAuthority": "ordivon_security.range.model",
+            "RangeEffectRequest": "ordivon_security.range.model",
+            "EvidenceRecorder": "ordivon_security.evidence.recorder",
+            "SynchronousContestProfile": "ordivon_security.range.synchronous",
+            "ContestRunner": "ordivon_security.contest.runner",
+            "DeepSeek Range-intent driver": "ordivon_security.integrations.harness_range_intent",
+        }
+        for name, module in expected.items():
+            self.assertEqual(entries[name]["module"], module)
+
     def test_manifest_exposes_distinct_maturity_tiers(self) -> None:
         value = ordivon_security.security_surface_manifest()
         tiers = {entry["tier"] for entry in value["entries"]}
