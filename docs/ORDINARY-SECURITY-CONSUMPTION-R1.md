@@ -81,7 +81,7 @@ A query for the generic compensation/recovery law returns zero Corpus records. T
 
 ## R1-D — Ordinary Blue incident consumer
 
-The EICAR and known-clean bytes used by CA4 are promoted only from private research constants into `ordivon_security.fixtures`; CA4 itself reuses the exact bytes. This lets an ordinary consumer compose the existing semantics without importing the CA4 acceptance runner.
+The original R1 implementation promoted the EICAR and known-clean bytes used by CA4 from private research constants into `ordivon_security.fixtures` so the ordinary-consumption probe could avoid importing the CA4 acceptance runner. A later package-membership deletion tournament found that this helper never acquired a second current consumer: only `research/ordinary-consumption/blue_incident.py` still required those exact bytes. The constants are therefore local to that research consumer again, and `ordivon_security.fixtures` is retired rather than presented as reusable package capability. The R1 semantic result is unchanged: the consumer composes exact maintained-fixture bytes without importing a historical acceptance runner.
 
 Using current installed ClamAV, two owned temporary-world treatments were executed:
 

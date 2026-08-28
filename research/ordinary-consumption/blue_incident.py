@@ -7,10 +7,11 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from ordivon_security.fixtures import CLEAN_TEST_BYTES, EICAR_TEST_BYTES
 from ordivon_security.research_corpus import ResearchCorpus
 
 ROOT = Path(__file__).resolve().parents[2]
+EICAR_TEST_BYTES = b"X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
+CLEAN_TEST_BYTES = b"ordivon-ca4-known-clean-v1\n"
 EICAR_ID = "sample:275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f"
 
 
