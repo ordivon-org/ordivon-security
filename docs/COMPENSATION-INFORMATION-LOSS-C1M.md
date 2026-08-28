@@ -327,3 +327,7 @@ This suggests a more general Agent-first rule:
 C1-N has now destroyed, corrupted, and forked the callee-private predicate truth. The unchanged `ensure-repaired` effect fails closed with zero mutation when even the owning authority cannot establish its predicate. A distinct digest-bound state witness outside that private boundary restores the exact state in the tested static faults, after which the original compensation semantics work again. See [`DOWNSTREAM-TRUTH-FAILURE-C1N.md`](DOWNSTREAM-TRUTH-FAILURE-C1N.md).
 
 The next pressure is witness freshness: fault the ordering between consequence-state changes and witness publication so a digest-valid witness can be stale. Only then can generation, atomic publication, or stronger coordination be justified.
+
+## Post-closeout executable standing — 2026-08-28
+
+C1-M's canonical result and acceptance evidence remain current research standing. Its one-shot local fault runner `cli_compensation_information_loss_acceptance.py` is retained under `fixtures/archive/runners/` rather than the current `ordivon_security` package. No installed command, current source consumer, research/script consumer, or exact documentation invocation requires the runner in the live package; the remaining unit test exercised only runner-local fixtures/classifiers. The accepted apparatus is source-fenced at `404e7e691fd2ed6e557ad525c9ff0b63c8aceedd` and may be restored explicitly for reproduction or a new experiment. Archiving the runner does not promote its local protocol mechanics into a general Security service.

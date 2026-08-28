@@ -285,3 +285,7 @@ C1-J does not prove:
 C1-K has now tested the smaller intrinsic-idempotency candidate and accepted it for one exact local ensure-state consequence: repeated invocation across ACK loss converged to one semantic world result without an adjacent dedup/inbox object. See [`INTRINSIC-IDEMPOTENCY-C1K.md`](INTRINSIC-IDEMPOTENCY-C1K.md).
 
 The next experiment should therefore test a consequence that is genuinely **non-idempotent but compensable**. If compensation can restore a declared invariant after duplicate execution, it may solve a different class without demanding a universal transaction system. Only after compensation is physically faulted should Security decide whether a shared atomic transaction primitive is unavoidable for the remaining class.
+
+## Post-closeout executable standing — 2026-08-28
+
+C1-J's canonical result and acceptance evidence remain current research standing. Its one-shot local fault runner `cli_recipient_commit_gap_acceptance.py` is retained under `fixtures/archive/runners/` rather than the current `ordivon_security` package. No installed command, current source consumer, research/script consumer, or exact documentation invocation requires the runner in the live package; the remaining unit test exercised only runner-local fixtures/classifiers. The accepted apparatus is source-fenced at `6563613bc0757f8db15caf1c9014bab577d893f8` and may be restored explicitly for reproduction or a new experiment. Archiving the runner does not promote its local protocol mechanics into a general Security service.

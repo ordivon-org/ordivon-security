@@ -216,3 +216,7 @@ C1-I/J/K now divide consequence protocols into a clearer hierarchy:
 C1-L has now tested a genuinely non-idempotent but compensable local consequence. The original effect duplicated under ACK loss; a distinct compensation repaired the invariant, while blind compensation retry overcompensated. Re-observing the repair invariant safely distinguished compensation-not-yet-applied from compensation-already-applied. See [`COMPENSATION-C1L.md`](COMPENSATION-C1L.md).
 
 The next experiment should remove that surviving observability and ask what compensation requires when repaired and unrepaired histories become indistinguishable after crash.
+
+## Post-closeout executable standing — 2026-08-28
+
+C1-K's canonical result and acceptance evidence remain current research standing. Its one-shot local fault runner `cli_intrinsic_idempotency_acceptance.py` is retained under `fixtures/archive/runners/` rather than the current `ordivon_security` package. No installed command, current source consumer, research/script consumer, or exact documentation invocation requires the runner in the live package; the remaining unit test exercised only runner-local fixtures/classifiers. The accepted apparatus is source-fenced at `e41ccf0ca852c7dc689ca8f6931321b9129e533b` and may be restored explicitly for reproduction or a new experiment. Archiving the runner does not promote its local protocol mechanics into a general Security service.

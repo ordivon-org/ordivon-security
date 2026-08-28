@@ -34,6 +34,25 @@ cluster — archiving one exposed the next):
   reconciler race runner (imported live c1a/c1b/c1d/c1c helpers, but no
   module imported it; no doc or evidence mention)
 
+C1 consequence-protocol family (C1-I through C1-N):
+
+- `cli_vanishing_consequence_acceptance.py` — C1-I
+  (receipt: `evidence/acceptance/c1i-information-loss-3241eb9.json`)
+- `cli_recipient_commit_gap_acceptance.py` — C1-J
+  (receipt: `evidence/acceptance/c1j-recipient-commit-gap-6563613.json`)
+- `cli_intrinsic_idempotency_acceptance.py` — C1-K
+  (receipt: `evidence/acceptance/c1k-intrinsic-idempotency-e41ccf0.json`)
+- `cli_compensation_acceptance.py` — C1-L
+  (receipt: `evidence/acceptance/c1l-compensation-bbbacb4.json`)
+- `cli_compensation_information_loss_acceptance.py` — C1-M
+  (receipt: `evidence/acceptance/c1m-compensation-information-loss-404e7e6.json`)
+- `cli_downstream_truth_failure_acceptance.py` — C1-N
+  (receipt: `evidence/acceptance/c1n-downstream-truth-failure-88d068b.json`)
+
+These runners form a bounded local consequence-protocol research chain. C1-N imports the
+C1-M compensation binding as historical experiment apparatus; archiving the family together
+preserves that relation without promoting it to current shared support.
+
 World-entity family:
 
 - `cli_world_entity_prebody_abandonment_acceptance.py`

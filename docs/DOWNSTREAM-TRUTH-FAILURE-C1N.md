@@ -246,3 +246,7 @@ witness publication
 and create histories where a valid witness is stale relative to the real consequence. If a digest-valid but stale witness can restore the wrong semantic state, integrity alone is insufficient and generation/freshness/atomic publication pressure becomes real.
 
 Only after that experiment should a transaction-like boundary be considered.
+
+## Post-closeout executable standing — 2026-08-28
+
+C1-N's canonical result and acceptance evidence remain current research standing. Its one-shot local fault runner `cli_downstream_truth_failure_acceptance.py` is retained under `fixtures/archive/runners/` rather than the current `ordivon_security` package. No installed command, current source consumer, research/script consumer, or exact documentation invocation requires the runner in the live package; the remaining unit test exercised only runner-local fixtures/classifiers. The accepted apparatus is source-fenced at `88d068b1bce471faf3298fa050fec9c4de4eb27c` and may be restored explicitly for reproduction or a new experiment. Archiving the runner does not promote its local protocol mechanics into a general Security service.

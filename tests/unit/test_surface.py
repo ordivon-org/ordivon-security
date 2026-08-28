@@ -92,6 +92,18 @@ class SecuritySurfaceTests(unittest.TestCase):
         self.assertTrue(HostAssignedDeepSeekHarnessTurnDriver.__name__)
         self.assertTrue(RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver.__name__)
 
+    def test_archived_c1i_n_consequence_runners_do_not_return_to_current_package(self) -> None:
+        package = Path(ordivon_security.__file__).resolve().parent
+        for module_name in (
+            "cli_vanishing_consequence_acceptance.py",
+            "cli_recipient_commit_gap_acceptance.py",
+            "cli_intrinsic_idempotency_acceptance.py",
+            "cli_compensation_acceptance.py",
+            "cli_compensation_information_loss_acceptance.py",
+            "cli_downstream_truth_failure_acceptance.py",
+        ):
+            self.assertFalse((package / module_name).exists(), module_name)
+
     def test_archived_c1d_historical_runner_does_not_return_to_current_package(self) -> None:
         package = Path(ordivon_security.__file__).resolve().parent
         retired = package / "cli_windows_kvm_fresh_controller_continuation_acceptance.py"
