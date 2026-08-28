@@ -7,8 +7,12 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_digest
-
-from .windows_kvm import _digest_path, _replace_private_json
+from ordivon_security.providers.windows_kvm import (
+    digest_path as _digest_path,
+)
+from ordivon_security.providers.windows_kvm import (
+    replace_private_json as _replace_private_json,
+)
 
 _RESOLVE_PATH = Path("/mnt/c/Program Files/目标产品B/引擎.exe")
 _INTL_PATH = Path("/mnt/c/Program Files/目标产品B/intl.dll")

@@ -207,7 +207,7 @@ class WindowsKvmMachineProviderTests(unittest.TestCase):
     def test_qmp_topology_is_external_machine_truth_not_guest_report(self) -> None:
         provider = WindowsKvmMachineProvider(self.config)
         state: JsonObject = {"qmpPath": str(self.root / "qmp.sock")}
-        with patch("ordivon_security.providers.windows_kvm._QmpClient", _FakeQmpClient):
+        with patch("ordivon_security.providers.windows_kvm.WindowsKvmQmpClient", _FakeQmpClient):
             topology = provider.inspect_qmp(state)
             provider.qmp_execute(state, "system_powerdown")
         self.assertIs(topology["networkDevicePresent"], True)
@@ -395,7 +395,7 @@ class WindowsKvmMachineProviderTests(unittest.TestCase):
 
 class QmpEventWaitTests(unittest.TestCase):
     def test_event_wait_uses_one_deadline_read_and_does_not_retry_timed_out_reader(self) -> None:
-        from ordivon_security.providers.windows_kvm import _QmpClient
+        from ordivon_security.providers.windows_kvm import WindowsKvmQmpClient
 
         class FakeSocket:
             def __init__(self) -> None:
@@ -404,7 +404,7 @@ class QmpEventWaitTests(unittest.TestCase):
             def settimeout(self, value: float) -> None:
                 self.timeouts.append(value)
 
-        client = _QmpClient(Path("/tmp/unused-qmp.sock"), timeout_seconds=5)
+        client = WindowsKvmQmpClient(Path("/tmp/unused-qmp.sock"), timeout_seconds=5)
         socket = FakeSocket()
         client._socket = socket  # type: ignore[assignment]
         with (

@@ -15,14 +15,16 @@ from ordivon_security.providers.windows_kvm import (
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
-    _digest_path,
-    _host_cpu_identity,
-    _version_line,
 )
 from ordivon_security.providers.windows_kvm import (
-    _pci_network_devices as _pci_network_devices,
+    digest_path as _digest_path,
 )
-from ordivon_security.providers.windows_kvm import _QmpClient as _QmpClient
+from ordivon_security.providers.windows_kvm import (
+    executable_version_line as _version_line,
+)
+from ordivon_security.providers.windows_kvm import (
+    host_cpu_identity as _host_cpu_identity,
+)
 from ordivon_security.providers.windows_kvm import (
     load_json_object as _load_object,
 )
@@ -54,12 +56,13 @@ def _write_private_json(path: Path, value: JsonObject) -> None:
     _replace_private_json(path, value)
 
 
-def _run_checked(
+def run_windows_kvm_command(
     arguments: list[str],
     *,
     timeout_seconds: int = 120,
     environment: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
+    """Run one bounded command for the Windows Evaluation P0/P1 profile family."""
     return subprocess.run(
         arguments,
         check=True,
@@ -475,7 +478,7 @@ class WindowsKvmEvaluationBackend:
         run_disk_path = Path(cast(str, instance.state["runDiskPath"]))
         with run_disk_path.open("xb") as handle:
             handle.truncate(self.config.run_disk_mib * 1024 * 1024)
-        _run_checked([str(self.config.mkfs_fat_path), "-n", _RUN_LABEL, str(run_disk_path)])
+        run_windows_kvm_command([str(self.config.mkfs_fat_path), "-n", _RUN_LABEL, str(run_disk_path)])
         manifest: JsonObject = {
             "schemaVersion": 1,
             "kind": "ordivon.security.windows-kvm-run",
@@ -490,7 +493,7 @@ class WindowsKvmEvaluationBackend:
         manifest_path = run_path / "ordivon-run.json"
         _write_private_json(manifest_path, manifest)
         environment = {**os.environ, "MTOOLS_SKIP_CHECK": "1"}
-        _run_checked(
+        run_windows_kvm_command(
             [
                 str(self.config.mcopy_path),
                 "-o",
@@ -501,7 +504,7 @@ class WindowsKvmEvaluationBackend:
             ],
             environment=environment,
         )
-        _run_checked(
+        run_windows_kvm_command(
             [
                 str(self.config.mcopy_path),
                 "-o",

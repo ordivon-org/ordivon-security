@@ -4,7 +4,6 @@ import argparse
 import json
 from pathlib import Path
 
-from ordivon_security.evaluation.windows_kvm import _load_object
 from ordivon_security.evaluation.windows_kvm_p1_cases import (
     CapabilityCase,
     EnvironmentTransformationManifest,
@@ -14,6 +13,7 @@ from ordivon_security.evaluation.windows_kvm_p1_execution_media import (
     WindowsKvmP1ExecutionMediaConfig,
     materialize_windows_kvm_p1_execution_media,
 )
+from ordivon_security.providers.windows_kvm import load_json_object as _load_object
 
 
 def build_parser() -> argparse.ArgumentParser:

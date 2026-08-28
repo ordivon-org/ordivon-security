@@ -50,6 +50,7 @@ S2 separates **machine authority** from **software Evaluation admission**. The e
 - low-level process and ledger helpers shared by hard-failure reconciliation.
 - exact PID/start-time liveness observation through the Provider-owned `process_identity_alive()` primitive, shared by Evaluation and Range reconciliation rather than reimplemented per profile.
 - owner-local durable-state/process primitives (`load_json_object`, `replace_private_json`, `fsync_directory`, `terminate_process`, `set_path_owner`, `process_start_time`) consumed by multiple Windows profiles; these are module-level substrate contracts, not package-root Security API.
+- owner-local machine observation/mechanics primitives (`digest_path`, `host_cpu_identity`, `executable_version_line`, `pci_network_devices`, `WindowsKvmQmpClient`) consumed directly by the Evaluation adapter/builder instead of being re-exported through `evaluation.windows_kvm`; these likewise remain Provider module contracts, not package-root API.
 
 Its execution identity contains no Sample digest, fixture attestation, Evaluation action, or Guardian decision. Network policy is deliberately represented as `caller-supplied-qemu-topology`: the substrate can observe topology, but does not authorize one.
 

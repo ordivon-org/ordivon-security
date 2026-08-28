@@ -20,19 +20,25 @@ from ordivon_security._canonical import (
 )
 from ordivon_security.identity import security_source_identity
 from ordivon_security.providers.windows_kvm import (
+    WindowsKvmQmpClient as _QmpClient,
+)
+from ordivon_security.providers.windows_kvm import (
+    digest_path as _digest_path,
+)
+from ordivon_security.providers.windows_kvm import (
+    host_cpu_identity as _host_cpu_identity,
+)
+from ordivon_security.providers.windows_kvm import (
+    pci_network_devices as _pci_network_devices,
+)
+from ordivon_security.providers.windows_kvm import (
     set_path_owner as _set_owner,
 )
 from ordivon_security.providers.windows_kvm import (
     terminate_process as _terminate_pid,
 )
 
-from .windows_kvm import (
-    _digest_path,
-    _host_cpu_identity,
-    _pci_network_devices,
-    _QmpClient,
-    _run_checked,
-)
+from .windows_kvm import run_windows_kvm_command as _run_checked
 
 _BUILD_LABEL = "ORDIVONBLD"
 _CONFIG_LABEL = "ORDIVONCFG"

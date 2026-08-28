@@ -6,8 +6,12 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue, canonical_digest
-
-from .windows_kvm import _digest_path, _replace_private_json
+from ordivon_security.providers.windows_kvm import (
+    digest_path as _digest_path,
+)
+from ordivon_security.providers.windows_kvm import (
+    replace_private_json as _replace_private_json,
+)
 
 _VM_SURFACE = "disposable-windows-kvm"
 _HOST_BASELINE_SURFACE = "windows-host-read-only-baseline"

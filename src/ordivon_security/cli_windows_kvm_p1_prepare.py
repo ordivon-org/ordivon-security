@@ -4,12 +4,12 @@ import argparse
 import json
 from pathlib import Path
 
-from ordivon_security.evaluation.windows_kvm import _load_object
 from ordivon_security.evaluation.windows_kvm_p1 import (
     WindowsKvmInstallerProfile,
     WindowsKvmP1MediaConfig,
     prepare_windows_kvm_installer_media,
 )
+from ordivon_security.providers.windows_kvm import load_json_object as _load_object
 
 
 def build_parser() -> argparse.ArgumentParser:

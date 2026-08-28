@@ -37,7 +37,8 @@ def _validate_unix_socket_path(path: Path, label: str) -> None:
         )
 
 
-def _digest_path(path: Path) -> tuple[str, int]:
+def digest_path(path: Path) -> tuple[str, int]:
+    """Return SHA-256 and byte length for one machine-substrate artifact."""
     digest = hashlib.sha256()
     byte_length = 0
     with path.open("rb") as handle:
@@ -85,7 +86,8 @@ def replace_private_json(path: Path, value: JsonObject) -> None:
         raise
 
 
-def _host_cpu_identity() -> JsonObject:
+def host_cpu_identity() -> JsonObject:
+    """Observe the host CPU identity bound into Windows machine execution identity."""
     fields: dict[str, str] = {}
     for line in Path("/proc/cpuinfo").read_text(encoding="utf-8").splitlines():
         if not line.strip():
@@ -118,7 +120,7 @@ def _host_cpu_identity() -> JsonObject:
     return identity
 
 
-def _version_line(executable: Path, *args: str) -> str:
+def executable_version_line(executable: Path, *args: str) -> str:
     completed = subprocess.run(
         [str(executable), *args],
         check=True,
@@ -311,8 +313,8 @@ class WindowsKvmBaseImage:
         for path in (manifest_path, image_path, vars_path):
             if path.is_symlink() or not path.is_file():
                 raise ValueError(f"Windows KVM base file is missing or unsafe: {path}")
-        actual_image_digest, _ = _digest_path(image_path)
-        actual_vars_digest, _ = _digest_path(vars_path)
+        actual_image_digest, _ = digest_path(image_path)
+        actual_vars_digest, _ = digest_path(vars_path)
         if actual_image_digest != digests["baseImage"]:
             raise ValueError("Windows KVM base image digest differs")
         if actual_vars_digest != digests["baseVars"]:
@@ -442,7 +444,9 @@ class WindowsKvmMachineClosure:
     details: JsonObject
 
 
-class _QmpClient:
+class WindowsKvmQmpClient:
+    """Bounded QMP client used by the Windows KVM machine family."""
+
     def __init__(self, path: Path, *, timeout_seconds: int) -> None:
         self.path = path
         self.timeout_seconds = timeout_seconds
@@ -450,7 +454,7 @@ class _QmpClient:
         self._reader: Any = None
         self._writer: Any = None
 
-    def __enter__(self) -> _QmpClient:
+    def __enter__(self) -> WindowsKvmQmpClient:
         deadline = time.monotonic() + self.timeout_seconds
         while True:
             connection: socket.socket | None = None
@@ -601,11 +605,12 @@ def windows_kvm_machine_base_arguments(
     ]
 
 
-def _pci_network_devices(value: JsonValue) -> list[JsonObject]:
+def pci_network_devices(value: JsonValue) -> list[JsonObject]:
+    """Extract PCI network-class devices from QMP topology recursively."""
     found: list[JsonObject] = []
     if isinstance(value, list):
         for item in value:
-            found.extend(_pci_network_devices(item))
+            found.extend(pci_network_devices(item))
     elif isinstance(value, dict):
         class_info = value.get("class_info")
         if isinstance(class_info, dict):
@@ -616,7 +621,7 @@ def _pci_network_devices(value: JsonValue) -> list[JsonObject]:
             ):
                 found.append(value)
         for item in value.values():
-            found.extend(_pci_network_devices(item))
+            found.extend(pci_network_devices(item))
     return found
 
 
@@ -637,9 +642,9 @@ class WindowsKvmMachineProvider:
 
     @property
     def execution_identity(self) -> JsonObject:
-        qemu_digest, _ = _digest_path(self.config.qemu_path)
-        swtpm_digest, _ = _digest_path(self.config.swtpm_path)
-        firmware_digest, _ = _digest_path(self.config.firmware_code_path)
+        qemu_digest, _ = digest_path(self.config.qemu_path)
+        swtpm_digest, _ = digest_path(self.config.swtpm_path)
+        firmware_digest, _ = digest_path(self.config.firmware_code_path)
         if firmware_digest != self.base.firmware_code_digest:
             raise ValueError("Windows KVM firmware differs from the sealed base identity")
         configuration: JsonObject = {
@@ -668,16 +673,16 @@ class WindowsKvmMachineProvider:
             "sourceIsoDigest": self.base.source_iso_digest,
             "guestRunnerDigest": self.base.guest_runner_digest,
             "windowsBuild": self.base.windows_build,
-            "hostCpu": _host_cpu_identity(),
+            "hostCpu": host_cpu_identity(),
             "qemu": {
                 "path": str(self.config.qemu_path),
                 "digest": qemu_digest,
-                "version": _version_line(self.config.qemu_path, "--version"),
+                "version": executable_version_line(self.config.qemu_path, "--version"),
             },
             "swtpm": {
                 "path": str(self.config.swtpm_path),
                 "digest": swtpm_digest,
-                "version": _version_line(self.config.swtpm_path, "--version"),
+                "version": executable_version_line(self.config.swtpm_path, "--version"),
             },
             "firmwareCode": {
                 "path": str(self.config.firmware_code_path),
@@ -963,10 +968,10 @@ class WindowsKvmMachineProvider:
 
     def inspect_qmp(self, state: JsonObject) -> JsonObject:
         qmp_path = Path(cast(str, state["qmpPath"]))
-        with _QmpClient(qmp_path, timeout_seconds=self.config.qmp_ready_timeout_seconds) as qmp:
+        with WindowsKvmQmpClient(qmp_path, timeout_seconds=self.config.qmp_ready_timeout_seconds) as qmp:
             status = qmp.execute("query-status")
             pci = qmp.execute("query-pci")
-        network_devices = _pci_network_devices(pci)
+        network_devices = pci_network_devices(pci)
         state["networkDevicePresent"] = bool(network_devices)
         return {
             "status": status,
@@ -983,7 +988,7 @@ class WindowsKvmMachineProvider:
         timeout_seconds: int = 5,
     ) -> JsonValue:
         qmp_path = Path(cast(str, state["qmpPath"]))
-        with _QmpClient(qmp_path, timeout_seconds=timeout_seconds) as qmp:
+        with WindowsKvmQmpClient(qmp_path, timeout_seconds=timeout_seconds) as qmp:
             return qmp.execute(command)
 
     def wait_for_qmp_event(
@@ -994,7 +999,7 @@ class WindowsKvmMachineProvider:
         timeout_seconds: int,
     ) -> JsonObject:
         qmp_path = Path(cast(str, state["qmpPath"]))
-        with _QmpClient(
+        with WindowsKvmQmpClient(
             qmp_path,
             timeout_seconds=self.config.qmp_ready_timeout_seconds,
         ) as qmp:

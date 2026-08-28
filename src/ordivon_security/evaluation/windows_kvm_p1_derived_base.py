@@ -14,8 +14,9 @@ from ordivon_security._canonical import JsonObject, canonical_digest
 from ordivon_security.identity import security_source_identity
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmBaseImage,
-    _digest_path,
-    _run_checked,
+)
+from ordivon_security.providers.windows_kvm import (
+    digest_path as _digest_path,
 )
 from ordivon_security.providers.windows_kvm import (
     load_json_object as _load_object,
@@ -26,6 +27,7 @@ from ordivon_security.providers.windows_kvm import (
 
 from .models import SampleIdentity
 from .vault import SampleVault
+from .windows_kvm import run_windows_kvm_command as _run_checked
 
 _RESOURCE_PATHS: dict[str, PurePosixPath] = {
     "generic-controller": PurePosixPath("ProgramData/Ordivon/p1-controller.exe"),

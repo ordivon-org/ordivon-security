@@ -15,8 +15,14 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue, canonical_digest
 from ordivon_security.identity import security_source_identity
+from ordivon_security.providers.windows_kvm import (
+    digest_path as _digest_path,
+)
+from ordivon_security.providers.windows_kvm import (
+    replace_private_json as _replace_private_json,
+)
 
-from .windows_kvm import _digest_path, _replace_private_json, _run_checked
+from .windows_kvm import run_windows_kvm_command as _run_checked
 from .windows_kvm_p1_cases import CapabilityCase, EnvironmentTransformationManifest
 
 _EXECUTION_LABEL = "ORDIVON_P1_EXEC"
