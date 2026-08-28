@@ -92,6 +92,12 @@ class SecuritySurfaceTests(unittest.TestCase):
         self.assertTrue(HostAssignedDeepSeekHarnessTurnDriver.__name__)
         self.assertTrue(RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver.__name__)
 
+    def test_actor_facade_does_not_reexport_foreign_lifecycle_variants(self) -> None:
+        import ordivon_security.actors as actors
+
+        self.assertFalse(hasattr(actors, "HostAssignedDeepSeekHarnessTurnDriver"))
+        self.assertFalse(hasattr(actors, "RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver"))
+
     def test_archived_c1i_n_consequence_runners_do_not_return_to_current_package(self) -> None:
         package = Path(ordivon_security.__file__).resolve().parent
         for module_name in (

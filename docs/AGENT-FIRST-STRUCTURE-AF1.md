@@ -41,7 +41,7 @@ Thus `externalBoundary = denied` continues to describe current no-uplink experim
 
 ## Canonical semantic import paths
 
-New code should use `ordivon_security.integrations` and `ordivon_security.world_boundary` for Host/Runtime experiment adapters and World destination/admission adapters respectively.
+New code should use `ordivon_security.integrations` and `ordivon_security.world_boundary` for Host/Runtime experiment-adapter discovery and World destination/admission adapters respectively. Host/Runtime turn-driver implementations remain physically under `actors/` because they implement Security's `AgentTurnDriver` side of `NativeHarnessActorBackend`; `integrations` is their canonical foreign-lifecycle projection, not a second implementation owner.
 
 The `integrations` namespace is reserved for current foreign-system bindings. IF0/IF1 readback/finalization machinery is experiment-specific and lives in `finalized_range_intent_research_fixture.py`; current IF2 may consume that historical treatment without promoting it into the reusable integration surface.
 
