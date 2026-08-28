@@ -43,7 +43,7 @@ Thus `externalBoundary = denied` continues to describe current no-uplink experim
 
 New code should use `ordivon_security.integrations` and `ordivon_security.world_boundary` for Host/Runtime experiment adapters and World destination/admission adapters respectively.
 
-Historical `ordivon_security.actors.host_assigned`, `actors.runtime_assigned`, and `evaluation.world_*` implementations remain valid compatibility paths so accepted evidence and tests are not rewritten merely for directory aesthetics.
+Historical `ordivon_security.actors.host_assigned`, `actors.runtime_assigned`, and `evaluation.world_*` paths remain valid compatibility paths where current consumers still require them. World destination implementations now live under `ordivon_security.world_boundary`; the historical Evaluation module paths are thin aliases rather than a second ownership claim.
 
 ## Explicit non-goals
 

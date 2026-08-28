@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 
 from ordivon_security._canonical import canonical_bytes, canonical_digest
-from ordivon_security.evaluation.world_resource import (
+from ordivon_security.world_boundary.resource import (
     WorldResourceIdentityConflict,
     WorldResourceInbox,
     WorldResourcePolicyRejected,

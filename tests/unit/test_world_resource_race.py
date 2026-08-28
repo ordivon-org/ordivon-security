@@ -61,7 +61,7 @@ def request(operation: str) -> dict[str, object]:
 _MATERIALIZER = r"""
 import json,sys,time
 from pathlib import Path
-from ordivon_security.evaluation.world_resource import WorldResourceInbox
+from ordivon_security.world_boundary.resource import WorldResourceInbox
 root=Path(sys.argv[1]);ready=Path(sys.argv[2]);release=Path(sys.argv[3])
 req=json.load(sys.stdin)
 inbox=WorldResourceInbox(root,destination_world_id=sys.argv[4],allowed_source_world_ids=(sys.argv[5],),allowed_resource_kinds=(sys.argv[6],))

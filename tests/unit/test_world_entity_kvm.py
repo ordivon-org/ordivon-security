@@ -10,13 +10,13 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from ordivon_security._canonical import canonical_digest
-from ordivon_security.evaluation.world_entity import (
+from ordivon_security.providers.windows_kvm import WindowsKvmMachineConfig
+from ordivon_security.world_boundary.entity import (
     WorldEntityKvmConfig,
     WorldEntityKvmDestination,
     WorldEntityMigrationIdentityConflict,
     WorldEntityMigrationRequestError,
 )
-from ordivon_security.providers.windows_kvm import WindowsKvmMachineConfig
 
 SOURCE = "run:w2-entity:A"
 DESTINATION = "security-world:w2-entity:B"
@@ -313,7 +313,7 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
             instance_id=instance_id,
             generation=self.destination._generation(),
         )
-        with patch("ordivon_security.evaluation.world_entity._set_owner"):
+        with patch("ordivon_security.world_boundary.entity._set_owner"):
             self.destination._stage_continuity(state, request, binding)
         self.provider.persist_state(
             instance_id=instance_id,
@@ -353,7 +353,7 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         state, ledger = self._stage_only(prepared)
         run_path = Path(state["runPath"])
         with patch(
-            "ordivon_security.evaluation.world_entity._process_start_time",
+            "ordivon_security.world_boundary.entity._process_start_time",
             return_value=None,
         ):
             response = self.destination.handle(reconcile_request(prepared))
@@ -372,7 +372,7 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         _, ledger = self._stage_only(prepared)
         before = ledger.read_bytes()
         with patch(
-            "ordivon_security.evaluation.world_entity._process_start_time",
+            "ordivon_security.world_boundary.entity._process_start_time",
             return_value=1,
         ):
             response = self.destination.handle(reconcile_request(prepared))
@@ -395,11 +395,11 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         )
         with (
             patch(
-                "ordivon_security.evaluation.world_entity._process_start_time",
+                "ordivon_security.world_boundary.entity._process_start_time",
                 side_effect=lambda pid: 1001 if pid == 111 else None,
             ),
             patch(
-                "ordivon_security.evaluation.world_entity._process_arguments",
+                "ordivon_security.world_boundary.entity._process_arguments",
                 return_value=(str(self.destination.config.machine.swtpm_path), "socket"),
             ),
         ):
@@ -416,7 +416,7 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         _, ledger = self._stage_only(prepared)
         self.provider.destroy_clean = False
         with patch(
-            "ordivon_security.evaluation.world_entity._process_start_time",
+            "ordivon_security.world_boundary.entity._process_start_time",
             return_value=None,
         ):
             response = self.destination.handle(reconcile_request(prepared))
@@ -495,11 +495,11 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
         persist_calls = self.provider.persist_calls
         with (
             patch(
-                "ordivon_security.evaluation.world_entity._process_start_time",
+                "ordivon_security.world_boundary.entity._process_start_time",
                 side_effect=process_start_time,
             ),
             patch(
-                "ordivon_security.evaluation.world_entity._process_arguments",
+                "ordivon_security.world_boundary.entity._process_arguments",
                 return_value=qemu_arguments,
             ),
         ):
@@ -529,9 +529,9 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
     def test_materialize_stages_real_fat_continuity_and_commits_one_receipt(self) -> None:
         request = materialize_request()
         with (
-            patch("ordivon_security.evaluation.world_entity._set_owner"),
+            patch("ordivon_security.world_boundary.entity._set_owner"),
             patch(
-                "ordivon_security.evaluation.world_entity.windows_kvm_machine_base_arguments",
+                "ordivon_security.world_boundary.entity.windows_kvm_machine_base_arguments",
                 return_value=[],
             ),
         ):
@@ -556,9 +556,9 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
     ) -> None:
         request = materialize_request()
         with (
-            patch("ordivon_security.evaluation.world_entity._set_owner"),
+            patch("ordivon_security.world_boundary.entity._set_owner"),
             patch(
-                "ordivon_security.evaluation.world_entity.windows_kvm_machine_base_arguments",
+                "ordivon_security.world_boundary.entity.windows_kvm_machine_base_arguments",
                 return_value=[],
             ),
         ):
@@ -642,9 +642,9 @@ class WorldEntityKvmDestinationTests(unittest.TestCase):
     def test_inspection_materialized_receipt_survives_fresh_destination_without_native_actions(self) -> None:
         request = materialize_request("migration:inspection:materialized")
         with (
-            patch("ordivon_security.evaluation.world_entity._set_owner"),
+            patch("ordivon_security.world_boundary.entity._set_owner"),
             patch(
-                "ordivon_security.evaluation.world_entity.windows_kvm_machine_base_arguments",
+                "ordivon_security.world_boundary.entity.windows_kvm_machine_base_arguments",
                 return_value=[],
             ),
         ):

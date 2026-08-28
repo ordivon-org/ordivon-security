@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 from ordivon_security._canonical import canonical_digest
-from ordivon_security.evaluation.world_message import (
+from ordivon_security.world_boundary.message import (
     WorldMessageIdentityConflict,
     WorldMessageInbox,
     WorldMessagePolicyRejected,

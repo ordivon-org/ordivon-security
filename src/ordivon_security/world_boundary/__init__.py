@@ -1,11 +1,10 @@
 """Security-side World destination/admission experiment surface.
 
-The implementation remains at its historical ``evaluation.world_*`` paths for compatibility.
-New Security code should import these adapters here so software Evaluation is not mistaken for
-ownership of cross-World message, resource, or Entity semantics.
+Implementations live in this namespace. Historical ``evaluation.world_*`` module paths remain
+thin public compatibility shims for exact older consumers; they do not own the implementation.
 """
 
-from ordivon_security.evaluation.world_entity import (
+from .entity import (
     WorldEntityKvmConfig,
     WorldEntityKvmDestination,
     WorldEntityMigrationIdentityConflict,
@@ -13,14 +12,14 @@ from ordivon_security.evaluation.world_entity import (
     WorldEntityMigrationRequestError,
     rejected_world_entity_response,
 )
-from ordivon_security.evaluation.world_message import (
+from .message import (
     WorldMessageIdentityConflict,
     WorldMessageInbox,
     WorldMessagePolicyRejected,
     WorldMessageRequestError,
     rejected_world_message_response,
 )
-from ordivon_security.evaluation.world_resource import (
+from .resource import (
     WorldResourceIdentityConflict,
     WorldResourceInbox,
     WorldResourcePolicyRejected,

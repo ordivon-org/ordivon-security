@@ -6,7 +6,7 @@ import threading
 import unittest
 from pathlib import Path
 
-from ordivon_security.evaluation.world_message import WorldMessageInbox
+from ordivon_security.world_boundary.message import WorldMessageInbox
 from tests.unit.test_world_message_inbox import (
     DESTINATION,
     KIND,
