@@ -8,25 +8,23 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
-from ordivon_security.cli_deliberation_af2_ablation_if3_acceptance import (
+from ordivon_security.deliberation_before_authority_research_support import (
     DeliberationPrimedAF2Driver,
-)
-from ordivon_security.cli_deliberation_before_authority_if2_acceptance import (
     _deliberate_without_effect_authority,
 )
-from ordivon_security.cli_p1_physical_adaptation import (
-    _ACTOR,
+from ordivon_security.integrations import DeepSeekRangeIntentConfig, RangeIntentHarnessFailure
+from ordivon_security.p1_physical_adaptation_research_fixture import (
     _ACTIONS,
+    _ACTOR,
     _AUTHORITY,
     _EFFECTS,
-    _ZONE,
     _VARIANTS,
-    _PhysicalWorld,
+    _ZONE,
     _action_from_model,
     _authority,
     _interfaces,
+    _PhysicalWorld,
 )
-from ordivon_security.integrations import DeepSeekRangeIntentConfig, RangeIntentHarnessFailure
 from ordivon_security.range import RangeEffectRequest
 
 _OBJECTIVE = (

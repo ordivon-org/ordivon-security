@@ -3,11 +3,13 @@ from __future__ import annotations
 import unittest
 
 from ordivon_security.cli_p1_physical_adaptation import (
-    _VARIANTS,
-    _PhysicalWorld,
     _adaptive_policy,
     _run_policy,
     _static_policy,
+)
+from ordivon_security.p1_physical_adaptation_research_fixture import (
+    _VARIANTS,
+    _PhysicalWorld,
 )
 
 
