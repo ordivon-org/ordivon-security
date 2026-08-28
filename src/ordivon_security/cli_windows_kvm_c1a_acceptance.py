@@ -15,11 +15,6 @@ from ordivon_security.cli_windows_kvm_c1_acceptance import (
     _backend_state,
     _world_still_peer_a,
 )
-from ordivon_security.cli_windows_kvm_s6_acceptance import (
-    _compile_canary,
-    _guest_claim_passes,
-    _topology_phases,
-)
 from ordivon_security.providers.windows_kvm import WindowsKvmMachineConfig
 from ordivon_security.range import (
     RangeAuthority,
@@ -30,6 +25,11 @@ from ordivon_security.range import (
 )
 from ordivon_security.range.windows_fabric import WindowsFabricRangeConfig
 from ordivon_security.range.windows_topology_churn import WindowsTopologyChurnRange
+from ordivon_security.windows_kvm_acceptance_support import (
+    compile_topology_churn_canary,
+    topology_guest_claim_passes,
+    topology_phases,
+)
 
 _ACTOR_ID = "actor:c1a-autonomous-controller"
 _AUTHORITY_ID = "range-authority:c1a-autonomous-controller"
@@ -436,7 +436,7 @@ def main() -> None:
 
     canary_root = args.state_root / "canaries"
     canary_path = canary_root / f"ordivon-c1a-autonomous-intent-{token}.exe"
-    compilation = _compile_canary(canary_path)
+    compilation = compile_topology_churn_canary(canary_path)
     session: RangeSession | None = None
     pre_intent_state: JsonObject | None = None
     post_control_state: JsonObject | None = None
@@ -597,7 +597,7 @@ def main() -> None:
 
     events = [] if session is None else [event.to_dict() for event in session.events]
     event_types = [event.get("eventType") for event in events]
-    phases = _topology_phases(events)
+    phases = topology_phases(events)
     history = None if final_state is None else final_state.get("topologyHistory")
     history_phases = (
         [item.get("phase") for item in history if isinstance(item, dict)]
@@ -661,7 +661,7 @@ def main() -> None:
         "bothChallengeFlowsObserved": isinstance(sensor, dict)
         and sensor.get("peerATrafficObserved") is True
         and sensor.get("peerBTrafficObserved") is True,
-        "guestObservedBothPeers": _guest_claim_passes(guest_claim),
+        "guestObservedBothPeers": topology_guest_claim_passes(guest_claim),
         "residualClosureClean": destroy_receipt is not None
         and destroy_receipt.get("clean") is True,
     }

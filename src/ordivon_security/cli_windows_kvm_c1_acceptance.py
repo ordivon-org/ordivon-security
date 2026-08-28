@@ -7,11 +7,6 @@ from pathlib import Path
 
 from ordivon_security._canonical import JsonObject
 from ordivon_security.acceptance_support import write_receipt
-from ordivon_security.cli_windows_kvm_s6_acceptance import (
-    _compile_canary,
-    _guest_claim_passes,
-    _topology_phases,
-)
 from ordivon_security.providers.windows_kvm import WindowsKvmMachineConfig
 from ordivon_security.range import (
     RangeAuthority,
@@ -22,6 +17,11 @@ from ordivon_security.range import (
 )
 from ordivon_security.range.windows_fabric import WindowsFabricRangeConfig
 from ordivon_security.range.windows_topology_churn import WindowsTopologyChurnRange
+from ordivon_security.windows_kvm_acceptance_support import (
+    compile_topology_churn_canary,
+    topology_guest_claim_passes,
+    topology_phases,
+)
 
 _ACTOR_ID = "actor:c1-fabric-controller"
 _AUTHORITY_ID = "range-authority:c1-fabric-controller"
@@ -103,7 +103,7 @@ def main() -> None:
     token = f"{time.time_ns():x}"
     canary_root = args.state_root / "canaries"
     canary_path = canary_root / f"ordivon-c1-topology-authority-{token}.exe"
-    compilation = _compile_canary(canary_path)
+    compilation = compile_topology_churn_canary(canary_path)
     session: RangeSession | None = None
     final_state: JsonObject | None = None
     pre_authority_state: JsonObject | None = None
@@ -242,7 +242,7 @@ def main() -> None:
 
     events = [] if session is None else [event.to_dict() for event in session.events]
     event_types = [event.get("eventType") for event in events]
-    phases = _topology_phases(events)
+    phases = topology_phases(events)
     guest_claim = None if final_state is None else final_state.get("guestClaim")
     sensor = None if final_state is None else final_state.get("sensorObservation")
     history = None if final_state is None else final_state.get("topologyHistory")
@@ -296,7 +296,7 @@ def main() -> None:
         "bothChallengeFlowsObserved": isinstance(sensor, dict)
         and sensor.get("peerATrafficObserved") is True
         and sensor.get("peerBTrafficObserved") is True,
-        "guestObservedBothPeers": _guest_claim_passes(guest_claim),
+        "guestObservedBothPeers": topology_guest_claim_passes(guest_claim),
         "singleNetworkDevicePresent": final_state is not None
         and final_state.get("networkDevicePresent") is True,
         "residualClosureClean": destroy_receipt is not None

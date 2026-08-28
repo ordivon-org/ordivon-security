@@ -21,7 +21,6 @@ from ordivon_security.cli_windows_kvm_c1b_acceptance import (
     _machine_config,
     _process_truth,
 )
-from ordivon_security.cli_windows_kvm_s6_acceptance import _compile_canary
 from ordivon_security.providers.windows_kvm import _load_object, _replace_private_json
 from ordivon_security.range import (
     RangeAuthority,
@@ -32,6 +31,7 @@ from ordivon_security.range import (
 from ordivon_security.range.windows_fabric import WindowsFabricRangeConfig, _run
 from ordivon_security.range.windows_fabric_reconcile import reconcile_windows_fabric_range_runs
 from ordivon_security.range.windows_topology_churn import WindowsTopologyChurnRange
+from ordivon_security.windows_kvm_acceptance_support import compile_topology_churn_canary
 
 _ACTOR_ID = "actor:partial-materialization-controller"
 _AUTHORITY_ID = "range-authority:partial-materialization-controller"
@@ -172,7 +172,7 @@ def _owner(args: argparse.Namespace) -> None:
     token = args.token
     canary_root = args.state_root / "canaries"
     canary_path = canary_root / f"ordivon-partial-materialization-{token}.exe"
-    compilation = _compile_canary(canary_path)
+    compilation = compile_topology_churn_canary(canary_path)
     authority = RangeAuthority(
         authority_id=_AUTHORITY_ID,
         revision="1",

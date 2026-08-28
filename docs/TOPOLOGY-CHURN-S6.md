@@ -154,6 +154,8 @@ It establishes:
 
 The sanitized acceptance index is [`../evidence/acceptance/windows-kvm-s6-topology-churn-03a93e3.json`](../evidence/acceptance/windows-kvm-s6-topology-churn-03a93e3.json).
 
+The S6 architecture, topology-churn Range implementation, canary source and later C1-series consumers remain current. On 2026-08-28 the one-shot `cli_windows_kvm_s6_acceptance.py` orchestration was retired after its shared canary/claim/topology helpers were moved into neutral Windows-KVM acceptance support. No current command, documentation entry or production consumer invoked the runner itself. The accepted physical trial remains exactly reproducible from its bound `03a93e3` revision; later normal-path regressions are carried by the C1-series consumers rather than by keeping the original orchestration module permanently live.
+
 ## Real failures and corrections
 
 ### Fast success looked like startup failure

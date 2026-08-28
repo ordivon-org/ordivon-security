@@ -14,7 +14,6 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, validate_json
 from ordivon_security.acceptance_support import git_revision, write_receipt
-from ordivon_security.cli_windows_kvm_s6_acceptance import _compile_canary
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     _load_object,
@@ -32,6 +31,7 @@ from ordivon_security.range.windows_fabric_reconcile import (
     reconcile_windows_fabric_range_runs,
 )
 from ordivon_security.range.windows_topology_churn import WindowsTopologyChurnRange
+from ordivon_security.windows_kvm_acceptance_support import compile_topology_churn_canary
 
 _ACTOR_ID = "actor:c1b-interrupted-controller"
 _AUTHORITY_ID = "range-authority:c1b-interrupted-controller"
@@ -173,7 +173,7 @@ def _owner(args: argparse.Namespace) -> None:
     token = args.token
     canary_root = args.state_root / "canaries"
     canary_path = canary_root / f"ordivon-c1b-interrupted-{token}.exe"
-    compilation = _compile_canary(canary_path)
+    compilation = compile_topology_churn_canary(canary_path)
     authority = RangeAuthority(
         authority_id=_AUTHORITY_ID,
         revision="1",

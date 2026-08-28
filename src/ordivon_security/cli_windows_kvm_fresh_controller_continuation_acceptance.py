@@ -25,10 +25,6 @@ from ordivon_security.cli_windows_kvm_partial_materialization_acceptance import 
     _link_names,
     _root_link_truth,
 )
-from ordivon_security.cli_windows_kvm_s6_acceptance import (
-    _compile_canary,
-    _guest_claim_passes,
-)
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineProvider,
     _load_object,
@@ -48,6 +44,10 @@ from ordivon_security.range.windows_fabric_reconcile import (
     _root_link_kinds,
     _validated_range_ledger,
     reconcile_windows_fabric_range_runs,
+)
+from ordivon_security.windows_kvm_acceptance_support import (
+    compile_topology_churn_canary,
+    topology_guest_claim_passes,
 )
 
 _ACTOR_ID = "actor:fresh-controller-continuation"
@@ -526,7 +526,7 @@ def _owner(args: argparse.Namespace) -> None:
     token = args.token
     canary_root = args.state_root / "canaries"
     canary_path = canary_root / f"ordivon-fresh-controller-{token}.exe"
-    compilation = _compile_canary(canary_path)
+    compilation = compile_topology_churn_canary(canary_path)
     authority = RangeAuthority(
         authority_id=_AUTHORITY_ID,
         revision="1",
@@ -734,7 +734,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         )
         is False,
         "guestCompletedAfterFreshController": guest_completed,
-        "guestObservedBothPeers": _guest_claim_passes(guest_claim),
+        "guestObservedBothPeers": topology_guest_claim_passes(guest_claim),
         "peerBServiceCompleted": peer_exit == 0,
         "sensorObservedBothFlows": sensor.get("peerATrafficObserved") is True
         and sensor.get("peerBTrafficObserved") is True,
