@@ -8,13 +8,13 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
 from ordivon_security.autonomous_communication_research_fixture import (
-    _A_ID,
-    _ACTIVATE_EFFECT,
-    _B_ID,
-    _MATCH_SIGNAL_B,
-    _MESSAGE_EFFECT,
-    _MISMATCH_SIGNAL_B,
-    _RANGE_ID,
+    AC0_ACTIVATE_EFFECT,
+    AC0_ACTOR_A_ID,
+    AC0_ACTOR_B_ID,
+    AC0_MATCH_SIGNAL_B,
+    AC0_MESSAGE_EFFECT,
+    AC0_MISMATCH_SIGNAL_B,
+    AC0_RANGE_ID,
     _a_authority,
     _a_context,
     _AC0RangeBackend,
@@ -49,8 +49,8 @@ def _run_world(
         RangeSessionSpec(
             session_id=f"range-session:ac0-{treatment}",
             revision="1",
-            range_id=_RANGE_ID,
-            actor_ids=(_A_ID, _B_ID),
+            range_id=AC0_RANGE_ID,
+            actor_ids=(AC0_ACTOR_A_ID, AC0_ACTOR_B_ID),
             authorities=(_a_authority(), _b_authority()),
             metadata={
                 "purpose": "autonomous-communication-ac0",
@@ -62,8 +62,8 @@ def _run_world(
     destroy_receipt: JsonObject | None = None
     try:
         session.start()
-        session.update_actor_presence(_A_ID, "active", logical_time=1)
-        session.update_actor_presence(_B_ID, "active", logical_time=1)
+        session.update_actor_presence(AC0_ACTOR_A_ID, "active", logical_time=1)
+        session.update_actor_presence(AC0_ACTOR_B_ID, "active", logical_time=1)
         logical_time = 2
         a_admissions: list[JsonObject] = []
         a_receipts: list[JsonObject] = []
@@ -118,7 +118,7 @@ def _run_world(
                 "admissions": b_admissions,
                 "executionReceipts": b_receipts,
             },
-            "messagesVisibleToAAfterB": _messages_for(final_state, _A_ID),
+            "messagesVisibleToAAfterB": _messages_for(final_state, AC0_ACTOR_A_ID),
             "outcome": outcome,
             "finalState": final_state,
             "events": [event.to_dict() for event in session.events],
@@ -153,7 +153,7 @@ def run_experiment(*, state_root: Path, driver: DeepSeekRangeIntentDriver) -> Js
 
     match = _run_world(
         root=state_root / "match",
-        signal_b=_MATCH_SIGNAL_B,
+        signal_b=AC0_MATCH_SIGNAL_B,
         treatment="match",
         source_decision_requests=source_requests,
         source_context_digest=a_context.digest,
@@ -163,7 +163,7 @@ def run_experiment(*, state_root: Path, driver: DeepSeekRangeIntentDriver) -> Js
     )
     mismatch = _run_world(
         root=state_root / "mismatch",
-        signal_b=_MISMATCH_SIGNAL_B,
+        signal_b=AC0_MISMATCH_SIGNAL_B,
         treatment="mismatch",
         source_decision_requests=source_requests,
         source_context_digest=a_context.digest,
@@ -212,7 +212,7 @@ def run_experiment(*, state_root: Path, driver: DeepSeekRangeIntentDriver) -> Js
         == mismatch["sourceA"]["decisionDigest"]
         == a_decision.digest,
         "sourceACommunicated": len(source_requests) > 0
-        and all(request.effect_type == _MESSAGE_EFFECT for request in source_requests),
+        and all(request.effect_type == AC0_MESSAGE_EFFECT for request in source_requests),
         "sameSourceMessageProjectionAcrossCounterfactuals": canonical_digest(
             {"messages": match_messages}
         )
@@ -235,9 +235,9 @@ def run_experiment(*, state_root: Path, driver: DeepSeekRangeIntentDriver) -> Js
         "zeroOracleRegretBothWorlds": match_outcome.get("regret") == 0
         and mismatch_outcome.get("regret") == 0,
         "receiverCanReplyWithoutReplyBeingRequired": all(
-            interface.effect_type in {_MESSAGE_EFFECT, _ACTIVATE_EFFECT}
+            interface.effect_type in {AC0_MESSAGE_EFFECT, AC0_ACTIVATE_EFFECT}
             for interface in _b_context(
-                cast(JsonObject, match["finalState"]), signal_b=_MATCH_SIGNAL_B
+                cast(JsonObject, match["finalState"]), signal_b=AC0_MATCH_SIGNAL_B
             ).effect_interfaces
         ),
         "noTrustReputationCoalitionOntologyInAgentSurface": all(

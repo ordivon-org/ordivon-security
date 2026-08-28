@@ -3,7 +3,10 @@ from __future__ import annotations
 import unittest
 
 from ordivon_security._canonical import canonical_digest
-from ordivon_security.autonomous_communication_research_fixture import _A_ID, _B_ID
+from ordivon_security.autonomous_communication_research_fixture import (
+    AC0_ACTOR_A_ID,
+    AC0_ACTOR_B_ID,
+)
 from ordivon_security.cli_verifiable_disclosure_ac2_acceptance import (
     _DISCLOSURE_CAPABILITY,
     _DISCLOSURE_EFFECT,
@@ -19,8 +22,8 @@ class VerifiableDisclosureAC2Tests(unittest.TestCase):
             "messages": [
                 {
                     "messageId": "message:ac0:ac0-a:1",
-                    "sourceId": _A_ID,
-                    "recipientId": _B_ID,
+                    "sourceId": AC0_ACTOR_A_ID,
+                    "recipientId": AC0_ACTOR_B_ID,
                     "content": {"signal": 1},
                     "claimTruthStatus": "not-promoted",
                 }
@@ -30,8 +33,8 @@ class VerifiableDisclosureAC2Tests(unittest.TestCase):
     def verified(self) -> dict[str, object]:
         return {
             "disclosureId": "verified-disclosure:ac2:a-signal:1",
-            "sourceId": _A_ID,
-            "recipientId": _B_ID,
+            "sourceId": AC0_ACTOR_A_ID,
+            "recipientId": AC0_ACTOR_B_ID,
             "property": "privateSignal",
             "value": 1,
             "truthAuthority": "owned-range-selective-disclosure",
@@ -43,7 +46,7 @@ class VerifiableDisclosureAC2Tests(unittest.TestCase):
         request = _controlled_disclosure_request()
         self.assertEqual(request.capability, _DISCLOSURE_CAPABILITY)
         self.assertEqual(request.effect_type, _DISCLOSURE_EFFECT)
-        self.assertEqual(request.payload, {"recipientId": _B_ID, "property": "privateSignal"})
+        self.assertEqual(request.payload, {"recipientId": AC0_ACTOR_B_ID, "property": "privateSignal"})
         self.assertNotIn("value", request.payload)
 
     def test_b_sees_message_and_separate_verified_evidence(self) -> None:

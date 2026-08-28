@@ -6,10 +6,10 @@ from pathlib import Path
 
 from ordivon_security._canonical import canonical_digest
 from ordivon_security.autonomous_communication_research_fixture import (
-    _A_ID,
-    _B_ID,
-    _MATCH_SIGNAL_B,
-    _MESSAGE_EFFECT,
+    AC0_ACTOR_A_ID,
+    AC0_ACTOR_B_ID,
+    AC0_MATCH_SIGNAL_B,
+    AC0_MESSAGE_EFFECT,
     _a_context,
     _AC0RangeBackend,
     _b_context,
@@ -25,7 +25,7 @@ from ordivon_security.range import RangeSession, RangeSessionSpec
 class AutonomousCommunicationAC0Tests(unittest.TestCase):
     def test_a_surface_has_only_message_effect_and_no_social_ontology(self) -> None:
         context = _a_context()
-        self.assertEqual([item.effect_type for item in context.effect_interfaces], [_MESSAGE_EFFECT])
+        self.assertEqual([item.effect_type for item in context.effect_interfaces], [AC0_MESSAGE_EFFECT])
         text = str(context.to_dict()).lower()
         for token in ("trust", "reputation", "coalition", "collude", "organization"):
             self.assertNotIn(token, text)
@@ -35,8 +35,8 @@ class AutonomousCommunicationAC0Tests(unittest.TestCase):
             "messages": [
                 {
                     "messageId": "message:ac0:ac0-a:1",
-                    "sourceId": _A_ID,
-                    "recipientId": _B_ID,
+                    "sourceId": AC0_ACTOR_A_ID,
+                    "recipientId": AC0_ACTOR_B_ID,
                     "content": {"signal": 1, "note": "example"},
                     "claimTruthStatus": "not-promoted",
                     "requestId": "must-not-project",
@@ -44,7 +44,7 @@ class AutonomousCommunicationAC0Tests(unittest.TestCase):
                 }
             ]
         }
-        visible = _messages_for(state, _B_ID)
+        visible = _messages_for(state, AC0_ACTOR_B_ID)
         self.assertEqual(len(visible), 1)
         self.assertEqual(
             set(visible[0]),
@@ -57,8 +57,8 @@ class AutonomousCommunicationAC0Tests(unittest.TestCase):
             "messages": [
                 {
                     "messageId": "message:ac0:ac0-a:1",
-                    "sourceId": _A_ID,
-                    "recipientId": _B_ID,
+                    "sourceId": AC0_ACTOR_A_ID,
+                    "recipientId": AC0_ACTOR_B_ID,
                     "content": {"signal": 1},
                     "claimTruthStatus": "not-promoted",
                 }
@@ -82,14 +82,14 @@ class AutonomousCommunicationAC0Tests(unittest.TestCase):
 
     def test_evaluator_score_is_private_and_oracle_bound(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
-            backend = _AC0RangeBackend(Path(raw) / "world", signal_b=_MATCH_SIGNAL_B)
+            backend = _AC0RangeBackend(Path(raw) / "world", signal_b=AC0_MATCH_SIGNAL_B)
             session = RangeSession(
                 backend,
                 RangeSessionSpec(
                     session_id="range-session:ac0-unit",
                     revision="1",
                     range_id=backend.range_id,
-                    actor_ids=(_A_ID, _B_ID),
+                    actor_ids=(AC0_ACTOR_A_ID, AC0_ACTOR_B_ID),
                 ),
             )
             session.start()

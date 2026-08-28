@@ -11,11 +11,11 @@ from typing import cast
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
 from ordivon_security.actors.autonomous import RangeIntentContext
 from ordivon_security.autonomous_communication_research_fixture import (
-    _A_ID,
-    _B_ID,
-    _MATCH_SIGNAL_B,
-    _MISMATCH_SIGNAL_B,
-    _RANGE_ID,
+    AC0_ACTOR_A_ID,
+    AC0_ACTOR_B_ID,
+    AC0_MATCH_SIGNAL_B,
+    AC0_MISMATCH_SIGNAL_B,
+    AC0_RANGE_ID,
     _a_authority,
     _AC0RangeBackend,
     _activation_interface,
@@ -55,20 +55,20 @@ def _sha256(data: bytes) -> str:
 
 def _b_context(state: JsonObject, *, signal_b: int) -> RangeIntentContext:
     return RangeIntentContext(
-        actor_id=_B_ID,
+        actor_id=AC0_ACTOR_B_ID,
         objective=_B_OBJECTIVE,
         visible_observation={
             "schemaVersion": 1,
             "kind": "ordivon.security.ac1-b-visible-observation",
             "privateSignal": {"value": signal_b, "authority": "world-private-to-b"},
             "otherActorPrivateSignal": "UNKNOWN",
-            "messagesForActor": _messages_for(state, _B_ID),
+            "messagesForActor": _messages_for(state, AC0_ACTOR_B_ID),
             "sharedMechanism": {"activated": False},
             "sharedRules": _shared_rules(),
             "publicIncentiveStructure": _public_incentive_structure(),
         },
         authorities=(_b_authority(),),
-        effect_interfaces=(_message_interface(_B_ID), _activation_interface()),
+        effect_interfaces=(_message_interface(AC0_ACTOR_B_ID), _activation_interface()),
         metadata={"experiment": "AC1", "role": "B", "phase": "post-frozen-a-message"},
     )
 
@@ -95,8 +95,8 @@ def _run_world(
         RangeSessionSpec(
             session_id=f"range-session:ac1-{treatment}",
             revision="1",
-            range_id=_RANGE_ID,
-            actor_ids=(_A_ID, _B_ID),
+            range_id=AC0_RANGE_ID,
+            actor_ids=(AC0_ACTOR_A_ID, AC0_ACTOR_B_ID),
             authorities=(
                 # Reuse the exact AC0 authorities; AC1 changes only receiver-visible public incentives.
                 _a_authority(),
@@ -113,8 +113,8 @@ def _run_world(
     destroy_receipt: JsonObject | None = None
     try:
         session.start()
-        session.update_actor_presence(_A_ID, "active", logical_time=1)
-        session.update_actor_presence(_B_ID, "active", logical_time=1)
+        session.update_actor_presence(AC0_ACTOR_A_ID, "active", logical_time=1)
+        session.update_actor_presence(AC0_ACTOR_B_ID, "active", logical_time=1)
         source_request = _frozen_a_request()
         source_admission, source_receipt = _admit_execute(
             session=session,
@@ -164,7 +164,7 @@ def _run_world(
                 "admissions": b_admissions,
                 "executionReceipts": b_receipts,
             },
-            "messagesVisibleToAAfterB": _messages_for(final_state, _A_ID),
+            "messagesVisibleToAAfterB": _messages_for(final_state, AC0_ACTOR_A_ID),
             "outcome": outcome,
             "finalState": final_state,
             "events": [event.to_dict() for event in session.events],
@@ -179,13 +179,13 @@ def _run_world(
 def run_experiment(*, state_root: Path, driver: DeepSeekRangeIntentDriver) -> JsonObject:
     match = _run_world(
         root=state_root / "match",
-        signal_b=_MATCH_SIGNAL_B,
+        signal_b=AC0_MATCH_SIGNAL_B,
         treatment="match",
         driver=driver,
     )
     mismatch = _run_world(
         root=state_root / "mismatch",
-        signal_b=_MISMATCH_SIGNAL_B,
+        signal_b=AC0_MISMATCH_SIGNAL_B,
         treatment="mismatch",
         driver=driver,
     )

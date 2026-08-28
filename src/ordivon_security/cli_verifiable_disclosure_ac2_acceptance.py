@@ -11,12 +11,12 @@ from typing import cast
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
 from ordivon_security.actors.autonomous import RangeIntentContext
 from ordivon_security.autonomous_communication_research_fixture import (
-    _A_ID,
-    _B_ID,
-    _MATCH_SIGNAL_B,
-    _MESSAGE_EFFECT,
-    _MISMATCH_SIGNAL_B,
-    _RANGE_ID,
+    AC0_ACTOR_A_ID,
+    AC0_ACTOR_B_ID,
+    AC0_MATCH_SIGNAL_B,
+    AC0_MESSAGE_EFFECT,
+    AC0_MISMATCH_SIGNAL_B,
+    AC0_RANGE_ID,
     _a_authority,
     _AC0RangeBackend,
     _activation_interface,
@@ -75,7 +75,7 @@ def _disclosure_authority() -> RangeAuthority:
     return RangeAuthority(
         authority_id=_DISCLOSURE_AUTHORITY,
         revision="1",
-        actor_id=_A_ID,
+        actor_id=AC0_ACTOR_A_ID,
         zone_refs=(_DISCLOSURE_ZONE,),
         capabilities=(_DISCLOSURE_CAPABILITY,),
         external_boundary="owned-local-ac2-world",
@@ -89,12 +89,12 @@ def _disclosure_authority() -> RangeAuthority:
 def _controlled_disclosure_request() -> RangeEffectRequest:
     return RangeEffectRequest(
         request_id=_DISCLOSURE_REQUEST_ID,
-        actor_id=_A_ID,
+        actor_id=AC0_ACTOR_A_ID,
         authority_id=_DISCLOSURE_AUTHORITY,
         zone_ref=_DISCLOSURE_ZONE,
         capability=_DISCLOSURE_CAPABILITY,
         effect_type=_DISCLOSURE_EFFECT,
-        payload={"recipientId": _B_ID, "property": "privateSignal"},
+        payload={"recipientId": AC0_ACTOR_B_ID, "property": "privateSignal"},
     )
 
 
@@ -122,15 +122,15 @@ class _AC2RangeBackend(_AC0RangeBackend):
             or admission.effect_type != _DISCLOSURE_EFFECT
         ):
             raise ValueError("AC2 disclosure received another effect contract")
-        if request.actor_id != _A_ID:
+        if request.actor_id != AC0_ACTOR_A_ID:
             raise ValueError("AC2 disclosure must originate from A authority")
-        if request.payload != {"recipientId": _B_ID, "property": "privateSignal"}:
+        if request.payload != {"recipientId": AC0_ACTOR_B_ID, "property": "privateSignal"}:
             raise ValueError("AC2 disclosure request payload differs from controlled contract")
         state = self.inspect(instance)
         signals = state.get("privateSignals")
-        if not isinstance(signals, dict) or signals.get(_A_ID) not in {0, 1}:
+        if not isinstance(signals, dict) or signals.get(AC0_ACTOR_A_ID) not in {0, 1}:
             raise ValueError("AC2 authoritative A private signal is unavailable")
-        signal = cast(int, signals[_A_ID])
+        signal = cast(int, signals[AC0_ACTOR_A_ID])
         receipt: JsonObject = {
             "schemaVersion": 1,
             "kind": "ordivon.security.ac2-disclosure-execution-receipt",
@@ -141,8 +141,8 @@ class _AC2RangeBackend(_AC0RangeBackend):
         }
         verified: JsonObject = {
             "disclosureId": _DISCLOSURE_ID,
-            "sourceId": _A_ID,
-            "recipientId": _B_ID,
+            "sourceId": AC0_ACTOR_A_ID,
+            "recipientId": AC0_ACTOR_B_ID,
             "property": "privateSignal",
             "value": signal,
             "truthAuthority": "owned-range-selective-disclosure",
@@ -165,7 +165,7 @@ def _verified_disclosure_for_b(events: tuple[object, ...]) -> JsonObject | None:
         payload = getattr(raw, "payload", None)
         if event_type != "actor.private-signal-disclosed-verified" or not isinstance(payload, dict):
             continue
-        if payload.get("recipientId") != _B_ID:
+        if payload.get("recipientId") != AC0_ACTOR_B_ID:
             continue
         value: JsonObject = {
             "disclosureId": payload.get("disclosureId"),
@@ -193,7 +193,7 @@ def _b_context(
         "kind": "ordivon.security.ac2-b-visible-observation",
         "privateSignal": {"value": signal_b, "authority": "world-private-to-b"},
         "otherActorPrivateSignal": "UNKNOWN-without-verified-disclosure",
-        "messagesForActor": _messages_for(state, _B_ID),
+        "messagesForActor": _messages_for(state, AC0_ACTOR_B_ID),
         "verifiedDisclosureForActor": deepcopy(verified_disclosure),
         "sharedMechanism": {"activated": False},
         "sharedRules": _shared_rules(),
@@ -205,11 +205,11 @@ def _b_context(
         },
     }
     return RangeIntentContext(
-        actor_id=_B_ID,
+        actor_id=AC0_ACTOR_B_ID,
         objective=_B_OBJECTIVE,
         visible_observation=observation,
         authorities=(_b_authority(),),
-        effect_interfaces=(_message_interface(_B_ID), _activation_interface()),
+        effect_interfaces=(_message_interface(AC0_ACTOR_B_ID), _activation_interface()),
         metadata={"experiment": "AC2", "role": "B", "phase": "post-verified-disclosure"},
     )
 
@@ -242,7 +242,7 @@ def _execute_request(
             },
             None,
         )
-    if request.effect_type == _MESSAGE_EFFECT:
+    if request.effect_type == AC0_MESSAGE_EFFECT:
         receipt = backend.apply_message(
             session.instance, admission, request, logical_time=logical_time + 1
         )
@@ -276,8 +276,8 @@ def _run_world(
         RangeSessionSpec(
             session_id=f"range-session:ac2-{treatment}",
             revision="1",
-            range_id=_RANGE_ID,
-            actor_ids=(_A_ID, _B_ID),
+            range_id=AC0_RANGE_ID,
+            actor_ids=(AC0_ACTOR_A_ID, AC0_ACTOR_B_ID),
             authorities=(_a_authority(), _disclosure_authority(), _b_authority()),
             metadata={
                 "purpose": "verifiable-selective-disclosure-ac2",
@@ -291,8 +291,8 @@ def _run_world(
     destroy_receipt: JsonObject | None = None
     try:
         session.start()
-        session.update_actor_presence(_A_ID, "active", logical_time=1)
-        session.update_actor_presence(_B_ID, "active", logical_time=1)
+        session.update_actor_presence(AC0_ACTOR_A_ID, "active", logical_time=1)
+        session.update_actor_presence(AC0_ACTOR_B_ID, "active", logical_time=1)
 
         frozen_message = _frozen_a_request()
         message_admission, message_receipt, _ = _execute_request(
@@ -358,7 +358,7 @@ def _run_world(
                 "admissions": b_admissions,
                 "executionReceipts": b_receipts,
             },
-            "messagesVisibleToAAfterB": _messages_for(final_state, _A_ID),
+            "messagesVisibleToAAfterB": _messages_for(final_state, AC0_ACTOR_A_ID),
             "outcome": outcome,
             "finalState": final_state,
             "events": [event.to_dict() for event in session.events],
@@ -373,13 +373,13 @@ def _run_world(
 def run_experiment(*, state_root: Path, driver: DeepSeekRangeIntentDriver) -> JsonObject:
     match = _run_world(
         root=state_root / "match",
-        signal_b=_MATCH_SIGNAL_B,
+        signal_b=AC0_MATCH_SIGNAL_B,
         treatment="match",
         driver=driver,
     )
     mismatch = _run_world(
         root=state_root / "mismatch",
-        signal_b=_MISMATCH_SIGNAL_B,
+        signal_b=AC0_MISMATCH_SIGNAL_B,
         treatment="mismatch",
         driver=driver,
     )

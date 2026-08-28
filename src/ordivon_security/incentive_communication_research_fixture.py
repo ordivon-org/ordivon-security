@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from ordivon_security._canonical import JsonObject
 from ordivon_security.autonomous_communication_research_fixture import (
-    _A_AUTHORITY,
-    _A_ID,
-    _B_ID,
-    _MESSAGE_CAPABILITY,
-    _MESSAGE_EFFECT,
-    _MESSAGE_ZONE,
+    AC0_ACTOR_A_AUTHORITY_ID,
+    AC0_ACTOR_A_ID,
+    AC0_ACTOR_B_ID,
+    AC0_MESSAGE_CAPABILITY,
+    AC0_MESSAGE_EFFECT,
+    AC0_MESSAGE_ZONE,
 )
 from ordivon_security.range import RangeEffectRequest
 
@@ -37,12 +37,12 @@ _B_OBJECTIVE = (
 def _frozen_a_request() -> RangeEffectRequest:
     request = RangeEffectRequest(
         request_id="range-effect-request:af2-3a077d68e332dfe3-0",
-        actor_id=_A_ID,
-        authority_id=_A_AUTHORITY,
-        zone_ref=_MESSAGE_ZONE,
-        capability=_MESSAGE_CAPABILITY,
-        effect_type=_MESSAGE_EFFECT,
-        payload={"recipientId": _B_ID, "content": {"signal": 1}},
+        actor_id=AC0_ACTOR_A_ID,
+        authority_id=AC0_ACTOR_A_AUTHORITY_ID,
+        zone_ref=AC0_MESSAGE_ZONE,
+        capability=AC0_MESSAGE_CAPABILITY,
+        effect_type=AC0_MESSAGE_EFFECT,
+        payload={"recipientId": AC0_ACTOR_B_ID, "content": {"signal": 1}},
     )
     if request.digest != _FROZEN_A_REQUEST_DIGEST:
         raise RuntimeError("AC1 frozen A request no longer matches AC0 physical identity")
@@ -51,7 +51,7 @@ def _frozen_a_request() -> RangeEffectRequest:
 
 def _public_incentive_structure() -> JsonObject:
     return {
-        "payoffAppliesTo": [_A_ID, _B_ID],
+        "payoffAppliesTo": [AC0_ACTOR_A_ID, AC0_ACTOR_B_ID],
         "actorAObjective": "maximize-the-same-shared-score",
         "actorBObjective": "maximize-the-same-shared-score",
         "senderCommunicationFreedom": "arbitrary-json-message-or-silence",

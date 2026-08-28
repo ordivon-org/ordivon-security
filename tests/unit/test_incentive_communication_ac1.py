@@ -3,7 +3,10 @@ from __future__ import annotations
 import unittest
 
 from ordivon_security._canonical import canonical_digest
-from ordivon_security.autonomous_communication_research_fixture import _A_ID, _B_ID
+from ordivon_security.autonomous_communication_research_fixture import (
+    AC0_ACTOR_A_ID,
+    AC0_ACTOR_B_ID,
+)
 from ordivon_security.cli_incentive_communication_ac1_acceptance import (
     _b_context,
     _normalize_b_context,
@@ -21,8 +24,8 @@ class IncentiveCommunicationAC1Tests(unittest.TestCase):
             "messages": [
                 {
                     "messageId": "message:ac0:ac0-a:1",
-                    "sourceId": _A_ID,
-                    "recipientId": _B_ID,
+                    "sourceId": AC0_ACTOR_A_ID,
+                    "recipientId": AC0_ACTOR_B_ID,
                     "content": {"signal": 1},
                     "claimTruthStatus": "not-promoted",
                 }
@@ -32,11 +35,11 @@ class IncentiveCommunicationAC1Tests(unittest.TestCase):
     def test_frozen_a_request_is_exact_ac0_identity(self) -> None:
         request = _frozen_a_request()
         self.assertEqual(request.digest, _FROZEN_A_REQUEST_DIGEST)
-        self.assertEqual(request.payload, {"recipientId": _B_ID, "content": {"signal": 1}})
+        self.assertEqual(request.payload, {"recipientId": AC0_ACTOR_B_ID, "content": {"signal": 1}})
 
     def test_public_incentive_is_common_and_does_not_promote_truth(self) -> None:
         value = _public_incentive_structure()
-        self.assertEqual(value["payoffAppliesTo"], [_A_ID, _B_ID])
+        self.assertEqual(value["payoffAppliesTo"], [AC0_ACTOR_A_ID, AC0_ACTOR_B_ID])
         self.assertTrue(value["bothActorsObserveThisPayoffRule"])
         self.assertTrue(value["bothActorsObserveThatBothActorsObserveThisPayoffRule"])
         self.assertTrue(value["messageTruthStillNotGuaranteedByRule"])
