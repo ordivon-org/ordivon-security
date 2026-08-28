@@ -12,12 +12,12 @@ from ordivon_security.deliberation_before_authority_research_support import (
     _deliberate_without_effect_authority,
     _DELiberation_PROMPT_REVISION,
 )
-from ordivon_security.integrations import DeepSeekRangeIntentConfig
-from ordivon_security.integrations.harness_finalized_range_intent import (
+from ordivon_security.finalized_range_intent_research_fixture import (
     DeepSeekFinalizedRangeIntentDriver,
     FinalizedRangeIntentConfig,
     RangeIntentHarnessFailure,
 )
+from ordivon_security.integrations import DeepSeekRangeIntentConfig
 from ordivon_security.integrations.harness_range_intent import (
     _git_revision as _integration_git_revision,
 )
@@ -78,7 +78,7 @@ class DeliberationPrimedFinalizedRangeIntentDriver(DeepSeekFinalizedRangeIntentD
 
         # Import the experimentally validated IF1 bridge/tool constants rather than changing them.
         bridge_module = importlib.import_module(
-            "ordivon_security.integrations.harness_finalized_range_intent"
+            "ordivon_security.finalized_range_intent_research_fixture"
         )
         request_item_schema: JsonObject = {
             "type": "object",
