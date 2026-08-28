@@ -14,8 +14,8 @@ audience:
   - builder
   - evaluator
   - agent
-updated: 2026-08-15
-summary: Canonical experiment sequence from reproducible Contests and CAGE transfer through adaptive Campaigns, organizations, evaluator attacks, coevolution, and cross-fidelity transfer.
+updated: 2026-08-28
+summary: Canonical research sequence with current standing layered over historical proposals; later accepted gates pressure-bind Campaign, Organization, provider, telemetry, coevolution and cross-fidelity expansion rather than treating R-numbering as a feature queue.
 evidence_status: not_applicable
 readiness: READY
 applies_to:
@@ -28,6 +28,10 @@ related:
   - security.agent-experiment-p0
 ---
 # Autonomous adversarial systems research agenda
+
+## Currentness rule
+
+The R-numbered sequence is retained as research provenance, **not** as an executable feature queue. When a later accepted experiment or negative admission gate supersedes an earlier proposal, the later standing governs current work and the earlier text becomes a historical falsifier/reopen condition. A numbered section therefore does not by itself authorize a subsystem, external provider, higher-fidelity environment, or new ontology.
 
 ## Core question
 
@@ -123,21 +127,27 @@ Falsifier: explicit opponent models overfit known policies or fail to improve he
 
 ## R4 — Campaign and strategic resources
 
-Introduce Campaign state only after repeated Contests require persistence across missions or actor replacement. Measure initiative, tempo, reserve, option value, capability exposure, escalation, withdrawal, and allocation of compute, credentials, footholds, tools, and Agents.
+**Current standing: NEGATIVE_ADMISSION / HISTORICAL_PROPOSAL.** CA7 later tested this abstraction pressure and found no current failure that requires persistent Campaign state beyond current observation, ordinary recent trajectory, RangeSession world continuity, Host work continuity and Harness cognition. The original proposal below remains useful as the falsifier that was tested; it is not a current implementation instruction. Reopen only under CA7's explicit cross-mission/strategic-state conditions.
+
+Historical proposal: introduce Campaign state only after repeated Contests require persistence across missions or actor replacement. Measure initiative, tempo, reserve, option value, capability exposure, escalation, withdrawal, and allocation of compute, credentials, footholds, tools, and Agents.
 
 Falsifier: an ordinary trajectory plus memory produces the same transfer and strategic ordering.
 
 ## R5 — Multi-Agent organization
 
-Compare monolithic actors with specialist teams under limited communication, compartmentalization, delegated authority, compromised members, actor loss, and command replacement.
+**Current standing: NEGATIVE_ADMISSION / HISTORICAL_PROPOSAL.** CA7 later found no current evidence forcing an explicit Organization subsystem; Host work topology plus existing Actor/authority boundaries remain sufficient for the accepted consumers. The comparison remains a valid future falsifier, but it must not be read as a request to build an organization/role graph by roadmap inertia. Reopen only when an independent consumer demonstrates team-organization benefit that survives the existing Host/Actor composition.
+
+Historical proposal: compare monolithic actors with specialist teams under limited communication, compartmentalization, delegated authority, compromised members, actor loss, and command replacement.
 
 Falsifier: organization adds only latency and token cost, or Host branch/join semantics fully explain the behavior.
 
 ## R6 — Container emulation
 
-Deploy a small isolated containerlab Range with Red workspace, Blue workspace, targets, gateway, sensor, and inaccessible management plane. Separate Provider traffic from contested Range traffic. Add Zeek first; add Suricata or endpoint collection only when required.
+**Current standing: PRESSURE_GATED / NOT_CURRENT_NEXT_STEP.** S5/S6 already established an isolated physical fabric without requiring a generic containerlab layer. O1 found a useful carrier-observability distinction from existing Windows-native telemetry, and Ordinary Security Consumption R1 then closed the higher-fidelity gate negative: no decision-blocking network/process telemetry gap justified containerlab, Zeek, Suricata, a Windows endpoint stack or a higher-fidelity tactical transfer. External telemetry/emulation systems remain provider candidates, not roadmap dependencies.
 
-Falsifier: the Range cannot reset and destroy reliably, world truth depends on evaluated actors, or container fidelity does not change the research result.
+Historical proposal: deploy a small isolated containerlab Range with Red workspace, Blue workspace, targets, gateway, sensor, and inaccessible management plane. Separate Provider traffic from contested Range traffic. If a future consumer reopens the telemetry gap, evaluate Zeek first and add Suricata or endpoint collection only for a distinction the existing evidence cannot supply.
+
+Falsifier/reopen pressure: container fidelity materially changes a decision or accepted research result while the Range can still reset/destroy reliably and world truth remains independent of evaluated actors.
 
 ## R7 — Classical capability assimilation
 
@@ -174,9 +184,11 @@ Falsifier: the evaluator cannot detect known synthetic attacks, or rankings are 
 
 ## R9 — Coevolution and transfer
 
-Run repeated encounters with held-out opponents, world variants, policy/tool mutation, alternating and simultaneous adaptation, and transfer from simulation to container and VM ranges.
+**Current standing: NEGATIVE_ADMISSION / PRESSURE_GATED.** CA7 closed persistent coevolution and cross-fidelity strategic infrastructure as unearned for the current evidence base, while Ordinary R1 separately found no higher-fidelity transfer pressure in ordinary consumption. The experimental question remains legitimate; the infrastructure does not become current merely because R9 exists in the original sequence.
 
-Falsifier: gains disappear on held-out opponents or are explained by evaluator exploitation and memorization.
+Historical proposal: run repeated encounters with held-out opponents, world variants, policy/tool mutation, alternating and simultaneous adaptation, and transfer from simulation to container and VM ranges.
+
+Falsifier/reopen pressure: an independent held-out consumer shows durable benefit or failure that cannot be explained by evaluator exploitation, memorization, ordinary trajectory/current observation, or existing provider-specific fidelity.
 
 ## Research discipline
 
