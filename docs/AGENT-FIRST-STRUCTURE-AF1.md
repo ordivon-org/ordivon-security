@@ -69,7 +69,7 @@ At Security source revision `774e33594345bfd1dd0686456498d9ea7a3f0154`, the curr
 - 15 explicitly represented `research-apparatus` modules in `security_surface_manifest()`;
 - 2 documented manual `python -m` commands (`cli_windows_host_p1_baseline` and `cli_windows_kvm_acceptance`).
 
-There is no fourth/unclassified CLI class and the current CLI→CLI import graph has zero edges. Two P1 self-test programs remain current test apparatus but no longer carry the `cli_` identity because neither installation metadata, current surface representation, nor documentation treats them as a command interface.
+There is no fourth/unclassified CLI class and the current CLI→CLI import graph has zero edges. Two P1 self-test programs were first stripped of a false `cli_` identity and then, under a later package-membership deletion pressure, moved to `tests/support/`: no current source consumer, surface entry, runbook or installed command required their Python orchestration in the package. Their bounded C resources remain package fixtures under test.
 
 Shared executable responsibility that survived deletion pressure now lives outside command runners. Current examples include `adversarial_capability_environment_fixture.py`, `autonomous_communication_research_fixture.py`, `incentive_communication_research_fixture.py`, `intent_convergence_research_fixture.py`, `deliberation_before_authority_research_support.py`, and `p1_physical_adaptation_research_fixture.py`. These modules exist because more than one current consumer requires the same exact fixture/support semantics; they are not a generic experiment framework. Test-only support extracted solely to keep historical runners mechanically convenient is not a current capability and belongs with archived apparatus.
 
