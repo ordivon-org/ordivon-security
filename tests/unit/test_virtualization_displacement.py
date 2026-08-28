@@ -1,5 +1,7 @@
 import unittest
+
 from scripts.assess_virtualization_displacement import assessment
+
 
 class VirtualizationDisplacementTests(unittest.TestCase):
     def test_ts9_displacement_keeps_security_authority_and_does_not_authorize_install(self):

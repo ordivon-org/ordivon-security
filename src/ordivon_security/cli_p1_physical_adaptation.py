@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, cast
+from typing import Any, cast
 
 from ordivon_security._canonical import JsonObject, validate_json
 from ordivon_security.actors.autonomous import RangeIntentContext
