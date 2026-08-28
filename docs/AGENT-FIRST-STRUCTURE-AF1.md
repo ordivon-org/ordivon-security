@@ -47,7 +47,7 @@ The `integrations` namespace is reserved for current foreign-system bindings. IF
 
 AF2 and IF2/IF3 do share one narrower treatment-extension contract inside `integrations.harness_range_intent`: the exact `RANGE_INTENT_TOOL_NAME` / `RANGE_INTENT_PROMPT_REVISION`, `RangeIntentBridge`, `resolve_recorded_range_intent`, and source-binding helpers. Those names exist so ablations can hold the effect-intent transport and foreign-source identity fixed while varying deliberation/finalization treatment. They are module-level research/integration contracts and are deliberately absent from `ordivon_security.integrations.__all__`.
 
-Historical `ordivon_security.actors.host_assigned`, `actors.runtime_assigned`, and `evaluation.world_*` paths remain valid compatibility paths where current consumers still require them. World destination implementations now live under `ordivon_security.world_boundary`; the historical Evaluation module paths are thin aliases rather than a second ownership claim.
+Historical compatibility survives only under current consumer pressure. `ordivon_security.actors.host_assigned` / `actors.runtime_assigned` remain physical implementation paths for the foreign-lifecycle Actor variants, while `ordivon_security.evaluation.world_entity` remains a frozen compatibility alias because current World production acceptance still imports that exact path. The old `evaluation.world_resource` and `evaluation.world_message` aliases had no current external/source consumer beyond compatibility tests and are retired. World destination implementations live under `ordivon_security.world_boundary`; compatibility never constitutes a second ownership claim.
 
 ## Explicit non-goals
 

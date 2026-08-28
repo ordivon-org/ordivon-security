@@ -181,20 +181,15 @@ class SecuritySurfaceTests(unittest.TestCase):
         self.assertFalse(hasattr(evaluation, "WorldMessageInbox"))
         self.assertFalse(hasattr(evaluation, "WorldEntityKvmDestination"))
 
-    def test_historical_evaluation_world_module_paths_are_thin_compatible_aliases(self) -> None:
+    def test_only_current_historical_world_module_path_remains_compatible(self) -> None:
         from ordivon_security.evaluation.world_entity import (
             WorldEntityKvmDestination as HistoricalEntityDestination,
         )
-        from ordivon_security.evaluation.world_message import (
-            WorldMessageInbox as HistoricalMessageInbox,
-        )
-        from ordivon_security.evaluation.world_resource import (
-            WorldResourceInbox as HistoricalResourceInbox,
-        )
 
         self.assertIs(HistoricalEntityDestination, WorldEntityKvmDestination)
-        self.assertIs(HistoricalMessageInbox, WorldMessageInbox)
-        self.assertIs(HistoricalResourceInbox, WorldResourceInbox)
+        package = Path(ordivon_security.__file__).resolve().parent
+        self.assertFalse((package / "evaluation" / "world_resource.py").exists())
+        self.assertFalse((package / "evaluation" / "world_message.py").exists())
 
     def test_canonical_world_boundary_imports_are_available(self) -> None:
         self.assertTrue(WorldMessageInbox.__name__)
