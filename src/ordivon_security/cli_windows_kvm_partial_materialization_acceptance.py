@@ -14,13 +14,6 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, validate_json
 from ordivon_security.acceptance_support import git_revision, write_receipt
-from ordivon_security.cli_windows_kvm_c1b_acceptance import (
-    _digest_bytes,
-    _host_namespace_truth,
-    _ledger_semantic_binding,
-    _machine_config,
-    _process_truth,
-)
 from ordivon_security.providers.windows_kvm import _load_object, _replace_private_json
 from ordivon_security.range import (
     RangeAuthority,
@@ -32,6 +25,13 @@ from ordivon_security.range.windows_fabric import WindowsFabricRangeConfig, _run
 from ordivon_security.range.windows_fabric_reconcile import reconcile_windows_fabric_range_runs
 from ordivon_security.range.windows_topology_churn import WindowsTopologyChurnRange
 from ordivon_security.windows_kvm_acceptance_support import compile_topology_churn_canary
+from ordivon_security.windows_kvm_recovery_acceptance_support import (
+    digest_bytes,
+    host_namespace_truth,
+    ledger_semantic_binding,
+    process_truth,
+    windows_kvm_machine_config,
+)
 
 _ACTOR_ID = "actor:partial-materialization-controller"
 _AUTHORITY_ID = "range-authority:partial-materialization-controller"
@@ -159,7 +159,7 @@ class _KillAfterRootVethRange(WindowsTopologyChurnRange):
             "expectedRootLinks": [peer_veth, fabric_veth],
             "actorReplacementRequest": copy.deepcopy(run.state.get("actorReplacementRequest")),
             "actorReplacementReceipt": copy.deepcopy(run.state.get("actorReplacementReceipt")),
-            "ledgerSha256AtGate": _digest_bytes(ledger_bytes),
+            "ledgerSha256AtGate": digest_bytes(ledger_bytes),
             "ledgerByteLengthAtGate": len(ledger_bytes),
         }
         validate_json(payload)
@@ -184,7 +184,7 @@ def _owner(args: argparse.Namespace) -> None:
     )
     backend = _KillAfterRootVethRange(
         WindowsFabricRangeConfig(
-            machine=_machine_config(args),
+            machine=windows_kvm_machine_config(args),
             canary_path=canary_path,
             canary_digest=str(compilation["canaryDigest"]),
             max_runtime_seconds=args.max_runtime_seconds,
@@ -290,9 +290,9 @@ def _supervisor(args: argparse.Namespace) -> None:
     ledger_path = ledgers[0]
     ledger = _load_object(ledger_path, "partial-materialization Range ledger")
     gate = _load_object(args.gate, "partial-materialization kill gate")
-    binding = _ledger_semantic_binding(ledger)
-    process_truth = _process_truth(ledger)
-    namespace_truth = _host_namespace_truth(ledger)
+    binding = ledger_semantic_binding(ledger)
+    process_truth_value = process_truth(ledger)
+    namespace_truth = host_namespace_truth(ledger)
     expected_root_links_raw = gate.get("expectedRootLinks")
     if not isinstance(expected_root_links_raw, list) or not all(
         isinstance(item, str) for item in expected_root_links_raw
@@ -306,7 +306,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         args.state_root,
         receipt_path=reconciliation_path,
     )
-    post_namespace_truth = _host_namespace_truth(
+    post_namespace_truth = host_namespace_truth(
         {
             "ownedNamespaceCandidates": ledger.get("ownedNamespaceCandidates"),
             "fabricNamespace": ledger.get("fabricNamespace"),
@@ -340,10 +340,10 @@ def _supervisor(args: argparse.Namespace) -> None:
         in cast(list[str], namespace_truth.get("ownedNamespacesPresent", [])),
         "hostObservedBothPartialRootVethEnds": set(cast(list[str], pre_root_links["presentNames"]))
         == set(expected_root_links),
-        "ownerDeadWhilePhysicalSubstrateStillLive": process_truth.get("ownerAlive") is False
-        and process_truth.get("qemuAlive") is True
-        and process_truth.get("swtpmAlive") is True
-        and process_truth.get("captureAlive") is True,
+        "ownerDeadWhilePhysicalSubstrateStillLive": process_truth_value.get("ownerAlive") is False
+        and process_truth_value.get("qemuAlive") is True
+        and process_truth_value.get("swtpmAlive") is True
+        and process_truth_value.get("captureAlive") is True,
         "reconcilerReportedPassed": reconciliation.get("status") == "passed"
         and reconciliation.get("reconciled") == 1
         and reconciliation.get("attentionRequired") == 0,
@@ -395,7 +395,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         "ledger": ledger,
         "semanticEffectBinding": binding,
         "preReconcile": {
-            "processTruth": process_truth,
+            "processTruth": process_truth_value,
             "namespaceTruth": namespace_truth,
             "rootLinkTruth": pre_root_links,
         },

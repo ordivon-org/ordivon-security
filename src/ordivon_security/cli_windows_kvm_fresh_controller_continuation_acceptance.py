@@ -13,12 +13,6 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue, validate_json
 from ordivon_security.acceptance_support import git_revision, write_receipt
-from ordivon_security.cli_windows_kvm_c1b_acceptance import (
-    _host_namespace_truth,
-    _ledger_semantic_binding,
-    _machine_config,
-    _process_truth,
-)
 from ordivon_security.cli_windows_kvm_partial_materialization_acceptance import (
     _FAULT_POINT,
     _KillAfterRootVethRange,
@@ -49,6 +43,12 @@ from ordivon_security.windows_kvm_acceptance_support import (
     compile_topology_churn_canary,
     topology_guest_claim_passes,
 )
+from ordivon_security.windows_kvm_recovery_acceptance_support import (
+    host_namespace_truth,
+    ledger_semantic_binding,
+    process_truth,
+    windows_kvm_machine_config,
+)
 
 _ACTOR_ID = "actor:fresh-controller-continuation"
 _AUTHORITY_ID = "range-authority:fresh-controller-continuation"
@@ -61,7 +61,7 @@ _PEER_PORT = 48080
 _PREFIX_LENGTH = 24
 
 
-def _digest_bytes(value: bytes) -> str:
+def digest_bytes(value: bytes) -> str:
     return "sha256:" + hashlib.sha256(value).hexdigest()
 
 
@@ -276,7 +276,7 @@ def _sensor_truth(
     digest: str | None = None
     if pcap.is_file():
         raw = pcap.read_bytes()
-        digest = _digest_bytes(raw)
+        digest = digest_bytes(raw)
         completed = subprocess.run(
             [str(tcpdump_path), "-nn", "-r", str(pcap)],
             check=False,
@@ -315,7 +315,7 @@ def _persist_continued_ledger(
     peer_pid: int,
     peer_start_time: int | None,
 ) -> JsonObject:
-    before_binding = _ledger_semantic_binding(ledger)
+    before_binding = ledger_semantic_binding(ledger)
     before_receipt = ledger.get("actorReplacementReceipt")
     updated = dict(ledger)
     updated["updatedAtNs"] = time.time_ns()
@@ -327,7 +327,7 @@ def _persist_continued_ledger(
     validate_json(updated)
     _replace_private_json(ledger_path, cast(JsonObject, updated))
     reread = _load_object(ledger_path, "fresh-controller continued Range ledger")
-    if _ledger_semantic_binding(reread) != before_binding:
+    if ledger_semantic_binding(reread) != before_binding:
         raise RuntimeError("fresh controller changed the admitted semantic effect binding")
     if reread.get("actorReplacementReceipt") != before_receipt:
         raise RuntimeError("fresh controller changed the non-truth backend receipt")
@@ -365,7 +365,7 @@ def _continue_peer_b_from_root_veth(
     root_kinds = _root_link_kinds(Path("/usr/bin/ip"), host_links)
     if root_kinds != {peer_veth: "veth", fabric_veth: "veth"}:
         raise RuntimeError(f"fresh controller refuses unexpected root-link truth: {root_kinds!r}")
-    namespace_truth = _host_namespace_truth(ledger)
+    namespace_truth = host_namespace_truth(ledger)
     if set(cast(list[str], namespace_truth.get("ownedNamespacesPresent", []))) != {
         fabric_ns,
         peer_b_ns,
@@ -479,7 +479,7 @@ def _continue_peer_b_from_root_veth(
         "kind": "ordivon.security.fresh-controller-peer-b-continuation",
         "sourceTopologyPhase": ledger.get("topologyPhase"),
         "targetTopologyPhase": "peer-b-present",
-        "semanticEffectBinding": _ledger_semantic_binding(continued_ledger),
+        "semanticEffectBinding": ledger_semantic_binding(continued_ledger),
         "backendReceipt": continued_ledger.get("actorReplacementReceipt"),
         "resourceIdentity": {
             "fabricNamespace": fabric_ns,
@@ -498,7 +498,7 @@ def _continue_peer_b_from_root_veth(
         },
         "after": {
             "rootLinkTruth": _root_link_truth(names=host_links),
-            "namespaceTruth": _host_namespace_truth(continued_ledger),
+            "namespaceTruth": host_namespace_truth(continued_ledger),
             "peerBNamespaceLinks": _namespace_link_names(peer_b_ns),
             "fabricNamespaceLinks": _namespace_link_names(fabric_ns),
             "bridgeTruth": after_bridge,
@@ -538,7 +538,7 @@ def _owner(args: argparse.Namespace) -> None:
     )
     backend = _KillAfterRootVethRange(
         WindowsFabricRangeConfig(
-            machine=_machine_config(args),
+            machine=windows_kvm_machine_config(args),
             canary_path=canary_path,
             canary_digest=str(compilation["canaryDigest"]),
             max_runtime_seconds=args.max_runtime_seconds,
@@ -629,12 +629,12 @@ def _supervisor(args: argparse.Namespace) -> None:
     ledger_bytes = ledger_path.read_bytes()
     ledger = _load_object(ledger_path, "fresh-controller inherited Range ledger")
     gate = _load_object(args.gate, "fresh-controller owner-loss gate")
-    semantic_binding = _ledger_semantic_binding(ledger)
-    process_truth_before = _process_truth(ledger)
-    host_truth_before = _host_namespace_truth(ledger)
+    semantic_binding = ledger_semantic_binding(ledger)
+    process_truth_before = process_truth(ledger)
+    host_truth_before = host_namespace_truth(ledger)
     expected_peer_ns, peer_veth, fabric_veth = _link_names(cast(str, ledger["rangeSessionId"]))
     root_truth_before = _root_link_truth(names=(peer_veth, fabric_veth))
-    machine = WindowsKvmMachineProvider(_machine_config(args))
+    machine = WindowsKvmMachineProvider(windows_kvm_machine_config(args))
     qmp_before = machine.inspect_qmp(ledger)
 
     continuation, peer_process = _continue_peer_b_from_root_veth(
@@ -645,7 +645,7 @@ def _supervisor(args: argparse.Namespace) -> None:
     continued_ledger_bytes = ledger_path.read_bytes()
     continued_ledger = _load_object(ledger_path, "fresh-controller continued ledger")
     qmp_after = machine.inspect_qmp(continued_ledger)
-    process_truth_after = _process_truth(continued_ledger)
+    process_truth_after = process_truth(continued_ledger)
 
     qemu_pid = continued_ledger.get("qemuPid")
     qemu_start = continued_ledger.get("qemuStartTime")
@@ -678,7 +678,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         capture_pid=capture_pid,
         capture_start_time=capture_start,
     )
-    host_truth_completed = _host_namespace_truth(continued_ledger)
+    host_truth_completed = host_namespace_truth(continued_ledger)
     bridge_completed = _bridge_truth(
         fabric_namespace=cast(str, continued_ledger["fabricNamespace"]),
         bridge_name=cast(str, continued_ledger["bridgeName"]),
@@ -693,9 +693,9 @@ def _supervisor(args: argparse.Namespace) -> None:
         args.state_root,
         receipt_path=reconciliation_path,
     )
-    closure_namespace_truth = _host_namespace_truth(continued_ledger)
+    closure_namespace_truth = host_namespace_truth(continued_ledger)
     closure_root_truth = _root_link_truth(names=(peer_veth, fabric_veth))
-    closure_process_truth = _process_truth(continued_ledger)
+    closure_process_truth = process_truth(continued_ledger)
 
     network_devices_before = qmp_before.get("networkDevices")
     network_devices_after = qmp_after.get("networkDevices")
@@ -703,7 +703,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         "ownerKilledAtExactPartialGate": owner.returncode == -signal.SIGKILL
         and gate.get("faultPoint") == _FAULT_POINT,
         "semanticEffectIdentityInherited": isinstance(semantic_binding, dict)
-        and semantic_binding == _ledger_semantic_binding(continued_ledger),
+        and semantic_binding == ledger_semantic_binding(continued_ledger),
         "stablePhaseWasPeerARemoved": ledger.get("topologyPhase") == "peer-a-removed"
         and ledger.get("currentPeerAddress") is None,
         "partialWorldObservedBeforeContinuation": set(
@@ -774,14 +774,14 @@ def _supervisor(args: argparse.Namespace) -> None:
             "stderrTail": stderr[-2000:],
         },
         "inheritedLedger": {
-            "sha256": _digest_bytes(ledger_bytes),
+            "sha256": digest_bytes(ledger_bytes),
             "byteLength": len(ledger_bytes),
             "topologyPhase": ledger.get("topologyPhase"),
             "currentPeerAddress": ledger.get("currentPeerAddress"),
             "semanticEffectBinding": semantic_binding,
         },
         "continuedLedger": {
-            "sha256": _digest_bytes(continued_ledger_bytes),
+            "sha256": digest_bytes(continued_ledger_bytes),
             "byteLength": len(continued_ledger_bytes),
             "topologyPhase": continued_ledger.get("topologyPhase"),
             "currentPeerAddress": continued_ledger.get("currentPeerAddress"),

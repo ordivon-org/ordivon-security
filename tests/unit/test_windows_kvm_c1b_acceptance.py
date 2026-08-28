@@ -4,9 +4,9 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-from ordivon_security.cli_windows_kvm_c1b_acceptance import _ledger_semantic_binding
 from ordivon_security.range.protocol import RangeSessionInstance
 from ordivon_security.range.windows_topology_churn import WindowsTopologyChurnRange
+from ordivon_security.windows_kvm_recovery_acceptance_support import ledger_semantic_binding
 
 
 class C1bAcceptanceTests(unittest.TestCase):
@@ -17,7 +17,7 @@ class C1bAcceptanceTests(unittest.TestCase):
             "topologyPhase": "peer-a-removed",
             "currentPeerAddress": None,
         }
-        self.assertIsNone(_ledger_semantic_binding(ledger))
+        self.assertIsNone(ledger_semantic_binding(ledger))
 
     def test_effect_binding_is_recognized_without_interpreting_world_truth(self) -> None:
         binding = {
@@ -31,7 +31,7 @@ class C1bAcceptanceTests(unittest.TestCase):
             "currentPeerAddress": "10.253.70.4",
             "actorReplacementRequest": binding,
         }
-        self.assertEqual(_ledger_semantic_binding(ledger), binding)
+        self.assertEqual(ledger_semantic_binding(ledger), binding)
 
     def test_s6_running_ledger_extra_persists_exact_effect_binding(self) -> None:
         backend = object.__new__(WindowsTopologyChurnRange)
