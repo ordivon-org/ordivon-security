@@ -11,10 +11,6 @@ from typing import Any, cast
 
 from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
 from ordivon_security.acceptance_support import git_revision, write_receipt
-from ordivon_security.cli_windows_kvm_c1_acceptance import (
-    _backend_state,
-    _world_still_peer_a,
-)
 from ordivon_security.providers.windows_kvm import WindowsKvmMachineConfig
 from ordivon_security.range import (
     RangeAuthority,
@@ -27,8 +23,10 @@ from ordivon_security.range.windows_fabric import WindowsFabricRangeConfig
 from ordivon_security.range.windows_topology_churn import WindowsTopologyChurnRange
 from ordivon_security.windows_kvm_acceptance_support import (
     compile_topology_churn_canary,
+    range_backend_state,
     topology_guest_claim_passes,
     topology_phases,
+    world_still_peer_a,
 )
 
 _ACTOR_ID = "actor:c1a-autonomous-controller"
@@ -504,7 +502,7 @@ def main() -> None:
         session.update_actor_presence(_ACTOR_ID, "active", logical_time=1)
         deadline = time.monotonic() + args.max_runtime_seconds
         while True:
-            state = _backend_state(session)
+            state = range_backend_state(session)
             session.poll_backend()
             if state.get("peerAExitCode") == 0:
                 pre_intent_state = state
@@ -515,9 +513,9 @@ def main() -> None:
                 raise TimeoutError("C1-A peer-A completion exceeded outer bound")
             time.sleep(0.25)
         time.sleep(0.5)
-        pre_intent_state = _backend_state(session)
+        pre_intent_state = range_backend_state(session)
         session.poll_backend()
-        if not _world_still_peer_a(pre_intent_state):
+        if not world_still_peer_a(pre_intent_state):
             raise RuntimeError("C1-A world changed before model intent")
 
         visible = _visible_snapshot(pre_intent_state)
@@ -543,9 +541,9 @@ def main() -> None:
         )
         if control_turn["decision"]["decision"] != "hold":
             raise RuntimeError("C1-A control objective did not produce hold intent")
-        post_control_state = _backend_state(session)
+        post_control_state = range_backend_state(session)
         session.poll_backend()
-        if not _world_still_peer_a(post_control_state):
+        if not world_still_peer_a(post_control_state):
             raise RuntimeError("C1-A control intent changed the world")
 
         effect_turn = _run_intent_turn(
@@ -569,7 +567,7 @@ def main() -> None:
         session.poll_backend()
 
         while True:
-            state = _backend_state(session)
+            state = range_backend_state(session)
             session.poll_backend()
             if state.get("running") is False:
                 final_state = state
@@ -578,7 +576,7 @@ def main() -> None:
                 failure = TimeoutError("C1-A autonomous effect exceeded outer bound")
                 session.terminate("outer-timeout", logical_time=4)
                 session.poll_backend()
-                final_state = _backend_state(session)
+                final_state = range_backend_state(session)
                 break
             time.sleep(1)
         session.poll_backend()
@@ -633,14 +631,14 @@ def main() -> None:
         "physicalPreconditionReachedBeforeModel": pre_intent_state is not None
         and pre_intent_state.get("peerAExitCode") == 0,
         "worldUnchangedBeforeModel": pre_intent_state is not None
-        and _world_still_peer_a(pre_intent_state),
+        and world_still_peer_a(pre_intent_state),
         "preIntentSnapshotHistoryImmutable": _peer_a_only_history(pre_intent_state),
         "sameVisibleWorldForBothObjectives": same_observation,
         "sameModelHarnessAuthorityForBothObjectives": same_actor_stack,
         "controlObjectiveChoseHold": isinstance(control_decision, dict)
         and control_decision.get("decision") == "hold",
         "controlIntentDidNotMutateWorld": post_control_state is not None
-        and _world_still_peer_a(post_control_state),
+        and world_still_peer_a(post_control_state),
         "postControlSnapshotHistoryImmutable": _peer_a_only_history(post_control_state),
         "effectObjectiveChoseRequest": isinstance(effect_decision, dict)
         and effect_decision.get("decision") == "request-effect",

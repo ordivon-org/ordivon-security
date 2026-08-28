@@ -115,3 +115,27 @@ def topology_phases(events: list[JsonObject]) -> set[str]:
         if isinstance(payload, dict) and isinstance(payload.get("phase"), str):
             phases.add(str(payload["phase"]))
     return phases
+
+
+def range_backend_state(session: object) -> JsonObject:
+    inspect = getattr(session, "inspect", None)
+    if not callable(inspect):
+        raise TypeError("Range session does not expose inspect()")
+    inspected = inspect()
+    if not isinstance(inspected, dict):
+        raise RuntimeError("Range inspection is not a JSON object")
+    value = inspected.get("backendState")
+    if not isinstance(value, dict):
+        raise RuntimeError("Range backend state is unavailable")
+    return value
+
+
+def world_still_peer_a(value: JsonObject) -> bool:
+    truth = value.get("fabricTruth")
+    return (
+        value.get("topologyChurnCompleted") is False
+        and value.get("actorReplacementRequest") is None
+        and isinstance(truth, dict)
+        and truth.get("phase") == "peer-a-present"
+        and truth.get("currentPeerAddress") == "10.253.70.3"
+    )

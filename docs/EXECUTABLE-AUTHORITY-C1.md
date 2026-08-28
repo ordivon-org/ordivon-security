@@ -127,6 +127,8 @@ The maintained Windows Guest completed both peer challenges, external tcpdump ob
 
 The private accepted receipt is retained outside Git and bound by [`../evidence/acceptance/c1-executable-range-authority-49f1aa9.json`](../evidence/acceptance/c1-executable-range-authority-49f1aa9.json).
 
+The C1 authority/effect contracts, actor-authorized S6 Range behavior and later C1-A+ fault programme remain current. On 2026-08-28 the one-shot `cli_windows_kvm_c1_acceptance.py` physical orchestration was retired after its only surviving shared state predicates moved into neutral Windows-KVM acceptance support. The accepted C1 trial remains recoverable from its bound `49f1aa9` revision; current Security code does not need the historical orchestration module in order to retain or apply the C1 authority laws.
+
 ## S6 regression
 
 The same implementation was rerun with the default `backend-owned` S6 profile. It passed replacement start/completion, A-removed/B-present Host truth, Guest and tcpdump dual-flow observations, peer-B current truth, and residual closure. C1 therefore adds a second trigger profile without replacing S6 semantics.

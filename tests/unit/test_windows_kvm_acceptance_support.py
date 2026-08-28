@@ -3,12 +3,35 @@ from __future__ import annotations
 import unittest
 
 from ordivon_security.windows_kvm_acceptance_support import (
+    range_backend_state,
     topology_guest_claim_passes,
     topology_phases,
+    world_still_peer_a,
 )
 
 
+class _Session:
+    def __init__(self, backend_state: object) -> None:
+        self._backend_state = backend_state
+
+    def inspect(self) -> dict[str, object]:
+        return {"backendState": self._backend_state}
+
+
 class WindowsKvmAcceptanceSupportTests(unittest.TestCase):
+    def test_range_backend_state_and_peer_a_predicate_preserve_c1_boundary(self) -> None:
+        state = {
+            "topologyChurnCompleted": False,
+            "actorReplacementRequest": None,
+            "fabricTruth": {"phase": "peer-a-present", "currentPeerAddress": "10.253.70.3"},
+        }
+        self.assertIs(range_backend_state(_Session(state)), state)
+        self.assertTrue(world_still_peer_a(state))
+        changed = {**state, "actorReplacementRequest": {"effectId": "x"}}
+        self.assertFalse(world_still_peer_a(changed))
+        with self.assertRaisesRegex(RuntimeError, "backend state is unavailable"):
+            range_backend_state(_Session(None))
+
     def test_topology_guest_claim_passes_only_exact_completed_fixture(self) -> None:
         claim = {
             "status": "completed",
