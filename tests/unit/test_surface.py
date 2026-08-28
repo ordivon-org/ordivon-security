@@ -104,6 +104,10 @@ class SecuritySurfaceTests(unittest.TestCase):
         ):
             self.assertFalse((package / module_name).exists(), module_name)
 
+    def test_archived_c1a_physical_proof_does_not_return_to_current_package(self) -> None:
+        package = Path(ordivon_security.__file__).resolve().parent
+        self.assertFalse((package / "cli_windows_kvm_c1a_acceptance.py").exists())
+
     def test_archived_c1d_historical_runner_does_not_return_to_current_package(self) -> None:
         package = Path(ordivon_security.__file__).resolve().parent
         retired = package / "cli_windows_kvm_fresh_controller_continuation_acceptance.py"

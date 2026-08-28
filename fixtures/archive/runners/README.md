@@ -18,6 +18,9 @@ evidence is history; runners are not compatibility requirements).
 C1 successor/recovery family (these four imported one another in a closed
 cluster — archiving one exposed the next):
 
+- `cli_windows_kvm_c1a_acceptance.py` — C1-A autonomous physical intent proof
+  (receipt: `evidence/acceptance/c1a-autonomous-range-intent-f692c22.json`;
+  reusable intent semantics graduated to AF2 current contracts)
 - `cli_windows_kvm_fresh_controller_continuation_acceptance.py` — C1D
   (receipt: `evidence/acceptance/c1d-fresh-controller-continuation-691145f.json`;
   unique fresh-controller continuation apparatus retained historically, no current
