@@ -104,6 +104,12 @@ class SecuritySurfaceTests(unittest.TestCase):
         ):
             self.assertFalse((package / module_name).exists(), module_name)
 
+    def test_archived_ace1_ace7_intermediate_runners_do_not_return_to_current_package(self) -> None:
+        package = Path(ordivon_security.__file__).resolve().parent
+        for index in range(1, 8):
+            module_name = f"cli_adversarial_capability_environment_ace{index}.py"
+            self.assertFalse((package / module_name).exists(), module_name)
+
     def test_archived_if0_falsifier_does_not_return_to_current_package(self) -> None:
         package = Path(ordivon_security.__file__).resolve().parent
         self.assertFalse((package / "cli_intent_finalization_if0_acceptance.py").exists())

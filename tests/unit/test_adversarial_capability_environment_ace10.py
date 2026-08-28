@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from ordivon_security.cli_adversarial_capability_environment_ace7 import build_context
+from ordivon_security.adversarial_capability_environment_fixture import consequence_context
 from ordivon_security.integrations.harness_range_intent import (
     _compile_model_context,
     _deterministic_consequence_summary,
@@ -11,7 +11,7 @@ from ordivon_security.integrations.harness_range_intent import (
 
 class AdversarialCapabilityEnvironmentAce10Tests(unittest.TestCase):
     def test_deterministic_summary_is_exact_for_current_consequence_shape(self) -> None:
-        consequence = build_context(contract_visible=True).to_dict()["effectInterfaces"][0]["consequence"]
+        consequence = consequence_context(representation_contract=True).to_dict()["effectInterfaces"][0]["consequence"]
         value = _deterministic_consequence_summary(consequence)
         self.assertEqual(
             value,
@@ -20,7 +20,7 @@ class AdversarialCapabilityEnvironmentAce10Tests(unittest.TestCase):
         )
 
     def test_summary_projection_replaces_untrusted_prose_with_deterministic_derivative(self) -> None:
-        source = build_context(contract_visible=True).to_dict()
+        source = consequence_context(representation_contract=True).to_dict()
         compiled = _compile_model_context(source, render_consequence_summary=True)
         semantics = compiled["effectInterfaces"][0]["semantics"]
         self.assertNotIn("without restarting", semantics)

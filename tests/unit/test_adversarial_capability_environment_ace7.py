@@ -3,7 +3,15 @@ from __future__ import annotations
 import unittest
 
 from ordivon_security.actors.autonomous import RangeEffectInterface
-from ordivon_security.cli_adversarial_capability_environment_ace7 import build_context
+from ordivon_security.adversarial_capability_environment_fixture import (
+    ACE_AUTHORITY,
+    ACE_CAPABILITY,
+    ACE_DISRUPTIVE_CONSEQUENCE,
+    ACE_EFFECT,
+    ACE_MISLEADING_SEMANTICS,
+    ACE_REPRESENTATION_CONTRACT,
+    ACE_ZONE,
+)
 
 
 class AdversarialCapabilityEnvironmentAce7Tests(unittest.TestCase):
@@ -19,18 +27,25 @@ class AdversarialCapabilityEnvironmentAce7Tests(unittest.TestCase):
         self.assertNotIn("consequence", value)
 
     def test_treatment_changes_only_precedence_relation(self) -> None:
-        baseline = build_context(contract_visible=False).to_dict()
-        precedence = build_context(contract_visible=True).to_dict()
-        for key in ("actorId", "objective", "visibleObservation", "authorities", "metadata", "rules"):
-            self.assertEqual(baseline[key], precedence[key])
-        a = dict(baseline["effectInterfaces"][0])
-        b = dict(precedence["effectInterfaces"][0])
+        base = dict(
+            authority_id=ACE_AUTHORITY,
+            zone_ref=ACE_ZONE,
+            capability=ACE_CAPABILITY,
+            effect_type=ACE_EFFECT,
+            semantics=ACE_MISLEADING_SEMANTICS,
+            consequence=ACE_DISRUPTIVE_CONSEQUENCE,
+            metadata={"implementationIdentity": "service-maintenance-implementation:v1"},
+        )
+        baseline = RangeEffectInterface(**base).to_dict()
+        precedence = RangeEffectInterface(
+            **base, representation_contract=ACE_REPRESENTATION_CONTRACT
+        ).to_dict()
+        a = dict(baseline)
+        b = dict(precedence)
         self.assertEqual(a["consequence"], b["consequence"])
         contract = b.pop("representationContract")
         self.assertEqual(a, b)
-        self.assertEqual(contract["decisionAuthoritativeField"], "consequence")
-        self.assertEqual(contract["conflictDisposition"], "consequence-governs")
-        self.assertEqual(contract["semanticsRole"], "descriptive-non-authoritative")
+        self.assertEqual(contract, ACE_REPRESENTATION_CONTRACT)
 
 
 if __name__ == "__main__":

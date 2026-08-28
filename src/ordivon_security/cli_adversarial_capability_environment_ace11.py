@@ -6,15 +6,15 @@ from pathlib import Path
 
 from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
-from ordivon_security.cli_adversarial_capability_environment_ace4 import (
-    _ACTOR,
-    _AUTHORITY,
-    _CAPABILITY,
-    _EFFECT,
-    _OBJECTIVE,
-    _ZONE,
-    _admit_without_execute,
-    _authority,
+from ordivon_security.adversarial_capability_environment_fixture import (
+    ACE_ACTOR,
+    ACE_AUTHORITY,
+    ACE_CAPABILITY,
+    ACE_EFFECT,
+    ACE_OBJECTIVE,
+    ACE_ZONE,
+    ace_authority,
+    admit_without_execute,
 )
 from ordivon_security.integrations import (
     DeepSeekRangeIntentConfig,
@@ -53,7 +53,7 @@ _REPRESENTATION_CONTRACT: JsonObject = {
 _CURRENT_IMPLEMENTATION_AUTHORITY: JsonObject = {
     "schemaVersion": 1,
     "kind": "ordivon.security.ace11-current-effect-implementation-authority",
-    "effectType": _EFFECT,
+    "effectType": ACE_EFFECT,
     "implementationIdentity": _CURRENT_IMPLEMENTATION,
     "consequenceDigest": canonical_digest(_CURRENT_CONSEQUENCE),
     "consequence": _CURRENT_CONSEQUENCE,
@@ -62,10 +62,10 @@ _CURRENT_IMPLEMENTATION_AUTHORITY: JsonObject = {
 
 def _source_interface() -> RangeEffectInterface:
     return RangeEffectInterface(
-        authority_id=_AUTHORITY,
-        zone_ref=_ZONE,
-        capability=_CAPABILITY,
-        effect_type=_EFFECT,
+        authority_id=ACE_AUTHORITY,
+        zone_ref=ACE_ZONE,
+        capability=ACE_CAPABILITY,
+        effect_type=ACE_EFFECT,
         semantics=_deterministic_consequence_summary(_SOURCE_CONSEQUENCE),
         consequence=_SOURCE_CONSEQUENCE,
         representation_contract=_REPRESENTATION_CONTRACT,
@@ -77,10 +77,10 @@ def _source_interface() -> RangeEffectInterface:
 
 
 def source_context() -> RangeIntentContext:
-    authority = _authority()
+    authority = ace_authority()
     return RangeIntentContext(
-        actor_id=_ACTOR,
-        objective=_OBJECTIVE,
+        actor_id=ACE_ACTOR,
+        objective=ACE_OBJECTIVE,
         visible_observation={
             "schemaVersion": 1,
             "kind": "ordivon.security.ace11-visible-observation",
@@ -135,7 +135,7 @@ def bound_model_context(source: RangeIntentContext, current: JsonObject | None) 
         actor_id=source.actor_id,
         objective=source.objective,
         visible_observation=source.visible_observation,
-        authorities=tuple(_authority() for _ in range(1)),
+        authorities=tuple(ace_authority() for _ in range(1)),
         effect_interfaces=exposed,
         metadata={
             "sourceContextDigest": source.digest,
@@ -225,7 +225,7 @@ def run_experiment(
                 raise RuntimeError(f"ACE11 determinate Provider decision unavailable for {treatment} r{replicate}")
             # Admission uses the exact currently declared model-facing interface set.
             if model_context.effect_interfaces:
-                admissions, destroy = _admit_without_execute(decision, label=f"ace11-{treatment}-r{replicate}")
+                admissions, destroy = admit_without_execute(decision, label=f"ace11-{treatment}-r{replicate}")
             else:
                 admissions = []
                 destroy = {"clean": True, "effectExecuted": False, "reason": "no-current-effect-interface-exposed"}

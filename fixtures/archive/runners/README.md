@@ -56,6 +56,21 @@ These runners form a bounded local consequence-protocol research chain. C1-N imp
 C1-M compensation binding as historical experiment apparatus; archiving the family together
 preserves that relation without promoting it to current shared support.
 
+Adversarial capability-environment intermediate experiment chain:
+
+- `cli_adversarial_capability_environment_ace1.py` — ACE1 source-role ablation
+- `cli_adversarial_capability_environment_ace2.py` — ACE2 objective-warning ablation
+- `cli_adversarial_capability_environment_ace3.py` — ACE3 world-truth-role ablation
+- `cli_adversarial_capability_environment_ace4.py` — ACE4 consequence-misrepresentation proof
+- `cli_adversarial_capability_environment_ace5.py` — ACE5 structured-consequence repair
+- `cli_adversarial_capability_environment_ace6.py` — ACE6 first-class-consequence treatment
+- `cli_adversarial_capability_environment_ace7.py` — ACE7 representation-precedence treatment
+
+Their exact receipts remain under `evidence/acceptance/ace1-*` through `ace7-*`. The
+current contracts forced by ACE6/7 are tested directly against `RangeEffectInterface` and
+Harness compilation using `adversarial_capability_environment_fixture.py`; ACE11 consumes
+the same bounded authority/effect fixture without importing historical ACE4 orchestration.
+
 Intent-convergence falsifier family:
 
 - `cli_intent_finalization_if0_acceptance.py` — IF0 explicit-finalization falsifier
