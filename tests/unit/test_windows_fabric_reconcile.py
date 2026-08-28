@@ -183,7 +183,7 @@ class WindowsFabricRangeReconcileTests(unittest.TestCase):
     def test_active_exact_owner_is_skipped(self) -> None:
         ledger_path, _ = self._s6_ledger()
         with patch(
-            "ordivon_security.range.windows_fabric_reconcile._identity_alive",
+            "ordivon_security.range.windows_fabric_reconcile.process_identity_alive",
             return_value=True,
         ):
             result = reconcile_windows_fabric_range_runs(self.root)

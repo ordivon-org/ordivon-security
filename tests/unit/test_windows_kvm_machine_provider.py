@@ -13,6 +13,8 @@ from ordivon_security._canonical import JsonObject, canonical_digest
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
+    process_identity_alive,
+    process_start_time,
 )
 
 
@@ -43,6 +45,22 @@ class _FakeQmpClient:
         if command in {"quit", "system_powerdown"}:
             return {}
         raise AssertionError(f"unexpected QMP command: {command}")
+
+
+class WindowsKvmProcessIdentityTests(unittest.TestCase):
+    @patch("ordivon_security.providers.windows_kvm._process_identity")
+    def test_exact_process_currentness_is_provider_owned(self, observe) -> None:
+        observe.return_value = ("S", 77)
+        self.assertTrue(process_identity_alive(42, 77))
+        self.assertFalse(process_identity_alive(42, 78))
+        observe.return_value = ("Z", 77)
+        self.assertFalse(process_identity_alive(42, 77))
+        self.assertFalse(process_identity_alive("42", 77))
+
+    @patch("ordivon_security.providers.windows_kvm._process_start_time", return_value=88)
+    def test_public_start_time_observation_preserves_provider_identity(self, observe) -> None:
+        self.assertEqual(process_start_time(42), 88)
+        observe.assert_called_once_with(42)
 
 
 class WindowsKvmMachineProviderTests(unittest.TestCase):

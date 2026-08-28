@@ -48,6 +48,7 @@ S2 separates **machine authority** from **software Evaluation admission**. The e
 - machine shutdown/termination primitives;
 - run-directory and ledger residual closure;
 - low-level process and ledger helpers shared by hard-failure reconciliation.
+- exact PID/start-time liveness observation through the Provider-owned `process_identity_alive()` primitive, shared by Evaluation and Range reconciliation rather than reimplemented per profile.
 
 Its execution identity contains no Sample digest, fixture attestation, Evaluation action, or Guardian decision. Network policy is deliberately represented as `caller-supplied-qemu-topology`: the substrate can observe topology, but does not authorize one.
 

@@ -12,9 +12,9 @@ from ordivon_security._canonical import JsonObject, JsonValue
 from ordivon_security.providers.windows_kvm import (
     _fsync_directory,
     _load_object,
-    _process_identity,
     _replace_private_json,
     _terminate_pid,
+    process_identity_alive,
 )
 from ordivon_security.range.windows_fabric_recovery_ownership import (
     clear_windows_fabric_recovery_claim_history,
@@ -25,13 +25,6 @@ _SUPPORTED_RANGES = {
     "range:windows-isolated-fabric-s5": "s5",
     "range:windows-topology-churn-s6": "s6",
 }
-
-
-def _identity_alive(pid: object, start_time: object) -> bool:
-    if not isinstance(pid, int) or pid < 1 or not isinstance(start_time, int):
-        return False
-    identity = _process_identity(pid)
-    return identity is not None and identity[1] == start_time and identity[0] != "Z"
 
 
 def _session_token(session_id: str) -> str:
@@ -311,7 +304,7 @@ def reconcile_windows_fabric_range_runs(
 
         run_path, namespace_candidates, host_link_candidates, canary_path = validated
         managed_tokens.add(token)
-        if _identity_alive(ledger.get("ownerPid"), ledger.get("ownerStartTime")):
+        if process_identity_alive(ledger.get("ownerPid"), ledger.get("ownerStartTime")):
             results.append(
                 {
                     "runToken": token,

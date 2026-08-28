@@ -11,17 +11,10 @@ from ordivon_security._canonical import JsonObject, JsonValue
 from ordivon_security.providers.windows_kvm import (
     _fsync_directory,
     _load_object,
-    _process_identity,
     _replace_private_json,
     _terminate_pid,
+    process_identity_alive,
 )
-
-
-def _identity_alive(pid: object, start_time: object) -> bool:
-    if not isinstance(pid, int) or pid < 1 or not isinstance(start_time, int):
-        return False
-    identity = _process_identity(pid)
-    return identity is not None and identity[1] == start_time and identity[0] != "Z"
 
 
 def _validated_run_path(runs_root: Path, ledger_path: Path, ledger: JsonObject) -> Path | None:
@@ -233,7 +226,7 @@ def reconcile_windows_kvm_runs(
             )
             continue
         managed_tokens.add(token)
-        if _identity_alive(ledger.get("ownerPid"), ledger.get("ownerStartTime")):
+        if process_identity_alive(ledger.get("ownerPid"), ledger.get("ownerStartTime")):
             results.append(
                 {"runToken": token, "decision": "skipped-active", "phase": ledger.get("phase")}
             )

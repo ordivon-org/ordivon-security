@@ -13,9 +13,9 @@ from typing import cast
 from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
 from ordivon_security.providers.windows_kvm import (
     _load_object,
-    _process_identity,
-    _process_start_time,
     _replace_private_json,
+    process_identity_alive,
+    process_start_time,
 )
 
 
@@ -25,13 +25,6 @@ class RecoveryClaimStaleError(RuntimeError):
 
 def _digest_bytes(value: bytes) -> str:
     return "sha256:" + hashlib.sha256(value).hexdigest()
-
-
-def _identity_alive(pid: object, start_time: object) -> bool:
-    if not isinstance(pid, int) or pid < 1 or not isinstance(start_time, int):
-        return False
-    identity = _process_identity(pid)
-    return identity is not None and identity[1] == start_time and identity[0] != "Z"
 
 
 def _claims_root(state_root: Path) -> Path:
@@ -245,11 +238,11 @@ def acquire_windows_fabric_successor_claim(
                 "successor claim ledger generation changed before acquisition"
             )
         ledger = _load_object(ledger_path, "successor claim Range ledger")
-        if _identity_alive(ledger.get("ownerPid"), ledger.get("ownerStartTime")):
+        if process_identity_alive(ledger.get("ownerPid"), ledger.get("ownerStartTime")):
             raise RuntimeError(
                 "successor claim refuses a Range whose original owner is still alive"
             )
-        claimant_start = _process_start_time(os.getpid())
+        claimant_start = process_start_time(os.getpid())
         if claimant_start is None:
             raise RuntimeError("successor claim process identity is not observable")
         effect = ledger.get("actorReplacementRequest")

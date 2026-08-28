@@ -168,6 +168,19 @@ def _process_start_time(pid: int) -> int | None:
     return identity[1] if identity is not None else None
 
 
+def process_start_time(pid: int) -> int | None:
+    """Observe one Linux process start-time identity from the machine substrate."""
+    return _process_start_time(pid)
+
+
+def process_identity_alive(pid: object, start_time: object) -> bool:
+    """Return whether the exact PID/start-time identity is currently live and non-zombie."""
+    if not isinstance(pid, int) or pid < 1 or not isinstance(start_time, int):
+        return False
+    identity = _process_identity(pid)
+    return identity is not None and identity[1] == start_time and identity[0] != "Z"
+
+
 def _reap_child(pid: int) -> None:
     with suppress(ChildProcessError):
         os.waitpid(pid, os.WNOHANG)

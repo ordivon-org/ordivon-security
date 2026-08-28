@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from ordivon_security.providers.windows_kvm import _process_start_time
+from ordivon_security.providers.windows_kvm import process_start_time
 from ordivon_security.range.windows_fabric_recovery_ownership import (
     RecoveryClaimStaleError,
     acquire_windows_fabric_successor_claim,
@@ -152,7 +152,7 @@ class WindowsFabricRecoveryOwnershipTests(unittest.TestCase):
         gate.release()
 
     def test_successor_claim_refuses_live_predecessor(self) -> None:
-        start = _process_start_time(os.getpid())
+        start = process_start_time(os.getpid())
         assert start is not None
         ledger = self._ledger(owner_pid=os.getpid(), owner_start=start)
         with self.assertRaisesRegex(RuntimeError, "original owner is still alive"):
