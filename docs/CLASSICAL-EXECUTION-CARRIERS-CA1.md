@@ -399,3 +399,7 @@ verified consequence
 ```
 
 CA2 should test scanners, fuzzers/program analysis, exact vulnerable target revisions, false positives, exploitability proofs, and provider currentness while reusing CA0/CA1's authority/evidence separation.
+
+## Post-closeout executable standing — 2026-08-28
+
+CA1's accepted/falsified research result and source-fenced evidence remain canonical. The one-shot `cli_ca1_carrier_matrix.py` experiment runner is retained under `fixtures/archive/runners/` rather than the current package because it has no installed command, current source/research consumer, exact documentation invocation, or current surface claim; its remaining unit test exercised runner-local experiment apparatus. The accepted evidence is indexed by the `1ce7d60` receipt. Restoring the runner is an explicit reproduction/new-experiment action, not a current Security capability requirement.

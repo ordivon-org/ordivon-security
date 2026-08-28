@@ -99,3 +99,7 @@ CA1-CA4 now provide four materially different consumers: Windows execution carri
 > Did these consumers repeatedly require one missing Security provider-binding abstraction, or did provider-specific adapters plus existing owner contracts already suffice?
 
 CA5 should answer that by code/evidence audit before implementing any gateway.
+
+## Post-closeout executable standing — 2026-08-28
+
+CA4's accepted/falsified research result and source-fenced evidence remain canonical. The one-shot `cli_ca4_defensive_plane.py` experiment runner is retained under `fixtures/archive/runners/` rather than the current package because it has no installed command, current source/research consumer, exact documentation invocation, or current surface claim; its remaining unit test exercised runner-local experiment apparatus. The accepted evidence is indexed by the `2a3d203` receipt. Restoring the runner is an explicit reproduction/new-experiment action, not a current Security capability requirement.

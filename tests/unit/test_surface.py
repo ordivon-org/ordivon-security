@@ -104,6 +104,17 @@ class SecuritySurfaceTests(unittest.TestCase):
         ):
             self.assertFalse((package / module_name).exists(), module_name)
 
+    def test_archived_ca1_ca6_research_runners_do_not_return_to_current_package(self) -> None:
+        package = Path(ordivon_security.__file__).resolve().parent
+        for module_name in (
+            "cli_ca1_carrier_matrix.py",
+            "cli_ca2_vulnerability_evidence.py",
+            "cli_ca3_post_compromise_state.py",
+            "cli_ca4_defensive_plane.py",
+            "cli_ca6_tactical_adaptation.py",
+        ):
+            self.assertFalse((package / module_name).exists(), module_name)
+
     def test_archived_c1a_physical_proof_does_not_return_to_current_package(self) -> None:
         package = Path(ordivon_security.__file__).resolve().parent
         self.assertFalse((package / "cli_windows_kvm_c1a_acceptance.py").exists())

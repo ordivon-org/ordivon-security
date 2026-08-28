@@ -172,3 +172,7 @@ Those are exactly the facts CA7 must require before admitting Campaign/Organizat
 CA6 produced **no failure that ordinary current-observation composition cannot explain**. The correct CA7 action is therefore an admission decision, not implementation of the remaining roadmap.
 
 Unless another independent consumer demonstrates cross-episode strategic state that materially changes decisions, Campaign, Organization and coevolution remain unearned.
+
+## Post-closeout executable standing — 2026-08-28
+
+CA6's accepted/falsified research result and source-fenced evidence remain canonical. The one-shot `cli_ca6_tactical_adaptation.py` experiment runner is retained under `fixtures/archive/runners/` rather than the current package because it has no installed command, current source/research consumer, exact documentation invocation, or current surface claim; its remaining unit test exercised runner-local experiment apparatus. The accepted evidence is indexed by the `c59aa0a` receipt. Restoring the runner is an explicit reproduction/new-experiment action, not a current Security capability requirement.

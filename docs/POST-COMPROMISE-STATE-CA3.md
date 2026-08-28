@@ -130,3 +130,7 @@ raw observation
 ```
 
 It should retain known-clean, malicious/synthetic, delayed/conflicting and sensor-failure controls and avoid an omniscient `DETECT` primitive.
+
+## Post-closeout executable standing — 2026-08-28
+
+CA3's accepted/falsified research result and source-fenced evidence remain canonical. The one-shot `cli_ca3_post_compromise_state.py` experiment runner is retained under `fixtures/archive/runners/` rather than the current package because it has no installed command, current source/research consumer, exact documentation invocation, or current surface claim; its remaining unit test exercised runner-local experiment apparatus. The accepted evidence is indexed by the `27de2f9` receipt. Restoring the runner is an explicit reproduction/new-experiment action, not a current Security capability requirement.

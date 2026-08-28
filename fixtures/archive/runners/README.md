@@ -56,6 +56,18 @@ These runners form a bounded local consequence-protocol research chain. C1-N imp
 C1-M compensation binding as historical experiment apparatus; archiving the family together
 preserves that relation without promoting it to current shared support.
 
+Classical/adaptive carrier research family:
+
+- `cli_ca1_carrier_matrix.py` — CA1 classical execution-carrier matrix
+- `cli_ca2_vulnerability_evidence.py` — CA2 provider/vulnerability evidence
+- `cli_ca3_post_compromise_state.py` — CA3 post-compromise state
+- `cli_ca4_defensive_plane.py` — CA4 defensive observation/response plane
+- `cli_ca6_tactical_adaptation.py` — CA6 tactical adaptation
+
+CA5 and CA7 already close through evidence/document standing rather than a current runner.
+The archived CA runners have no installed command or current package consumer; their accepted
+receipts and canonical documents remain the owner-native research record.
+
 World-entity family:
 
 - `cli_world_entity_prebody_abandonment_acceptance.py`
