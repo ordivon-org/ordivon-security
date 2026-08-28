@@ -310,3 +310,9 @@ If the ordinary AF2 Tool intent remains zero-effect after prior deliberation, th
 ## Follow-up
 
 IF3 performs the planned subtraction and is accepted: no-effect deliberation is retained, IF1 readback/finalization Tools are removed, and ordinary AF2 revision still converges to `[]`. See [`INTENT-CEREMONY-ABLATION-IF3.md`](INTENT-CEREMONY-ABLATION-IF3.md).
+
+## Post-closeout executable standing — 2026-08-28
+
+IF0–IF2 remain one canonical experimental series and the aggregate acceptance index remains `evidence/acceptance/if0-if2-intent-convergence-cb2f0ae.json`. IF1's stronger readback/digest-bound-finalization treatment remains a falsifier: apparatus revision `e9c344f40281653ccf2603ce3387b0ede78a9194`, physical receipt SHA-256 `d3bd0e6f4dab9ab30194e6ec32284d6c7c7661ad6d84bc277351f54ce4fda738`. IF3 subsequently preserves the accepted deliberation-before-authority behavior after removing IF1 readback/finalization Tools.
+
+The one-shot `cli_intent_readback_if1_acceptance.py` runner is therefore retained under `fixtures/archive/runners/` rather than the current package. It had no installed command, current source consumer, or current surface claim; its remaining unit test only replayed the exact IF0/AC2 context digest. This retirement does not remove the IF1 negative result and does not assert that readback/finalization is useless in every domain.

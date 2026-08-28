@@ -56,6 +56,15 @@ These runners form a bounded local consequence-protocol research chain. C1-N imp
 C1-M compensation binding as historical experiment apparatus; archiving the family together
 preserves that relation without promoting it to current shared support.
 
+Intent-convergence falsifier family:
+
+- `cli_intent_readback_if1_acceptance.py` — IF1 exact-readback/digest-bound-finalization falsifier
+  (aggregate evidence: `evidence/acceptance/if0-if2-intent-convergence-cb2f0ae.json`;
+  apparatus revision `e9c344f40281653ccf2603ce3387b0ede78a9194`)
+
+IF3 later preserves the IF2 success after removing IF1 readback/finalization Tools, so IF1
+remains historical falsifier apparatus rather than a current package capability.
+
 Classical/adaptive carrier research family:
 
 - `cli_ca1_carrier_matrix.py` — CA1 classical execution-carrier matrix
