@@ -19,6 +19,17 @@ receipts live in `evidence/acceptance/` and their conclusions live in
 `docs/`. Archiving the runner does not touch evidence (AGENTS.md rule 19:
 evidence is history; runners are not compatibility requirements).
 
+## Historical support snapshots
+
+Some archived runners import helper modules that were briefly extracted into the current package during runner retirement. A later deletion tournament found no current executable consumer for those helpers. Their source snapshots now live in `../support/`:
+
+- `acceptance_support.py`
+- `windows_kvm_acceptance_support.py`
+- `windows_kvm_partial_world_fixture.py`
+- `windows_kvm_recovery_acceptance_support.py`
+
+Archived runners are historical source, not a promise that current HEAD can execute them unchanged. Reproduction should use the exact accepted historical revision or explicitly re-adjudicate and rebind its apparatus dependencies; do not restore support into the current package merely to satisfy an old import.
+
 ## Contents
 
 C1 successor/recovery family (these four imported one another in a closed
