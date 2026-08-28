@@ -10,11 +10,19 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue
 from ordivon_security.providers.windows_kvm import (
-    _fsync_directory,
-    _load_object,
-    _replace_private_json,
-    _terminate_pid,
+    fsync_directory as _fsync_directory,
+)
+from ordivon_security.providers.windows_kvm import (
+    load_json_object as _load_object,
+)
+from ordivon_security.providers.windows_kvm import (
     process_identity_alive,
+)
+from ordivon_security.providers.windows_kvm import (
+    replace_private_json as _replace_private_json,
+)
+from ordivon_security.providers.windows_kvm import (
+    terminate_process as _terminate_pid,
 )
 from ordivon_security.range.windows_fabric_recovery_ownership import (
     clear_windows_fabric_recovery_claim_history,

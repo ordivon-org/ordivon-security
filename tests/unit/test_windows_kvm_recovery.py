@@ -9,13 +9,15 @@ import unittest
 from pathlib import Path
 
 from ordivon_security._canonical import JsonObject
-from ordivon_security.evaluation.windows_kvm import (
-    _process_start_time,
-    _replace_private_json,
-)
 from ordivon_security.evaluation.windows_kvm_reconcile import (
     _reconcile_benign_fixtures,
     reconcile_windows_kvm_runs,
+)
+from ordivon_security.providers.windows_kvm import (
+    process_start_time as _process_start_time,
+)
+from ordivon_security.providers.windows_kvm import (
+    replace_private_json as _replace_private_json,
 )
 
 

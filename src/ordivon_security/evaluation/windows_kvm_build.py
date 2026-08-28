@@ -19,6 +19,12 @@ from ordivon_security._canonical import (
     canonical_digest,
 )
 from ordivon_security.identity import security_source_identity
+from ordivon_security.providers.windows_kvm import (
+    set_path_owner as _set_owner,
+)
+from ordivon_security.providers.windows_kvm import (
+    terminate_process as _terminate_pid,
+)
 
 from .windows_kvm import (
     _digest_path,
@@ -26,8 +32,6 @@ from .windows_kvm import (
     _pci_network_devices,
     _QmpClient,
     _run_checked,
-    _set_owner,
-    _terminate_pid,
 )
 
 _BUILD_LABEL = "ORDIVONBLD"

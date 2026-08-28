@@ -16,9 +16,13 @@ from ordivon_security.identity import security_source_identity
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
-    _process_start_time,
-    _set_owner,
     windows_kvm_machine_base_arguments,
+)
+from ordivon_security.providers.windows_kvm import (
+    process_start_time as _process_start_time,
+)
+from ordivon_security.providers.windows_kvm import (
+    set_path_owner as _set_owner,
 )
 
 from .model import RangeSessionSpec

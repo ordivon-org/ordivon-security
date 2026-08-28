@@ -17,20 +17,20 @@ from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineProvider,
     _digest_path,
     _host_cpu_identity,
-    _load_object,
-    _replace_private_json,
-    _set_owner,
     _version_line,
 )
 from ordivon_security.providers.windows_kvm import (
     _pci_network_devices as _pci_network_devices,
 )
-from ordivon_security.providers.windows_kvm import (
-    _process_start_time as _process_start_time,
-)
 from ordivon_security.providers.windows_kvm import _QmpClient as _QmpClient
 from ordivon_security.providers.windows_kvm import (
-    _terminate_pid as _terminate_pid,
+    load_json_object as _load_object,
+)
+from ordivon_security.providers.windows_kvm import (
+    replace_private_json as _replace_private_json,
+)
+from ordivon_security.providers.windows_kvm import (
+    set_path_owner as _set_owner,
 )
 
 from .backend import (

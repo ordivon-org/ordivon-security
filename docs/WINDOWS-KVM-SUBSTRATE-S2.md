@@ -49,6 +49,7 @@ S2 separates **machine authority** from **software Evaluation admission**. The e
 - run-directory and ledger residual closure;
 - low-level process and ledger helpers shared by hard-failure reconciliation.
 - exact PID/start-time liveness observation through the Provider-owned `process_identity_alive()` primitive, shared by Evaluation and Range reconciliation rather than reimplemented per profile.
+- owner-local durable-state/process primitives (`load_json_object`, `replace_private_json`, `fsync_directory`, `terminate_process`, `set_path_owner`, `process_start_time`) consumed by multiple Windows profiles; these are module-level substrate contracts, not package-root Security API.
 
 Its execution identity contains no Sample digest, fixture attestation, Evaluation action, or Guardian decision. Network policy is deliberately represented as `caller-supplied-qemu-topology`: the substrate can observe topology, but does not authorize one.
 

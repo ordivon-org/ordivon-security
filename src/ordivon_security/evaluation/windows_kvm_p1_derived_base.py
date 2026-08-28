@@ -15,9 +15,13 @@ from ordivon_security.identity import security_source_identity
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmBaseImage,
     _digest_path,
-    _load_object,
-    _replace_private_json,
     _run_checked,
+)
+from ordivon_security.providers.windows_kvm import (
+    load_json_object as _load_object,
+)
+from ordivon_security.providers.windows_kvm import (
+    replace_private_json as _replace_private_json,
 )
 
 from .models import SampleIdentity

@@ -40,8 +40,6 @@ from ordivon_security.evaluation.windows_kvm import (
     WindowsKvmEvaluationBackend,
     WindowsKvmProviderConfig,
     _pci_network_devices,
-    _process_start_time,
-    _terminate_pid,
     windows_kvm_qemu_arguments,
 )
 from ordivon_security.evaluation.windows_kvm_build import (
@@ -53,6 +51,12 @@ from ordivon_security.evaluation.windows_kvm_build import (
     _validate_unattend,
     build_windows_kvm_base,
     windows_kvm_install_arguments,
+)
+from ordivon_security.providers.windows_kvm import (
+    process_start_time as _process_start_time,
+)
+from ordivon_security.providers.windows_kvm import (
+    terminate_process as _terminate_pid,
 )
 
 

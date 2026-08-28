@@ -57,7 +57,7 @@ class WindowsKvmProcessIdentityTests(unittest.TestCase):
         self.assertFalse(process_identity_alive(42, 77))
         self.assertFalse(process_identity_alive("42", 77))
 
-    @patch("ordivon_security.providers.windows_kvm._process_start_time", return_value=88)
+    @patch("ordivon_security.providers.windows_kvm._process_identity", return_value=("S", 88))
     def test_public_start_time_observation_preserves_provider_identity(self, observe) -> None:
         self.assertEqual(process_start_time(42), 88)
         observe.assert_called_once_with(42)
@@ -263,7 +263,7 @@ class WindowsKvmMachineProviderTests(unittest.TestCase):
                 return_value=process,
             ),
             patch(
-                "ordivon_security.providers.windows_kvm._process_start_time",
+                "ordivon_security.providers.windows_kvm.process_start_time",
                 return_value=777,
             ),
         ):
@@ -357,7 +357,7 @@ class WindowsKvmMachineProviderTests(unittest.TestCase):
                 return_value=FakeProcess(),
             ) as popen,
             patch(
-                "ordivon_security.providers.windows_kvm._process_start_time",
+                "ordivon_security.providers.windows_kvm.process_start_time",
                 return_value=888,
             ),
         ):

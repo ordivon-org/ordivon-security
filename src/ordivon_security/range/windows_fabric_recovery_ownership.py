@@ -12,10 +12,14 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
 from ordivon_security.providers.windows_kvm import (
-    _load_object,
-    _replace_private_json,
+    load_json_object as _load_object,
+)
+from ordivon_security.providers.windows_kvm import (
     process_identity_alive,
     process_start_time,
+)
+from ordivon_security.providers.windows_kvm import (
+    replace_private_json as _replace_private_json,
 )
 
 

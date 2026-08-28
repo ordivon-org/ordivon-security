@@ -15,9 +15,13 @@ from ordivon_security._canonical import JsonObject, JsonValue, canonical_bytes, 
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineConfig,
     WindowsKvmMachineProvider,
-    _process_start_time,
-    _set_owner,
     windows_kvm_machine_base_arguments,
+)
+from ordivon_security.providers.windows_kvm import (
+    process_start_time as _process_start_time,
+)
+from ordivon_security.providers.windows_kvm import (
+    set_path_owner as _set_owner,
 )
 
 _REQUEST_KIND = "ordivon.world.entity-migration-destination-request"

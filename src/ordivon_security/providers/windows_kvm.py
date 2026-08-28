@@ -47,7 +47,8 @@ def _digest_path(path: Path) -> tuple[str, int]:
     return "sha256:" + digest.hexdigest(), byte_length
 
 
-def _load_object(path: Path, label: str) -> JsonObject:
+def load_json_object(path: Path, label: str) -> JsonObject:
+    """Load one validated JSON object through the Windows machine substrate."""
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
         raise ValueError(f"{label} must be an object")
@@ -55,7 +56,8 @@ def _load_object(path: Path, label: str) -> JsonObject:
     return value
 
 
-def _fsync_directory(path: Path) -> None:
+def fsync_directory(path: Path) -> None:
+    """Durably flush one directory after substrate-owned state mutation."""
     descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
     try:
         os.fsync(descriptor)
@@ -63,7 +65,8 @@ def _fsync_directory(path: Path) -> None:
         os.close(descriptor)
 
 
-def _replace_private_json(path: Path, value: JsonObject) -> None:
+def replace_private_json(path: Path, value: JsonObject) -> None:
+    """Atomically and durably replace one private JSON substrate record."""
     validate_json(value)
     if path.is_symlink():
         raise ValueError(f"Private JSON path must not be a symlink: {path}")
@@ -76,7 +79,7 @@ def _replace_private_json(path: Path, value: JsonObject) -> None:
             os.fsync(handle.fileno())
         os.replace(temporary, path)
         path.chmod(0o600)
-        _fsync_directory(path.parent)
+        fsync_directory(path.parent)
     except BaseException:
         temporary.unlink(missing_ok=True)
         raise
@@ -163,14 +166,10 @@ def _process_identity(pid: int) -> tuple[str, int] | None:
     return fields[0], start_time
 
 
-def _process_start_time(pid: int) -> int | None:
-    identity = _process_identity(pid)
-    return identity[1] if identity is not None else None
-
-
 def process_start_time(pid: int) -> int | None:
     """Observe one Linux process start-time identity from the machine substrate."""
-    return _process_start_time(pid)
+    identity = _process_identity(pid)
+    return identity[1] if identity is not None else None
 
 
 def process_identity_alive(pid: object, start_time: object) -> bool:
@@ -186,12 +185,13 @@ def _reap_child(pid: int) -> None:
         os.waitpid(pid, os.WNOHANG)
 
 
-def _terminate_pid(
+def terminate_process(
     pid: int,
     *,
     expected_fragment: str,
     expected_start_time: int | None = None,
 ) -> bool:
+    """Terminate only the exact expected process identity, failing closed on mismatch."""
     identity = _process_identity(pid)
     if identity is None:
         return True
@@ -243,7 +243,8 @@ def _terminate_pid(
     return _process_identity(pid) is None
 
 
-def _set_owner(path: Path, *, user: str, group: str) -> None:
+def set_path_owner(path: Path, *, user: str, group: str) -> None:
+    """Apply the exact user/group ownership required by the machine substrate."""
     shutil.chown(path, user=user, group=group)
 
 
@@ -272,7 +273,7 @@ class WindowsKvmBaseImage:
         marker = manifest_path.resolve(strict=False)
         if marker in seen:
             raise ValueError("Windows KVM base manifest parent chain contains a cycle")
-        manifest = _load_object(manifest_path, "Windows KVM base manifest")
+        manifest = load_json_object(manifest_path, "Windows KVM base manifest")
         if (
             manifest.get("schemaVersion") != 1
             or manifest.get("kind") != "ordivon.security.windows-kvm-base-image"
@@ -342,7 +343,7 @@ class WindowsKvmBaseImage:
             ):
                 raise ValueError("Windows KVM base parent identity is incomplete")
             parent_manifest_path = Path(cast(str, parent_manifest_value))
-            parent_manifest_object = _load_object(
+            parent_manifest_object = load_json_object(
                 parent_manifest_path, "Windows KVM parent base manifest"
             )
             if canonical_digest(parent_manifest_object) != parent_manifest_digest:
@@ -628,11 +629,11 @@ class WindowsKvmMachineProvider:
         self.runs_root = config.state_root / "runs"
         self.runs_root.mkdir(parents=True, exist_ok=True)
         self.runs_root.chmod(0o710)
-        _set_owner(self.runs_root, user="root", group=config.run_group)
+        set_path_owner(self.runs_root, user="root", group=config.run_group)
         self.ledgers_root = config.state_root / "run-ledgers"
         self.ledgers_root.mkdir(parents=True, exist_ok=True)
         self.ledgers_root.chmod(0o700)
-        _set_owner(self.ledgers_root, user="root", group="root")
+        set_path_owner(self.ledgers_root, user="root", group="root")
 
     @property
     def execution_identity(self) -> JsonObject:
@@ -695,12 +696,12 @@ class WindowsKvmMachineProvider:
         if run_path.exists():
             raise FileExistsError(f"Windows KVM Run already exists: {run_path}")
         run_path.mkdir(mode=0o700)
-        _set_owner(run_path, user=self.config.run_user, group=self.config.run_group)
+        set_path_owner(run_path, user=self.config.run_user, group=self.config.run_group)
         overlay_path = run_path / "system-overlay.qcow2"
         vars_path = run_path / "OVMF_VARS.4m.fd"
         tpm_state_path = run_path / "tpm-state"
         tpm_state_path.mkdir(mode=0o700)
-        _set_owner(tpm_state_path, user=self.config.run_user, group=self.config.run_group)
+        set_path_owner(tpm_state_path, user=self.config.run_user, group=self.config.run_group)
         try:
             _run_checked(
                 [
@@ -719,8 +720,8 @@ class WindowsKvmMachineProvider:
             shutil.copyfile(self.base.base_vars_path, vars_path)
             for path in (overlay_path, vars_path):
                 path.chmod(0o600)
-                _set_owner(path, user=self.config.run_user, group=self.config.run_group)
-            owner_start_time = _process_start_time(os.getpid())
+                set_path_owner(path, user=self.config.run_user, group=self.config.run_group)
+            owner_start_time = process_start_time(os.getpid())
             if owner_start_time is None:
                 raise RuntimeError("Windows KVM owner process identity was not observable")
         except BaseException:
@@ -795,7 +796,7 @@ class WindowsKvmMachineProvider:
                 if key in ledger and ledger[key] != value:
                     raise ValueError(f"Windows KVM ledger extra conflicts with core field: {key}")
                 ledger[key] = value
-        _replace_private_json(state_path, ledger)
+        replace_private_json(state_path, ledger)
 
     def start_swtpm(
         self,
@@ -841,7 +842,7 @@ class WindowsKvmMachineProvider:
                 raise TimeoutError("swtpm PID file was not created")
             time.sleep(0.1)
         pid = int(pid_path.read_text(encoding="utf-8").strip())
-        start_time = _process_start_time(pid)
+        start_time = process_start_time(pid)
         if start_time is None:
             raise RuntimeError("swtpm process identity was not observable")
         state["swtpmPid"] = pid
@@ -923,7 +924,7 @@ class WindowsKvmMachineProvider:
             stderr_path.open("xb") as stderr_handle,
         ):
             process = subprocess.Popen(launch_arguments, stdout=stdout_handle, stderr=stderr_handle)
-        start_time = _process_start_time(process.pid)
+        start_time = process_start_time(process.pid)
         if start_time is None:
             process.kill()
             process.wait(timeout=10)
@@ -1031,7 +1032,7 @@ class WindowsKvmMachineProvider:
         qemu_closed = (
             not isinstance(qemu_pid, int)
             or qemu_pid == 0
-            or _terminate_pid(
+            or terminate_process(
                 qemu_pid,
                 expected_fragment="qemu-system-x86_64",
                 expected_start_time=qemu_start_time if isinstance(qemu_start_time, int) else None,
@@ -1040,7 +1041,7 @@ class WindowsKvmMachineProvider:
         swtpm_closed = (
             not isinstance(swtpm_pid, int)
             or swtpm_pid == 0
-            or _terminate_pid(
+            or terminate_process(
                 swtpm_pid,
                 expected_fragment="swtpm",
                 expected_start_time=(
@@ -1065,7 +1066,7 @@ class WindowsKvmMachineProvider:
         ledger_removed = False
         if qemu_closed and swtpm_closed and run_removed and ledger_path is not None:
             ledger_path.unlink(missing_ok=True)
-            _fsync_directory(self.ledgers_root)
+            fsync_directory(self.ledgers_root)
             ledger_removed = not ledger_path.exists()
         clean = qemu_closed and swtpm_closed and run_removed and ledger_removed
         residual_objects: list[JsonValue] = []

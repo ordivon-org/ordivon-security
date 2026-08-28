@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue, validate_json
-from ordivon_security.providers.windows_kvm import _process_start_time
+from ordivon_security.providers.windows_kvm import process_start_time as _process_start_time
 
 from .model import RangeEffectAdmission, RangeSessionSpec
 from .protocol import RangeSessionInstance
