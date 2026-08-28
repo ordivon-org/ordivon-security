@@ -5,7 +5,7 @@ import unittest
 from importlib.resources import files
 from pathlib import Path
 
-from ordivon_security.cli_windows_kvm_p1_orchestrator_probe import (
+from ordivon_security.windows_kvm_p1_orchestrator_probe import (
     _FIXTURE_ID,
     _compile_orchestrator_probe,
 )

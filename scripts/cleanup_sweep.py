@@ -196,6 +196,58 @@ def _registered_clis() -> set[str]:
     return set(re.findall(r"ordivon_security\.(\w+):main", text))
 
 
+def _represented_research_clis() -> set[str]:
+    """Return CLIs intentionally represented as non-installed research apparatus.
+
+    The owner surface is the authority for this maturity distinction. If it cannot
+    be loaded, fail conservative: return no exemptions so the older warning remains.
+    """
+    source_root = str(REPO_ROOT / "src")
+    inserted = source_root not in sys.path
+    if inserted:
+        sys.path.insert(0, source_root)
+    try:
+        from ordivon_security.surface import security_surface_manifest
+
+        value = security_surface_manifest()
+    except Exception:
+        return set()
+    finally:
+        if inserted and sys.path and sys.path[0] == source_root:
+            sys.path.pop(0)
+    represented: set[str] = set()
+    for entry in value.get("entries", []):
+        if not isinstance(entry, dict) or entry.get("tier") != "research-apparatus":
+            continue
+        module = entry.get("module")
+        if not isinstance(module, str) or not module.startswith(f"{PKG}.cli_"):
+            continue
+        represented.add(module.removeprefix(f"{PKG}."))
+    return represented
+
+
+def _documented_module_clis(mods: dict[str, Path]) -> set[str]:
+    """Return CLIs explicitly documented for direct ``python -m`` execution."""
+    roots = [REPO_ROOT / "README.md", REPO_ROOT / "docs"]
+    documented: set[str] = set()
+    for module in mods:
+        if not module.startswith("cli_"):
+            continue
+        needle = f"python -m {PKG}.{module}"
+        for root in roots:
+            paths = [root] if root.is_file() else list(root.rglob("*.md")) if root.is_dir() else []
+            for path in paths:
+                try:
+                    if needle in path.read_text(encoding="utf-8"):
+                        documented.add(module)
+                        break
+                except OSError:
+                    continue
+            if module in documented:
+                break
+    return documented
+
+
 def _has_doc_reference(module: str, mods: dict[str, Path]) -> bool:
     """Does any docs/ markdown name this module (evidence of intent)?"""
     docs_dir = REPO_ROOT / "docs"
@@ -252,12 +304,14 @@ def detect(report: SweepReport) -> None:
     _refs, reverse = _scan_imports(mods)
     string_refs = _string_references(mods)
     registered = _registered_clis()
+    represented_research = _represented_research_clis()
+    documented_module_clis = _documented_module_clis(mods)
 
     # --- 1. Orphan modules (0 imports, unregistered, undocumented) -----------
     for module, count in sorted(reverse.items(), key=lambda kv: kv[1]):
         if count > 0 or module.endswith("__init__"):
             continue
-        if module in registered or module in string_refs:
+        if module in registered or module in string_refs or module in documented_module_clis:
             continue
         lines = sum(1 for _ in mods[module].open(encoding="utf-8"))
         if module.startswith("cli_") and _has_doc_reference(module, mods):
@@ -307,12 +361,17 @@ def detect(report: SweepReport) -> None:
     # --- 4. Unregistered CLI entry points -----------------------------------
     all_clis = sorted(m for m in mods if m.startswith("cli_") and not m.endswith("__init__"))
     unregistered = [m for m in all_clis if m not in registered]
-    if unregistered:
+    unexplained = [
+        m
+        for m in unregistered
+        if m not in represented_research and m not in documented_module_clis
+    ]
+    if unexplained:
         report.add(
             "CAREFUL",
-            "unregistered-cli",
-            f"{len(unregistered)}/{len(all_clis)} 个 CLI 未注册进 pyproject",
-            ", ".join(unregistered[:10]) + ("…" if len(unregistered) > 10 else ""),
+            "unregistered-cli-unclassified",
+            f"{len(unexplained)}/{len(all_clis)} 个 CLI 未注册且未被 current research surface 分类",
+            ", ".join(unexplained[:10]) + ("…" if len(unexplained) > 10 else ""),
         )
 
     # --- 5. Quarantine hygiene: compiled artifacts in isolation ------------
