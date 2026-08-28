@@ -13,12 +13,6 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue, validate_json
 from ordivon_security.acceptance_support import git_revision, write_receipt
-from ordivon_security.cli_windows_kvm_partial_materialization_acceptance import (
-    _FAULT_POINT,
-    _KillAfterRootVethRange,
-    _link_names,
-    _root_link_truth,
-)
 from ordivon_security.providers.windows_kvm import (
     WindowsKvmMachineProvider,
     _load_object,
@@ -42,6 +36,12 @@ from ordivon_security.range.windows_fabric_reconcile import (
 from ordivon_security.windows_kvm_acceptance_support import (
     compile_topology_churn_canary,
     topology_guest_claim_passes,
+)
+from ordivon_security.windows_kvm_partial_world_fixture import (
+    PARTIAL_MATERIALIZATION_FAULT_POINT,
+    KillAfterRootVethRange,
+    partial_link_names,
+    root_link_truth,
 )
 from ordivon_security.windows_kvm_recovery_acceptance_support import (
     host_namespace_truth,
@@ -412,7 +412,7 @@ def _continue_peer_b_from_root_veth(
         or after_bridge.get("externalRouteAbsent") is not True
     ):
         raise RuntimeError("fresh controller violated isolated fabric L3 truth")
-    if _root_link_truth(names=host_links).get("presentNames") != []:
+    if root_link_truth(names=host_links).get("presentNames") != []:
         raise RuntimeError("fresh controller left continued veth links in the Host root namespace")
 
     stdout_path = run_path / "peer-b.stdout.log"
@@ -497,7 +497,7 @@ def _continue_peer_b_from_root_veth(
             "bridgeTruth": before_bridge,
         },
         "after": {
-            "rootLinkTruth": _root_link_truth(names=host_links),
+            "rootLinkTruth": root_link_truth(names=host_links),
             "namespaceTruth": host_namespace_truth(continued_ledger),
             "peerBNamespaceLinks": _namespace_link_names(peer_b_ns),
             "fabricNamespaceLinks": _namespace_link_names(fabric_ns),
@@ -536,7 +536,7 @@ def _owner(args: argparse.Namespace) -> None:
         external_boundary="denied",
         metadata={"purpose": "fresh-controller-continuation"},
     )
-    backend = _KillAfterRootVethRange(
+    backend = KillAfterRootVethRange(
         WindowsFabricRangeConfig(
             machine=windows_kvm_machine_config(args),
             canary_path=canary_path,
@@ -556,7 +556,7 @@ def _owner(args: argparse.Namespace) -> None:
             authorities=(authority,),
             metadata={
                 "purpose": "fresh-controller-continuation",
-                "faultPoint": _FAULT_POINT,
+                "faultPoint": PARTIAL_MATERIALIZATION_FAULT_POINT,
                 "externalNetwork": "structurally-unrouted",
                 "guestDrivenPeerA": True,
             },
@@ -632,8 +632,10 @@ def _supervisor(args: argparse.Namespace) -> None:
     semantic_binding = ledger_semantic_binding(ledger)
     process_truth_before = process_truth(ledger)
     host_truth_before = host_namespace_truth(ledger)
-    expected_peer_ns, peer_veth, fabric_veth = _link_names(cast(str, ledger["rangeSessionId"]))
-    root_truth_before = _root_link_truth(names=(peer_veth, fabric_veth))
+    expected_peer_ns, peer_veth, fabric_veth = partial_link_names(
+        cast(str, ledger["rangeSessionId"])
+    )
+    root_truth_before = root_link_truth(names=(peer_veth, fabric_veth))
     machine = WindowsKvmMachineProvider(windows_kvm_machine_config(args))
     qmp_before = machine.inspect_qmp(ledger)
 
@@ -694,14 +696,14 @@ def _supervisor(args: argparse.Namespace) -> None:
         receipt_path=reconciliation_path,
     )
     closure_namespace_truth = host_namespace_truth(continued_ledger)
-    closure_root_truth = _root_link_truth(names=(peer_veth, fabric_veth))
+    closure_root_truth = root_link_truth(names=(peer_veth, fabric_veth))
     closure_process_truth = process_truth(continued_ledger)
 
     network_devices_before = qmp_before.get("networkDevices")
     network_devices_after = qmp_after.get("networkDevices")
     gates = {
         "ownerKilledAtExactPartialGate": owner.returncode == -signal.SIGKILL
-        and gate.get("faultPoint") == _FAULT_POINT,
+        and gate.get("faultPoint") == PARTIAL_MATERIALIZATION_FAULT_POINT,
         "semanticEffectIdentityInherited": isinstance(semantic_binding, dict)
         and semantic_binding == ledger_semantic_binding(continued_ledger),
         "stablePhaseWasPeerARemoved": ledger.get("topologyPhase") == "peer-a-removed"
@@ -766,7 +768,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         "kind": "ordivon.security.fresh-controller-continuation-acceptance",
         "status": "accepted" if passed else "failed",
         "securityRevision": security_revision,
-        "faultPoint": _FAULT_POINT,
+        "faultPoint": PARTIAL_MATERIALIZATION_FAULT_POINT,
         "owner": {
             "returnCode": owner.returncode,
             "elapsedMs": owner_elapsed_ms,

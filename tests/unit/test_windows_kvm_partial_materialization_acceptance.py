@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import unittest
 
-from ordivon_security.cli_windows_kvm_partial_materialization_acceptance import _link_names
+from ordivon_security.windows_kvm_partial_world_fixture import partial_link_names
 
 
 class PartialMaterializationAcceptanceTests(unittest.TestCase):
     def test_partial_resource_names_are_deterministic_from_session(self) -> None:
-        first = _link_names("range-session:partial:test")
-        second = _link_names("range-session:partial:test")
-        other = _link_names("range-session:partial:other")
+        first = partial_link_names("range-session:partial:test")
+        second = partial_link_names("range-session:partial:test")
+        other = partial_link_names("range-session:partial:other")
         self.assertEqual(first, second)
         self.assertNotEqual(first, other)
         self.assertTrue(first[0].startswith("s6q"))
