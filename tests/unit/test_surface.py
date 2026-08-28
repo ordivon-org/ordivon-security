@@ -20,23 +20,8 @@ from ordivon_security.world_boundary import (
 
 
 class SecuritySurfaceTests(unittest.TestCase):
-    def test_package_root_stays_narrow_after_mixed_api_facade_retirement(self) -> None:
+    def test_package_root_is_navigation_only_after_mixed_surface_contraction(self) -> None:
         expected = {
-            "AdversarialWindowsRange",
-            "ContestResult",
-            "ContestRunner",
-            "EvaluationResult",
-            "EvaluationRunner",
-            "EvaluationSpec",
-            "RangeAuthority",
-            "RangeEvent",
-            "RangeSession",
-            "RangeSessionSpec",
-            "ResearchCorpus",
-            "SacrificialWindowsRangeConfig",
-            "ScenarioManifest",
-            "WindowsKvmMachineConfig",
-            "WindowsKvmMachineProvider",
             "security_ordinary_capability_preflight",
             "security_ordinary_surface_manifest",
             "security_surface_manifest",
@@ -44,6 +29,14 @@ class SecuritySurfaceTests(unittest.TestCase):
         self.assertEqual(set(ordivon_security.__all__), expected)
         for name in expected:
             self.assertIsNotNone(getattr(ordivon_security, name))
+        for domain_name in (
+            "RangeSession",
+            "ContestRunner",
+            "EvaluationRunner",
+            "ResearchCorpus",
+            "WindowsKvmMachineProvider",
+        ):
+            self.assertFalse(hasattr(ordivon_security, domain_name), domain_name)
 
     def test_manifest_exposes_distinct_maturity_tiers(self) -> None:
         value = ordivon_security.security_surface_manifest()
