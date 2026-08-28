@@ -11,10 +11,6 @@ from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_d
 from ordivon_security.cli_deliberation_before_authority_if2_acceptance import (
     _deliberate_without_effect_authority,
 )
-from ordivon_security.cli_intent_finalization_if0_acceptance import (
-    _EXPECTED_CONTEXT_DIGEST,
-    _exact_ac2_mismatch_context,
-)
 from ordivon_security.integrations.harness_range_intent import (
     _PROMPT_REVISION,
     _TOOL_NAME,
@@ -27,6 +23,10 @@ from ordivon_security.integrations.harness_range_intent import (
 )
 from ordivon_security.integrations.harness_range_intent import (
     _git_revision as _integration_git_revision,
+)
+from ordivon_security.intent_convergence_research_fixture import (
+    AC2_MISMATCH_CONTEXT_DIGEST,
+    exact_ac2_mismatch_context,
 )
 from ordivon_security.range import RangeEffectRequest
 
@@ -296,7 +296,7 @@ class DeliberationPrimedAF2Driver:
 
 
 def run_experiment(*, config: DeepSeekRangeIntentConfig) -> JsonObject:
-    context = _exact_ac2_mismatch_context()
+    context = exact_ac2_mismatch_context()
     deliberation = _deliberate_without_effect_authority(
         context=context,
         config=config,
@@ -307,7 +307,7 @@ def run_experiment(*, config: DeepSeekRangeIntentConfig) -> JsonObject:
     effect_types = [item.effect_type for item in decision.effect_requests]
     deliberation_text = str(deliberation["summary"]).lower()
     gates = {
-        "exactAC2MismatchContextReplayed": context.digest == _EXPECTED_CONTEXT_DIGEST,
+        "exactAC2MismatchContextReplayed": context.digest == AC2_MISMATCH_CONTEXT_DIGEST,
         "deliberationHasNoDomainEffectTools": deliberation["domainEffectToolsAvailable"] is False,
         "deliberationPreAdmission": deliberation["securityAdmissionPerformed"] is False,
         "deliberationPreExecution": deliberation["effectExecutionPerformed"] is False,

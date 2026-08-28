@@ -58,6 +58,9 @@ preserves that relation without promoting it to current shared support.
 
 Intent-convergence falsifier family:
 
+- `cli_intent_finalization_if0_acceptance.py` — IF0 explicit-finalization falsifier
+  (aggregate evidence: `evidence/acceptance/if0-if2-intent-convergence-cb2f0ae.json`;
+  apparatus revision `4e30b93a71d0132522234e05cc7bf93cc5af9a57`)
 - `cli_intent_readback_if1_acceptance.py` — IF1 exact-readback/digest-bound-finalization falsifier
   (aggregate evidence: `evidence/acceptance/if0-if2-intent-convergence-cb2f0ae.json`;
   apparatus revision `e9c344f40281653ccf2603ce3387b0ede78a9194`)
