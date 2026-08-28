@@ -37,7 +37,8 @@ _PREFIX_LENGTH = 24
 _PEER_PORT = 48080
 
 
-def _digest(path: Path) -> str:
+def digest_fabric_path(path: Path) -> str:
+    """Digest one artifact used by the isolated-fabric profile family."""
     value = hashlib.sha256()
     with path.open("rb") as handle:
         while chunk := handle.read(4 * 1024 * 1024):
@@ -45,9 +46,10 @@ def _digest(path: Path) -> str:
     return "sha256:" + value.hexdigest()
 
 
-def _run(
+def run_fabric_command(
     arguments: list[str], *, timeout: int = 30, check: bool = True
 ) -> subprocess.CompletedProcess[str]:
+    """Run one bounded host command for the Windows isolated-fabric profile family."""
     return subprocess.run(
         arguments,
         check=check,
@@ -58,7 +60,8 @@ def _run(
     )
 
 
-def _stop_process(process: subprocess.Popen[bytes] | None) -> bool:
+def stop_fabric_process(process: subprocess.Popen[bytes] | None) -> bool:
+    """Stop one process owned by the isolated-fabric profile family."""
     if process is None or process.poll() is not None:
         return True
     process.terminate()
@@ -88,7 +91,7 @@ class WindowsFabricRangeConfig:
     def __post_init__(self) -> None:
         if self.canary_path.is_symlink() or not self.canary_path.is_file():
             raise ValueError("S5 fabric canary is missing or unsafe")
-        if _digest(self.canary_path) != self.canary_digest:
+        if digest_fabric_path(self.canary_path) != self.canary_digest:
             raise ValueError("S5 fabric canary digest differs")
         for path in (
             self.ip_path,
@@ -106,7 +109,9 @@ class WindowsFabricRangeConfig:
 
 
 @dataclass(slots=True)
-class _FabricRun:
+class WindowsFabricRun:
+    """Live run state shared by the S5 base profile and S6 topology-churn extension."""
+
     instance: RangeSessionInstance
     state: JsonObject
     process: subprocess.Popen[bytes]
@@ -140,7 +145,7 @@ class WindowsIsolatedFabricRange:
     def __init__(self, config: WindowsFabricRangeConfig) -> None:
         self.config = config
         self.machine_provider = WindowsKvmMachineProvider(config.machine)
-        self._runs: dict[str, _FabricRun] = {}
+        self._runs: dict[str, WindowsFabricRun] = {}
 
     @property
     def execution_identity(self) -> JsonObject:
@@ -157,7 +162,7 @@ class WindowsIsolatedFabricRange:
             tools[name] = {
                 "path": str(path),
                 "resolvedPath": str(path.resolve()),
-                "digest": _digest(path.resolve()),
+                "digest": digest_fabric_path(path.resolve()),
             }
         identity: JsonObject = {
             "kind": "ordivon.security.windows-isolated-fabric-range",
@@ -190,7 +195,7 @@ class WindowsIsolatedFabricRange:
 
     def _emit(
         self,
-        run: _FabricRun,
+        run: WindowsFabricRun,
         *,
         logical_time: int,
         plane: str,
@@ -236,7 +241,7 @@ class WindowsIsolatedFabricRange:
             "canaryDigest": self.config.canary_digest,
         }
 
-    def _run_ledger_extra(self, run: _FabricRun) -> JsonObject:
+    def _run_ledger_extra(self, run: WindowsFabricRun) -> JsonObject:
         return {
             "rangeSessionId": run.instance.session_id,
             "rangeSpecDigest": cast(str, run.state["rangeSpecDigest"]),
@@ -265,7 +270,7 @@ class WindowsIsolatedFabricRange:
         run_disk = run_path / "ordivon-run.img"
         with run_disk.open("xb") as handle:
             handle.truncate(self.config.run_disk_mib * 1024 * 1024)
-        _run([str(self.config.mkfs_fat_path), "-n", _RUN_LABEL, str(run_disk)], timeout=120)
+        run_fabric_command([str(self.config.mkfs_fat_path), "-n", _RUN_LABEL, str(run_disk)], timeout=120)
         manifest: JsonObject = {
             "schemaVersion": 1,
             "kind": "ordivon.security.windows-kvm-run",
@@ -318,12 +323,12 @@ class WindowsIsolatedFabricRange:
         peer: subprocess.Popen[bytes] | None = None
         capture: subprocess.Popen[bytes] | None = None
         try:
-            _run([str(self.config.ip_path), "netns", "add", fabric_ns])
+            run_fabric_command([str(self.config.ip_path), "netns", "add", fabric_ns])
             created.append(fabric_ns)
-            _run([str(self.config.ip_path), "netns", "add", peer_ns])
+            run_fabric_command([str(self.config.ip_path), "netns", "add", peer_ns])
             created.append(peer_ns)
             for namespace in (fabric_ns, peer_ns):
-                _run(
+                run_fabric_command(
                     [
                         str(self.config.ip_path),
                         "netns",
@@ -335,7 +340,7 @@ class WindowsIsolatedFabricRange:
                         "net.ipv6.conf.all.disable_ipv6=1",
                     ]
                 )
-                _run(
+                run_fabric_command(
                     [
                         str(self.config.ip_path),
                         "netns",
@@ -347,7 +352,7 @@ class WindowsIsolatedFabricRange:
                         "net.ipv6.conf.default.disable_ipv6=1",
                     ]
                 )
-            _run(
+            run_fabric_command(
                 [
                     str(self.config.ip_path),
                     "-n",
@@ -359,8 +364,8 @@ class WindowsIsolatedFabricRange:
                     "bridge",
                 ]
             )
-            _run([str(self.config.ip_path), "-n", fabric_ns, "link", "set", bridge_name, "up"])
-            _run(
+            run_fabric_command([str(self.config.ip_path), "-n", fabric_ns, "link", "set", bridge_name, "up"])
+            run_fabric_command(
                 [
                     str(self.config.ip_path),
                     "netns",
@@ -377,7 +382,7 @@ class WindowsIsolatedFabricRange:
                     self.config.machine.run_user,
                 ]
             )
-            _run(
+            run_fabric_command(
                 [
                     str(self.config.ip_path),
                     "-n",
@@ -389,8 +394,8 @@ class WindowsIsolatedFabricRange:
                     bridge_name,
                 ]
             )
-            _run([str(self.config.ip_path), "-n", fabric_ns, "link", "set", tap_name, "up"])
-            _run(
+            run_fabric_command([str(self.config.ip_path), "-n", fabric_ns, "link", "set", tap_name, "up"])
+            run_fabric_command(
                 [
                     str(self.config.ip_path),
                     "link",
@@ -403,9 +408,9 @@ class WindowsIsolatedFabricRange:
                     fabric_veth,
                 ]
             )
-            _run([str(self.config.ip_path), "link", "set", peer_veth, "netns", peer_ns])
-            _run([str(self.config.ip_path), "link", "set", fabric_veth, "netns", fabric_ns])
-            _run(
+            run_fabric_command([str(self.config.ip_path), "link", "set", peer_veth, "netns", peer_ns])
+            run_fabric_command([str(self.config.ip_path), "link", "set", fabric_veth, "netns", fabric_ns])
+            run_fabric_command(
                 [
                     str(self.config.ip_path),
                     "-n",
@@ -417,10 +422,10 @@ class WindowsIsolatedFabricRange:
                     bridge_name,
                 ]
             )
-            _run([str(self.config.ip_path), "-n", fabric_ns, "link", "set", fabric_veth, "up"])
-            _run([str(self.config.ip_path), "-n", peer_ns, "link", "set", "lo", "up"])
-            _run([str(self.config.ip_path), "-n", peer_ns, "link", "set", peer_veth, "up"])
-            _run(
+            run_fabric_command([str(self.config.ip_path), "-n", fabric_ns, "link", "set", fabric_veth, "up"])
+            run_fabric_command([str(self.config.ip_path), "-n", peer_ns, "link", "set", "lo", "up"])
+            run_fabric_command([str(self.config.ip_path), "-n", peer_ns, "link", "set", peer_veth, "up"])
+            run_fabric_command(
                 [
                     str(self.config.ip_path),
                     "-n",
@@ -434,18 +439,18 @@ class WindowsIsolatedFabricRange:
             )
 
             bridge_state = json.loads(
-                _run(
+                run_fabric_command(
                     [str(self.config.ip_path), "-n", fabric_ns, "-j", "addr", "show", bridge_name]
                 ).stdout
             )[0]
             routes = json.loads(
-                _run([str(self.config.ip_path), "-n", fabric_ns, "-j", "route"]).stdout or "[]"
+                run_fabric_command([str(self.config.ip_path), "-n", fabric_ns, "-j", "route"]).stdout or "[]"
             )
             peer_routes = json.loads(
-                _run([str(self.config.ip_path), "-n", peer_ns, "-j", "route"]).stdout or "[]"
+                run_fabric_command([str(self.config.ip_path), "-n", peer_ns, "-j", "route"]).stdout or "[]"
             )
             ports = json.loads(
-                _run(
+                run_fabric_command(
                     [
                         str(self.config.ip_path),
                         "netns",
@@ -567,10 +572,10 @@ class WindowsIsolatedFabricRange:
                 raise RuntimeError("S5 synthetic peer exited during startup")
             return peer, capture
         except BaseException:
-            _stop_process(capture)
-            _stop_process(peer)
+            stop_fabric_process(capture)
+            stop_fabric_process(peer)
             for namespace in reversed(created):
-                _run([str(self.config.ip_path), "netns", "del", namespace], check=False)
+                run_fabric_command([str(self.config.ip_path), "netns", "del", namespace], check=False)
             raise
 
     def _qemu_arguments(self, state: JsonObject, instance_id: str) -> list[str]:
@@ -641,7 +646,7 @@ class WindowsIsolatedFabricRange:
                 network_namespace=cast(str, state["fabricNamespace"]),
                 ip_path=self.config.ip_path,
             )
-            run = _FabricRun(
+            run = WindowsFabricRun(
                 instance=instance,
                 state=state,
                 process=process,
@@ -660,7 +665,7 @@ class WindowsIsolatedFabricRange:
                     "S5 Windows Guest must expose exactly one QMP-observed network device"
                 )
             post_qemu_ports = json.loads(
-                _run(
+                run_fabric_command(
                     [
                         str(self.config.ip_path),
                         "netns",
@@ -710,9 +715,9 @@ class WindowsIsolatedFabricRange:
             return instance
         except BaseException:
             if capture is not None:
-                _stop_process(capture)
+                stop_fabric_process(capture)
             if peer is not None:
-                _stop_process(peer)
+                stop_fabric_process(peer)
             self.machine_provider.destroy_state(
                 instance_id=instance.instance_id,
                 generation=generation,
@@ -729,8 +734,8 @@ class WindowsIsolatedFabricRange:
             value = state.get(key)
             if isinstance(value, str):
                 requested.append(value)
-                _run([str(self.config.ip_path), "netns", "del", value], check=False)
-        listed = _run([str(self.config.ip_path), "netns", "list"], check=False).stdout.splitlines()
+                run_fabric_command([str(self.config.ip_path), "netns", "del", value], check=False)
+        listed = run_fabric_command([str(self.config.ip_path), "netns", "list"], check=False).stdout.splitlines()
         remaining_names = {line.split()[0] for line in listed if line.strip()}
         residual = [name for name in requested if name in remaining_names]
         return {
@@ -739,7 +744,7 @@ class WindowsIsolatedFabricRange:
             "clean": not residual,
         }
 
-    def _run_for(self, instance: RangeSessionInstance) -> _FabricRun:
+    def _run_for(self, instance: RangeSessionInstance) -> WindowsFabricRun:
         try:
             return self._runs[instance.instance_id]
         except KeyError as error:
@@ -747,7 +752,7 @@ class WindowsIsolatedFabricRange:
                 f"unknown {self.stage_label} Range instance: {instance.instance_id}"
             ) from error
 
-    def _extract_guest_claim(self, run: _FabricRun) -> JsonObject | None:
+    def _extract_guest_claim(self, run: WindowsFabricRun) -> JsonObject | None:
         if run.guest_claim_recorded:
             return run.guest_claim
         run.guest_claim_recorded = True
@@ -823,17 +828,17 @@ class WindowsIsolatedFabricRange:
         )
         return claim
 
-    def _record_sensor(self, run: _FabricRun) -> JsonObject:
+    def _record_sensor(self, run: WindowsFabricRun) -> JsonObject:
         if run.sensor_recorded:
             return run.sensor_observation or {}
         run.sensor_recorded = True
-        _stop_process(run.capture_process)
+        stop_fabric_process(run.capture_process)
         pcap = Path(cast(str, run.state["pcapPath"]))
         lines: list[str] = []
         pcap_digest: str | None = None
         if pcap.is_file():
-            pcap_digest = _digest(pcap)
-            output = _run(
+            pcap_digest = digest_fabric_path(pcap)
+            output = run_fabric_command(
                 [str(self.config.tcpdump_path), "-nn", "-r", str(pcap)], check=False
             ).stdout
             lines = [
@@ -860,7 +865,7 @@ class WindowsIsolatedFabricRange:
         )
         return observation
 
-    def _record_exit_if_needed(self, run: _FabricRun) -> int | None:
+    def _record_exit_if_needed(self, run: WindowsFabricRun) -> int | None:
         exit_code = run.process.poll()
         if exit_code is None or run.exit_recorded:
             return exit_code
@@ -928,8 +933,8 @@ class WindowsIsolatedFabricRange:
     def destroy(self, instance: RangeSessionInstance) -> JsonObject:
         run = self._run_for(instance)
         self._record_exit_if_needed(run)
-        _stop_process(run.capture_process)
-        _stop_process(run.peer_process)
+        stop_fabric_process(run.capture_process)
+        stop_fabric_process(run.peer_process)
         generation = f"windows-kvm:{self.machine_provider.base.environment_image_digest[-16:]}"
         machine = self.machine_provider.destroy_state(
             instance_id=instance.instance_id,

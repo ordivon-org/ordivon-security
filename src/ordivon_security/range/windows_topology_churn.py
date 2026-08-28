@@ -17,10 +17,18 @@ from .protocol import RangeSessionInstance
 from .windows_fabric import (
     WindowsFabricRangeConfig,
     WindowsIsolatedFabricRange,
-    _digest,
-    _FabricRun,
-    _run,
-    _stop_process,
+)
+from .windows_fabric import (
+    WindowsFabricRun as _FabricRun,
+)
+from .windows_fabric import (
+    digest_fabric_path as _digest,
+)
+from .windows_fabric import (
+    run_fabric_command as _run,
+)
+from .windows_fabric import (
+    stop_fabric_process as _stop_process,
 )
 
 _RANGE_ID = "range:windows-topology-churn-s6"

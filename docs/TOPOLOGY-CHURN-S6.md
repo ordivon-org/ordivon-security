@@ -215,3 +215,6 @@ The original S6 physical acceptance remains valid, but a later source audit foun
 S6 should still stop at topology churn. Exogenous world change and its recovery did **not** justify expanding the generic `RangeSession` API.
 
 With S6-R closed, the next useful question can come from a different consumer: the first consequential world change requested by a contested Actor. That experiment should preserve `proposal ≠ admission ≠ execution ≠ effect receipt ≠ external verification` and decide from failure whether any persistent Range action gateway is actually required.
+
+
+S6 now consumes the S5 fabric extension through explicit module-level contracts (`WindowsFabricRun`, bounded fabric command/process helpers, and artifact digesting) rather than importing S5 private implementation names. This records the actual inheritance boundary without promoting those mechanics to Security-wide API.

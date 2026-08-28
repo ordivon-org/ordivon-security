@@ -173,3 +173,6 @@ S5 does not provide:
 S5 should stop here. The fabric boundary itself has survived its first real Windows consumer.
 
 The next experiment was narrowed to one live topology change rather than another full VM. S6 kept the same Windows Guest alive, removed peer A, introduced peer B, and required external truth to preserve the intermediate and final topology. That pressure was sufficient to expose stale-current-state and fast-success process assumptions without justifying a generic topology or materialization framework. See [`TOPOLOGY-CHURN-S6.md`](TOPOLOGY-CHURN-S6.md).
+
+
+A later S6 boundary audit established one narrower extension contract inside `range.windows_fabric`: `WindowsFabricRun`, `run_fabric_command`, `stop_fabric_process`, and `digest_fabric_path`. S6 consumes these names because it is a direct topology-churn extension of the S5 isolated-fabric lifecycle. They are owner-local module contracts, not `ordivon_security.range` package-root API and not a generic network framework.
