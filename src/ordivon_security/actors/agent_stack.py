@@ -54,7 +54,7 @@ def _digest(value: str, label: str) -> str:
     return value
 
 
-def _json_object_copy(value: object) -> JsonObject:
+def copy_json_object(value: object) -> JsonObject:
     encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     decoded = json.loads(encoded)
     if not isinstance(decoded, dict):
@@ -485,7 +485,9 @@ class AgentTurnDriverError(RuntimeError):
         validate_json(self.details)
 
 
-class _PlanSelectionBridge:
+class PlanSelectionBridge:
+    """Bridge one Harness Tool selection into the exact Security-granted plan surface."""
+
     def __init__(
         self,
         *,
@@ -731,7 +733,7 @@ class DeepSeekHarnessTurnDriver:
         harness_run_id = f"harness-run:security:{actor_token}:tick-{observation.tick}:{token}"
         catalog = self._catalog()
         observation_type = self._domain_module.ToolObservation
-        bridge = _PlanSelectionBridge(
+        bridge = PlanSelectionBridge(
             catalog=catalog,
             observation_type=observation_type,
             bridge_identity={
@@ -802,9 +804,9 @@ class DeepSeekHarnessTurnDriver:
                 details=details,
             ) from error
         stop_code = str(getattr(result.stop_code, "value", result.stop_code))
-        trace = _json_object_copy(result.trace.to_dict())
+        trace = copy_json_object(result.trace.to_dict())
         trace_digest = canonical_digest(trace)
-        usage = _json_object_copy(result.usage)
+        usage = copy_json_object(result.usage)
         raw_effective = usage.get("effectiveModelIds", [])
         effective_models = (
             tuple(item for item in raw_effective if isinstance(item, str))

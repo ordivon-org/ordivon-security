@@ -19,7 +19,9 @@ from .agent_stack import (
     AgentTurnDriverError,
     AgentTurnEvidence,
     DeepSeekHarnessTurnDriver,
-    _json_object_copy,
+)
+from .agent_stack import (
+    copy_json_object as _json_object_copy,
 )
 from .protocol import ActorProposalFailureCode
 
@@ -353,7 +355,7 @@ class HostAssignedDeepSeekHarnessTurnDriver:
         _text(harness_run_id, "Host-assigned Harness Run identity", prefix="harness-run")
         catalog = self.delegate._catalog()
         observation_type = self.delegate._domain_module.ToolObservation
-        from .agent_stack import _PlanSelectionBridge
+        from .agent_stack import PlanSelectionBridge as _PlanSelectionBridge
 
         bridge = _PlanSelectionBridge(
             catalog=catalog,

@@ -15,7 +15,9 @@ from .agent_stack import (
     AgentTurnDriverError,
     AgentTurnEvidence,
     DeepSeekHarnessTurnDriver,
-    _json_object_copy,
+)
+from .agent_stack import (
+    copy_json_object as _json_object_copy,
 )
 from .host_assigned import HostAssignedDeepSeekHarnessTurnDriver
 from .protocol import ActorProposalFailureCode

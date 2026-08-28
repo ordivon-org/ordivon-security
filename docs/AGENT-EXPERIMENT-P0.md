@@ -183,6 +183,8 @@ process or workspace effect.
 
 ## P0-B accepted implementation
 
+The P0-B/P0-C implementation reuses two explicit `actors.agent_stack` module-level extension contracts from P0-A: `PlanSelectionBridge` preserves the exact Harness Tool-to-Security granted-plan boundary, and `copy_json_object` preserves validated JSON evidence/identity copying across driver variants. They are deliberately not re-exported from `ordivon_security.actors`; they are extension mechanics for this driver family, not general Actor API.
+
 `HostAssignedDeepSeekHarnessTurnDriver` wraps the P0-A model/Harness turn without
 changing its Provider, action catalog, budgets, or Runtime boundary. For every
 actor tick it creates a durable Host lifecycle:
