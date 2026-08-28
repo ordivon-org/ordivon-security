@@ -10,7 +10,7 @@ from typing import cast
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
 from ordivon_security.deliberation_before_authority_research_support import (
     _deliberate_without_effect_authority,
-    _DELiberation_PROMPT_REVISION,
+    _DELiberationRANGE_INTENT_PROMPT_REVISION,
 )
 from ordivon_security.finalized_range_intent_research_fixture import (
     DeepSeekFinalizedRangeIntentDriver,
@@ -19,18 +19,18 @@ from ordivon_security.finalized_range_intent_research_fixture import (
 )
 from ordivon_security.integrations import DeepSeekRangeIntentConfig
 from ordivon_security.integrations.harness_range_intent import (
-    _git_revision as _integration_git_revision,
+    insert_range_intent_sources,
+    source_project_version,
 )
 from ordivon_security.integrations.harness_range_intent import (
-    _insert_sources,
-    _project_version,
+    source_git_revision as _integrationsource_git_revision,
 )
 from ordivon_security.intent_convergence_research_fixture import (
     AC2_MISMATCH_CONTEXT_DIGEST,
     exact_ac2_mismatch_context,
 )
 
-_AUTHORITY_PROMPT_REVISION = "security-agent-first-range-intent-readback-if1-v1"
+_AUTHORITYRANGE_INTENT_PROMPT_REVISION = "security-agent-first-range-intent-readback-if1-v1"
 
 
 def _git_revision(path: Path) -> str:
@@ -62,13 +62,13 @@ class DeliberationPrimedFinalizedRangeIntentDriver(DeepSeekFinalizedRangeIntentD
             raise ValueError("IF2 deliberation belongs to another context")
 
         base = self.config.base
-        _insert_sources(harness_source=base.harness_source, protocol_source=base.protocol_source)
+        insert_range_intent_sources(harness_source=base.harness_source, protocol_source=base.protocol_source)
         domain_module = importlib.import_module("ordivon_harness.api")
         deepseek_module = importlib.import_module("ordivon_harness.api")
         version_module = importlib.import_module("ordivon_harness.version")
-        harness_revision = _integration_git_revision(base.harness_source, "Harness")
-        protocol_revision = _integration_git_revision(base.protocol_repository, "Computing protocol")
-        harness_version = _project_version(base.harness_source, "Harness")
+        harness_revision = _integrationsource_git_revision(base.harness_source, "Harness")
+        protocol_revision = _integrationsource_git_revision(base.protocol_repository, "Computing protocol")
+        harness_version = source_project_version(base.harness_source, "Harness")
         settings = deepseek_module.DeepSeekSettings.from_secret_file(
             base.secret_path,
             timeout_seconds=base.provider_timeout_seconds,
@@ -133,7 +133,7 @@ class DeliberationPrimedFinalizedRangeIntentDriver(DeepSeekFinalizedRangeIntentD
         )
         catalog = domain_module.DomainToolCatalog(
             domain_id="domain:security-agent-first-deliberation-before-authority-if2",
-            revision=_DELiberation_PROMPT_REVISION,
+            revision=_DELiberationRANGE_INTENT_PROMPT_REVISION,
             tools=(pending_tool, review_tool, finalize_tool),
         )
         bridge = bridge_module._FinalizedRangeIntentBridge(
@@ -147,7 +147,7 @@ class DeliberationPrimedFinalizedRangeIntentDriver(DeepSeekFinalizedRangeIntentD
                 "actorId": context.actor_id,
                 "contextDigest": context.digest,
                 "deliberationDigest": canonical_digest(original),
-                "promptRevision": _DELiberation_PROMPT_REVISION,
+                "promptRevision": _DELiberationRANGE_INTENT_PROMPT_REVISION,
             },
             tool_bridge_error_type=domain_module.ToolBridgeError,
             model_correctable_kind=domain_module.ToolBridgeErrorKind.MODEL_CORRECTABLE,
@@ -276,7 +276,7 @@ class DeliberationPrimedFinalizedRangeIntentDriver(DeepSeekFinalizedRangeIntentD
             tuple(effect_requests),
             metadata={
                 "source": "deepseek-via-ordivon-harness",
-                "promptRevision": _DELiberation_PROMPT_REVISION,
+                "promptRevision": _DELiberationRANGE_INTENT_PROMPT_REVISION,
             },
         )
         evidence: JsonObject = {

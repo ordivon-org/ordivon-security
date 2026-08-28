@@ -10,9 +10,9 @@ from ordivon_security.actors.autonomous import RangeIntentContext, RangeIntentDe
 from ordivon_security.integrations.harness_range_intent import (
     DeepSeekRangeIntentConfig,
     RangeIntentHarnessFailure,
-    _git_revision,
-    _insert_sources,
-    _project_version,
+    insert_range_intent_sources,
+    source_git_revision,
+    source_project_version,
 )
 from ordivon_security.range import RangeEffectRequest
 
@@ -256,13 +256,13 @@ class DeepSeekFinalizedRangeIntentDriver:
         if not label or label != label.strip():
             raise ValueError("IF0 turn label must be non-empty and trimmed")
         base = self.config.base
-        _insert_sources(harness_source=base.harness_source, protocol_source=base.protocol_source)
+        insert_range_intent_sources(harness_source=base.harness_source, protocol_source=base.protocol_source)
         domain_module = importlib.import_module("ordivon_harness.api")
         deepseek_module = importlib.import_module("ordivon_harness.api")
         version_module = importlib.import_module("ordivon_harness.version")
-        harness_revision = _git_revision(base.harness_source, "Harness")
-        protocol_revision = _git_revision(base.protocol_repository, "Computing protocol")
-        harness_version = _project_version(base.harness_source, "Harness")
+        harness_revision = source_git_revision(base.harness_source, "Harness")
+        protocol_revision = source_git_revision(base.protocol_repository, "Computing protocol")
+        harness_version = source_project_version(base.harness_source, "Harness")
         settings = deepseek_module.DeepSeekSettings.from_secret_file(
             base.secret_path,
             timeout_seconds=base.provider_timeout_seconds,

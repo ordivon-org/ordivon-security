@@ -13,12 +13,12 @@ from ordivon_security._canonical import JsonObject, canonical_digest, validate_j
 from ordivon_security.actors.autonomous import RangeIntentContext, RangeIntentDecision
 from ordivon_security.range import RangeEffectRequest
 
-_TOOL_NAME = "submit_range_intents"
+RANGE_INTENT_TOOL_NAME = "submit_range_intents"
 _DOMAIN_ID = "domain:security-agent-first-range-intent-af2"
-_PROMPT_REVISION = "security-agent-first-range-intent-af2-v3"
+RANGE_INTENT_PROMPT_REVISION = "security-agent-first-range-intent-af2-v3"
 
 
-def _git_revision(path: Path, label: str) -> str:
+def source_git_revision(path: Path, label: str) -> str:
     if not path.is_dir() or not (path / ".git").exists():
         raise ValueError(f"{label} source is not a Git repository: {path}")
     revision = subprocess.run(
@@ -40,7 +40,7 @@ def _git_revision(path: Path, label: str) -> str:
     return revision
 
 
-def _project_version(path: Path, label: str) -> str:
+def source_project_version(path: Path, label: str) -> str:
     pyproject = path / "pyproject.toml"
     if not pyproject.is_file():
         raise ValueError(f"{label} pyproject is missing: {pyproject}")
@@ -54,7 +54,8 @@ def _project_version(path: Path, label: str) -> str:
     return version
 
 
-def _insert_sources(*, harness_source: Path, protocol_source: Path) -> None:
+def insert_range_intent_sources(*, harness_source: Path, protocol_source: Path) -> None:
+    """Expose the exact Harness/Protocol sources used by the AF2/IF treatment family."""
     for path in (protocol_source / "src", harness_source / "src"):
         if not path.is_dir():
             raise ValueError(f"AF2 source package root is missing: {path}")
@@ -123,12 +124,13 @@ def _compile_model_context(
     return compiled
 
 
-def _resolve_recorded_range_intent(
+def resolve_recorded_range_intent(
     requests: list[JsonObject] | None,
     *,
     stop_code: str,
     tool_calls: int,
 ) -> tuple[list[JsonObject], str]:
+    """Resolve exact pending Tool intent or the admitted zero-effect conclusion form."""
     if requests is not None:
         return requests, "submit-range-intents"
     if stop_code in {"candidate_completed", "needs_input"} and tool_calls == 0:
@@ -165,7 +167,9 @@ class DeepSeekRangeIntentConfig:
             raise ValueError("AF2 max effect requests must be between 1 and 32")
 
 
-class _RangeIntentBridge:
+class RangeIntentBridge:
+    """Record replaceable AF2 pending effect intent without admitting or executing it."""
+
     def __init__(
         self,
         *,
@@ -187,7 +191,7 @@ class _RangeIntentBridge:
         self.intent_revisions: list[list[JsonObject]] = []
 
     def execute(self, call: Any, *, step_id: str) -> Any:
-        if getattr(call, "name", None) != _TOOL_NAME:
+        if getattr(call, "name", None) != RANGE_INTENT_TOOL_NAME:
             raise ValueError("AF2 received an unexpected Harness Tool")
         arguments = getattr(call, "arguments", None)
         if not isinstance(arguments, dict) or set(arguments) != {"requests"}:
@@ -217,7 +221,7 @@ class _RangeIntentBridge:
         self.intent_revisions.append(parsed)
         return self.observation_type(
             tool_call_id=call.tool_call_id,
-            tool_name=_TOOL_NAME,
+            tool_name=RANGE_INTENT_TOOL_NAME,
             status="observed",
             structured_content={
                 "intentRecorded": True,
@@ -252,16 +256,16 @@ class DeepSeekRangeIntentDriver:
     ) -> tuple[RangeIntentDecision, JsonObject]:
         if not label or label != label.strip():
             raise ValueError("AF2 turn label must be non-empty and trimmed")
-        _insert_sources(
+        insert_range_intent_sources(
             harness_source=self.config.harness_source,
             protocol_source=self.config.protocol_source,
         )
         domain_module = importlib.import_module("ordivon_harness.api")
         deepseek_module = importlib.import_module("ordivon_harness.api")
         version_module = importlib.import_module("ordivon_harness.version")
-        harness_revision = _git_revision(self.config.harness_source, "Harness")
-        protocol_revision = _git_revision(self.config.protocol_repository, "Computing protocol")
-        harness_version = _project_version(self.config.harness_source, "Harness")
+        harness_revision = source_git_revision(self.config.harness_source, "Harness")
+        protocol_revision = source_git_revision(self.config.protocol_repository, "Computing protocol")
+        harness_version = source_project_version(self.config.harness_source, "Harness")
         settings = deepseek_module.DeepSeekSettings.from_secret_file(
             self.config.secret_path,
             timeout_seconds=self.config.provider_timeout_seconds,
@@ -271,7 +275,7 @@ class DeepSeekRangeIntentDriver:
             raise ValueError("AF2 requires explicit credentialScopeId")
         adapter = deepseek_module.DeepSeekTurnAdapter(settings)
         tool_definition = domain_module.AgentToolDefinition(
-            _TOOL_NAME,
+            RANGE_INTENT_TOOL_NAME,
             (
                 "Record or replace the complete pending set of autonomous Security Range effect "
                 "requests for this bounded decision. This is replaceable pending intent, not a "
@@ -324,16 +328,16 @@ class DeepSeekRangeIntentDriver:
         token = model_context_digest.removeprefix("sha256:")[:16]
 
         prompt_revision = (
-            _PROMPT_REVISION + "-representation-contract-v1"
+            RANGE_INTENT_PROMPT_REVISION + "-representation-contract-v1"
             if self.config.consume_representation_contract
-            else _PROMPT_REVISION
+            else RANGE_INTENT_PROMPT_REVISION
         )
         catalog = domain_module.DomainToolCatalog(
             domain_id=_DOMAIN_ID,
             revision=prompt_revision,
             tools=(tool_definition,),
         )
-        bridge = _RangeIntentBridge(
+        bridge = RangeIntentBridge(
             catalog=catalog,
             observation_type=domain_module.ToolObservation,
             max_effect_requests=self.config.max_effect_requests,
@@ -410,7 +414,7 @@ class DeepSeekRangeIntentDriver:
                     ),
                 },
             ),
-            allowed_tools=(_TOOL_NAME,),
+            allowed_tools=(RANGE_INTENT_TOOL_NAME,),
             budget=budget,
         )
         result = runner.run(plan)
@@ -452,7 +456,7 @@ class DeepSeekRangeIntentDriver:
             raise RangeIntentHarnessFailure(stop_code, failure_evidence)
         if result.conclusion is None:
             raise RuntimeError("AF2 model completed without a conclusion")
-        recorded_requests, intent_recording = _resolve_recorded_range_intent(
+        recorded_requests, intent_recording = resolve_recorded_range_intent(
             bridge.requests,
             stop_code=stop_code,
             tool_calls=int(result.tool_calls),

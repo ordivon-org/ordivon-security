@@ -6,8 +6,8 @@ from pathlib import Path
 from ordivon_security.actors.autonomous import RangeEffectInterface, RangeIntentContext
 from ordivon_security.integrations import RangeIntentHarnessFailure
 from ordivon_security.integrations.harness_range_intent import (
-    _RangeIntentBridge,
-    _resolve_recorded_range_intent,
+    RangeIntentBridge,
+    resolve_recorded_range_intent,
 )
 from ordivon_security.range import RangeAuthority, RangeEffectRequest
 
@@ -147,7 +147,7 @@ class AutonomousRangeIntentTests(unittest.TestCase):
             arguments = {"requests": []}
             tool_call_id = "call:retract"
 
-        bridge = _RangeIntentBridge(
+        bridge = RangeIntentBridge(
             catalog=object(),
             observation_type=FakeObservation,
             max_effect_requests=8,
@@ -174,14 +174,14 @@ class AutonomousRangeIntentTests(unittest.TestCase):
         self.assertFalse(second.kwargs["structured_content"]["effectExecuted"])
 
     def test_needs_input_without_tool_is_explicit_zero_effect_hold(self) -> None:
-        requests, recording = _resolve_recorded_range_intent(
+        requests, recording = resolve_recorded_range_intent(
             None, stop_code="needs_input", tool_calls=0
         )
         self.assertEqual(requests, [])
         self.assertEqual(recording, "implicit-zero-effect-conclusion")
 
     def test_candidate_completed_without_tool_is_zero_effect_hold(self) -> None:
-        requests, recording = _resolve_recorded_range_intent(
+        requests, recording = resolve_recorded_range_intent(
             None, stop_code="candidate_completed", tool_calls=0
         )
         self.assertEqual(requests, [])

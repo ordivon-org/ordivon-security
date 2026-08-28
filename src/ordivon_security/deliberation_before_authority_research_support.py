@@ -11,17 +11,17 @@ from ordivon_security._canonical import (
     validate_json,
 )
 from ordivon_security.integrations.harness_range_intent import (
-    _PROMPT_REVISION,
-    _TOOL_NAME,
+    RANGE_INTENT_PROMPT_REVISION,
+    RANGE_INTENT_TOOL_NAME,
     DeepSeekRangeIntentConfig,
+    RangeIntentBridge,
     RangeIntentHarnessFailure,
-    _insert_sources,
-    _project_version,
-    _RangeIntentBridge,
-    _resolve_recorded_range_intent,
+    insert_range_intent_sources,
+    resolve_recorded_range_intent,
+    source_project_version,
 )
 from ordivon_security.integrations.harness_range_intent import (
-    _git_revision as _integration_git_revision,
+    source_git_revision as _integrationsource_git_revision,
 )
 from ordivon_security.range import RangeEffectRequest
 
@@ -34,7 +34,7 @@ def _deliberate_without_effect_authority(
     config: DeepSeekRangeIntentConfig,
     label: str,
 ) -> JsonObject:
-    _insert_sources(harness_source=config.harness_source, protocol_source=config.protocol_source)
+    insert_range_intent_sources(harness_source=config.harness_source, protocol_source=config.protocol_source)
     deepseek_module = importlib.import_module("ordivon_harness.api")
     model_module = importlib.import_module("ordivon_harness.ordivon.model")
     version_module = importlib.import_module("ordivon_harness.version")
@@ -125,10 +125,10 @@ def _deliberate_without_effect_authority(
         "effectiveModelId": str(result.effective_model_id or adapter.model_id),
         "credentialScopeId": str(settings.credential_scope_id),
         "harness": {
-            "sourceRevision": _integration_git_revision(config.harness_source, "Harness"),
-            "declaredVersion": _project_version(config.harness_source, "Harness"),
+            "sourceRevision": _integrationsource_git_revision(config.harness_source, "Harness"),
+            "declaredVersion": source_project_version(config.harness_source, "Harness"),
             "runtimeMetadataVersion": str(version_module.package_version()),
-            "protocolSourceRevision": _integration_git_revision(
+            "protocolSourceRevision": _integrationsource_git_revision(
                 config.protocol_repository, "Computing protocol"
             ),
         },
@@ -152,18 +152,18 @@ class DeliberationPrimedAF2Driver:
     def decide(self, context, *, label: str):
         if self.deliberation.get("contextDigest") != context.digest:
             raise ValueError("IF3 deliberation belongs to another context")
-        _insert_sources(
+        insert_range_intent_sources(
             harness_source=self.config.harness_source,
             protocol_source=self.config.protocol_source,
         )
         domain_module = importlib.import_module("ordivon_harness.api")
         deepseek_module = importlib.import_module("ordivon_harness.api")
         version_module = importlib.import_module("ordivon_harness.version")
-        harness_revision = _integration_git_revision(self.config.harness_source, "Harness")
-        protocol_revision = _integration_git_revision(
+        harness_revision = _integrationsource_git_revision(self.config.harness_source, "Harness")
+        protocol_revision = _integrationsource_git_revision(
             self.config.protocol_repository, "Computing protocol"
         )
-        harness_version = _project_version(self.config.harness_source, "Harness")
+        harness_version = source_project_version(self.config.harness_source, "Harness")
         settings = deepseek_module.DeepSeekSettings.from_secret_file(
             self.config.secret_path,
             timeout_seconds=self.config.provider_timeout_seconds,
@@ -173,7 +173,7 @@ class DeliberationPrimedAF2Driver:
             raise ValueError("IF3 requires explicit credentialScopeId")
         adapter = deepseek_module.DeepSeekTurnAdapter(settings)
         tool_definition = domain_module.AgentToolDefinition(
-            _TOOL_NAME,
+            RANGE_INTENT_TOOL_NAME,
             (
                 "Record or replace the complete pending set of autonomous Security Range effect "
                 "requests for this bounded decision. This is replaceable pending intent, not a "
@@ -217,7 +217,7 @@ class DeliberationPrimedAF2Driver:
             revision=_IF3_PROMPT_REVISION,
             tools=(tool_definition,),
         )
-        bridge = _RangeIntentBridge(
+        bridge = RangeIntentBridge(
             catalog=catalog,
             observation_type=domain_module.ToolObservation,
             max_effect_requests=self.config.max_effect_requests,
@@ -292,7 +292,7 @@ class DeliberationPrimedAF2Driver:
                     ),
                 },
             ),
-            allowed_tools=(_TOOL_NAME,),
+            allowed_tools=(RANGE_INTENT_TOOL_NAME,),
             budget=budget,
         )
         result = runner.run(plan)
@@ -337,7 +337,7 @@ class DeliberationPrimedAF2Driver:
             raise RangeIntentHarnessFailure(stop_code, failure)
         if result.conclusion is None:
             raise RuntimeError("IF3 authority phase completed without conclusion")
-        recorded, intent_recording = _resolve_recorded_range_intent(
+        recorded, intent_recording = resolve_recorded_range_intent(
             bridge.requests,
             stop_code=stop_code,
             tool_calls=int(result.tool_calls),
@@ -361,7 +361,7 @@ class DeliberationPrimedAF2Driver:
                 metadata={
                     "source": "deepseek-via-ordivon-harness",
                     "promptRevision": _IF3_PROMPT_REVISION,
-                    "baseAF2PromptRevision": _PROMPT_REVISION,
+                    "baseAF2PromptRevision": RANGE_INTENT_PROMPT_REVISION,
                 },
             )
         except ValueError as error:
