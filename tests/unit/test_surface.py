@@ -57,6 +57,19 @@ class SecuritySurfaceTests(unittest.TestCase):
         self.assertIn("ResearchCorpus", names)
         self.assertIn("CA-LIC entitlement authority research", names)
 
+    def test_current_surface_uses_exact_locators_and_separates_historical_apparatus(self) -> None:
+        value = ordivon_security.security_surface_manifest()
+        entries = value["entries"]
+        self.assertTrue(all("*" not in str(entry["module"]) for entry in entries))
+        names = {entry["name"] for entry in entries}
+        self.assertNotIn("Acceptance runners", names)
+        self.assertIn("Windows P1 admitted command family", names)
+        historical = value["historicalResearch"]
+        self.assertEqual(historical["authorityMap"], "docs/authority.md")
+        self.assertEqual(historical["acceptanceEvidenceRoot"], "evidence/acceptance")
+        self.assertEqual(historical["archivedRunnerRoot"], "fixtures/archive/runners")
+        self.assertIn("do not claim current package", historical["rule"])
+
     def test_surface_cli_defaults_to_ordinary_navigation_without_experiment(self) -> None:
         stdout = io.StringIO()
         with contextlib.redirect_stdout(stdout):
@@ -130,6 +143,7 @@ class OrdinarySecuritySurfaceTests(unittest.TestCase):
             {"EvidenceRecorder", "RangeSession", "ResearchCorpus", "Software Evaluation"},
         )
         self.assertNotIn("Acceptance runners", names)
+        self.assertNotIn("Windows P1 admitted command family", names)
         self.assertNotIn("CA-LIC entitlement authority research", names)
         routes = {route["job"]: route["primarySurface"] for route in ordinary["routes"]}
         self.assertEqual(routes["provider-snapshot-currentness"], "ResearchCorpus")

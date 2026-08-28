@@ -50,3 +50,11 @@ Historical `ordivon_security.actors.host_assigned`, `actors.runtime_assigned`, a
 AF1 does not redesign the Agent cognition loop, remove Contest or Evaluation, make Host/Runtime integration a Security core primitive, invent an external-scope ontology, move every historical acceptance helper, or create a transaction, causal-DAG, policy, trust, organization or society framework.
 
 The next step is AF2: graduate only the minimum autonomous Range-intent surface already forced by C1-A, without importing Contest tick/action-menu assumptions.
+
+## Currentness correction — 2026-08-28
+
+AF1's original machine-readable surface used wildcard locators such as `ordivon_security.cli_*_acceptance` and `ordivon_security.cli_windows_kvm_p1_*` to classify broad research-apparatus families. That was a useful 2026-08-08 approximation, but later Existence Gauntlet work retired or archived many one-shot runners while those wildcards continued to project them as if they were current package affordances.
+
+The current surface therefore no longer uses wildcard module locators. Historical acceptance standing is projected separately through `docs/authority.md`, `evidence/acceptance`, and `fixtures/archive/runners`, explicitly without claiming current package membership. The P1 research entry now denotes the exact currently installed command family from `pyproject.toml`; unregistered probes are not implied merely because their filenames share a prefix.
+
+This preserves AF1's four-tier distinction while adding a currentness rule: **category membership and historical provenance do not establish current executable existence.**

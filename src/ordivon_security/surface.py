@@ -257,17 +257,14 @@ _SURFACE: tuple[SecuritySurfaceEntry, ...] = (
         "accepted-research",
     ),
     SecuritySurfaceEntry(
-        "Acceptance runners",
+        "Windows P1 admitted command family",
         "research-apparatus",
-        "ordivon_security.cli_*_acceptance",
-        "Fault injectors and physical acceptance orchestration retaining exact historical evidence.",
-        "research-only",
-    ),
-    SecuritySurfaceEntry(
-        "Windows P1 probes/canaries",
-        "research-apparatus",
-        "ordivon_security.cli_windows_kvm_p1_*",
-        "Case-specific build, probe, observer and orchestration apparatus.",
+        "pyproject.toml",
+        (
+            "Five currently installed P1 research commands: prepare, readback, execution-media "
+            "materialization, generic-controller canary, and derived-base sealing. Unregistered "
+            "probe modules are not implied by this entry."
+        ),
         "research-only",
     ),
 )
@@ -278,6 +275,15 @@ def security_surface_manifest() -> JsonObject:
         "schemaVersion": 1,
         "kind": "ordivon.security.agent-first-surface",
         "entries": [entry.to_dict() for entry in _SURFACE],
+        "historicalResearch": {
+            "authorityMap": "docs/authority.md",
+            "acceptanceEvidenceRoot": "evidence/acceptance",
+            "archivedRunnerRoot": "fixtures/archive/runners",
+            "rule": (
+                "Historical evidence, archived runners, and Git-recoverable apparatus do not "
+                "claim current package or executable surface membership."
+            ),
+        },
         "rules": [
             "Profiles do not become constitutional law merely because they are accepted.",
             "Research apparatus may consume reusable substrate; reusable substrate must not depend on experiment chronology.",
