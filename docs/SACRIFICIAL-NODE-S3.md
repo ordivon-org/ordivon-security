@@ -91,6 +91,8 @@ The correction changed QMP event waiting to one deadline-bounded blocking read. 
 
 Subsequent physical runs observed `RESET` through QMP and passed all external gates. The final acceptance was rerun from a clean worktree and binds implementation revision `fc5740aa83df8d4ec2aae657e4f72810b982f6de` directly in Range execution identity. It is indexed by [`../evidence/acceptance/windows-kvm-s3-sacrificial-node-fc5740a.json`](../evidence/acceptance/windows-kvm-s3-sacrificial-node-fc5740a.json).
 
+The S3 architecture, `AdversarialWindowsRange`, maintained canary source and unit regressions remain current. The one-shot physical orchestration module `cli_windows_kvm_s3_acceptance.py` was retired from HEAD on 2026-08-28 after its only remaining cross-module role (`_write_receipt`) was moved to neutral acceptance support. No current code/console consumer used the runner itself. Exact accepted apparatus remains recoverable from the bound `fc5740a` revision; rerunning that historical physical trial is therefore an explicit reproduction action, not a permanent default executable surface.
+
 ## What S3 proves
 
 Within this maintained single-node challenge:

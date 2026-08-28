@@ -18,8 +18,7 @@ from ordivon_security._canonical import (
     canonical_digest,
     validate_json,
 )
-from ordivon_security.cli_windows_kvm_c1a_acceptance import _git_revision
-from ordivon_security.cli_windows_kvm_s3_acceptance import _write_receipt
+from ordivon_security.acceptance_support import git_revision, write_receipt
 
 _EFFECT_ID = "range-effect:c1i-vanishing-pulse-v1"
 _REQUEST_ID = "range-effect-request:c1i-vanishing-pulse-v1"
@@ -622,7 +621,7 @@ def _run_idempotent_history(root: Path, public_socket_root: Path, history: str) 
 
 
 def _supervisor(args: argparse.Namespace) -> None:
-    revision = _git_revision(Path.cwd(), "Security")
+    revision = git_revision(Path.cwd(), "Security")
     args.state_root.mkdir(parents=True, exist_ok=False)
     public_socket_root = Path("/tmp") / f"ordivon-c1i-{os.getpid()}"
     public_socket_root.mkdir(mode=0o777)
@@ -754,7 +753,7 @@ def _supervisor(args: argparse.Namespace) -> None:
             "genericCausalDagRequired": False,
         },
     }
-    _write_receipt(args.receipt, receipt)
+    write_receipt(args.receipt, receipt)
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
     if not passed:
         raise SystemExit(1)

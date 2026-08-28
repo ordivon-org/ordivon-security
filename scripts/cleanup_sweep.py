@@ -272,8 +272,6 @@ def detect(report: SweepReport) -> None:
 
     # --- 2. Shared helpers still living inside acceptance CLIs --------------
     helper_hosts = {
-        "cli_windows_kvm_s3_acceptance": "_write_receipt",
-        "cli_windows_kvm_c1a_acceptance": "_git_revision",
     }
     for host, helper in helper_hosts.items():
         consumers = sorted(

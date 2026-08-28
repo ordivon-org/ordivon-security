@@ -9,7 +9,7 @@ from importlib.resources import files
 from pathlib import Path
 
 from ordivon_security._canonical import JsonObject, canonical_digest
-from ordivon_security.cli_windows_kvm_s3_acceptance import _write_receipt
+from ordivon_security.acceptance_support import write_receipt
 from ordivon_security.providers.windows_kvm import WindowsKvmMachineConfig
 from ordivon_security.range import RangeSession, RangeSessionSpec
 from ordivon_security.range.windows_fabric import WindowsFabricRangeConfig
@@ -269,7 +269,7 @@ def main() -> None:
         if failure is None
         else {"errorType": type(failure).__name__, "errorMessage": str(failure)},
     }
-    _write_receipt(args.receipt, receipt)
+    write_receipt(args.receipt, receipt)
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
     if not passed:
         raise SystemExit(1)

@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, validate_json
-from ordivon_security.cli_windows_kvm_c1a_acceptance import _git_revision
+from ordivon_security.acceptance_support import git_revision, write_receipt
 from ordivon_security.cli_windows_kvm_c1b_acceptance import (
     _digest_bytes,
     _host_namespace_truth,
@@ -21,7 +21,6 @@ from ordivon_security.cli_windows_kvm_c1b_acceptance import (
     _machine_config,
     _process_truth,
 )
-from ordivon_security.cli_windows_kvm_s3_acceptance import _write_receipt
 from ordivon_security.cli_windows_kvm_s6_acceptance import _compile_canary
 from ordivon_security.providers.windows_kvm import _load_object, _replace_private_json
 from ordivon_security.range import (
@@ -251,7 +250,7 @@ def _owner(args: argparse.Namespace) -> None:
 
 
 def _supervisor(args: argparse.Namespace) -> None:
-    security_revision = _git_revision(Path.cwd(), "Security")
+    security_revision = git_revision(Path.cwd(), "Security")
     args.state_root.mkdir(parents=True, exist_ok=False)
     args.state_root.chmod(0o755)
     args.gate.parent.mkdir(parents=True, exist_ok=True)
@@ -414,7 +413,7 @@ def _supervisor(args: argparse.Namespace) -> None:
             "automaticContinuationProved": False,
         },
     }
-    _write_receipt(args.receipt, receipt)
+    write_receipt(args.receipt, receipt)
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
     expected_status = "accepted" if args.expect_fixed_reconciler else "falsifier-observed"
     if status != expected_status:

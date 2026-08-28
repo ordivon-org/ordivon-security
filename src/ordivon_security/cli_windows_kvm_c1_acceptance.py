@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 
 from ordivon_security._canonical import JsonObject
-from ordivon_security.cli_windows_kvm_s3_acceptance import _write_receipt
+from ordivon_security.acceptance_support import write_receipt
 from ordivon_security.cli_windows_kvm_s6_acceptance import (
     _compile_canary,
     _guest_claim_passes,
@@ -322,7 +322,7 @@ def main() -> None:
         if failure is None
         else {"errorType": type(failure).__name__, "errorMessage": str(failure)},
     }
-    _write_receipt(args.receipt, receipt)
+    write_receipt(args.receipt, receipt)
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
     if not passed:
         raise SystemExit(1)

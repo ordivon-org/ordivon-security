@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import importlib
 import json
-import subprocess
 import sys
 import time
 import tomllib
@@ -11,11 +10,11 @@ from pathlib import Path
 from typing import Any, cast
 
 from ordivon_security._canonical import JsonObject, canonical_digest, validate_json
+from ordivon_security.acceptance_support import git_revision, write_receipt
 from ordivon_security.cli_windows_kvm_c1_acceptance import (
     _backend_state,
     _world_still_peer_a,
 )
-from ordivon_security.cli_windows_kvm_s3_acceptance import _write_receipt
 from ordivon_security.cli_windows_kvm_s6_acceptance import (
     _compile_canary,
     _guest_claim_passes,
@@ -49,28 +48,6 @@ _EFFECT_OBJECTIVE = (
     "Continue the maintained Guest challenge to the replacement peer B now that peer A "
     "has completed successfully."
 )
-
-
-def _git_revision(path: Path, label: str) -> str:
-    if not path.is_dir() or not (path / ".git").exists():
-        raise ValueError(f"{label} source is not a Git repository: {path}")
-    revision = subprocess.run(
-        ["git", "-C", str(path), "rev-parse", "HEAD"],
-        check=True,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    ).stdout.strip()
-    dirty = subprocess.run(
-        ["git", "-C", str(path), "status", "--porcelain"],
-        check=True,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    ).stdout.strip()
-    if dirty:
-        raise ValueError(f"{label} source tree must be clean")
-    return revision
 
 
 def _project_version(path: Path, label: str) -> str:
@@ -448,9 +425,9 @@ def _run_intent_turn(
 def main() -> None:
     args = build_parser().parse_args()
     token = f"{time.time_ns():x}"
-    security_revision = _git_revision(Path.cwd(), "Security")
-    harness_revision = _git_revision(args.harness_source, "Harness")
-    protocol_revision = _git_revision(args.protocol_repository, "Computing protocol")
+    security_revision = git_revision(Path.cwd(), "Security")
+    harness_revision = git_revision(args.harness_source, "Harness")
+    protocol_revision = git_revision(args.protocol_repository, "Computing protocol")
     harness_version = _project_version(args.harness_source, "Harness")
     _insert_harness_sources(
         harness_source=args.harness_source,
@@ -714,7 +691,7 @@ def main() -> None:
         if failure is None
         else {"errorType": type(failure).__name__, "errorMessage": str(failure)},
     }
-    _write_receipt(args.receipt, receipt)
+    write_receipt(args.receipt, receipt)
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
     if not passed:
         raise SystemExit(1)

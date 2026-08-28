@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, JsonValue, validate_json
-from ordivon_security.cli_windows_kvm_c1a_acceptance import _git_revision
+from ordivon_security.acceptance_support import git_revision, write_receipt
 from ordivon_security.cli_windows_kvm_c1b_acceptance import (
     _host_namespace_truth,
     _ledger_semantic_binding,
@@ -25,7 +25,6 @@ from ordivon_security.cli_windows_kvm_partial_materialization_acceptance import 
     _link_names,
     _root_link_truth,
 )
-from ordivon_security.cli_windows_kvm_s3_acceptance import _write_receipt
 from ordivon_security.cli_windows_kvm_s6_acceptance import (
     _compile_canary,
     _guest_claim_passes,
@@ -587,7 +586,7 @@ def _owner(args: argparse.Namespace) -> None:
 
 
 def _supervisor(args: argparse.Namespace) -> None:
-    security_revision = _git_revision(Path.cwd(), "Security")
+    security_revision = git_revision(Path.cwd(), "Security")
     args.state_root.mkdir(parents=True, exist_ok=False)
     args.state_root.chmod(0o755)
     args.gate.parent.mkdir(parents=True, exist_ok=True)
@@ -826,7 +825,7 @@ def _supervisor(args: argparse.Namespace) -> None:
         },
     }
     validate_json(receipt)
-    _write_receipt(args.receipt, receipt)
+    write_receipt(args.receipt, receipt)
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
     if not passed:
         raise SystemExit(1)

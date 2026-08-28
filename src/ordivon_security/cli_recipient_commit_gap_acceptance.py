@@ -13,8 +13,7 @@ from pathlib import Path
 from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
-from ordivon_security.cli_windows_kvm_c1a_acceptance import _git_revision
-from ordivon_security.cli_windows_kvm_s3_acceptance import _write_receipt
+from ordivon_security.acceptance_support import git_revision, write_receipt
 
 _EFFECT_ID = "range-effect:c1j-recipient-commit-gap-pulse-v1"
 _REQUEST_ID = "range-effect-request:c1j-recipient-commit-gap-pulse-v1"
@@ -558,7 +557,7 @@ def _run_reserved_history(*, root: Path, mode: str) -> JsonObject:
 
 
 def _supervisor(args: argparse.Namespace) -> None:
-    revision = _git_revision(Path.cwd(), "Security")
+    revision = git_revision(Path.cwd(), "Security")
     if args.state_root is None or args.receipt is None:
         raise ValueError("C1-J supervisor requires state-root and receipt")
     args.state_root.mkdir(parents=True, exist_ok=False)
@@ -705,7 +704,7 @@ def _supervisor(args: argparse.Namespace) -> None:
                 "genericCausalDagRequired": False,
             },
         }
-        _write_receipt(args.receipt, receipt)
+        write_receipt(args.receipt, receipt)
         print(json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2))
         if not passed:
             raise SystemExit(1)
