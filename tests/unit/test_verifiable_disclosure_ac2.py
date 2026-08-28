@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 from ordivon_security._canonical import canonical_digest
-from ordivon_security.cli_autonomous_communication_ac0_acceptance import _A_ID, _B_ID
+from ordivon_security.autonomous_communication_research_fixture import _A_ID, _B_ID
 from ordivon_security.cli_verifiable_disclosure_ac2_acceptance import (
     _DISCLOSURE_CAPABILITY,
     _DISCLOSURE_EFFECT,

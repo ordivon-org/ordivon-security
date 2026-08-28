@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from ordivon_security._canonical import canonical_digest
-from ordivon_security.cli_autonomous_communication_ac0_acceptance import (
+from ordivon_security.autonomous_communication_research_fixture import (
     _A_ID,
     _B_ID,
     _MATCH_SIGNAL_B,
@@ -14,6 +14,8 @@ from ordivon_security.cli_autonomous_communication_ac0_acceptance import (
     _AC0RangeBackend,
     _b_context,
     _messages_for,
+)
+from ordivon_security.cli_autonomous_communication_ac0_acceptance import (
     _normalize_b_context,
     _projection_without_private_signal,
 )

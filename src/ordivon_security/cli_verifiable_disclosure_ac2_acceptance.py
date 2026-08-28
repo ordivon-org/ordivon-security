@@ -10,7 +10,7 @@ from typing import cast
 
 from ordivon_security._canonical import JsonObject, canonical_bytes, canonical_digest, validate_json
 from ordivon_security.actors.autonomous import RangeIntentContext
-from ordivon_security.cli_autonomous_communication_ac0_acceptance import (
+from ordivon_security.autonomous_communication_research_fixture import (
     _A_ID,
     _B_ID,
     _MATCH_SIGNAL_B,
@@ -25,7 +25,7 @@ from ordivon_security.cli_autonomous_communication_ac0_acceptance import (
     _messages_for,
     _shared_rules,
 )
-from ordivon_security.cli_incentive_communication_ac1_acceptance import (
+from ordivon_security.incentive_communication_research_fixture import (
     _B_OBJECTIVE,
     _FROZEN_A_CONTEXT_DIGEST,
     _FROZEN_A_DECISION_DIGEST,

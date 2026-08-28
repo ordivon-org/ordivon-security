@@ -3,12 +3,14 @@ from __future__ import annotations
 import unittest
 
 from ordivon_security._canonical import canonical_digest
-from ordivon_security.cli_autonomous_communication_ac0_acceptance import _A_ID, _B_ID
+from ordivon_security.autonomous_communication_research_fixture import _A_ID, _B_ID
 from ordivon_security.cli_incentive_communication_ac1_acceptance import (
-    _FROZEN_A_REQUEST_DIGEST,
     _b_context,
-    _frozen_a_request,
     _normalize_b_context,
+)
+from ordivon_security.incentive_communication_research_fixture import (
+    _FROZEN_A_REQUEST_DIGEST,
+    _frozen_a_request,
     _public_incentive_structure,
 )
 

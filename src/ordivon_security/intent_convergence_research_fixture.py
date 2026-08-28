@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from ordivon_security._canonical import JsonObject
 from ordivon_security.actors.autonomous import RangeIntentContext
-from ordivon_security.cli_autonomous_communication_ac0_acceptance import _A_ID, _B_ID
+from ordivon_security.autonomous_communication_research_fixture import _A_ID, _B_ID
 from ordivon_security.cli_verifiable_disclosure_ac2_acceptance import _b_context
 
 AC2_MISMATCH_CONTEXT_DIGEST = (
