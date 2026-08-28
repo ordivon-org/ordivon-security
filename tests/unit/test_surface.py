@@ -79,6 +79,11 @@ class SecuritySurfaceTests(unittest.TestCase):
         self.assertTrue(HostAssignedDeepSeekHarnessTurnDriver.__name__)
         self.assertTrue(RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver.__name__)
 
+    def test_archived_c1d_historical_runner_does_not_return_to_current_package(self) -> None:
+        package = Path(ordivon_security.__file__).resolve().parent
+        retired = package / "cli_windows_kvm_fresh_controller_continuation_acceptance.py"
+        self.assertFalse(retired.exists())
+
     def test_retired_c1c_one_shot_acceptance_runner_does_not_return(self) -> None:
         package = Path(ordivon_security.__file__).resolve().parent
         retired = package / "cli_windows_kvm_partial_materialization_acceptance.py"

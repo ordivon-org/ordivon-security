@@ -257,3 +257,9 @@ C1-E has now run this race physically. Without arbitration, a preflight-valid su
 The accepted correction does not rewrite the dead predecessor as the successor. It separates historical provenance from current recovery authority: the successor CAS-binds a durable claim to the exact ledger digest, while one per-Run kernel gate makes successor continuation and reconciliation mutually exclusive. Successor SIGKILL releases the physical gate automatically, so a later reconciler can recover while retaining the stale claim as evidence.
 
 The next pressure is therefore multiple successor candidates over the same exact generation, not a generic distributed lease protocol.
+
+## Post-closeout executable standing — 2026-08-28
+
+C1-D's fresh-controller continuation result remains canonical: the same admitted effect and Guest can cross owner loss, a replacement process may classify the accepted partial world from durable identity plus current Host observation, and only the missing materialization suffix is executed without restoring the old `RangeSession` or event stream. Later C1-E/F/G/H work retained the recovery laws that survived this experiment in current Range recovery ownership/reconciliation code and archived its successor-family experiment runners.
+
+The unique C1-D physical runner is now likewise retained under `fixtures/archive/runners/cli_windows_kvm_fresh_controller_continuation_acceptance.py` rather than the current `ordivon_security` package. No `pyproject.toml`, `src`, `research`, `scripts`, or documentation entry invoked the module; its only remaining current import was a unit test of two runner-local Host parsing helpers. The accepted physical evidence remains source-fenced at `691145f8466bc2a0633882ebd6540d0e480f0f82`. Restoring this runner is an explicit reproduction/new-experiment action, not a current capability requirement.

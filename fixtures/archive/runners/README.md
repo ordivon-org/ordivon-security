@@ -18,6 +18,10 @@ evidence is history; runners are not compatibility requirements).
 C1 successor/recovery family (these four imported one another in a closed
 cluster — archiving one exposed the next):
 
+- `cli_windows_kvm_fresh_controller_continuation_acceptance.py` — C1D
+  (receipt: `evidence/acceptance/c1d-fresh-controller-continuation-691145f.json`;
+  unique fresh-controller continuation apparatus retained historically, no current
+  package/command consumer)
 - `cli_windows_kvm_unpublished_completion_acceptance.py` — C1H
   (receipt: `evidence/acceptance/c1h-unpublished-completion-6fce713.json`)
 - `cli_windows_kvm_mid_successor_recovery_acceptance.py` — C1G
