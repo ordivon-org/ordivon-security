@@ -1,12 +1,18 @@
 # Archived acceptance runners
 
 Experimental acceptance runners moved here by the cleanup sweep
-(`scripts/cleanup_sweep.py`) when they lost every live consumer:
+(`scripts/cleanup_sweep.py`) after retirement-time deletion pressure showed that no
+current executable responsibility required the complete runner. Typical retirement evidence is:
 
-- no `pyproject.toml` entry point
-- no import from `src/`, `tests/`, `research/`, or `scripts/`
-- no mention in `docs/` (the experiment may have docs, but the runner
-  itself was never referenced)
+- no `pyproject.toml` entry point;
+- no production/current source consumer of the complete runner;
+- no current runbook invocation requiring the runner in the live package;
+- any reusable fixture/support responsibility required by current consumers has already been
+  extracted to an owner-local non-CLI module.
+
+Canonical documents may later name the archived path explicitly to make executable standing and
+reproduction history recoverable. Such archival documentation is history/currentness metadata,
+not a new current consumer.
 
 The experiments they drove remain canonical history: their accepted
 receipts live in `evidence/acceptance/` and their conclusions live in

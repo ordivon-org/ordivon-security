@@ -8,7 +8,7 @@ lifecycle: active
 source_role: canonical
 visibility: public
 owners: [ordivon-security]
-updated: 2026-08-08
+updated: 2026-08-28
 summary: Structural classification separating reusable Security constitution, scoped profiles, cross-repository integrations, and research apparatus without breaking accepted historical imports or inventing new universal frameworks.
 evidence_status: verified
 readiness: ACCEPTED
@@ -58,3 +58,27 @@ AF1's original machine-readable surface used wildcard locators such as `ordivon_
 The current surface therefore no longer uses wildcard module locators. Historical acceptance standing is projected separately through `docs/authority.md`, `evidence/acceptance`, and `fixtures/archive/runners`, explicitly without claiming current package membership. The P1 research entry now denotes the exact currently installed command family from `pyproject.toml`; unregistered probes are not implied merely because their filenames share a prefix.
 
 This preserves AF1's four-tier distinction while adding a currentness rule: **category membership and historical provenance do not establish current executable existence.**
+
+## Post-Existence-Gauntlet executable topology — 2026-08-28
+
+At Security source revision `774e33594345bfd1dd0686456498d9ea7a3f0154`, the current top-level CLI namespace has 38 modules and an exact liveness partition:
+
+- 21 installed commands declared by `pyproject.toml`;
+- 15 explicitly represented `research-apparatus` modules in `security_surface_manifest()`;
+- 2 documented manual `python -m` commands (`cli_windows_host_p1_baseline` and `cli_windows_kvm_acceptance`).
+
+There is no fourth/unclassified CLI class and the current CLI→CLI import graph has zero edges. Two P1 self-test programs remain current test apparatus but no longer carry the `cli_` identity because neither installation metadata, current surface representation, nor documentation treats them as a command interface.
+
+Shared executable responsibility that survived deletion pressure now lives outside command runners. Current examples include `windows_kvm_partial_world_fixture.py`, `adversarial_capability_environment_fixture.py`, `autonomous_communication_research_fixture.py`, `incentive_communication_research_fixture.py`, `intent_convergence_research_fixture.py`, `deliberation_before_authority_research_support.py`, and `p1_physical_adaptation_research_fixture.py`. These modules exist because more than one current consumer requires the same exact fixture/support semantics; they are not a generic experiment framework.
+
+The resulting structural rule is stronger than the original AF1 classification:
+
+1. a current command must have an explicit current role witness — installed, research-surface, or documented manual;
+2. a unit test can preserve a current invariant without making the tested module a public/current CLI affordance;
+3. experiment chronology does not require every historical runner to remain importable from the current package;
+4. when a historical runner contains a responsibility still required by multiple current consumers, extract only that responsibility and archive the orchestration;
+5. current representation must not resurrect withdrawn apparatus through wildcard/category projection.
+
+`fixtures/archive/runners/` therefore contains historical reproduction apparatus whose evidence and canonical conclusions remain valid. Restoring one of those runners is an explicit new reproduction/experiment decision, not a compatibility obligation.
+
+This engineering contraction did not change the selected research-result standing projected by `research/security/authority/CURRENT.json`; its immutable source manifest remains a historical semantic-base binding and is not rewritten merely because current executable placement changes. Current implemented behavior continues to be owned by current source/tests, while `docs/authority.md` remains the owner-native recovery map for research authority.

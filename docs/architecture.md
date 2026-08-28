@@ -270,6 +270,8 @@ Current reusable architecture is intentionally smaller than the research corpus:
 
 The AF/AE/EC/AC/IF and C1-A→N documents remain canonical research evidence for the exact claims they test. Their chronology is not the architecture's default reading order.
 
+Current command/executable topology is role-partitioned rather than filename-pattern-driven. Installed commands are declared by `pyproject.toml`; current research-only command modules are named exactly by `security_surface_manifest()`; deliberately manual module commands are named by their canonical runbooks. Shared experiment mechanics live in owner-local support/fixture modules rather than one acceptance CLI importing another. Historical runners may remain under `fixtures/archive/runners/` without weakening the current contracts their experiments forced.
+
 ## Primary contracts
 
 | Contract / owner | Role |
