@@ -351,3 +351,8 @@ This is a concrete example of representation changing computational possibility 
 Do not immediately generalize a cross-owner compiler. The next Security consumer should test one real owner-native effect/provider where current implementation/consequence identity already exists independently of this synthetic apparatus. Only repeated pressure across another owner or provider should decide whether any shared protocol deserves promotion.
 
 Separately, memory/retrieval/Tool-server identity substitution remains an open adversarial-capability-environment line. It should reuse the same distinctions—source identity, current applicability, deterministic projection, surface admission, authority admission—rather than collapse back into “prompt injection.”
+## Post-closeout executable standing — 2026-08-28
+
+ACE8, ACE9 and ACE10 remain accepted/falsified research standing through this document, the retained acceptance receipts, the owner authority publication and exact Git history. A later Existence Gauntlet pass found their one-shot Python runners to have zero current code consumers, no installed console entrypoints and no current owner-recovery obligation. The three runner modules were therefore retired from HEAD after ACE11/current capability-surface work had absorbed the surviving executable relation.
+
+This retirement does **not** retract the ACE8–ACE10 results and does not make ACE11 a substitute for their historical experiment identity. Exact apparatus remains recoverable from Security revision `75565c5c4525874c48e2c85c20cd6fec8aa6bfc1`. Reintroducing a runner requires a new current reproduction/falsification consumer rather than historical executability alone.

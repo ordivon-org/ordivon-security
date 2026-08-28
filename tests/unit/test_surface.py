@@ -4,6 +4,7 @@ import contextlib
 import io
 import json
 import unittest
+from pathlib import Path
 
 import ordivon_security
 from ordivon_security.cli_surface import main as surface_cli_main
@@ -77,6 +78,15 @@ class SecuritySurfaceTests(unittest.TestCase):
     def test_canonical_integration_imports_are_available(self) -> None:
         self.assertTrue(HostAssignedDeepSeekHarnessTurnDriver.__name__)
         self.assertTrue(RuntimeBackedHostAssignedDeepSeekHarnessTurnDriver.__name__)
+
+    def test_retired_ace8_ace9_ace10_one_shot_runners_do_not_return(self) -> None:
+        package = Path(ordivon_security.__file__).resolve().parent
+        for module_name in (
+            "cli_adversarial_capability_environment_ace8.py",
+            "cli_adversarial_capability_environment_ace9.py",
+            "cli_adversarial_capability_environment_ace10.py",
+        ):
+            self.assertFalse((package / module_name).exists(), module_name)
 
     def test_canonical_world_boundary_imports_are_available(self) -> None:
         self.assertTrue(WorldMessageInbox.__name__)
