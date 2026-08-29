@@ -46,6 +46,7 @@ if actual != expected:
 print("owner environment doctor: valid profile=test")
 PY
   )
+  (cd "$repo" && "$python_bin" scripts/check_default_physical_profile.py)
 }
 doctor_cage() {
   doctor
