@@ -46,7 +46,7 @@ if actual != expected:
 print("owner environment doctor: valid profile=test")
 PY
   )
-  (cd "$repo" && "$python_bin" scripts/check_default_physical_profile.py)
+  (cd "$repo" && "$python_bin" scripts/check_default_physical_profile.py --profile source)
 }
 doctor_cage() {
   doctor
@@ -76,6 +76,7 @@ run_tests() {
   bootstrap
   doctor
   cd "$repo"
+  "$python_bin" scripts/check_default_physical_profile.py --profile contest-core
   "$python_bin" -m unittest discover -s tests/unit -v
 }
 run_cage_tests() {

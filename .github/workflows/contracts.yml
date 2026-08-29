@@ -14,15 +14,16 @@ jobs:
     container: python:3.12-slim
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - run: >-
+      - name: Materialize contest-core physical profile
+        run: >-
           apt-get update &&
           apt-get install -y --no-install-recommends
           git gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64 &&
           rm -rf /var/lib/apt/lists/*
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: python -m pip install --no-cache-dir uv==0.11.7
       - run: uv sync --locked
-      - run: uv run python scripts/check_default_physical_profile.py
+      - run: uv run python scripts/check_default_physical_profile.py --profile contest-core
       - run: uv run ruff check --select E9,F src tests
       - run: uv run python scripts/cleanup_sweep.py --json --fail-on-risky
       - run: uv run python -m compileall -q src tests
@@ -34,8 +35,9 @@ jobs:
     container: python:3.12-slim
     timeout-minutes: 10
     steps:
+      - name: Materialize source-checkout physical profile
+        run: apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - run: apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
       - run: python -m pip install --no-cache-dir uv==0.11.7
       - run: scripts/bootstrap_cage4.sh
       - run: ORDIVON_CAGE4_SOURCE=.cache/cage4 uv run --extra cage python -m unittest discover -s tests/integration -v

@@ -237,4 +237,4 @@ The goal is not to keep Agents weak. It is to make stronger adversarial Agents e
 
 ## Owner environment
 
-Use `scripts/owner-environment test`; use `cold-start` for fresh-environment proof and the explicit `*-cage` modes for the optional CAGE dependency profile. The default source-checkout test profile also requires Git on `PATH` plus `/usr/bin/x86_64-w64-mingw32-gcc` and `/usr/bin/x86_64-w64-mingw32-objdump`; these are physical test-profile capabilities, not Python package dependencies.
+Use `scripts/owner-environment test`; use `cold-start` for fresh-environment proof and the explicit `*-cage` modes for the optional CAGE dependency profile. A source checkout requires Git on `PATH` and a usable repository identity; the full contest-core unit profile additionally requires `/usr/bin/x86_64-w64-mingw32-gcc` and `/usr/bin/x86_64-w64-mingw32-objdump`. These are physical profile capabilities, not Python package dependencies; the CAGE profile does not inherit the unrelated MinGW requirement.
